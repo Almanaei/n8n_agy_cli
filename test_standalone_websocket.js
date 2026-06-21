@@ -22,7 +22,10 @@ ws.on('message', (data) => {
   }
   
   // Script flow logic
-  if (payload.text.includes("مرحبا بك")) {
+  const normalizedText = payload.text;
+  
+  if (normalizedText.includes("مرحبا بك في مركز") && !ws.sentNamePhone) {
+    ws.sentNamePhone = true;
     // Stage 1: Send client name and phone number
     setTimeout(() => {
       console.log("\nSending User Message: 'اسمي سالم، رقمي 35555563.'");
@@ -31,7 +34,8 @@ ws.on('message', (data) => {
         text: "اسمي سالم، رقمي 35555563."
       }));
     }, 2000);
-  } else if (payload.text.includes("تسجيل بياناتك") || payload.text.includes("كيف يمكنني مساعدتك")) {
+  } else if ((normalizedText.includes("تسجيل") || normalizedText.includes("سجل") || normalizedText.includes("مساعدتك") || normalizedText.includes("خدمة") || normalizedText.includes("سالم")) && !ws.sentEmail && ws.sentNamePhone) {
+    ws.sentEmail = true;
     // Stage 2: Send email address
     setTimeout(() => {
       console.log("\nSending User Message: 'almannaei90 [at] gmail.com'");
@@ -40,7 +44,8 @@ ws.on('message', (data) => {
         text: "almannaei90 [at] gmail.com"
       }));
     }, 2000);
-  } else if (payload.text.includes("حفظ بريدك")) {
+  } else if ((normalizedText.includes("حفظ") || normalizedText.includes("بريدك") || normalizedText.includes("الإلكتروني")) && !ws.closedWS && ws.sentEmail) {
+    ws.closedWS = true;
     // Stage 3: Hang up call (WebSocket close)
     setTimeout(() => {
       console.log("\nClosing connection to simulate hangup...");

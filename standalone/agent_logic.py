@@ -10,7 +10,7 @@ from openai import OpenAI
 load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 # Fallback values
-N8N_BASE_URL = "http://localhost:5678"
+N8N_BASE_URL = "http://127.0.0.1:5678"
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
@@ -122,13 +122,13 @@ class StandaloneAgent:
             except Exception as e:
                 print(f"Error initializing OpenAI client: {e}")
                 
-        # Set primary client and model name
-        if self.groq_client:
-            self.llm_client = self.groq_client
-            self.model_name = "llama-3.3-70b-versatile"
-        elif self.openai_client:
+        # Prefer OpenAI gpt-4o-mini for robust streaming tool use and Arabic capabilities
+        if self.openai_client:
             self.llm_client = self.openai_client
             self.model_name = "gpt-4o-mini"
+        elif self.groq_client:
+            self.llm_client = self.groq_client
+            self.model_name = "llama-3.3-70b-versatile"
         else:
             self.llm_client = None
             self.model_name = ""
@@ -181,7 +181,7 @@ class StandaloneAgent:
             return {"error": str(e)}
 
     def _call_llm_with_fallback(self, messages, tools=None, tool_choice=None, stream=False):
-        """Helper to call LLM, falling back from Groq to OpenAI if Groq is rate-limited or fails."""
+        """Helper to call LLM, falling back between OpenAI and Groq if one fails or is rate-limited."""
         primary_client = self.llm_client
         primary_model = self.model_name
         
@@ -204,9 +204,16 @@ class StandaloneAgent:
             print(f"Attempting query with model={primary_model}...")
             return primary_client.chat.completions.create(**get_kwargs(primary_model))
         except Exception as primary_err:
-            is_groq = primary_model.startswith("llama") or "groq" in str(getattr(primary_client, "base_url", "")).lower()
-            if is_groq and self.openai_client:
-                print(f"Primary LLM ({primary_model}) failed: {primary_err}. Falling back to OpenAI gpt-4o-mini...")
+            print(f"Primary LLM ({primary_model}) failed: {primary_err}")
+            # If primary was OpenAI and Groq is available, fallback to Groq
+            if primary_client == self.openai_client and self.groq_client:
+                print("Falling back to Groq llama-3.3-70b-versatile...")
+                self.llm_client = self.groq_client
+                self.model_name = "llama-3.3-70b-versatile"
+                return self.groq_client.chat.completions.create(**get_kwargs("llama-3.3-70b-versatile"))
+            # If primary was Groq and OpenAI is available, fallback to OpenAI
+            elif primary_client == self.groq_client and self.openai_client:
+                print("Falling back to OpenAI gpt-4o-mini...")
                 self.llm_client = self.openai_client
                 self.model_name = "gpt-4o-mini"
                 return self.openai_client.chat.completions.create(**get_kwargs("gpt-4o-mini"))
@@ -253,7 +260,8 @@ class StandaloneAgent:
                         "clientName": {"type": "string", "description": "The client's full name."},
                         "phoneNumber": {"type": "string", "description": "The client's phone number."},
                         "clientEmail": {"type": "string", "description": "The client's email address."}
-                    }
+                    },
+                    "required": []
                 }
             }
         }]
@@ -351,7 +359,8 @@ class StandaloneAgent:
                         "clientName": {"type": "string", "description": "The client's full name."},
                         "phoneNumber": {"type": "string", "description": "The client's phone number."},
                         "clientEmail": {"type": "string", "description": "The client's email address."}
-                    }
+                    },
+                    "required": []
                 }
             }
         }]
