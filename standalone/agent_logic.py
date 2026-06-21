@@ -522,6 +522,17 @@ class StandaloneAgent:
                     if name_words:
                         self.client_name = name_words[0]
 
+        # Extract email if present
+        if "@" in merged_msg or "[at]" in merged_msg:
+            normalized_email = merged_msg.replace(" [at] ", "@").replace("[at]", "@").strip()
+            email_match = re.search(r'\b[A-Za-z0-9\._%+-]+@[A-Za-z0-9\.-]+\.[A-Za-z]{2,}\b', normalized_email)
+            if email_match:
+                extracted_email = email_match.group(0)
+                if self.client_email != extracted_email:
+                    self.client_email = extracted_email
+                    self.trigger_n8n_lead_webhook()
+                    self.webhook_triggered = True
+
         # Trigger webhook immediately if both present but not yet triggered
         if self.client_name and self.phone_number and not self.webhook_triggered:
             self.trigger_n8n_lead_webhook()
@@ -531,7 +542,7 @@ class StandaloneAgent:
         """Fallback mock agent response when no API keys are present."""
         import re
         
-        has_greeted = any("تم تسجيل بياناتك بنجاح" in turn["message"] for turn in self.transcript if turn["role"] == "agent")
+        has_greeted = any(k in turn["message"] for turn in self.transcript if turn["role"] == "agent" for k in ["تسجيل", "مساعدتك", "خدمة", "أهلاً بك", "سجل"]) or len(self.transcript) > 2
         if self.client_name and self.phone_number and not has_greeted:
             ans = f"أهلاً بك يا {self.client_name}. تم تسجيل بياناتك بنجاح. كيف يمكنني مساعدتك اليوم؟"
             self.add_to_transcript("agent", ans)
