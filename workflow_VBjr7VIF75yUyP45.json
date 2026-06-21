@@ -1,0 +1,744 @@
+{
+  "updatedAt": "2026-06-20T00:27:50.554Z",
+  "createdAt": "2026-06-15T23:19:47.771Z",
+  "id": "VBjr7VIF75yUyP45",
+  "name": "ElevenLabs Lead Integration (Testable)",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "leads",
+        "options": {},
+        "responseMode": "responseNode"
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "name": "ElevenLabs Webhook",
+      "id": "1c01de71-a8cb-4fee-bb16-3ab6009a57c6",
+      "webhookId": "2c802d63-6ff8-43bd-928b-7be9b25e7de1"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $now }}",
+            "Client Name": "={{ $json.body.clientName || '' }}",
+            "Phone Number": "={{ $json.body.phoneNumber || '' }}",
+            "Client Email": "={{ ($json.body.clientEmail || '').replace(' [at] ', '@').replace('[at]', '@') }}",
+            "Conversation ID": "={{ $json.body.conversationId || '' }}",
+            "Lead Status": "New Lead"
+          },
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "type": "string"
+            },
+            {
+              "id": "Client Name",
+              "displayName": "Client Name",
+              "type": "string"
+            },
+            {
+              "id": "Phone Number",
+              "displayName": "Phone Number",
+              "type": "string"
+            },
+            {
+              "id": "Client Email",
+              "displayName": "Client Email",
+              "type": "string"
+            },
+            {
+              "id": "Conversation ID",
+              "displayName": "Conversation ID",
+              "type": "string"
+            },
+            {
+              "id": "Lead Status",
+              "displayName": "Lead Status",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        256,
+        0
+      ],
+      "id": "3393c1fa-09e4-48f1-9e3b-41574df6897e",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleApi": {
+          "id": "fXHzExTwkxRRpEVc",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "post-call",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        256
+      ],
+      "id": "webhook-post-call-id",
+      "name": "ElevenLabs Post-Call Webhook",
+      "webhookId": "df473dbe-7039-4a75-85b1-af0782408724"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Conversation ID",
+              "lookupValue": "={{ $json.body.data?.conversation_id || $json.body.conversation_id || '' }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        256,
+        256
+      ],
+      "id": "google-sheets-lookup-id",
+      "name": "Lookup Lead Email",
+      "credentials": {
+        "googleApi": {
+          "id": "fXHzExTwkxRRpEVc",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().filter(item => {\n  const email = item.json['Client Email'];\n  const hasEmail = email && typeof email === 'string' && email.includes('@');\n  const requested = item.json.sendEmailRequested === true;\n  return hasEmail && requested;\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        512,
+        256
+      ],
+      "id": "if-email-exists-id",
+      "name": "Email Exists?"
+    },
+    {
+      "parameters": {
+        "fromEmail": "mnaaaei@gmail.com",
+        "toEmail": "={{ $json['Client Email'] }}",
+        "subject": "نسخة من محادثتك مع المساعد الذكي",
+        "emailFormat": "html",
+        "html": "=<h3>مرحباً {{ $json['Client Name'] }}،</h3><p>شكراً لتواصلك معنا. إليك نسخة من المحادثة التي أجريتها مع مساعدنا الذكي:</p><hr/><div style='background:#f3f4f6; padding:20px; border-radius:10px;'>{{ ($('ElevenLabs Post-Call Webhook').item.json.body.data?.transcript || $('ElevenLabs Post-Call Webhook').item.json.body.transcript || []).filter(t => t.message || t.original_message).map(t => '<b>' + (t.role === 'user' ? 'العميل' : 'المساعد') + ':</b> ' + (t.original_message || t.message || '')).join('<br/><br/>') }}</div>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [
+        752,
+        256
+      ],
+      "id": "email-send-id",
+      "name": "Send Transcript Email",
+      "webhookId": "1d1dc155-9c1c-471e-89a5-0a653c506e96",
+      "credentials": {
+        "smtp": {
+          "id": "GKD2HE4TOKeoXDkO",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n// Find the match that has a valid email, or fall back to the last matching row\nlet lead = items.find(item => item.json['Client Email'] && item.json['Client Email'].includes('@'))?.json;\nif (!lead && items.length > 0) {\n  lead = items[items.length - 1].json;\n}\n\nconst webhookBody = $('ElevenLabs Post-Call Webhook').first().json.body || {};\nconst transcript = webhookBody.data?.transcript || webhookBody.transcript || [];\n\n// Helper function to extract email from text\nfunction extractEmail(text) {\n  if (!text) return null;\n  let normalized = text.replace(/\\[at\\]/gi, '@').replace(/\\s+at\\s+/gi, '@');\n  normalized = normalized.replace(/\\[dot\\]/gi, '.').replace(/\\s+dot\\s+/gi, '.');\n  const emailRegex = /[a-zA-Z0-9._%+-]+\\s*@\\s*[a-zA-Z0-9.-]+\\s*\\.\\s*[a-zA-Z]{2,}/g;\n  const matches = normalized.match(emailRegex);\n  return matches && matches.length > 0 ? matches[0].replace(/\\s+/g, '') : null;\n}\n\n// Clean the email address from lead/sheet if it exists\nlet clientEmail = lead ? (lead['Client Email'] || '') : '';\nif (clientEmail) {\n  clientEmail = clientEmail.replace(/\\[at\\]/gi, '@').replace(/\\s+/g, '');\n}\n\n// Combine all transcript messages to check for spoken email and request keywords\nlet allTranscriptText = '';\nconst formatted = transcript\n  .filter(t => t.message || t.original_message)\n  .map(t => {\n    const role = t.role === 'user' ? 'العميل' : 'المساعد';\n    const msg = t.original_message || t.message || '';\n    allTranscriptText += ' ' + msg;\n    return `*${role}*: ${msg}`;\n  }).join('\\n\\n');\n\n// If email not found in sheet, try to extract from transcript\nif (!clientEmail || !clientEmail.includes('@')) {\n  const extracted = extractEmail(allTranscriptText);\n  if (extracted) {\n    clientEmail = extracted;\n  }\n}\n\n// Check if user requested to send the chat on email\nconst userMessages = transcript\n  .filter(t => t.role === 'user')\n  .map(t => (t.original_message || t.message || '').toLowerCase());\n\nconst emailKeywords = ['إيميل', 'ايميل', 'البريد', 'بريد', 'email', 'mail'];\nconst keywordRequested = userMessages.some(msg => \n  emailKeywords.some(keyword => msg.includes(keyword))\n);\nconst sendEmailRequested = keywordRequested || (clientEmail && clientEmail.includes('@'));\n\n// Clean and format phone number for WhatsApp E.164 compatibility\nlet phone = String(lead ? lead['Phone Number'] || \"\" : \"\");\nphone = phone.replace(/\\s+/g, '').replace('+', '');\n\nif (phone.length === 8 && (phone.startsWith('3') || phone.startsWith('6') || phone.startsWith('1'))) {\n  // If it's a local Bahraini mobile/landline, add the country code 973\n  phone = '973' + phone;\n}\n\nconst whatsappNumber = phone ? `whatsapp:+${phone}` : '';\n\nreturn [{\n  json: {\n    ...(lead || {}),\n    'Client Email': clientEmail,\n    whatsappNumber,\n    formattedTranscript: formatted,\n    sendEmailRequested\n  }\n}];"
+      },
+      "id": "format-whatsapp-payload-id",
+      "name": "Format WhatsApp Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        512,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.twilio.com/2010-04-01/Accounts/AC0b4a145722566b71c0111e4dba2d75b0/Messages.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "specifyBody": "keypair",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "From",
+              "value": "whatsapp:+14155238886"
+            },
+            {
+              "name": "To",
+              "value": "={{ $json.whatsappNumber }}"
+            },
+            {
+              "name": "Body",
+              "value": "=مرحباً {{ $json[\"Client Name\"] }}،\n\nشكراً لتواصلك مع الإدارة العامة للدفاع المدني بمملكة البحرين. إليك نسخة من المحادثة التي أجريتها مع مساعدنا الذكي:\n\n{{ $json.formattedTranscript }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "send-whatsapp-summary-id",
+      "name": "Send WhatsApp Summary (Twilio)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        768,
+        400
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "ZTIi0yFrOg8SYhU0",
+          "name": "Unnamed credential"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"success\",\n  \"message\": \"Lead details saved.\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        120,
+        -100
+      ],
+      "id": "respond-to-webhook-id",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "ElevenLabs Post-Call Webhook": {
+      "main": [
+        [
+          {
+            "node": "Lookup Lead Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lookup Lead Email": {
+      "main": [
+        [
+          {
+            "node": "Format WhatsApp Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Exists?": {
+      "main": [
+        [
+          {
+            "node": "Send Transcript Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format WhatsApp Payload": {
+      "main": [
+        [
+          {
+            "node": "Email Exists?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send WhatsApp Summary (Twilio)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ElevenLabs Webhook": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "8f21e057-7b40-4d65-8f40-20074a468148",
+  "activeVersionId": "8f21e057-7b40-4d65-8f40-20074a468148",
+  "versionCounter": 88,
+  "triggerCount": 2,
+  "shared": [
+    {
+      "updatedAt": "2026-06-15T23:19:47.776Z",
+      "createdAt": "2026-06-15T23:19:47.776Z",
+      "role": "workflow:owner",
+      "workflowId": "VBjr7VIF75yUyP45",
+      "projectId": "0YDR0chcwuZcXqmk",
+      "project": {
+        "updatedAt": "2026-06-15T23:11:29.897Z",
+        "createdAt": "2026-06-13T11:21:41.879Z",
+        "id": "0YDR0chcwuZcXqmk",
+        "name": "Salem Ahmed <almannaei90@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "607a0526-257f-48a0-bce6-3462762ff6b2"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-06-20T00:27:50.559Z",
+    "createdAt": "2026-06-20T00:27:50.559Z",
+    "versionId": "8f21e057-7b40-4d65-8f40-20074a468148",
+    "workflowId": "VBjr7VIF75yUyP45",
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "leads",
+          "options": {},
+          "responseMode": "responseNode"
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 1.1,
+        "position": [
+          0,
+          0
+        ],
+        "name": "ElevenLabs Webhook",
+        "id": "1c01de71-a8cb-4fee-bb16-3ab6009a57c6",
+        "webhookId": "2c802d63-6ff8-43bd-928b-7be9b25e7de1"
+      },
+      {
+        "parameters": {
+          "authentication": "serviceAccount",
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "https://docs.google.com/spreadsheets/d/1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8/edit?gid=0#gid=0",
+            "mode": "url"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Sheet1",
+            "mode": "name"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "Timestamp": "={{ $now }}",
+              "Client Name": "={{ $json.body.clientName || '' }}",
+              "Phone Number": "={{ $json.body.phoneNumber || '' }}",
+              "Client Email": "={{ ($json.body.clientEmail || '').replace(' [at] ', '@').replace('[at]', '@') }}",
+              "Conversation ID": "={{ $json.body.conversationId || '' }}",
+              "Lead Status": "New Lead"
+            },
+            "schema": [
+              {
+                "id": "Timestamp",
+                "displayName": "Timestamp",
+                "type": "string"
+              },
+              {
+                "id": "Client Name",
+                "displayName": "Client Name",
+                "type": "string"
+              },
+              {
+                "id": "Phone Number",
+                "displayName": "Phone Number",
+                "type": "string"
+              },
+              {
+                "id": "Client Email",
+                "displayName": "Client Email",
+                "type": "string"
+              },
+              {
+                "id": "Conversation ID",
+                "displayName": "Conversation ID",
+                "type": "string"
+              },
+              {
+                "id": "Lead Status",
+                "displayName": "Lead Status",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          256,
+          0
+        ],
+        "id": "3393c1fa-09e4-48f1-9e3b-41574df6897e",
+        "name": "Google Sheets",
+        "credentials": {
+          "googleApi": {
+            "id": "fXHzExTwkxRRpEVc",
+            "name": "Google Sheets account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "post-call",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 1.1,
+        "position": [
+          0,
+          256
+        ],
+        "id": "webhook-post-call-id",
+        "name": "ElevenLabs Post-Call Webhook",
+        "webhookId": "df473dbe-7039-4a75-85b1-af0782408724"
+      },
+      {
+        "parameters": {
+          "authentication": "serviceAccount",
+          "documentId": {
+            "__rl": true,
+            "value": "https://docs.google.com/spreadsheets/d/1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8/edit?gid=0#gid=0",
+            "mode": "url"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Sheet1",
+            "mode": "name"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "Conversation ID",
+                "lookupValue": "={{ $json.body.data?.conversation_id || $json.body.conversation_id || '' }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          256,
+          256
+        ],
+        "id": "google-sheets-lookup-id",
+        "name": "Lookup Lead Email",
+        "credentials": {
+          "googleApi": {
+            "id": "fXHzExTwkxRRpEVc",
+            "name": "Google Sheets account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "return $input.all().filter(item => {\n  const email = item.json['Client Email'];\n  const hasEmail = email && typeof email === 'string' && email.includes('@');\n  const requested = item.json.sendEmailRequested === true;\n  return hasEmail && requested;\n});"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          512,
+          256
+        ],
+        "id": "if-email-exists-id",
+        "name": "Email Exists?"
+      },
+      {
+        "parameters": {
+          "fromEmail": "mnaaaei@gmail.com",
+          "toEmail": "={{ $json['Client Email'] }}",
+          "subject": "نسخة من محادثتك مع المساعد الذكي",
+          "emailFormat": "html",
+          "html": "=<h3>مرحباً {{ $json['Client Name'] }}،</h3><p>شكراً لتواصلك معنا. إليك نسخة من المحادثة التي أجريتها مع مساعدنا الذكي:</p><hr/><div style='background:#f3f4f6; padding:20px; border-radius:10px;'>{{ ($('ElevenLabs Post-Call Webhook').item.json.body.data?.transcript || $('ElevenLabs Post-Call Webhook').item.json.body.transcript || []).filter(t => t.message || t.original_message).map(t => '<b>' + (t.role === 'user' ? 'العميل' : 'المساعد') + ':</b> ' + (t.original_message || t.message || '')).join('<br/><br/>') }}</div>",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.emailSend",
+        "typeVersion": 2,
+        "position": [
+          752,
+          256
+        ],
+        "id": "email-send-id",
+        "name": "Send Transcript Email",
+        "webhookId": "1d1dc155-9c1c-471e-89a5-0a653c506e96",
+        "credentials": {
+          "smtp": {
+            "id": "GKD2HE4TOKeoXDkO",
+            "name": "SMTP account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const items = $input.all();\n// Find the match that has a valid email, or fall back to the last matching row\nlet lead = items.find(item => item.json['Client Email'] && item.json['Client Email'].includes('@'))?.json;\nif (!lead && items.length > 0) {\n  lead = items[items.length - 1].json;\n}\n\nconst webhookBody = $('ElevenLabs Post-Call Webhook').first().json.body || {};\nconst transcript = webhookBody.data?.transcript || webhookBody.transcript || [];\n\n// Helper function to extract email from text\nfunction extractEmail(text) {\n  if (!text) return null;\n  let normalized = text.replace(/\\[at\\]/gi, '@').replace(/\\s+at\\s+/gi, '@');\n  normalized = normalized.replace(/\\[dot\\]/gi, '.').replace(/\\s+dot\\s+/gi, '.');\n  const emailRegex = /[a-zA-Z0-9._%+-]+\\s*@\\s*[a-zA-Z0-9.-]+\\s*\\.\\s*[a-zA-Z]{2,}/g;\n  const matches = normalized.match(emailRegex);\n  return matches && matches.length > 0 ? matches[0].replace(/\\s+/g, '') : null;\n}\n\n// Clean the email address from lead/sheet if it exists\nlet clientEmail = lead ? (lead['Client Email'] || '') : '';\nif (clientEmail) {\n  clientEmail = clientEmail.replace(/\\[at\\]/gi, '@').replace(/\\s+/g, '');\n}\n\n// Combine all transcript messages to check for spoken email and request keywords\nlet allTranscriptText = '';\nconst formatted = transcript\n  .filter(t => t.message || t.original_message)\n  .map(t => {\n    const role = t.role === 'user' ? 'العميل' : 'المساعد';\n    const msg = t.original_message || t.message || '';\n    allTranscriptText += ' ' + msg;\n    return `*${role}*: ${msg}`;\n  }).join('\\n\\n');\n\n// If email not found in sheet, try to extract from transcript\nif (!clientEmail || !clientEmail.includes('@')) {\n  const extracted = extractEmail(allTranscriptText);\n  if (extracted) {\n    clientEmail = extracted;\n  }\n}\n\n// Check if user requested to send the chat on email\nconst userMessages = transcript\n  .filter(t => t.role === 'user')\n  .map(t => (t.original_message || t.message || '').toLowerCase());\n\nconst emailKeywords = ['إيميل', 'ايميل', 'البريد', 'بريد', 'email', 'mail'];\nconst keywordRequested = userMessages.some(msg => \n  emailKeywords.some(keyword => msg.includes(keyword))\n);\nconst sendEmailRequested = keywordRequested || (clientEmail && clientEmail.includes('@'));\n\n// Clean and format phone number for WhatsApp E.164 compatibility\nlet phone = String(lead ? lead['Phone Number'] || \"\" : \"\");\nphone = phone.replace(/\\s+/g, '').replace('+', '');\n\nif (phone.length === 8 && (phone.startsWith('3') || phone.startsWith('6') || phone.startsWith('1'))) {\n  // If it's a local Bahraini mobile/landline, add the country code 973\n  phone = '973' + phone;\n}\n\nconst whatsappNumber = phone ? `whatsapp:+${phone}` : '';\n\nreturn [{\n  json: {\n    ...(lead || {}),\n    'Client Email': clientEmail,\n    whatsappNumber,\n    formattedTranscript: formatted,\n    sendEmailRequested\n  }\n}];"
+        },
+        "id": "format-whatsapp-payload-id",
+        "name": "Format WhatsApp Payload",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          512,
+          400
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.twilio.com/2010-04-01/Accounts/AC0b4a145722566b71c0111e4dba2d75b0/Messages.json",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBasicAuth",
+          "sendBody": true,
+          "contentType": "form-urlencoded",
+          "specifyBody": "keypair",
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "From",
+                "value": "whatsapp:+14155238886"
+              },
+              {
+                "name": "To",
+                "value": "={{ $json.whatsappNumber }}"
+              },
+              {
+                "name": "Body",
+                "value": "=مرحباً {{ $json[\"Client Name\"] }}،\n\nشكراً لتواصلك مع الإدارة العامة للدفاع المدني بمملكة البحرين. إليك نسخة من المحادثة التي أجريتها مع مساعدنا الذكي:\n\n{{ $json.formattedTranscript }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "send-whatsapp-summary-id",
+        "name": "Send WhatsApp Summary (Twilio)",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          768,
+          400
+        ],
+        "credentials": {
+          "httpBasicAuth": {
+            "id": "ZTIi0yFrOg8SYhU0",
+            "name": "Unnamed credential"
+          }
+        },
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "respondWith": "json",
+          "responseBody": "{\n  \"status\": \"success\",\n  \"message\": \"Lead details saved.\"\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1,
+        "position": [
+          120,
+          -100
+        ],
+        "id": "respond-to-webhook-id",
+        "name": "Respond to Webhook"
+      }
+    ],
+    "connections": {
+      "ElevenLabs Post-Call Webhook": {
+        "main": [
+          [
+            {
+              "node": "Lookup Lead Email",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Lookup Lead Email": {
+        "main": [
+          [
+            {
+              "node": "Format WhatsApp Payload",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Email Exists?": {
+        "main": [
+          [
+            {
+              "node": "Send Transcript Email",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Format WhatsApp Payload": {
+        "main": [
+          [
+            {
+              "node": "Email Exists?",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Send WhatsApp Summary (Twilio)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "ElevenLabs Webhook": {
+        "main": [
+          [
+            {
+              "node": "Respond to Webhook",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Respond to Webhook": {
+        "main": [
+          [
+            {
+              "node": "Google Sheets",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Salem Ahmed",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-06-20T00:27:50.640Z",
+        "id": 85,
+        "workflowId": "VBjr7VIF75yUyP45",
+        "versionId": "8f21e057-7b40-4d65-8f40-20074a468148",
+        "event": "activated",
+        "userId": "607a0526-257f-48a0-bce6-3462762ff6b2"
+      },
+      {
+        "createdAt": "2026-06-20T00:27:50.759Z",
+        "id": 87,
+        "workflowId": "VBjr7VIF75yUyP45",
+        "versionId": "8f21e057-7b40-4d65-8f40-20074a468148",
+        "event": "activated",
+        "userId": "607a0526-257f-48a0-bce6-3462762ff6b2"
+      },
+      {
+        "createdAt": "2026-06-20T00:27:50.610Z",
+        "id": 84,
+        "workflowId": "VBjr7VIF75yUyP45",
+        "versionId": "8f21e057-7b40-4d65-8f40-20074a468148",
+        "event": "deactivated",
+        "userId": "607a0526-257f-48a0-bce6-3462762ff6b2"
+      },
+      {
+        "createdAt": "2026-06-20T00:27:50.703Z",
+        "id": 86,
+        "workflowId": "VBjr7VIF75yUyP45",
+        "versionId": "8f21e057-7b40-4d65-8f40-20074a468148",
+        "event": "deactivated",
+        "userId": "607a0526-257f-48a0-bce6-3462762ff6b2"
+      }
+    ]
+  }
+}

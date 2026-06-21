@@ -1,0 +1,21 @@
+# Dependency directories
+node_modules/
+__pycache__/
+*.pyc
+
+# Environment variables (contains private API keys)
+.env
+.env.local
+.env.*
+
+# Local data, logs, and cache
+*.log
+.agent/
+.agents/
+agent_info.json
+deref_exec.json
+execution_235.json
+raw_transcript.json
+
+# Executables
+cloudflared.exe
