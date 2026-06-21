@@ -1,7 +1,7 @@
 const localtunnel = require('localtunnel');
 const apiKey = "896c43093392d23879dc8d578e7840b4a0b27af2ecf38803e985386b494c427c";
 const agentId = "agent_1601kv6ytcwwfh1sfk46qqhrrq3j";
-const webhookId = "dfc6564248344f9fb3920afb5a05037c";
+const webhookId = "b78ba4ce83d64a8ca92dafb87447b48b";
 
 const systemPrompt = `You are a professional customer service assistant representing the General Directorate of Civil Defense in the Kingdom of Bahrain (الإدارة العامة للدفاع المدني في مملكة البحرين).
 
@@ -103,7 +103,7 @@ async function patchElevenLabs(baseUrl) {
   // 2. Patch Workspace Webhook
   const webhookPayload = {
     webhook_url: `${baseUrl}/webhook/post-call`,
-    name: "n8n_post_call_new2",
+    name: "n8n_post_call_active_tunnel",
     is_disabled: false
   };
 
