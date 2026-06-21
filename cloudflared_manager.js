@@ -27,105 +27,76 @@ CONVERSATIONAL RULES & GUARDRAILS:
    - If the user stops talking, do NOT repeatedly prompt them, ask if they are still there, or say anything like "هل أنت معي؟" or "هل أنت هنا؟". Simply wait patiently and silently for them to continue speaking or typing.`;
 
 async function patchElevenLabs(baseUrl) {
-  console.log(`[ElevenLabs] Patching agent and webhook with new Cloudflare URL: ${baseUrl}`);
+  console.log(`[ElevenLabs] Starting patch flow with new URL: ${baseUrl}`);
   
-  // 1. Patch Agent Config
-  const agentPayload = {
-    conversation_config: {
-      agent: {
-        prompt: {
-          prompt: systemPrompt,
-          tools: [
-            {
-              type: "webhook",
-              name: "save_lead_info",
-              description: "Call this tool to save the client's name, phone number, and optional email. This must be done BEFORE providing service details, or when they request an email transcript.",
-              api_schema: {
-                url: `${baseUrl}/webhook/leads`,
-                method: "POST",
-                request_headers: {
-                  "Content-Type": "application/json"
-                },
-                request_body_schema: {
-                  type: "object",
-                  required: ["conversationId"],
-                  properties: {
-                    clientName: {
-                      type: "string",
-                      description: "The client's full name."
-                    },
-                    phoneNumber: {
-                      type: "string",
-                      description: "The client's phone number."
-                    },
-                    clientEmail: {
-                      type: "string",
-                      description: "The client's email address (optional, only if requested by user)."
-                    },
-                    conversationId: {
-                      type: "string",
-                      dynamic_variable: "system__conversation_id"
-                    }
-                  }
-                }
-              }
-            }
-          ]
+  let activeWebhookId = null;
+  const targetUrl = `${baseUrl}/webhook/post-call`;
+
+  // 1. Manage Webhooks dynamically
+  try {
+    const listRes = await fetch("https://api.elevenlabs.io/v1/workspace/webhooks", {
+      headers: { "xi-api-key": apiKey }
+    });
+    if (!listRes.ok) {
+      throw new Error(`Failed to list webhooks: ${listRes.status} ${await listRes.text()}`);
+    }
+    const { webhooks } = await listRes.json();
+    
+    // Check if a webhook for targetUrl already exists
+    const existing = webhooks.find(wh => wh.webhook_url === targetUrl);
+    if (existing) {
+      console.log(`[ElevenLabs] Webhook for ${targetUrl} already exists: ${existing.webhook_id}`);
+      activeWebhookId = existing.webhook_id;
+    } else {
+      console.log(`[ElevenLabs] Creating new webhook for ${targetUrl}...`);
+      const createRes = await fetch("https://api.elevenlabs.io/v1/workspace/webhooks", {
+        method: "POST",
+        headers: {
+          "xi-api-key": apiKey,
+          "Content-Type": "application/json"
         },
-        first_message: "مرحبا بك في مركز خدمات الإدارة العامة للدفاع المدني .. يرجى تزويدي بالإسم ورقم الهاتف"
-      },
-      turn: {
-        turn_timeout: 15
+        body: JSON.stringify({
+          settings: {
+            auth_type: "hmac",
+            name: "n8n_post_call_active_tunnel",
+            webhook_url: targetUrl
+          }
+        })
+      });
+      if (!createRes.ok) {
+        throw new Error(`Failed to create webhook: ${createRes.status} ${await createRes.text()}`);
       }
+      const createData = await createRes.json();
+      console.log(`[ElevenLabs] Created webhook successfully: ${createData.webhook_id}`);
+      activeWebhookId = createData.webhook_id;
     }
-  };
-
-  try {
-    const agentRes = await fetch(`https://api.elevenlabs.io/v1/convai/agents/${agentId}`, {
+    
+    // Link in workspace ConvAI settings
+    console.log(`[ElevenLabs] Linking webhook ${activeWebhookId} in workspace ConvAI settings...`);
+    const settingsRes = await fetch("https://api.elevenlabs.io/v1/convai/settings", {
       method: "PATCH",
       headers: {
         "xi-api-key": apiKey,
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(agentPayload)
+      body: JSON.stringify({
+        webhooks: {
+          post_call_webhook_id: activeWebhookId
+        }
+      })
     });
-    
-    if (agentRes.ok) {
-      console.log("[ElevenLabs] Agent successfully patched! 🎉");
+    if (!settingsRes.ok) {
+      console.error("[ElevenLabs] Failed to update ConvAI settings:", await settingsRes.text());
     } else {
-      console.error("[ElevenLabs] Failed to patch agent:", await agentRes.text());
+      console.log("[ElevenLabs] ConvAI settings successfully updated with the active webhook! 🎉");
     }
   } catch (err) {
-    console.error("[ElevenLabs] Agent patch request error:", err);
+    console.error("[ElevenLabs] Error managing webhooks:", err);
+    return;
   }
 
-  const webhookPayload = {
-    webhook_url: `${baseUrl}/webhook/post-call`,
-    name: "n8n_post_call_active_tunnel",
-    is_disabled: false
-  };
-
-  try {
-    const webhookRes = await fetch(`https://api.elevenlabs.io/v1/workspace/webhooks/${webhookId}`, {
-      method: "PATCH",
-      headers: {
-        "xi-api-key": apiKey,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(webhookPayload)
-    });
-    
-    if (webhookRes.ok) {
-      console.log("[ElevenLabs] Workspace webhook successfully patched! 🎉");
-    } else {
-      console.error("[ElevenLabs] Failed to patch webhook:", await webhookRes.text());
-    }
-  } catch (err) {
-    console.error("[ElevenLabs] Webhook patch request error:", err);
-  }
-
-  // 3. Patch Workspace Tool
-  const toolId = "tool_4401kvmspm13ezyawnmd05seqpa5";
+  // 2. Manage Workspace Tools dynamically
+  let activeToolId = null;
   const toolPayload = {
     tool_config: {
       type: "webhook",
@@ -164,22 +135,141 @@ async function patchElevenLabs(baseUrl) {
   };
 
   try {
-    const toolRes = await fetch(`https://api.elevenlabs.io/v1/convai/tools/${toolId}`, {
+    const listToolsRes = await fetch("https://api.elevenlabs.io/v1/convai/tools", {
+      headers: { "xi-api-key": apiKey }
+    });
+    if (!listToolsRes.ok) {
+      throw new Error(`Failed to list tools: ${listToolsRes.status} ${await listToolsRes.text()}`);
+    }
+    const { tools } = await listToolsRes.json();
+    
+    // Find all tools named save_lead_info
+    const targetTools = tools.filter(t => t.tool_config?.name === "save_lead_info");
+    
+    if (targetTools.length > 0) {
+      // Update the first tool
+      activeToolId = targetTools[0].id;
+      console.log(`[ElevenLabs] Updating existing workspace tool ${activeToolId} with new URL...`);
+      const updateRes = await fetch(`https://api.elevenlabs.io/v1/convai/tools/${activeToolId}`, {
+        method: "PATCH",
+        headers: {
+          "xi-api-key": apiKey,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(toolPayload)
+      });
+      if (updateRes.ok) {
+        console.log(`[ElevenLabs] Tool ${activeToolId} successfully updated! 🎉`);
+      } else {
+        console.error(`[ElevenLabs] Failed to update tool ${activeToolId}:`, await updateRes.text());
+      }
+      
+      // Delete any duplicates
+      for (let i = 1; i < targetTools.length; i++) {
+        const dupId = targetTools[i].id;
+        console.log(`[ElevenLabs] Deleting duplicate workspace tool: ${dupId}`);
+        const delRes = await fetch(`https://api.elevenlabs.io/v1/convai/tools/${dupId}`, {
+          method: "DELETE",
+          headers: { "xi-api-key": apiKey }
+        });
+        if (delRes.ok) {
+          console.log(`[ElevenLabs] Deleted duplicate tool ${dupId}`);
+        } else {
+          console.error(`[ElevenLabs] Failed to delete duplicate tool ${dupId}:`, await delRes.text());
+        }
+      }
+    } else {
+      // Create a brand new workspace tool
+      console.log("[ElevenLabs] Creating new workspace tool save_lead_info...");
+      const createRes = await fetch("https://api.elevenlabs.io/v1/convai/tools", {
+        method: "POST",
+        headers: {
+          "xi-api-key": apiKey,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(toolPayload)
+      });
+      if (!createRes.ok) {
+        throw new Error(`Failed to create workspace tool: ${createRes.status} ${await createRes.text()}`);
+      }
+      const createData = await createRes.json();
+      activeToolId = createData.tool_id;
+      console.log(`[ElevenLabs] Created workspace tool successfully: ${activeToolId}`);
+    }
+  } catch (err) {
+    console.error("[ElevenLabs] Error managing workspace tools:", err);
+    return;
+  }
+
+  // 3. Patch Agent Config (including conversation_config and platform_settings.workspace_overrides)
+  const agentPayload = {
+    conversation_config: {
+      agent: {
+        prompt: {
+          prompt: systemPrompt,
+          tool_ids: [activeToolId]
+        },
+        first_message: "مرحبا بك في مركز خدمات الإدارة العامة للدفاع المدني .. يرجى تزويدي بالإسم ورقم الهاتف"
+      },
+      turn: {
+        turn_timeout: 15
+      }
+    },
+    platform_settings: {
+      workspace_overrides: {
+        webhooks: {
+          post_call_webhook_id: activeWebhookId,
+          events: ["transcript"],
+          transcript_format: "json",
+          send_audio: false
+        }
+      }
+    }
+  };
+
+  try {
+    const agentRes = await fetch(`https://api.elevenlabs.io/v1/convai/agents/${agentId}`, {
       method: "PATCH",
       headers: {
         "xi-api-key": apiKey,
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(toolPayload)
+      body: JSON.stringify(agentPayload)
     });
     
-    if (toolRes.ok) {
-      console.log("[ElevenLabs] Workspace tool successfully patched! 🎉");
+    if (agentRes.ok) {
+      console.log("[ElevenLabs] Agent successfully patched! 🎉");
     } else {
-      console.error("[ElevenLabs] Failed to patch tool:", await toolRes.text());
+      console.error("[ElevenLabs] Failed to patch agent:", await agentRes.text());
     }
   } catch (err) {
-    console.error("[ElevenLabs] Tool patch request error:", err);
+    console.error("[ElevenLabs] Agent patch request error:", err);
+  }
+
+  // 4. Clean up old/unused trycloudflare webhooks (should now succeed as agent override has been updated)
+  try {
+    const listRes = await fetch("https://api.elevenlabs.io/v1/workspace/webhooks", {
+      headers: { "xi-api-key": apiKey }
+    });
+    if (listRes.ok) {
+      const { webhooks } = await listRes.json();
+      for (const wh of webhooks) {
+        if (wh.webhook_id !== activeWebhookId && wh.webhook_url.includes("trycloudflare.com")) {
+          console.log(`[ElevenLabs] Deleting old/unused trycloudflare webhook: ${wh.webhook_id} (${wh.webhook_url})`);
+          const delRes = await fetch(`https://api.elevenlabs.io/v1/workspace/webhooks/${wh.webhook_id}`, {
+            method: "DELETE",
+            headers: { "xi-api-key": apiKey }
+          });
+          if (delRes.ok) {
+            console.log(`[ElevenLabs] Deleted old webhook ${wh.webhook_id}`);
+          } else {
+            console.error(`[ElevenLabs] Failed to delete old webhook ${wh.webhook_id}:`, await delRes.text());
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.error("[ElevenLabs] Error during webhook cleanup:", err);
   }
 }
 

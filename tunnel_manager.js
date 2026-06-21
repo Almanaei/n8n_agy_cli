@@ -100,30 +100,85 @@ async function patchElevenLabs(baseUrl) {
     console.error("[ElevenLabs] Agent patch request error:", err);
   }
 
-  // 2. Patch Workspace Webhook
-  const webhookPayload = {
-    webhook_url: `${baseUrl}/webhook/post-call`,
-    name: "n8n_post_call_active_tunnel",
-    is_disabled: false
-  };
-
+  // 2. Manage Webhooks dynamically
   try {
-    const webhookRes = await fetch(`https://api.elevenlabs.io/v1/workspace/webhooks/${webhookId}`, {
+    const listRes = await fetch("https://api.elevenlabs.io/v1/workspace/webhooks", {
+      headers: { "xi-api-key": apiKey }
+    });
+    if (!listRes.ok) {
+      throw new Error(`Failed to list webhooks: ${listRes.status} ${await listRes.text()}`);
+    }
+    const { webhooks } = await listRes.json();
+    
+    const targetUrl = `${baseUrl}/webhook/post-call`;
+    let activeWebhookId = null;
+    
+    // Check if a webhook for targetUrl already exists
+    const existing = webhooks.find(wh => wh.webhook_url === targetUrl);
+    if (existing) {
+      console.log(`[ElevenLabs] Webhook for ${targetUrl} already exists: ${existing.webhook_id}`);
+      activeWebhookId = existing.webhook_id;
+    } else {
+      console.log(`[ElevenLabs] Creating new webhook for ${targetUrl}...`);
+      const createRes = await fetch("https://api.elevenlabs.io/v1/workspace/webhooks", {
+        method: "POST",
+        headers: {
+          "xi-api-key": apiKey,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          settings: {
+            auth_type: "hmac",
+            name: "n8n_post_call_active_tunnel",
+            webhook_url: targetUrl
+          }
+        })
+      });
+      if (!createRes.ok) {
+        throw new Error(`Failed to create webhook: ${createRes.status} ${await createRes.text()}`);
+      }
+      const createData = await createRes.json();
+      console.log(`[ElevenLabs] Created webhook successfully: ${createData.webhook_id}`);
+      activeWebhookId = createData.webhook_id;
+    }
+    
+    // Link to ConvAI Settings
+    console.log(`[ElevenLabs] Linking webhook ${activeWebhookId} in workspace ConvAI settings...`);
+    const settingsRes = await fetch("https://api.elevenlabs.io/v1/convai/settings", {
       method: "PATCH",
       headers: {
         "xi-api-key": apiKey,
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(webhookPayload)
+      body: JSON.stringify({
+        webhooks: {
+          post_call_webhook_id: activeWebhookId
+        }
+      })
     });
-    
-    if (webhookRes.ok) {
-      console.log("[ElevenLabs] Workspace webhook successfully patched! 🎉");
+    if (!settingsRes.ok) {
+      console.error("[ElevenLabs] Failed to update ConvAI settings:", await settingsRes.text());
     } else {
-      console.error("[ElevenLabs] Failed to patch webhook:", await webhookRes.text());
+      console.log("[ElevenLabs] ConvAI settings successfully updated with the active webhook! 🎉");
+    }
+    
+    // Clean up old/unused localtunnel/trycloudflare webhooks
+    for (const wh of webhooks) {
+      if (wh.webhook_id !== activeWebhookId && (wh.webhook_url.includes("trycloudflare.com") || wh.webhook_url.includes("localtunnel.me") || wh.webhook_url.includes("lt.live"))) {
+        console.log(`[ElevenLabs] Deleting old/unused webhook: ${wh.webhook_id} (${wh.webhook_url})`);
+        const delRes = await fetch(`https://api.elevenlabs.io/v1/workspace/webhooks/${wh.webhook_id}`, {
+          method: "DELETE",
+          headers: { "xi-api-key": apiKey }
+        });
+        if (delRes.ok) {
+          console.log(`[ElevenLabs] Deleted old webhook ${wh.webhook_id}`);
+        } else {
+          console.error(`[ElevenLabs] Failed to delete old webhook ${wh.webhook_id}:`, await delRes.text());
+        }
+      }
     }
   } catch (err) {
-    console.error("[ElevenLabs] Webhook patch request error:", err);
+    console.error("[ElevenLabs] Error managing webhooks:", err);
   }
 }
 
