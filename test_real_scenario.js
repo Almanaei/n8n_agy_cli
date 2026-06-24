@@ -7,6 +7,7 @@ console.log(`[Simulator] Connecting to standalone voice agent at ${wsUrl}...`);
 const ws = new WebSocket(wsUrl);
 
 let step = 0;
+let conversationId = null;
 
 ws.on('open', () => {
   console.log("[Simulator] Connected successfully! Waiting for agent greeting...\n");
@@ -14,6 +15,12 @@ ws.on('open', () => {
 
 ws.on('message', (data) => {
   const payload = JSON.parse(data.toString());
+  
+  if (payload.conversation_id) {
+    conversationId = payload.conversation_id;
+    console.log(`[Simulator] Captured conversation ID: ${conversationId}`);
+  }
+
   if (payload.text) {
     console.log(`\x1b[36m[Agent Speech]\x1b[0m: ${payload.text}`);
     if (payload.audio) {
@@ -66,8 +73,36 @@ ws.on('message', (data) => {
   }
 });
 
-ws.on('close', () => {
+ws.on('close', async () => {
   console.log("\n[Simulator] Connection closed. Scenario complete.");
+  if (conversationId) {
+    console.log(`[Simulator] Waiting 4 seconds for n8n to complete lead registration before submitting feedback...`);
+    await new Promise(resolve => setTimeout(resolve, 4000));
+    
+    const feedbackPayload = {
+      conversationId: conversationId,
+      kpi: "100%",
+      comment: "المساعد ممتاز جداً وسريع في الرد، شكراً لكم!"
+    };
+    
+    console.log(`[Simulator] Submitting feedback and comment for ${conversationId}...`);
+    try {
+      const response = await fetch("http://localhost:3000/submit-feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(feedbackPayload)
+      });
+      if (response.ok) {
+        console.log(`[Simulator] Successfully submitted feedback! Response:`, await response.json());
+      } else {
+        console.error(`[Simulator] Failed to submit feedback: ${response.status}`, await response.text());
+      }
+    } catch (err) {
+      console.error(`[Simulator] Error submitting feedback:`, err);
+    }
+  } else {
+    console.warn("[Simulator] No conversation ID captured, skipping feedback submission.");
+  }
 });
 
 ws.on('error', (err) => {
