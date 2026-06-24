@@ -801,22 +801,25 @@
         /* Sleek Feedback Pill Toast */
         .feedback-toast {
             position: fixed;
-            bottom: -80px;
+            bottom: -150px;
             left: 24px;
-            background: rgba(22, 22, 23, 0.7);
+            background: rgba(22, 22, 23, 0.85);
             border: 1px solid var(--glass-border);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            padding: 10px 16px;
-            border-radius: 50px;
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            padding: 12px 18px;
+            border-radius: 24px;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 14px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 113, 227, 0.05);
+            gap: 12px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 113, 227, 0.08);
             transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
             z-index: 1100;
             opacity: 0;
             pointer-events: none;
+            width: auto;
+            max-width: 320px;
         }
 
         .feedback-toast.show {
@@ -825,36 +828,134 @@
             pointer-events: auto;
         }
 
+        .feedback-toast.expanded {
+            padding: 16px;
+            border-radius: 18px;
+        }
+
+        .feedback-options {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
         .feedback-emoji-btn {
             background: none;
             border: none;
-            font-size: 1.6rem;
             cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
             transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             outline: none;
-            padding: 2px;
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+
+        .feedback-emoji-btn .emoji {
+            font-size: 1.6rem;
+            line-height: 1;
+        }
+
+        .feedback-emoji-btn .label {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+            transition: color 0.2s ease;
         }
 
         .feedback-emoji-btn:hover {
-            transform: scale(1.35) translateY(-4px);
+            transform: scale(1.15) translateY(-2px);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .feedback-emoji-btn:hover .label {
+            color: #fff;
         }
 
         .feedback-emoji-btn:active {
             transform: scale(0.95);
         }
 
+        .feedback-comment-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 280px;
+            animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .feedback-comment-prompt {
+            font-size: 0.85rem;
+            color: #fff;
+            margin: 0;
+            line-height: 1.4;
+            text-align: right;
+            direction: rtl;
+        }
+
+        .feedback-comment-input-row {
+            display: flex;
+            gap: 8px;
+            direction: rtl;
+        }
+
+        .feedback-comment-input-row input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            outline: none;
+            direction: rtl;
+        }
+
+        .feedback-comment-input-row input:focus {
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .feedback-comment-input-row button {
+            background: var(--primary-color);
+            border: none;
+            color: #fff;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: opacity 0.2s ease;
+        }
+
+        .feedback-comment-input-row button:hover {
+            opacity: 0.9;
+        }
+
         .feedback-success-msg {
-            font-size: 0.9rem;
+            font-size: 1.2rem;
             color: var(--status-online);
             font-weight: 700;
             display: none;
-            margin-left: 4px;
             animation: fadeIn 0.3s ease;
         }
 
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Responsive */
@@ -1054,10 +1155,27 @@
 
     <!-- Feedback Pill Component -->
     <div id="feedback-toast" class="feedback-toast">
-        <button class="feedback-emoji-btn" onclick="submitFeedback(0)">😞</button>
-        <button class="feedback-emoji-btn" onclick="submitFeedback(50)">🙂</button>
-        <button class="feedback-emoji-btn" onclick="submitFeedback(70)">😊</button>
-        <button class="feedback-emoji-btn" onclick="submitFeedback(100)">😀</button>
+        <div id="feedback-options" class="feedback-options">
+            <button class="feedback-emoji-btn" onclick="submitFeedback(0)">
+                <span class="emoji">😞</span>
+                <span class="label">سيء</span>
+            </button>
+            <button class="feedback-emoji-btn" onclick="submitFeedback(50)">
+                <span class="emoji">🙂</span>
+                <span class="label">مقبول</span>
+            </button>
+            <button class="feedback-emoji-btn" onclick="submitFeedback(100)">
+                <span class="emoji">😀</span>
+                <span class="label">ممتاز</span>
+            </button>
+        </div>
+        <div id="feedback-comment-container" class="feedback-comment-container" style="display: none;">
+            <p id="feedback-comment-prompt" class="feedback-comment-prompt"></p>
+            <div class="feedback-comment-input-row">
+                <input type="text" id="feedback-comment-input" placeholder="اكتب تعليقك هنا..." onkeydown="if(event.key === 'Enter') submitComment()" />
+                <button id="feedback-comment-submit" onclick="submitComment()">إرسال</button>
+            </div>
+        </div>
         <span id="feedback-success" class="feedback-success-msg">✓</span>
     </div>
 
@@ -1065,15 +1183,23 @@
     <script>
         let ws;
         let feedbackTimeout;
+        let lastKpiValue = null;
 
         function showFeedbackToast(convId) {
+            if (convId) {
+                conversationId = convId;
+            }
             const toast = document.getElementById('feedback-toast');
+            const options = document.getElementById('feedback-options');
+            const commentContainer = document.getElementById('feedback-comment-container');
             const successMsg = document.getElementById('feedback-success');
-            const btns = toast.querySelectorAll('.feedback-emoji-btn');
             
             // Reset state
+            toast.classList.remove('expanded');
             successMsg.style.display = 'none';
-            btns.forEach(btn => btn.style.display = 'inline-block');
+            options.style.display = 'flex';
+            commentContainer.style.display = 'none';
+            lastKpiValue = null;
             
             toast.classList.add('show');
         }
@@ -1089,14 +1215,9 @@
                 return;
             }
             
-            const successMsg = document.getElementById('feedback-success');
-            const toast = document.getElementById('feedback-toast');
-            const btns = toast.querySelectorAll('.feedback-emoji-btn');
+            lastKpiValue = kpiValue;
             
-            // Show checkmark, hide buttons
-            btns.forEach(btn => btn.style.display = 'none');
-            successMsg.style.display = 'inline-block';
-            
+            // Instantly submit the quantitative vote to the server
             try {
                 const response = await fetch('/submit-feedback', {
                     method: 'POST',
@@ -1117,8 +1238,78 @@
             } catch (err) {
                 console.error("Error submitting feedback:", err);
             }
-            
-            // Slide down after a delay
+
+            const toast = document.getElementById('feedback-toast');
+            const options = document.getElementById('feedback-options');
+            const commentContainer = document.getElementById('feedback-comment-container');
+            const prompt = document.getElementById('feedback-comment-prompt');
+            const input = document.getElementById('feedback-comment-input');
+            const successMsg = document.getElementById('feedback-success');
+
+            // Hide initial emoji options
+            options.style.display = 'none';
+
+            if (kpiValue === 100) {
+                // Slide down text box for Good (100%)
+                prompt.innerText = "لقد أسعدني رأيك!، ما الذي اعجبك بالتحديد؟ رأيك سيساعدني في تطويري؟";
+                input.value = "";
+                toast.classList.add('expanded');
+                commentContainer.style.display = 'flex';
+                // Wait briefly for display flex to register before focus
+                setTimeout(() => input.focus(), 50);
+            } else if (kpiValue === 0) {
+                // Slide down text box for Bad (0%)
+                prompt.innerText = "يؤسفني ذلك! ما الذي أزعجك بالتحديد؟ رأيك سيساعدني في تطويري";
+                input.value = "";
+                toast.classList.add('expanded');
+                commentContainer.style.display = 'flex';
+                // Wait briefly for display flex to register before focus
+                setTimeout(() => input.focus(), 50);
+            } else {
+                // For Okay (50%), show success directly and slide away
+                successMsg.style.display = 'inline-block';
+                setTimeout(() => {
+                    hideFeedbackToast();
+                }, 1500);
+            }
+        }
+
+        window.submitComment = async function() {
+            const input = document.getElementById('feedback-comment-input');
+            const commentText = input.value.trim();
+            const commentContainer = document.getElementById('feedback-comment-container');
+            const successMsg = document.getElementById('feedback-success');
+            const toast = document.getElementById('feedback-toast');
+
+            if (commentText) {
+                try {
+                    const response = await fetch('/submit-feedback', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            conversationId: conversationId,
+                            kpi: lastKpiValue !== null ? lastKpiValue + "%" : undefined,
+                            comment: commentText
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error("Failed to submit comment to server");
+                    }
+                    
+                    console.log(`Comment submitted for ${conversationId}: ${commentText}`);
+                } catch (err) {
+                    console.error("Error submitting comment:", err);
+                }
+            }
+
+            // Show success, hide input, shrink toast and slide away
+            commentContainer.style.display = 'none';
+            toast.classList.remove('expanded');
+            successMsg.style.display = 'inline-block';
+
             setTimeout(() => {
                 hideFeedbackToast();
             }, 1500);

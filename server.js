@@ -124,15 +124,18 @@ erra6BzpXyWJxdylk4cdvD0=
             endColumnIndex: 7
           },
           cell: {
+            userEnteredValue: {
+              stringValue: kpiValue
+            },
             userEnteredFormat: {
               backgroundColor: {
                 red: kpiValue === '100%' ? 0.85 : (kpiValue === '0%' ? 1.0 : 1.0),
-                green: kpiValue === '100%' ? 1.0 : (kpiValue === '0%' ? 0.85 : 1.0),
-                blue: kpiValue === '100%' ? 0.85 : (kpiValue === '0%' ? 0.85 : 1.0)
+                green: kpiValue === '100%' ? 1.0 : (kpiValue === '0%' ? 0.85 : 0.95),
+                blue: kpiValue === '100%' ? 0.85 : (kpiValue === '0%' ? 0.85 : 0.8)
               }
             }
           },
-          fields: "userEnteredFormat.backgroundColor"
+          fields: "userEnteredValue,userEnteredFormat.backgroundColor"
         }
       }
     ]
@@ -152,6 +155,114 @@ erra6BzpXyWJxdylk4cdvD0=
   }
   
   console.log(`[Google Sheets Formatter] Successfully formatted Row ${rowIndex + 1} KPI cell! 🎉`);
+}
+
+async function writeFeedbackComment(conversationId, commentText) {
+  const clientEmail = "n8n-sheets-tracker@gen-lang-client-0132494438.iam.gserviceaccount.com";
+  const privateKey = `-----BEGIN PRIVATE KEY-----
+MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCgAKA3Jh5/C+wK
+g0R6az/dvjzeeMF6XgpNKuMrnvanoBRYu1hvncRqfIZEmaPk3aNBxMyTmnj3KFJa
+yWJNFdaARb8uANoqd2fpglb36lizEBgAciZ4MEjBDCAuiv2C66S2sUFvMvDy9r8i
+E5zGxizSSTSgoGSFjTI6BO9cDS3xnq4lgO/YkcS/z0zhni5/4uktIfhjqZtTafwJ
+PyOpbGWapdJULJo5Q+X6PYWqBBvTeK2GguR9QLB9QuQdGqvTEMEB3STbYsXgLn+N
+cc6bTLDW2KxJwONiZELpYsSJrkP32HIe7ZKqnrfE6A2z7s1r43aDwKe9khQ2/hYl
+b/aRX0zxAgMBAAECggEABut8AmKWSU+YT+yVMLe0eYg9nPALSxnn12ZKUKPFfmKq
+mptQo/Qmb2YPDwa3i0GIKuMiZ2RUBLl0VVuWEigmgKHzlp9gEBvdrUBPN1Xl6+mf
+Zh6JuiM5dErsVeL6O5gqJaIVJsRk3hcslUJUopalz9rtaSCCtHFyuYZm3TvvL57I
+G6+o3RccyrKdSma2WljpRuRjYFK9KmOULEKEbij0pNJdjqdeAO+BZ7U0nQRAQlVr
+uc1kr40nX5ICKbfPMe0OvpwwemooPqGOr22m8z7npOHIRJBxuvtPkQEdxfjvd4K/
+3mYUtd6qtKmgYxO4lJhwGJ1ZpqhAMUoKd0cmJ6UIWQKBgQDSU9bKhuRMXeEXMAY4
+UEfAZRq/FDTd9FZc6dr5EqtZSHRZB+jxqwg+dMTz7xje8aGgacmD4OoeFTQ0pd7A
+t9XVtLz6nqXEL9lDrD9tRrLTqrZEYiNxpaJUEIURPd+BweJcQk72ULJZDtc2eA67
+oN7uHmFFMyi0xwrhfsCYTlrC+QKBgQDCvzQ0zxPTDuDx8PPfdxTjRodXO3Zd0vre
+TffBFFTXGQI8eiRqiPiYVvUlyg9Iy/dnJA1GMnmwxHzauyVNF+NZnJckWIWgTzNe
+ionU+5qhXboBXEzdH3ZGSxe6cinUOSAg+vXTwW317uF5kLLFbthCQgozYb4j4Q3t
+tcTzDF5fuQKBgQCBcmYcyb6SnajeS4lYeVhfuhonBfmvrSTGFIvXhbz9u1EYRn0A
+1+HABr/83efxtsdh4hnLV87fau9xg7C/7aTm3VD98kxVnZlbRBTZXYzMJyH8nmXw
+GR/6Gxy6ytjXlIuLeqf8gxfxJeggtu1iXxU1em8lVuIzuNkihY9lbbwAiQKBgBgj
+UNo2zHM9hd4XCnMpNFqTNFU4low8iUGiklHJLlbWz7MlRHw76+wd4xbC+6//L/QF
+wOtxeCnTwNHvnkj27AQAZ69mlXFwP6K5MypF4T2c+2ANy60gqC1AQ3mlis+2IOhV
+ksCjWfjAmgvSRoY4He/gdZk2xTV3QJ21COtDHjNpAoGALXo07s3khPVrBHetGyQ/
+qJMcL1WmzbTPwzWKiXDKvSYmL/iGvO7T8fp/sFbB2v6juxqAfjx9v0pNVicl1Qal
+WQTD3N8zAs+SVVR8ZIqqNKOZhHBWtLy5SKWcntjouHsPdIh6dtYs97nFxfXjck8e
+erra6BzpXyWJxdylk4cdvD0=
+-----END PRIVATE KEY-----`;
+  
+  const spreadsheetId = "1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8";
+
+  console.log(`[Google Sheets Commenter] Generating access token...`);
+  const jwt = generateGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
+  
+  const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+      assertion: jwt
+    })
+  });
+  
+  if (!tokenRes.ok) {
+    throw new Error(`Failed to exchange JWT for token: ${tokenRes.status} ${await tokenRes.text()}`);
+  }
+  
+  const tokenData = await tokenRes.json();
+  const accessToken = tokenData.access_token;
+  
+  console.log(`[Google Sheets Commenter] Fetching sheet rows to locate conversationId: ${conversationId}...`);
+  const getRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Sheet1!A1:H1000`, {
+    headers: { "Authorization": `Bearer ${accessToken}` }
+  });
+  
+  if (!getRes.ok) {
+    throw new Error(`Failed to get values from sheet: ${getRes.status} ${await getRes.text()}`);
+  }
+  
+  const getData = await getRes.json();
+  const rows = getData.values || [];
+  
+  if (rows.length === 0) return;
+  
+  // Ensure header is written to H1 (Column index 7) if missing
+  const headers = rows[0];
+  if (headers.length < 8 || headers[7] !== "Feedback Comment") {
+    console.log(`[Google Sheets Commenter] Header "Feedback Comment" not found in H1. Writing header...`);
+    await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Sheet1!H1?valueInputOption=USER_ENTERED`, {
+      method: "PUT",
+      headers: {
+        "Authorization": `Bearer ${accessToken}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        values: [["Feedback Comment"]]
+      })
+    });
+  }
+  
+  const rowIndex = rows.findIndex(row => row[4] === conversationId);
+  if (rowIndex === -1) {
+    console.warn(`[Google Sheets Commenter] Conversation ID ${conversationId} not found in the sheet. Cannot write comment.`);
+    return;
+  }
+  
+  console.log(`[Google Sheets Commenter] Found conversation at row index: ${rowIndex}. Writing comment...`);
+  
+  const updateRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Sheet1!H${rowIndex + 1}?valueInputOption=USER_ENTERED`, {
+    method: "PUT",
+    headers: {
+      "Authorization": `Bearer ${accessToken}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      values: [[commentText]]
+    })
+  });
+  
+  if (!updateRes.ok) {
+    throw new Error(`Failed to write comment cell: ${updateRes.status} ${await updateRes.text()}`);
+  }
+  
+  console.log(`[Google Sheets Commenter] Successfully wrote comment to Row ${rowIndex + 1} Column H! 🎉`);
 }
 
 const server = http.createServer(async (req, res) => {
@@ -208,12 +319,24 @@ const server = http.createServer(async (req, res) => {
         try {
           const conversationId = feedbackData.conversationId;
           const kpiValue = feedbackData.kpi;
-          if (conversationId && (kpiValue === '100%' || kpiValue === '0%')) {
+          if (conversationId && (kpiValue === '100%' || kpiValue === '50%' || kpiValue === '0%')) {
             console.log(`[Google Sheets Formatter] Triggering programmatic format for ${conversationId} to ${kpiValue}...`);
             await formatKpiCell(conversationId, kpiValue);
           }
         } catch (formatError) {
           console.error("[Google Sheets Formatter] Error during cell formatting:", formatError);
+        }
+
+        // Write feedback comment to Google Sheets programmatically
+        try {
+          const conversationId = feedbackData.conversationId;
+          const commentText = feedbackData.comment;
+          if (conversationId && commentText !== undefined) {
+            console.log(`[Google Sheets Commenter] Writing comment for ${conversationId}: "${commentText}"...`);
+            await writeFeedbackComment(conversationId, commentText);
+          }
+        } catch (commentError) {
+          console.error("[Google Sheets Commenter] Error writing feedback comment:", commentError);
         }
 
         res.writeHead(200, { 
