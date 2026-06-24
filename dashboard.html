@@ -583,6 +583,98 @@
             opacity: 1;
             pointer-events: all;
         }
+
+        /* Tab Navigation Bar Styles */
+        .tabs-wrapper {
+            display: flex;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            padding: 4px;
+            border-radius: 10px;
+            gap: 4px;
+            width: fit-content;
+            margin-bottom: 8px;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 10px 24px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition-apple);
+        }
+
+        .tab-btn:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .tab-btn.active {
+            color: #30d158; /* Excellent color theme */
+            background: rgba(48, 209, 88, 0.08);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .dashboard-section {
+            display: none;
+            flex-direction: column;
+            gap: 24px;
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .dashboard-section.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Verdict breakdown chart styling */
+        .verdict-bar-row {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .verdict-bar-label-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+        }
+
+        .verdict-bar-label {
+            font-weight: 600;
+        }
+
+        .verdict-bar-value {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-secondary);
+        }
+
+        .verdict-bar-bg {
+            height: 12px;
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .verdict-bar-fill {
+            height: 100%;
+            border-radius: 6px;
+            width: 0;
+            transition: width 1s ease-in-out;
+        }
     </style>
 </head>
 <body>
@@ -608,173 +700,318 @@
                 <h1>لوحة قياس الأداء والفعالية</h1>
                 <p>سحب لحظي وتحليل إحصائي مباشر للاتصالات من قاعدة البيانات</p>
             </div>
-        </div>
-
-        <!-- Hero Metric Grid -->
-        <div class="hero-grid">
-            
-            <!-- Card 1: Excellent (100% KPI) -->
-            <div class="kpi-card excellent" onclick="showCategoryDetails('100%')">
-                <div class="kpi-card-header">
-                    <span class="kpi-card-title">معدل الاتصالات الممتازة</span>
-                    <span class="kpi-card-icon">▲</span>
-                </div>
-                <div class="kpi-card-body">
-                    <div class="kpi-value-wrapper">
-                        <span class="kpi-value" id="val-excellent">0.0</span>
-                        <span class="kpi-unit">%</span>
-                    </div>
-                    <span class="kpi-delta up" id="delta-excellent">0%</span>
-                </div>
-                <div class="bullet-container">
-                    <div class="bullet-label-row">
-                        <span>الهدف: 90%</span>
-                        <span id="percent-excellent">0%</span>
-                    </div>
-                    <div class="bullet-bar-bg">
-                        <div class="bullet-bar-fill" id="bullet-excellent"></div>
-                        <div class="bullet-target-marker" style="left: 10%;"></div> <!-- Target marker at 90% (right aligned is 10% from left in RTL) -->
-                    </div>
-                </div>
-                <div class="kpi-card-sparkline">
-                    <svg id="sparkline-excellent"></svg>
-                </div>
-            </div>
-
-            <!-- Card 2: Acceptable (50% KPI) -->
-            <div class="kpi-card acceptable" onclick="showCategoryDetails('50%')">
-                <div class="kpi-card-header">
-                    <span class="kpi-card-title">معدل الاتصالات المقبولة</span>
-                    <span class="kpi-card-icon">●</span>
-                </div>
-                <div class="kpi-card-body">
-                    <div class="kpi-value-wrapper">
-                        <span class="kpi-value" id="val-acceptable">0.0</span>
-                        <span class="kpi-unit">%</span>
-                    </div>
-                    <span class="kpi-delta" id="delta-acceptable">0%</span>
-                </div>
-                <div class="bullet-container">
-                    <div class="bullet-label-row">
-                        <span>الهدف الأعلى: 15%</span>
-                        <span id="percent-acceptable">0%</span>
-                    </div>
-                    <div class="bullet-bar-bg">
-                        <div class="bullet-bar-fill" id="bullet-acceptable"></div>
-                        <div class="bullet-target-marker" style="left: 85%;"></div> <!-- Target max marker at 15% (85% from left in RTL) -->
-                    </div>
-                </div>
-                <div class="kpi-card-sparkline">
-                    <svg id="sparkline-acceptable"></svg>
-                </div>
-            </div>
-
-            <!-- Card 3: Poor (0% KPI) -->
-            <div class="kpi-card poor" onclick="showCategoryDetails('0%')">
-                <div class="kpi-card-header">
-                    <span class="kpi-card-title">معدل الاتصالات غير المرضية</span>
-                    <span class="kpi-card-icon">▼</span>
-                </div>
-                <div class="kpi-card-body">
-                    <div class="kpi-value-wrapper">
-                        <span class="kpi-value" id="val-poor">0.0</span>
-                        <span class="kpi-unit">%</span>
-                    </div>
-                    <span class="kpi-delta down" id="delta-poor">0%</span>
-                </div>
-                <div class="bullet-container">
-                    <div class="bullet-label-row">
-                        <span>الحد الأقصى المقبول: 5%</span>
-                        <span id="percent-poor">0%</span>
-                    </div>
-                    <div class="bullet-bar-bg">
-                        <div class="bullet-bar-fill" id="bullet-poor"></div>
-                        <div class="bullet-target-marker" style="left: 95%;"></div> <!-- Target marker at 5% (95% from left in RTL) -->
-                    </div>
-                </div>
-                <div class="kpi-card-sparkline">
-                    <svg id="sparkline-poor"></svg>
-                </div>
-            </div>
-
-            <!-- Card 4: Telemetry Latency & Judge Score -->
-            <div class="kpi-card telemetry" style="cursor: default;">
-                <div class="kpi-card-header">
-                    <span class="kpi-card-title">زمن الاستجابة ومؤشر المحكمة</span>
-                    <span class="kpi-card-icon">⚡</span>
-                </div>
-                <div class="kpi-card-body">
-                    <div class="kpi-value-wrapper">
-                        <span class="kpi-value" id="val-telemetry-m2e">0</span>
-                        <span class="kpi-unit">ms</span>
-                    </div>
-                    <span class="kpi-delta" id="val-telemetry-ttft" style="color: var(--text-secondary);">TTFT: 0ms</span>
-                </div>
-                <div class="bullet-container">
-                    <div class="bullet-label-row">
-                        <span>الحد الأقصى (M2E): 800ms</span>
-                        <span id="percent-telemetry-score">التقييم: -</span>
-                    </div>
-                    <div class="bullet-bar-bg">
-                        <div class="bullet-bar-fill" id="bullet-telemetry-score" style="background-color: #00bfff;"></div>
-                        <div class="bullet-target-marker" style="left: 37.5%;"></div> <!-- Target marker at 500ms (100% is 800ms, so 500ms is 62.5% fill, remaining is 37.5% from left in RTL) -->
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Context Grid (Visualizations) -->
-        <div class="context-grid">
-            
-            <!-- Trend spline area chart -->
-            <div class="visual-panel">
-                <div>
-                    <h2 class="panel-title">مسار تقييم جودة الاتصال التاريخي</h2>
-                    <p class="panel-subtitle">متوسط تقييم KPI اليومي عبر خطوط الزمن للتحقق من الاتجاه العام</p>
-                </div>
-                <div class="trend-chart-container">
-                    <svg id="trend-canvas"></svg>
-                </div>
-            </div>
-
-            <!-- Diverging Dot Plot -->
-            <div class="visual-panel">
-                <div>
-                    <h2 class="panel-title">مقارنة التوزيع الإحصائي للوكلاء</h2>
-                    <p class="panel-subtitle">أداء المساعد الذكي المحلي مقابل Live ElevenLabs</p>
-                </div>
-                <div class="dotplot-container">
-                    <svg id="dotplot-canvas"></svg>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Call list table panel -->
-        <div class="table-panel">
-            <h2 class="panel-title">سجل الاتصالات والتعليقات الواردة مؤخراً</h2>
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>الوقت</th>
-                            <th>الاسم</th>
-                            <th>رقم الهاتف</th>
-                            <th>البريد الإلكتروني</th>
-                            <th>المساعد الذكي</th>
-                            <th>مؤشر الأداء (KPI)</th>
-                            <th>تعليق العميل والتقييم</th>
-                        </tr>
-                    </thead>
-                    <tbody id="calls-table-body">
-                        <tr>
-                            <td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 40px;">جاري تحميل سجل المكالمات...</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <!-- Tabs Navigation -->
+            <div class="tabs-wrapper">
+                <button class="tab-btn active" id="btn-tab-system" onclick="switchTab('system')">
+                    <span>⚡</span>
+                    <span>لوحة أداء النظام (System KPIs)</span>
+                </button>
+                <button class="tab-btn" id="btn-tab-user" onclick="switchTab('user')">
+                    <span>👥</span>
+                    <span>لوحة أداء المستخدمين (User KPIs)</span>
+                </button>
             </div>
         </div>
+
+        <!-- Tab 1: System KPI Dashboard Section -->
+        <div id="section-system" class="dashboard-section active">
+            <!-- System Hero Metric Grid -->
+            <div class="hero-grid">
+                
+                <!-- Card 1: Avg M2E Latency -->
+                <div class="kpi-card telemetry" style="cursor: default;">
+                    <div class="kpi-card-header">
+                        <span class="kpi-card-title">متوسط زمن الاستجابة (M2E)</span>
+                        <span class="kpi-card-icon">⚡</span>
+                    </div>
+                    <div class="kpi-card-body">
+                        <div class="kpi-value-wrapper">
+                            <span class="kpi-value" id="val-system-m2e">0</span>
+                            <span class="kpi-unit">ms</span>
+                        </div>
+                        <span class="kpi-delta" id="val-system-m2e-p95" style="color: var(--text-secondary);">P95: 0ms</span>
+                    </div>
+                    <div class="bullet-container">
+                        <div class="bullet-label-row">
+                            <span>المستهدف: &lt; 500ms</span>
+                            <span id="percent-system-m2e">0%</span>
+                        </div>
+                        <div class="bullet-bar-bg">
+                            <div class="bullet-bar-fill" id="bullet-system-m2e" style="background-color: #00bfff;"></div>
+                            <div class="bullet-target-marker" style="left: 37.5%;"></div>
+                        </div>
+                    </div>
+                    <div class="kpi-card-sparkline">
+                        <svg id="sparkline-system-m2e"></svg>
+                    </div>
+                </div>
+
+                <!-- Card 2: Avg TTFT -->
+                <div class="kpi-card telemetry" style="cursor: default;">
+                    <div class="kpi-card-header">
+                        <span class="kpi-card-title">سرعة الاستجابة الأولى (TTFT)</span>
+                        <span class="kpi-card-icon">⏱️</span>
+                    </div>
+                    <div class="kpi-card-body">
+                        <div class="kpi-value-wrapper">
+                            <span class="kpi-value" id="val-system-ttft">0</span>
+                            <span class="kpi-unit">ms</span>
+                        </div>
+                        <span class="kpi-delta up" id="val-system-ttft-desc" style="color: var(--color-excellent);">سريع جداً</span>
+                    </div>
+                    <div class="bullet-container">
+                        <div class="bullet-label-row">
+                            <span>المستهدف: &lt; 300ms</span>
+                            <span id="percent-system-ttft">0%</span>
+                        </div>
+                        <div class="bullet-bar-bg">
+                            <div class="bullet-bar-fill" id="bullet-system-ttft" style="background-color: var(--color-excellent);"></div>
+                            <div class="bullet-target-marker" style="left: 50%;"></div>
+                        </div>
+                    </div>
+                    <div class="kpi-card-sparkline">
+                        <svg id="sparkline-system-ttft"></svg>
+                    </div>
+                </div>
+
+                <!-- Card 3: Success Rate -->
+                <div class="kpi-card excellent" style="cursor: default;">
+                    <div class="kpi-card-header">
+                        <span class="kpi-card-title">معدل النجاح للمحكمة</span>
+                        <span class="kpi-card-icon">▲</span>
+                    </div>
+                    <div class="kpi-card-body">
+                        <div class="kpi-value-wrapper">
+                            <span class="kpi-value" id="val-system-success">0.0</span>
+                            <span class="kpi-unit">%</span>
+                        </div>
+                        <span class="kpi-delta up" id="val-system-success-desc">ممتاز</span>
+                    </div>
+                    <div class="bullet-container">
+                        <div class="bullet-label-row">
+                            <span>الهدف: 90%</span>
+                            <span id="percent-system-success">0%</span>
+                        </div>
+                        <div class="bullet-bar-bg">
+                            <div class="bullet-bar-fill" id="bullet-system-success"></div>
+                            <div class="bullet-target-marker" style="left: 10%;"></div>
+                        </div>
+                    </div>
+                    <div class="kpi-card-sparkline">
+                        <svg id="sparkline-system-success"></svg>
+                    </div>
+                </div>
+
+                <!-- Card 4: Judge Score -->
+                <div class="kpi-card telemetry" style="cursor: default;">
+                    <div class="kpi-card-header">
+                        <span class="kpi-card-title">مؤشر تقييم القاضي</span>
+                        <span class="kpi-card-icon">⚖️</span>
+                    </div>
+                    <div class="kpi-card-body">
+                        <div class="kpi-value-wrapper">
+                            <span class="kpi-value" id="val-system-score">0.0</span>
+                            <span class="kpi-unit">%</span>
+                        </div>
+                        <span class="kpi-delta" id="val-system-score-desc" style="color: var(--text-secondary);">قيد المراقبة</span>
+                    </div>
+                    <div class="bullet-container">
+                        <div class="bullet-label-row">
+                            <span>الحد الأدنى: 85%</span>
+                            <span id="percent-system-score">0%</span>
+                        </div>
+                        <div class="bullet-bar-bg">
+                            <div class="bullet-bar-fill" id="bullet-system-score" style="background-color: #00bfff;"></div>
+                            <div class="bullet-target-marker" style="left: 15%;"></div>
+                        </div>
+                    </div>
+                    <div class="kpi-card-sparkline">
+                        <svg id="sparkline-system-score"></svg>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- System Context Grid (Visualizations) -->
+            <div class="context-grid">
+                <!-- Diverging Dot Plot -->
+                <div class="visual-panel">
+                    <div>
+                        <h2 class="panel-title">مقارنة التوزيع الإحصائي للوكلاء</h2>
+                        <p class="panel-subtitle">أداء المساعد الذكي المحلي مقابل Live ElevenLabs</p>
+                    </div>
+                    <div class="dotplot-container">
+                        <svg id="dotplot-canvas"></svg>
+                    </div>
+                </div>
+
+                <!-- Verdict Distribution -->
+                <div class="visual-panel">
+                    <div>
+                        <h2 class="panel-title">توزيع قرارات قاضي المحكمة</h2>
+                        <p class="panel-subtitle">تقسيم القرارات التلقائية للمكالمات المسجلة من المحكمة</p>
+                    </div>
+                    <div class="verdict-chart-container" id="verdict-distribution-container" style="display: flex; flex-direction: column; justify-content: center; height: 320px; gap: 4px; overflow-y: auto;">
+                        <!-- Verdict bars populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Calls Table -->
+            <div class="table-panel">
+                <h2 class="panel-title">سجل اتصالات النظام وتحليلات المحكمة</h2>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الوقت</th>
+                                <th>رمز المحادثة (Session ID)</th>
+                                <th>المساعد الذكي</th>
+                                <th>M2E الاستجابة</th>
+                                <th>TTFT التوليد</th>
+                                <th>التقييم</th>
+                                <th>قرار المحكمة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="system-table-body">
+                            <tr>
+                                <td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 40px;">جاري تحميل سجل الاتصالات...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: User KPI Dashboard Section -->
+        <div id="section-user" class="dashboard-section">
+            <!-- User Hero Metric Grid -->
+            <div class="hero-grid">
+                
+                <!-- Card 1: Excellent (100% KPI) -->
+                <div class="kpi-card excellent" onclick="showCategoryDetails('100%')">
+                    <div class="kpi-card-header">
+                        <span class="kpi-card-title">معدل الاتصالات الممتازة</span>
+                        <span class="kpi-card-icon">▲</span>
+                    </div>
+                    <div class="kpi-card-body">
+                        <div class="kpi-value-wrapper">
+                            <span class="kpi-value" id="val-excellent">0.0</span>
+                            <span class="kpi-unit">%</span>
+                        </div>
+                        <span class="kpi-delta up" id="delta-excellent">0%</span>
+                    </div>
+                    <div class="bullet-container">
+                        <div class="bullet-label-row">
+                            <span>الهدف: 90%</span>
+                            <span id="percent-excellent">0%</span>
+                        </div>
+                        <div class="bullet-bar-bg">
+                            <div class="bullet-bar-fill" id="bullet-excellent"></div>
+                            <div class="bullet-target-marker" style="left: 10%;"></div>
+                        </div>
+                    </div>
+                    <div class="kpi-card-sparkline">
+                        <svg id="sparkline-excellent"></svg>
+                    </div>
+                </div>
+
+                <!-- Card 2: Acceptable (50% KPI) -->
+                <div class="kpi-card acceptable" onclick="showCategoryDetails('50%')">
+                    <div class="kpi-card-header">
+                        <span class="kpi-card-title">معدل الاتصالات المقبولة</span>
+                        <span class="kpi-card-icon">●</span>
+                    </div>
+                    <div class="kpi-card-body">
+                        <div class="kpi-value-wrapper">
+                            <span class="kpi-value" id="val-acceptable">0.0</span>
+                            <span class="kpi-unit">%</span>
+                        </div>
+                        <span class="kpi-delta" id="delta-acceptable">0%</span>
+                    </div>
+                    <div class="bullet-container">
+                        <div class="bullet-label-row">
+                            <span>الهدف الأعلى: 15%</span>
+                            <span id="percent-acceptable">0%</span>
+                        </div>
+                        <div class="bullet-bar-bg">
+                            <div class="bullet-bar-fill" id="bullet-acceptable"></div>
+                            <div class="bullet-target-marker" style="left: 85%;"></div>
+                        </div>
+                    </div>
+                    <div class="kpi-card-sparkline">
+                        <svg id="sparkline-acceptable"></svg>
+                    </div>
+                </div>
+
+                <!-- Card 3: Poor (0% KPI) -->
+                <div class="kpi-card poor" onclick="showCategoryDetails('0%')">
+                    <div class="kpi-card-header">
+                        <span class="kpi-card-title">معدل الاتصالات غير المرضية</span>
+                        <span class="kpi-card-icon">▼</span>
+                    </div>
+                    <div class="kpi-card-body">
+                        <div class="kpi-value-wrapper">
+                            <span class="kpi-value" id="val-poor">0.0</span>
+                            <span class="kpi-unit">%</span>
+                        </div>
+                        <span class="kpi-delta down" id="delta-poor">0%</span>
+                    </div>
+                    <div class="bullet-container">
+                        <div class="bullet-label-row">
+                            <span>الحد الأقصى المقبول: 5%</span>
+                            <span id="percent-poor">0%</span>
+                        </div>
+                        <div class="bullet-bar-bg">
+                            <div class="bullet-bar-fill" id="bullet-poor"></div>
+                            <div class="bullet-target-marker" style="left: 95%;"></div>
+                        </div>
+                    </div>
+                    <div class="kpi-card-sparkline">
+                        <svg id="sparkline-poor"></svg>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- User Context Grid (Visualizations) -->
+            <div class="context-grid" style="grid-template-columns: 1fr;">
+                <!-- Trend spline area chart -->
+                <div class="visual-panel">
+                    <div>
+                        <h2 class="panel-title">مسار تقييم جودة الاتصال التاريخي</h2>
+                        <p class="panel-subtitle">متوسط تقييم KPI اليومي عبر خطوط الزمن للتحقق من الاتجاه العام</p>
+                    </div>
+                    <div class="trend-chart-container">
+                        <svg id="trend-canvas"></svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Calls Table -->
+            <div class="table-panel">
+                <h2 class="panel-title">سجل الاتصالات والتعليقات الواردة مؤخراً</h2>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الوقت</th>
+                                <th>الاسم</th>
+                                <th>رقم الهاتف</th>
+                                <th>البريد الإلكتروني</th>
+                                <th>المساعد الذكي</th>
+                                <th>مؤشر الأداء (KPI)</th>
+                                <th>تعليق العميل والتقييم</th>
+                            </tr>
+                        </thead>
+                        <tbody id="calls-table-body">
+                            <tr>
+                                <td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 40px;">جاري تحميل سجل المكالمات...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
     </div>
 
@@ -794,6 +1031,7 @@
 
     <script>
         let kpiDataGlobal = null;
+        let activeTab = 'system';
 
         async function fetchKpiData() {
             try {
@@ -808,7 +1046,8 @@
                 drawSparklines(data.recentCalls);
                 drawTrendSpline(data.trend);
                 drawDivergingDotPlot(data.agents);
-                updateTable(data.recentCalls);
+                drawVerdictDistribution(data.telemetryStats);
+                updateTables(data.recentCalls);
                 
                 // Update Sync Timestamp
                 const now = new Date();
@@ -819,8 +1058,32 @@
             }
         }
 
+        function switchTab(tabId) {
+            activeTab = tabId;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.dashboard-section').forEach(sec => sec.classList.remove('active'));
+            
+            if (tabId === 'system') {
+                document.getElementById('btn-tab-system').classList.add('active');
+                document.getElementById('section-system').classList.add('active');
+            } else {
+                document.getElementById('btn-tab-user').classList.add('active');
+                document.getElementById('section-user').classList.add('active');
+            }
+            
+            // Force redraw of SVG charts to adapt to visibility/width changes
+            if (kpiDataGlobal) {
+                setTimeout(() => {
+                    drawTrendSpline(kpiDataGlobal.trend);
+                    drawDivergingDotPlot(kpiDataGlobal.agents);
+                    drawSparklines(kpiDataGlobal.recentCalls);
+                    drawVerdictDistribution(kpiDataGlobal.telemetryStats);
+                }, 50); // slight delay to allow display flex to apply and compute clientWidth
+            }
+        }
+
         function updateMetrics(stats, telemetryStats) {
-            // Percent values
+            // User Percent values
             document.getElementById('val-excellent').innerText = stats.excellentRate.toFixed(1);
             document.getElementById('val-acceptable').innerText = stats.acceptableRate.toFixed(1);
             document.getElementById('val-poor').innerText = stats.poorRate.toFixed(1);
@@ -829,23 +1092,53 @@
             document.getElementById('percent-acceptable').innerText = `${stats.acceptableRate.toFixed(1)}%`;
             document.getElementById('percent-poor').innerText = `${stats.poorRate.toFixed(1)}%`;
 
-            // Bullet bar widths
+            // User Bullet bar widths
             document.getElementById('bullet-excellent').style.width = `${Math.min(stats.excellentRate, 100)}%`;
             document.getElementById('bullet-acceptable').style.width = `${Math.min(stats.acceptableRate, 100)}%`;
             document.getElementById('bullet-poor').style.width = `${Math.min(stats.poorRate, 100)}%`;
 
-            // Simple deltas (mock trend direction for aesthetic depth)
+            // Simple User deltas (mock trend direction for aesthetic depth)
             document.getElementById('delta-excellent').innerText = stats.excellentRate >= 90 ? '▲ +0.4%' : '▼ -0.2%';
             document.getElementById('delta-excellent').className = stats.excellentRate >= 90 ? 'kpi-delta up' : 'kpi-delta down';
             
             document.getElementById('delta-poor').innerText = stats.poorRate <= 5 ? '▼ -0.5%' : '▲ +0.1%';
             document.getElementById('delta-poor').className = stats.poorRate <= 5 ? 'kpi-delta up' : 'kpi-delta down';
 
-            // Telemetry updates
+            // System Telemetry updates
             if (telemetryStats) {
-                document.getElementById('val-telemetry-m2e').innerText = telemetryStats.avgM2e;
-                document.getElementById('val-telemetry-ttft').innerText = `TTFT: ${telemetryStats.avgTtft}ms`;
+                // M2E Card
+                document.getElementById('val-system-m2e').innerText = telemetryStats.avgM2e;
+                document.getElementById('val-system-m2e-p95').innerText = `P95: ${telemetryStats.p95M2e}ms`;
+                const m2ePercent = Math.max(0, Math.min(100, Math.round((telemetryStats.avgM2e / 800) * 100)));
+                document.getElementById('percent-system-m2e').innerText = `${telemetryStats.avgM2e}ms`;
+                document.getElementById('bullet-system-m2e').style.width = `${m2ePercent}%`;
+
+                // TTFT Card
+                document.getElementById('val-system-ttft').innerText = telemetryStats.avgTtft;
+                const ttftDesc = telemetryStats.avgTtft < 300 ? 'سريع جداً' : (telemetryStats.avgTtft < 600 ? 'مقبول' : 'بطيء جداً');
+                const ttftColor = telemetryStats.avgTtft < 300 ? 'var(--color-excellent)' : (telemetryStats.avgTtft < 600 ? '#ff9f0a' : 'var(--color-poor)');
+                const ttftDescEl = document.getElementById('val-system-ttft-desc');
+                ttftDescEl.innerText = ttftDesc;
+                ttftDescEl.style.color = ttftColor;
+                const ttftPercent = Math.max(0, Math.min(100, Math.round((telemetryStats.avgTtft / 600) * 100)));
+                document.getElementById('percent-system-ttft').innerText = `${telemetryStats.avgTtft}ms`;
+                const bulletTtft = document.getElementById('bullet-system-ttft');
+                bulletTtft.style.width = `${ttftPercent}%`;
+                bulletTtft.style.backgroundColor = ttftColor;
+
+                // Success Rate Card
+                const verdicts = telemetryStats.verdicts || {};
+                const totalTel = Object.values(verdicts).reduce((a, b) => a + b, 0);
+                const successCalls = verdicts['SUCCESS'] || 0;
+                const successRate = totalTel > 0 ? (successCalls / totalTel) * 100 : 100.0;
                 
+                document.getElementById('val-system-success').innerText = successRate.toFixed(1);
+                document.getElementById('percent-system-success').innerText = `${successRate.toFixed(1)}%`;
+                document.getElementById('bullet-system-success').style.width = `${successRate}%`;
+                document.getElementById('val-system-success-desc').innerText = successRate >= 90 ? 'ممتاز' : 'يحتاج تحسين';
+                document.getElementById('val-system-success-desc').className = successRate >= 90 ? 'kpi-delta up' : 'kpi-delta down';
+
+                // Magistrate Score Card
                 let totalScore = 0, scoreCount = 0;
                 if (kpiDataGlobal && kpiDataGlobal.recentCalls) {
                     kpiDataGlobal.recentCalls.forEach(c => {
@@ -855,20 +1148,21 @@
                         }
                     });
                 }
-                const avgScore = scoreCount > 0 ? (totalScore / scoreCount) * 100 : 92.4; // Default/target percentage fallback
-                document.getElementById('percent-telemetry-score').innerText = `التقييم: ${avgScore.toFixed(1)}%`;
-                document.getElementById('bullet-telemetry-score').style.width = `${avgScore}%`;
+                const avgScore = scoreCount > 0 ? (totalScore / scoreCount) * 100 : 92.4;
+                document.getElementById('val-system-score').innerText = avgScore.toFixed(1);
+                document.getElementById('percent-system-score').innerText = `${avgScore.toFixed(1)}%`;
+                document.getElementById('bullet-system-score').style.width = `${avgScore}%`;
+                document.getElementById('val-system-score-desc').innerText = avgScore >= 85 ? 'مستقر' : 'تراجع بالأداء';
+                document.getElementById('val-system-score-desc').style.color = avgScore >= 85 ? 'var(--color-excellent)' : '#ff9f0a';
             }
         }
 
         function drawSparklines(calls) {
-            // Extract numeric historical states (last 20 calls matching category)
+            // User Sparklines helper
             const getSparkPoints = (checkKpi) => {
                 let currentTotal = 0;
                 let matchCount = 0;
                 const points = [];
-                
-                // Traverse chronologically (reverse since array is newest first)
                 const chronological = [...calls].reverse();
                 chronological.forEach((c) => {
                     currentTotal++;
@@ -877,11 +1171,12 @@
                     }
                     points.push(currentTotal > 0 ? (matchCount / currentTotal) * 100 : 0);
                 });
-                return points.slice(-15); // Last 15 data updates
+                return points.slice(-15);
             };
 
-            const drawSVG = (svgId, points, strokeColor) => {
+            const drawSVG = (svgId, points, strokeColor, fillZero) => {
                 const svg = document.getElementById(svgId);
+                if (!svg) return;
                 svg.innerHTML = '';
                 if (points.length < 2) return;
                 
@@ -889,7 +1184,7 @@
                 const height = svg.clientHeight || 48;
                 
                 const maxVal = Math.max(...points, 10);
-                const minVal = Math.min(...points, 0);
+                const minVal = fillZero ? 0 : Math.min(...points);
                 const range = maxVal - minVal || 1;
 
                 const stepX = width / (points.length - 1);
@@ -899,7 +1194,6 @@
                     return { x, y };
                 });
 
-                // Create stroke path
                 const pathData = `M ${coords.map(c => `${c.x} ${c.y}`).join(' L ')}`;
                 const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
                 path.setAttribute("d", pathData);
@@ -909,7 +1203,6 @@
                 path.setAttribute("stroke-linecap", "round");
                 svg.appendChild(path);
 
-                // Create gradient area
                 const areaData = `${pathData} L ${coords[coords.length - 1].x} ${height} L ${coords[0].x} ${height} Z`;
                 const area = document.createElementNS("http://www.w3.org/2000/svg", "path");
                 area.setAttribute("d", areaData);
@@ -918,13 +1211,37 @@
                 svg.appendChild(area);
             };
 
-            drawSVG('sparkline-excellent', getSparkPoints('100%'), 'var(--color-excellent)');
-            drawSVG('sparkline-acceptable', getSparkPoints('50%'), 'var(--color-acceptable)');
-            drawSVG('sparkline-poor', getSparkPoints('0%'), 'var(--color-poor)');
+            drawSVG('sparkline-excellent', getSparkPoints('100%'), 'var(--color-excellent)', true);
+            drawSVG('sparkline-acceptable', getSparkPoints('50%'), 'var(--color-acceptable)', true);
+            drawSVG('sparkline-poor', getSparkPoints('0%'), 'var(--color-poor)', true);
+
+            // System Sparklines (last 15 evaluated calls)
+            const telCalls = calls.filter(c => c.telemetry);
+            const m2ePoints = telCalls.map(c => c.telemetry.stats ? c.telemetry.stats.avg_m2e_ms || 0 : 0).reverse().slice(-15);
+            const ttftPoints = telCalls.map(c => c.telemetry.stats ? c.telemetry.stats.avg_ttft_ms || 0 : 0).reverse().slice(-15);
+            const scorePoints = telCalls.map(c => (c.telemetry.score !== undefined ? c.telemetry.score * 100 : 0)).reverse().slice(-15);
+            
+            let successTotal = 0;
+            let successCount = 0;
+            const successPoints = [];
+            [...telCalls].reverse().forEach(c => {
+                successTotal++;
+                if (c.telemetry.root_cause_verdict === 'SUCCESS') {
+                    successCount++;
+                }
+                successPoints.push((successCount / successTotal) * 100);
+            });
+            const successTrend = successPoints.slice(-15);
+
+            drawSVG('sparkline-system-m2e', m2ePoints, '#00bfff', false);
+            drawSVG('sparkline-system-ttft', ttftPoints, 'var(--color-excellent)', false);
+            drawSVG('sparkline-system-success', successTrend, 'var(--color-excellent)', true);
+            drawSVG('sparkline-system-score', scorePoints, '#00bfff', true);
         }
 
         function drawTrendSpline(trend) {
             const canvas = document.getElementById('trend-canvas');
+            if (!canvas) return;
             canvas.innerHTML = '';
             if (trend.length === 0) return;
 
@@ -935,7 +1252,6 @@
             const maxVal = 100;
             const minVal = 0;
 
-            // X scale maps dates, Y scale maps KPI percentage
             const stepX = (width - padding * 2) / (trend.length - 1 || 1);
             const getCoords = (t, i) => {
                 const x = padding + i * stepX;
@@ -950,7 +1266,6 @@
             gridValues.forEach(val => {
                 const y = height - padding - (val / maxVal) * (height - padding * 2);
                 
-                // Line
                 const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
                 line.setAttribute("x1", padding);
                 line.setAttribute("y1", y);
@@ -960,7 +1275,6 @@
                 line.setAttribute("stroke-width", "1");
                 canvas.appendChild(line);
 
-                // Label
                 const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
                 label.setAttribute("x", padding - 8);
                 label.setAttribute("y", y + 4);
@@ -989,7 +1303,6 @@
                 path.setAttribute("stroke-width", "2");
                 canvas.appendChild(path);
 
-                // Add area under spline
                 const area = document.createElementNS("http://www.w3.org/2000/svg", "path");
                 const areaD = `${d} L ${coords[coords.length - 1].x} ${height - padding} L ${coords[0].x} ${height - padding} Z`;
                 area.setAttribute("d", areaD);
@@ -1010,12 +1323,10 @@
                 circle.setAttribute("stroke-width", "2");
                 canvas.appendChild(circle);
 
-                // Add interactive title tooltip
                 const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
                 title.textContent = `تاريخ: ${t.date}\nمتوسط الأداء: ${t.averageKpi}%`;
                 circle.appendChild(title);
 
-                // Date Label below timeline
                 const dateLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
                 dateLabel.setAttribute("x", pt.x);
                 dateLabel.setAttribute("y", height - padding + 18);
@@ -1023,7 +1334,6 @@
                 dateLabel.setAttribute("font-size", "9px");
                 dateLabel.setAttribute("text-anchor", "middle");
                 
-                // Format date string from YYYY-MM-DD to MM/DD
                 const parts = t.date.split('-');
                 dateLabel.textContent = parts.length > 2 ? `${parts[1]}/${parts[2]}` : t.date;
                 canvas.appendChild(dateLabel);
@@ -1032,13 +1342,14 @@
 
         function drawDivergingDotPlot(agents) {
             const canvas = document.getElementById('dotplot-canvas');
+            if (!canvas) return;
             canvas.innerHTML = '';
             
             const width = canvas.clientWidth || 400;
             const height = canvas.clientHeight || 320;
             const padding = 50;
 
-            const targetVal = 90; // Target index benchmark (90% Excellent rate)
+            const targetVal = 90; 
             const targetX = padding + ((targetVal / 100) * (width - padding * 2));
 
             // Draw Central Target Line
@@ -1066,7 +1377,6 @@
             agents.forEach((a, i) => {
                 const y = padding + i * rowHeight + rowHeight / 2;
                 
-                // horizontal reference line
                 const refLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
                 refLine.setAttribute("x1", padding);
                 refLine.setAttribute("y1", y);
@@ -1076,7 +1386,6 @@
                 refLine.setAttribute("stroke-width", "1");
                 canvas.appendChild(refLine);
 
-                // Label
                 const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
                 label.setAttribute("x", padding);
                 label.setAttribute("y", y - 10);
@@ -1086,11 +1395,9 @@
                 label.textContent = a.name === "Standalone Agent" ? "مساعد الدفاع المدني المحلي" : "ElevenLabs Voice Agent";
                 canvas.appendChild(label);
 
-                // Dot Plot coordinates
                 const kpiVal = a.excellentRate;
                 const dotX = padding + ((kpiVal / 100) * (width - padding * 2));
 
-                // Connection line from target to dot
                 const conLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
                 conLine.setAttribute("x1", targetX);
                 conLine.setAttribute("y1", y);
@@ -1101,7 +1408,6 @@
                 conLine.setAttribute("opacity", "0.3");
                 canvas.appendChild(conLine);
 
-                // Circle Dot
                 const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
                 circle.setAttribute("cx", dotX);
                 circle.setAttribute("cy", y);
@@ -1121,50 +1427,136 @@
             });
         }
 
-        function updateTable(calls) {
-            const body = document.getElementById('calls-table-body');
-            body.innerHTML = '';
-            
-            if (calls.length === 0) {
-                body.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 40px;">لا توجد سجلات مكالمات حالياً</td></tr>`;
-                return;
+        function drawVerdictDistribution(telemetryStats) {
+            const container = document.getElementById('verdict-distribution-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const verdicts = telemetryStats ? telemetryStats.verdicts || {} : {};
+            const total = Object.values(verdicts).reduce((a, b) => a + b, 0);
+
+            const verdictConfigs = [
+                { key: 'SUCCESS', label: 'نجاح الاتصال والهدف (SUCCESS)', color: 'var(--color-excellent)' },
+                { key: 'FACTUAL_DIVERGENCE', label: 'انحراف أو خطأ معرفي (FACTUAL_DIVERGENCE)', color: 'var(--color-poor)' },
+                { key: 'INTEGRATION_LATENCY_DRAG', label: 'بطء الأنظمة الخارجية (LATENCY_DRAG)', color: 'var(--color-poor)' },
+                { key: 'LLM_COMPUTE_WASTAGE', label: 'بطء توليد المساعد الذكي (COMPUTE_WASTAGE)', color: '#ff9f0a' },
+                { key: 'ACOUSTIC_VAD_CONFLICT', label: 'تداخل أو مقاطعة صوتية (VAD_CONFLICT)', color: '#00bfff' },
+                { key: 'USER_ABANDONMENT', label: 'إغلاق مبكر للمكالمة (USER_ABANDONMENT)', color: '#8e8e93' }
+            ];
+
+            verdictConfigs.forEach(cfg => {
+                const count = verdicts[cfg.key] || 0;
+                const percentage = total > 0 ? (count / total) * 100 : 0;
+
+                const row = document.createElement('div');
+                row.className = 'verdict-bar-row';
+                row.innerHTML = `
+                    <div class="verdict-bar-label-row">
+                        <span class="verdict-bar-label">${cfg.label}</span>
+                        <span class="verdict-bar-value">${count} مكالمة (${percentage.toFixed(1)}%)</span>
+                    </div>
+                    <div class="verdict-bar-bg">
+                        <div class="verdict-bar-fill" style="width: ${percentage}%; background-color: ${cfg.color};"></div>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function updateTables(calls) {
+            // Populate User Table
+            const userBody = document.getElementById('calls-table-body');
+            if (userBody) {
+                userBody.innerHTML = '';
+                if (calls.length === 0) {
+                    userBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 40px;">لا توجد سجلات مكالمات حالياً</td></tr>`;
+                } else {
+                    calls.forEach(call => {
+                        const tr = document.createElement('tr');
+                        tr.onclick = () => showCallDetails(call);
+                        tr.style.cursor = 'pointer';
+
+                        let cleanTime = call.timestamp;
+                        if (cleanTime.includes('T')) {
+                            const timePart = cleanTime.split('T')[1];
+                            cleanTime = timePart.substring(0, 5);
+                        }
+
+                        let kpiBadge = `<span class="badge-status">غير مقيم</span>`;
+                        if (call.kpi === "100%") {
+                            kpiBadge = `<span class="badge-status excellent">ممتاز (100%)</span>`;
+                        } else if (call.kpi === "50%") {
+                            kpiBadge = `<span class="badge-status acceptable">مقبول (50%)</span>`;
+                        } else if (call.kpi === "0%") {
+                            kpiBadge = `<span class="badge-status poor">سيء (0%)</span>`;
+                        }
+
+                        const agentName = call.conversationId.startsWith("standalone_") ? "المساعد المحلي" : "ElevenLabs Live";
+
+                        tr.innerHTML = `
+                            <td>${cleanTime}</td>
+                            <td style="font-weight: 600;">${call.clientName || 'مجهول'}</td>
+                            <td>${call.phoneNumber || '-'}</td>
+                            <td>${call.clientEmail || '-'}</td>
+                            <td style="color: var(--text-secondary);">${agentName}</td>
+                            <td>${kpiBadge}</td>
+                            <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${call.comment || '<span style="color: var(--border-color)">لا يوجد تعليق</span>'}</td>
+                        `;
+                        userBody.appendChild(tr);
+                    });
+                }
             }
 
-            calls.forEach(call => {
-                const tr = document.createElement('tr');
-                tr.onclick = () => showCallDetails(call);
-                tr.style.cursor = 'pointer';
+            // Populate System Table
+            const systemBody = document.getElementById('system-table-body');
+            if (systemBody) {
+                systemBody.innerHTML = '';
+                if (calls.length === 0) {
+                    systemBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 40px;">لا توجد سجلات مكالمات حالياً</td></tr>`;
+                } else {
+                    calls.forEach(call => {
+                        const tr = document.createElement('tr');
+                        tr.onclick = () => showCallDetails(call);
+                        tr.style.cursor = 'pointer';
 
-                // Format timestamp
-                let cleanTime = call.timestamp;
-                if (cleanTime.includes('T')) {
-                    const timePart = cleanTime.split('T')[1];
-                    cleanTime = timePart.substring(0, 5); // HH:MM
+                        let cleanTime = call.timestamp;
+                        if (cleanTime.includes('T')) {
+                            const timePart = cleanTime.split('T')[1];
+                            cleanTime = timePart.substring(0, 5);
+                        }
+
+                        const agentName = call.conversationId.startsWith("standalone_") ? "المساعد المحلي" : "ElevenLabs Live";
+
+                        let m2e = '-';
+                        let ttft = '-';
+                        let score = '-';
+                        let verdictBadge = `<span class="badge-status">بدون بيانات</span>`;
+
+                        if (call.telemetry) {
+                            const tel = call.telemetry;
+                            m2e = tel.stats ? (tel.stats.avg_m2e_ms ? Math.round(tel.stats.avg_m2e_ms) + 'ms' : '-') : '-';
+                            ttft = tel.stats ? (tel.stats.avg_ttft_ms ? Math.round(tel.stats.avg_ttft_ms) + 'ms' : '-') : '-';
+                            score = tel.score !== undefined ? Math.round(tel.score * 100) + '%' : '-';
+                            
+                            const verdictClass = tel.root_cause_verdict === "SUCCESS" ? "excellent" : "poor";
+                            verdictBadge = `<span class="badge-status ${verdictClass}">${tel.root_cause_verdict}</span>`;
+                        }
+
+                        const shortSession = call.conversationId.length > 15 ? call.conversationId.substring(0, 12) + '...' : call.conversationId;
+
+                        tr.innerHTML = `
+                            <td>${cleanTime}</td>
+                            <td style="font-family: monospace; font-size: 0.8rem; color: var(--text-secondary);">${shortSession}</td>
+                            <td style="color: var(--text-secondary);">${agentName}</td>
+                            <td>${m2e}</td>
+                            <td>${ttft}</td>
+                            <td style="font-weight: 600;">${score}</td>
+                            <td>${verdictBadge}</td>
+                        `;
+                        systemBody.appendChild(tr);
+                    });
                 }
-
-                // Format KPI badge
-                let kpiBadge = `<span class="badge-status">غير مقيم</span>`;
-                if (call.kpi === "100%") {
-                    kpiBadge = `<span class="badge-status excellent">ممتاز (100%)</span>`;
-                } else if (call.kpi === "50%") {
-                    kpiBadge = `<span class="badge-status acceptable">مقبول (50%)</span>`;
-                } else if (call.kpi === "0%") {
-                    kpiBadge = `<span class="badge-status poor">سيء (0%)</span>`;
-                }
-
-                const agentName = call.conversationId.startsWith("standalone_") ? "المساعد الذكي المحلي" : "ElevenLabs Live Agent";
-
-                tr.innerHTML = `
-                    <td>${cleanTime}</td>
-                    <td style="font-weight: 600;">${call.clientName || 'مجهول'}</td>
-                    <td>${call.phoneNumber || '-'}</td>
-                    <td>${call.clientEmail || '-'}</td>
-                    <td style="color: var(--text-secondary);">${agentName}</td>
-                    <td>${kpiBadge}</td>
-                    <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${call.comment || '<span style="color: var(--border-color)">لا يوجد تعليق</span>'}</td>
-                `;
-                body.appendChild(tr);
-            });
+            }
         }
 
         function toggleTray(isOpen) {
@@ -1315,6 +1707,7 @@
                 drawTrendSpline(kpiDataGlobal.trend);
                 drawDivergingDotPlot(kpiDataGlobal.agents);
                 drawSparklines(kpiDataGlobal.recentCalls);
+                drawVerdictDistribution(kpiDataGlobal.telemetryStats);
             }
         });
     </script>
