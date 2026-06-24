@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة إحصائيات الأداء (KPI) - الدفاع المدني</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #030508;
+            --surface-color: #0d0f12;
+            --surface-hover: #14171c;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #f5f5f7;
+            --text-secondary: #86868b;
+            
+            /* Accessibility-optimized Semantic Matrix */
+            --color-excellent: #30d158; /* Cyan/Teal (100% KPI) */
+            --color-acceptable: #8e8e93; /* Muted Slate (50% KPI) */
+            --color-poor: #ff9f0a; /* Warm Amber (0% KPI) */
+            
+            --transition-apple: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Glowing background meshes */
+        body::before {
+            content: "";
+            position: absolute;
+            top: -10%;
+            left: -10%;
+            width: 60%;
+            height: 50%;
+            background: radial-gradient(circle, rgba(48, 209, 88, 0.05) 0%, transparent 70%);
+            z-index: -1;
+            filter: blur(120px);
+            pointer-events: none;
+        }
+
+        body::after {
+            content: "";
+            position: absolute;
+            bottom: -10%;
+            right: -10%;
+            width: 50%;
+            height: 50%;
+            background: radial-gradient(circle, rgba(255, 159, 10, 0.03) 0%, transparent 70%);
+            z-index: -1;
+            filter: blur(120px);
+            pointer-events: none;
+        }
+
+        /* Header Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 56px;
+            z-index: 100;
+            background: rgba(3, 5, 8, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+        }
+
+        .nav-logo {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-logo .badge {
+            background: rgba(48, 209, 88, 0.15);
+            color: var(--color-excellent);
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .nav-sync {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .sync-indicator {
+            width: 8px;
+            height: 8px;
+            background-color: var(--color-excellent);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px var(--color-excellent);
+        }
+
+        /* Main Container */
+        .dashboard-container {
+            margin-top: 56px;
+            padding: 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            max-width: 1600px;
+            width: 100%;
+            align-self: center;
+        }
+
+        /* Header section */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dashboard-title h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .dashboard-title p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Hero cards grid */
+        .hero-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 968px) {
+            .hero-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .kpi-card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            cursor: pointer;
+            transition: var(--transition-apple);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card:hover {
+            background-color: var(--surface-hover);
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .kpi-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .kpi-card-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .kpi-card-icon {
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+        }
+
+        .kpi-card.excellent .kpi-card-icon {
+            background: rgba(48, 209, 88, 0.1);
+            color: var(--color-excellent);
+        }
+
+        .kpi-card.acceptable .kpi-card-icon {
+            background: rgba(142, 142, 147, 0.1);
+            color: var(--color-acceptable);
+        }
+
+        .kpi-card.poor .kpi-card-icon {
+            background: rgba(255, 159, 10, 0.1);
+            color: var(--color-poor);
+        }
+
+        .kpi-card-body {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+        }
+
+        .kpi-value-wrapper {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+
+        .kpi-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.8rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .kpi-unit {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .kpi-delta {
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .kpi-delta.up {
+            color: var(--color-excellent);
+        }
+
+        .kpi-delta.down {
+            color: var(--color-poor);
+        }
+
+        /* Bullet chart */
+        .bullet-container {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .bullet-label-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .bullet-bar-bg {
+            height: 8px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bullet-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            width: 0;
+            transition: width 1s ease-in-out;
+        }
+
+        .kpi-card.excellent .bullet-bar-fill {
+            background-color: var(--color-excellent);
+        }
+
+        .kpi-card.acceptable .bullet-bar-fill {
+            background-color: var(--color-acceptable);
+        }
+
+        .kpi-card.poor .bullet-bar-fill {
+            background-color: var(--color-poor);
+        }
+
+        .bullet-target-marker {
+            position: absolute;
+            top: 0;
+            width: 2px;
+            height: 100%;
+            background-color: var(--text-primary);
+            z-index: 2;
+        }
+
+        /* Sparkline mini-charts */
+        .kpi-card-sparkline {
+            width: 100%;
+            height: 48px;
+            margin-top: 8px;
+        }
+
+        .kpi-card-sparkline svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        /* Context Canvas: Visualization Rows */
+        .context-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 1200px) {
+            .context-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .visual-panel {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .panel-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        /* Primary trend visualization */
+        .trend-chart-container {
+            width: 100%;
+            height: 320px;
+            position: relative;
+        }
+
+        .trend-chart-container svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Diverging Dot Plot */
+        .dotplot-container {
+            width: 100%;
+            height: 320px;
+        }
+
+        .dotplot-container svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Call list section */
+        .table-panel {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+            font-size: 0.9rem;
+        }
+
+        th {
+            padding: 12px 16px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            color: var(--text-primary);
+        }
+
+        tr:hover td {
+            background-color: rgba(255, 255, 255, 0.015);
+        }
+
+        .badge-status {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-status.excellent {
+            background: rgba(48, 209, 88, 0.12);
+            color: var(--color-excellent);
+        }
+
+        .badge-status.acceptable {
+            background: rgba(142, 142, 147, 0.12);
+            color: var(--color-acceptable);
+        }
+
+        .badge-status.poor {
+            background: rgba(255, 159, 10, 0.12);
+            color: var(--color-poor);
+        }
+
+        /* Slide-over details tray */
+        .details-tray {
+            position: fixed;
+            top: 0;
+            right: -450px;
+            width: 450px;
+            height: 100%;
+            background-color: var(--surface-color);
+            border-left: 1px solid var(--border-color);
+            z-index: 1000;
+            transition: var(--transition-apple);
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            padding: 30px;
+            gap: 24px;
+        }
+
+        .details-tray.open {
+            right: 0;
+        }
+
+        .tray-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+        }
+
+        .tray-close-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition-apple);
+        }
+
+        .tray-close-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .tray-body {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .tray-meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .tray-meta-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .tray-meta-value {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .transcript-box {
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition-apple);
+        }
+
+        .backdrop.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <div class="navbar">
+        <div class="nav-logo">
+            <span>مركز الإحصائيات الذكي</span>
+            <span class="badge">دفاع مدني البحرين</span>
+        </div>
+        <div class="nav-sync">
+            <span class="sync-indicator"></span>
+            <span id="last-sync-time">مزامنة البيانات...</span>
+        </div>
+    </div>
+
+    <!-- Dashboard Container -->
+    <div class="dashboard-container">
+        
+        <!-- Header -->
+        <div class="dashboard-header">
+            <div class="dashboard-title">
+                <h1>لوحة قياس الأداء والفعالية</h1>
+                <p>سحب لحظي وتحليل إحصائي مباشر للاتصالات من قاعدة البيانات</p>
+            </div>
+        </div>
+
+        <!-- Hero Metric Grid -->
+        <div class="hero-grid">
+            
+            <!-- Card 1: Excellent (100% KPI) -->
+            <div class="kpi-card excellent" onclick="showCategoryDetails('100%')">
+                <div class="kpi-card-header">
+                    <span class="kpi-card-title">معدل الاتصالات الممتازة</span>
+                    <span class="kpi-card-icon">▲</span>
+                </div>
+                <div class="kpi-card-body">
+                    <div class="kpi-value-wrapper">
+                        <span class="kpi-value" id="val-excellent">0.0</span>
+                        <span class="kpi-unit">%</span>
+                    </div>
+                    <span class="kpi-delta up" id="delta-excellent">0%</span>
+                </div>
+                <div class="bullet-container">
+                    <div class="bullet-label-row">
+                        <span>الهدف: 90%</span>
+                        <span id="percent-excellent">0%</span>
+                    </div>
+                    <div class="bullet-bar-bg">
+                        <div class="bullet-bar-fill" id="bullet-excellent"></div>
+                        <div class="bullet-target-marker" style="left: 10%;"></div> <!-- Target marker at 90% (right aligned is 10% from left in RTL) -->
+                    </div>
+                </div>
+                <div class="kpi-card-sparkline">
+                    <svg id="sparkline-excellent"></svg>
+                </div>
+            </div>
+
+            <!-- Card 2: Acceptable (50% KPI) -->
+            <div class="kpi-card acceptable" onclick="showCategoryDetails('50%')">
+                <div class="kpi-card-header">
+                    <span class="kpi-card-title">معدل الاتصالات المقبولة</span>
+                    <span class="kpi-card-icon">●</span>
+                </div>
+                <div class="kpi-card-body">
+                    <div class="kpi-value-wrapper">
+                        <span class="kpi-value" id="val-acceptable">0.0</span>
+                        <span class="kpi-unit">%</span>
+                    </div>
+                    <span class="kpi-delta" id="delta-acceptable">0%</span>
+                </div>
+                <div class="bullet-container">
+                    <div class="bullet-label-row">
+                        <span>الهدف الأعلى: 15%</span>
+                        <span id="percent-acceptable">0%</span>
+                    </div>
+                    <div class="bullet-bar-bg">
+                        <div class="bullet-bar-fill" id="bullet-acceptable"></div>
+                        <div class="bullet-target-marker" style="left: 85%;"></div> <!-- Target max marker at 15% (85% from left in RTL) -->
+                    </div>
+                </div>
+                <div class="kpi-card-sparkline">
+                    <svg id="sparkline-acceptable"></svg>
+                </div>
+            </div>
+
+            <!-- Card 3: Poor (0% KPI) -->
+            <div class="kpi-card poor" onclick="showCategoryDetails('0%')">
+                <div class="kpi-card-header">
+                    <span class="kpi-card-title">معدل الاتصالات غير المرضية</span>
+                    <span class="kpi-card-icon">▼</span>
+                </div>
+                <div class="kpi-card-body">
+                    <div class="kpi-value-wrapper">
+                        <span class="kpi-value" id="val-poor">0.0</span>
+                        <span class="kpi-unit">%</span>
+                    </div>
+                    <span class="kpi-delta down" id="delta-poor">0%</span>
+                </div>
+                <div class="bullet-container">
+                    <div class="bullet-label-row">
+                        <span>الحد الأقصى المقبول: 5%</span>
+                        <span id="percent-poor">0%</span>
+                    </div>
+                    <div class="bullet-bar-bg">
+                        <div class="bullet-bar-fill" id="bullet-poor"></div>
+                        <div class="bullet-target-marker" style="left: 95%;"></div> <!-- Target marker at 5% (95% from left in RTL) -->
+                    </div>
+                </div>
+                <div class="kpi-card-sparkline">
+                    <svg id="sparkline-poor"></svg>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Context Grid (Visualizations) -->
+        <div class="context-grid">
+            
+            <!-- Trend spline area chart -->
+            <div class="visual-panel">
+                <div>
+                    <h2 class="panel-title">مسار تقييم جودة الاتصال التاريخي</h2>
+                    <p class="panel-subtitle">متوسط تقييم KPI اليومي عبر خطوط الزمن للتحقق من الاتجاه العام</p>
+                </div>
+                <div class="trend-chart-container">
+                    <svg id="trend-canvas"></svg>
+                </div>
+            </div>
+
+            <!-- Diverging Dot Plot -->
+            <div class="visual-panel">
+                <div>
+                    <h2 class="panel-title">مقارنة التوزيع الإحصائي للوكلاء</h2>
+                    <p class="panel-subtitle">أداء المساعد الذكي المحلي مقابل Live ElevenLabs</p>
+                </div>
+                <div class="dotplot-container">
+                    <svg id="dotplot-canvas"></svg>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Call list table panel -->
+        <div class="table-panel">
+            <h2 class="panel-title">سجل الاتصالات والتعليقات الواردة مؤخراً</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>الوقت</th>
+                            <th>الاسم</th>
+                            <th>رقم الهاتف</th>
+                            <th>البريد الإلكتروني</th>
+                            <th>المساعد الذكي</th>
+                            <th>مؤشر الأداء (KPI)</th>
+                            <th>تعليق العميل والتقييم</th>
+                        </tr>
+                    </thead>
+                    <tbody id="calls-table-body">
+                        <tr>
+                            <td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 40px;">جاري تحميل سجل المكالمات...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Backdrop for drawer -->
+    <div class="backdrop" id="backdrop" onclick="toggleTray(false)"></div>
+
+    <!-- Detail Slide-over Drawer -->
+    <div class="details-tray" id="details-tray">
+        <div class="tray-header">
+            <h2 id="tray-title" class="panel-title">تفاصيل التصنيف</h2>
+            <button class="tray-close-btn" onclick="toggleTray(false)">×</button>
+        </div>
+        <div class="tray-body" id="tray-body-content">
+            <!-- Dynamic content injected here -->
+        </div>
+    </div>
+
+    <script>
+        let kpiDataGlobal = null;
+
+        async function fetchKpiData() {
+            try {
+                const response = await fetch('/api/kpi-data');
+                if (!response.ok) {
+                    throw new Error('API fetch failed');
+                }
+                const data = await response.json();
+                kpiDataGlobal = data;
+                
+                updateMetrics(data.stats);
+                drawSparklines(data.recentCalls);
+                drawTrendSpline(data.trend);
+                drawDivergingDotPlot(data.agents);
+                updateTable(data.recentCalls);
+                
+                // Update Sync Timestamp
+                const now = new Date();
+                document.getElementById('last-sync-time').innerText = `آخر تحديث: ${now.toLocaleTimeString('ar-BH')}`;
+            } catch (err) {
+                console.error("Error fetching KPI dataset:", err);
+                document.getElementById('last-sync-time').innerText = "خطأ في سحب البيانات";
+            }
+        }
+
+        function updateMetrics(stats) {
+            // Percent values
+            document.getElementById('val-excellent').innerText = stats.excellentRate.toFixed(1);
+            document.getElementById('val-acceptable').innerText = stats.acceptableRate.toFixed(1);
+            document.getElementById('val-poor').innerText = stats.poorRate.toFixed(1);
+
+            document.getElementById('percent-excellent').innerText = `${stats.excellentRate.toFixed(1)}%`;
+            document.getElementById('percent-acceptable').innerText = `${stats.acceptableRate.toFixed(1)}%`;
+            document.getElementById('percent-poor').innerText = `${stats.poorRate.toFixed(1)}%`;
+
+            // Bullet bar widths
+            document.getElementById('bullet-excellent').style.width = `${Math.min(stats.excellentRate, 100)}%`;
+            document.getElementById('bullet-acceptable').style.width = `${Math.min(stats.acceptableRate, 100)}%`;
+            document.getElementById('bullet-poor').style.width = `${Math.min(stats.poorRate, 100)}%`;
+
+            // Simple deltas (mock trend direction for aesthetic depth)
+            document.getElementById('delta-excellent').innerText = stats.excellentRate >= 90 ? '▲ +0.4%' : '▼ -0.2%';
+            document.getElementById('delta-excellent').className = stats.excellentRate >= 90 ? 'kpi-delta up' : 'kpi-delta down';
+            
+            document.getElementById('delta-poor').innerText = stats.poorRate <= 5 ? '▼ -0.5%' : '▲ +0.1%';
+            document.getElementById('delta-poor').className = stats.poorRate <= 5 ? 'kpi-delta up' : 'kpi-delta down';
+        }
+
+        function drawSparklines(calls) {
+            // Extract numeric historical states (last 20 calls matching category)
+            const getSparkPoints = (checkKpi) => {
+                let currentTotal = 0;
+                let matchCount = 0;
+                const points = [];
+                
+                // Traverse chronologically (reverse since array is newest first)
+                const chronological = [...calls].reverse();
+                chronological.forEach((c) => {
+                    currentTotal++;
+                    if (c.kpi === checkKpi) {
+                        matchCount++;
+                    }
+                    points.push(currentTotal > 0 ? (matchCount / currentTotal) * 100 : 0);
+                });
+                return points.slice(-15); // Last 15 data updates
+            };
+
+            const drawSVG = (svgId, points, strokeColor) => {
+                const svg = document.getElementById(svgId);
+                svg.innerHTML = '';
+                if (points.length < 2) return;
+                
+                const width = svg.clientWidth || 300;
+                const height = svg.clientHeight || 48;
+                
+                const maxVal = Math.max(...points, 10);
+                const minVal = Math.min(...points, 0);
+                const range = maxVal - minVal || 1;
+
+                const stepX = width / (points.length - 1);
+                const coords = points.map((p, i) => {
+                    const x = i * stepX;
+                    const y = height - ((p - minVal) / range) * (height - 6) - 3;
+                    return { x, y };
+                });
+
+                // Create stroke path
+                const pathData = `M ${coords.map(c => `${c.x} ${c.y}`).join(' L ')}`;
+                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                path.setAttribute("d", pathData);
+                path.setAttribute("fill", "none");
+                path.setAttribute("stroke", strokeColor);
+                path.setAttribute("stroke-width", "2");
+                path.setAttribute("stroke-linecap", "round");
+                svg.appendChild(path);
+
+                // Create gradient area
+                const areaData = `${pathData} L ${coords[coords.length - 1].x} ${height} L ${coords[0].x} ${height} Z`;
+                const area = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                area.setAttribute("d", areaData);
+                area.setAttribute("fill", strokeColor);
+                area.setAttribute("opacity", "0.04");
+                svg.appendChild(area);
+            };
+
+            drawSVG('sparkline-excellent', getSparkPoints('100%'), 'var(--color-excellent)');
+            drawSVG('sparkline-acceptable', getSparkPoints('50%'), 'var(--color-acceptable)');
+            drawSVG('sparkline-poor', getSparkPoints('0%'), 'var(--color-poor)');
+        }
+
+        function drawTrendSpline(trend) {
+            const canvas = document.getElementById('trend-canvas');
+            canvas.innerHTML = '';
+            if (trend.length === 0) return;
+
+            const width = canvas.clientWidth || 800;
+            const height = canvas.clientHeight || 320;
+            const padding = 40;
+
+            const maxVal = 100;
+            const minVal = 0;
+
+            // X scale maps dates, Y scale maps KPI percentage
+            const stepX = (width - padding * 2) / (trend.length - 1 || 1);
+            const getCoords = (t, i) => {
+                const x = padding + i * stepX;
+                const y = height - padding - (t.averageKpi / maxVal) * (height - padding * 2);
+                return { x, y };
+            };
+
+            const coords = trend.map((t, i) => getCoords(t, i));
+
+            // Gridlines
+            const gridValues = [0, 50, 100];
+            gridValues.forEach(val => {
+                const y = height - padding - (val / maxVal) * (height - padding * 2);
+                
+                // Line
+                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                line.setAttribute("x1", padding);
+                line.setAttribute("y1", y);
+                line.setAttribute("x2", width - padding);
+                line.setAttribute("y2", y);
+                line.setAttribute("stroke", "rgba(255, 255, 255, 0.05)");
+                line.setAttribute("stroke-width", "1");
+                canvas.appendChild(line);
+
+                // Label
+                const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                label.setAttribute("x", padding - 8);
+                label.setAttribute("y", y + 4);
+                label.setAttribute("fill", "var(--text-secondary)");
+                label.setAttribute("font-size", "10px");
+                label.setAttribute("text-anchor", "end");
+                label.textContent = `${val}%`;
+                canvas.appendChild(label);
+            });
+
+            // Trend Path (Spline curve)
+            if (coords.length > 1) {
+                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                let d = `M ${coords[0].x} ${coords[0].y}`;
+                
+                for (let i = 0; i < coords.length - 1; i++) {
+                    const curr = coords[i];
+                    const next = coords[i+1];
+                    const controlX = curr.x + (next.x - curr.x) / 2;
+                    d += ` C ${controlX} ${curr.y}, ${controlX} ${next.y}, ${next.x} ${next.y}`;
+                }
+                
+                path.setAttribute("d", d);
+                path.setAttribute("fill", "none");
+                path.setAttribute("stroke", "var(--color-excellent)");
+                path.setAttribute("stroke-width", "2");
+                canvas.appendChild(path);
+
+                // Add area under spline
+                const area = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                const areaD = `${d} L ${coords[coords.length - 1].x} ${height - padding} L ${coords[0].x} ${height - padding} Z`;
+                area.setAttribute("d", areaD);
+                area.setAttribute("fill", "var(--color-excellent)");
+                area.setAttribute("opacity", "0.03");
+                canvas.appendChild(area);
+            }
+
+            // Interactive nodes
+            trend.forEach((t, i) => {
+                const pt = coords[i];
+                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circle.setAttribute("cx", pt.x);
+                circle.setAttribute("cy", pt.y);
+                circle.setAttribute("r", "4");
+                circle.setAttribute("fill", "var(--bg-color)");
+                circle.setAttribute("stroke", "var(--color-excellent)");
+                circle.setAttribute("stroke-width", "2");
+                canvas.appendChild(circle);
+
+                // Add interactive title tooltip
+                const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+                title.textContent = `تاريخ: ${t.date}\nمتوسط الأداء: ${t.averageKpi}%`;
+                circle.appendChild(title);
+
+                // Date Label below timeline
+                const dateLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                dateLabel.setAttribute("x", pt.x);
+                dateLabel.setAttribute("y", height - padding + 18);
+                dateLabel.setAttribute("fill", "var(--text-secondary)");
+                dateLabel.setAttribute("font-size", "9px");
+                dateLabel.setAttribute("text-anchor", "middle");
+                
+                // Format date string from YYYY-MM-DD to MM/DD
+                const parts = t.date.split('-');
+                dateLabel.textContent = parts.length > 2 ? `${parts[1]}/${parts[2]}` : t.date;
+                canvas.appendChild(dateLabel);
+            });
+        }
+
+        function drawDivergingDotPlot(agents) {
+            const canvas = document.getElementById('dotplot-canvas');
+            canvas.innerHTML = '';
+            
+            const width = canvas.clientWidth || 400;
+            const height = canvas.clientHeight || 320;
+            const padding = 50;
+
+            const targetVal = 90; // Target index benchmark (90% Excellent rate)
+            const targetX = padding + ((targetVal / 100) * (width - padding * 2));
+
+            // Draw Central Target Line
+            const targetLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            targetLine.setAttribute("x1", targetX);
+            targetLine.setAttribute("y1", padding);
+            targetLine.setAttribute("x2", targetX);
+            targetLine.setAttribute("y2", height - padding);
+            targetLine.setAttribute("stroke", "rgba(255, 255, 255, 0.2)");
+            targetLine.setAttribute("stroke-width", "1");
+            targetLine.setAttribute("stroke-dasharray", "4 4");
+            canvas.appendChild(targetLine);
+
+            const targetLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            targetLabel.setAttribute("x", targetX);
+            targetLabel.setAttribute("y", padding - 10);
+            targetLabel.setAttribute("fill", "var(--text-primary)");
+            targetLabel.setAttribute("font-size", "10px");
+            targetLabel.setAttribute("text-anchor", "middle");
+            targetLabel.textContent = `مستهدف: ${targetVal}%`;
+            canvas.appendChild(targetLabel);
+
+            // Draw agents coordinates
+            const rowHeight = (height - padding * 2) / (agents.length || 1);
+            agents.forEach((a, i) => {
+                const y = padding + i * rowHeight + rowHeight / 2;
+                
+                // horizontal reference line
+                const refLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                refLine.setAttribute("x1", padding);
+                refLine.setAttribute("y1", y);
+                refLine.setAttribute("x2", width - padding);
+                refLine.setAttribute("y2", y);
+                refLine.setAttribute("stroke", "rgba(255, 255, 255, 0.02)");
+                refLine.setAttribute("stroke-width", "1");
+                canvas.appendChild(refLine);
+
+                // Label
+                const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                label.setAttribute("x", padding);
+                label.setAttribute("y", y - 10);
+                label.setAttribute("fill", "var(--text-secondary)");
+                label.setAttribute("font-size", "11px");
+                label.setAttribute("text-anchor", "start");
+                label.textContent = a.name === "Standalone Agent" ? "مساعد الدفاع المدني المحلي" : "ElevenLabs Voice Agent";
+                canvas.appendChild(label);
+
+                // Dot Plot coordinates
+                const kpiVal = a.excellentRate;
+                const dotX = padding + ((kpiVal / 100) * (width - padding * 2));
+
+                // Connection line from target to dot
+                const conLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                conLine.setAttribute("x1", targetX);
+                conLine.setAttribute("y1", y);
+                conLine.setAttribute("x2", dotX);
+                conLine.setAttribute("y2", y);
+                conLine.setAttribute("stroke", kpiVal >= targetVal ? "var(--color-excellent)" : "var(--color-poor)");
+                conLine.setAttribute("stroke-width", "2");
+                conLine.setAttribute("opacity", "0.3");
+                canvas.appendChild(conLine);
+
+                // Circle Dot
+                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circle.setAttribute("cx", dotX);
+                circle.setAttribute("cy", y);
+                circle.setAttribute("r", "7");
+                circle.setAttribute("fill", kpiVal >= targetVal ? "var(--color-excellent)" : "var(--color-poor)");
+                canvas.appendChild(circle);
+
+                const valueText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                valueText.setAttribute("x", dotX);
+                valueText.setAttribute("y", y + 4);
+                valueText.setAttribute("fill", "#000");
+                valueText.setAttribute("font-size", "9px");
+                valueText.setAttribute("font-weight", "700");
+                valueText.setAttribute("text-anchor", "middle");
+                valueText.textContent = `${Math.round(kpiVal)}%`;
+                canvas.appendChild(valueText);
+            });
+        }
+
+        function updateTable(calls) {
+            const body = document.getElementById('calls-table-body');
+            body.innerHTML = '';
+            
+            if (calls.length === 0) {
+                body.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 40px;">لا توجد سجلات مكالمات حالياً</td></tr>`;
+                return;
+            }
+
+            calls.forEach(call => {
+                const tr = document.createElement('tr');
+                tr.onclick = () => showCallDetails(call);
+                tr.style.cursor = 'pointer';
+
+                // Format timestamp
+                let cleanTime = call.timestamp;
+                if (cleanTime.includes('T')) {
+                    const timePart = cleanTime.split('T')[1];
+                    cleanTime = timePart.substring(0, 5); // HH:MM
+                }
+
+                // Format KPI badge
+                let kpiBadge = `<span class="badge-status">غير مقيم</span>`;
+                if (call.kpi === "100%") {
+                    kpiBadge = `<span class="badge-status excellent">ممتاز (100%)</span>`;
+                } else if (call.kpi === "50%") {
+                    kpiBadge = `<span class="badge-status acceptable">مقبول (50%)</span>`;
+                } else if (call.kpi === "0%") {
+                    kpiBadge = `<span class="badge-status poor">سيء (0%)</span>`;
+                }
+
+                const agentName = call.conversationId.startsWith("standalone_") ? "المساعد الذكي المحلي" : "ElevenLabs Live Agent";
+
+                tr.innerHTML = `
+                    <td>${cleanTime}</td>
+                    <td style="font-weight: 600;">${call.clientName || 'مجهول'}</td>
+                    <td>${call.phoneNumber || '-'}</td>
+                    <td>${call.clientEmail || '-'}</td>
+                    <td style="color: var(--text-secondary);">${agentName}</td>
+                    <td>${kpiBadge}</td>
+                    <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${call.comment || '<span style="color: var(--border-color)">لا يوجد تعليق</span>'}</td>
+                `;
+                body.appendChild(tr);
+            });
+        }
+
+        function toggleTray(isOpen) {
+            const tray = document.getElementById('details-tray');
+            const backdrop = document.getElementById('backdrop');
+            if (isOpen) {
+                tray.classList.add('open');
+                backdrop.classList.add('open');
+            } else {
+                tray.classList.remove('open');
+                backdrop.classList.remove('open');
+            }
+        }
+
+        function showCallDetails(call) {
+            const title = document.getElementById('tray-title');
+            const body = document.getElementById('tray-body-content');
+
+            title.innerText = `سجل المكالمة: ${call.clientName || 'مجهول'}`;
+            
+            const agentName = call.conversationId.startsWith("standalone_") ? "المساعد الذكي المحلي" : "ElevenLabs Live Agent";
+            const kpiStatus = call.kpi ? call.kpi : "غير مقيم";
+
+            body.innerHTML = `
+                <div class="tray-meta-item">
+                    <span class="tray-meta-label">الاسم الكامل</span>
+                    <span class="tray-meta-value">${call.clientName || 'مجهول'}</span>
+                </div>
+                <div class="tray-meta-item">
+                    <span class="tray-meta-label">رقم الهاتف</span>
+                    <span class="tray-meta-value">${call.phoneNumber || '-'}</span>
+                </div>
+                <div class="tray-meta-item">
+                    <span class="tray-meta-label">البريد الإلكتروني</span>
+                    <span class="tray-meta-value">${call.clientEmail || '-'}</span>
+                </div>
+                <div class="tray-meta-item">
+                    <span class="tray-meta-label">المساعد الذكي المستخدم</span>
+                    <span class="tray-meta-value">${agentName}</span>
+                </div>
+                <div class="tray-meta-item">
+                    <span class="tray-meta-label">رمز المحادثة (Session ID)</span>
+                    <span class="tray-meta-value" style="font-family: monospace; font-size: 0.85rem;">${call.conversationId}</span>
+                </div>
+                <div class="tray-meta-item">
+                    <span class="tray-meta-label">مؤشر أداء المكالمة (KPI)</span>
+                    <span class="tray-meta-value">${kpiStatus}</span>
+                </div>
+                <div class="tray-meta-item">
+                    <span class="tray-meta-label">التعليق والتقييم النوعي للعميل</span>
+                    <span class="tray-meta-value" style="font-style: italic; color: ${call.kpi === '100%' ? 'var(--color-excellent)' : (call.kpi === '0%' ? 'var(--color-poor)' : 'var(--text-primary)')};">
+                        "${call.comment || 'لا يوجد تعليق'}"
+                    </span>
+                </div>
+            `;
+
+            toggleTray(true);
+        }
+
+        function showCategoryDetails(kpiCategory) {
+            if (!kpiDataGlobal) return;
+            
+            const filtered = kpiDataGlobal.recentCalls.filter(c => c.kpi === kpiCategory);
+            const title = document.getElementById('tray-title');
+            const body = document.getElementById('tray-body-content');
+
+            const categoryName = kpiCategory === "100%" ? "الممتازة" : (kpiCategory === "50%" ? "المقبولة" : "غير المرضية (السيئة)");
+            title.innerText = `قائمة المكالمات ${categoryName}`;
+
+            if (filtered.length === 0) {
+                body.innerHTML = `<p style="color: var(--text-secondary); text-align: center; padding-top: 40px;">لا توجد مكالمات مسجلة تحت هذا التصنيف حالياً</p>`;
+                toggleTray(true);
+                return;
+            }
+
+            let html = `<div style="display: flex; flex-direction: column; gap: 14px;">`;
+            filtered.forEach(call => {
+                const agent = call.conversationId.startsWith("standalone_") ? "المحلي" : "الخارجي";
+                html += `
+                    <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; cursor: pointer;" onclick="showCallDetails(${JSON.stringify(call).replace(/"/g, '&quot;')})">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-weight: 600;">${call.clientName || 'مجهول'}</span>
+                            <span style="font-size: 0.75rem; color: var(--text-secondary);">${call.timestamp.split('T')[1]?.substring(0,5) || ''}</span>
+                        </div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 4px;">رقم: ${call.phoneNumber || '-'} | مساعد: ${agent}</div>
+                        <div style="font-size: 0.8rem; font-style: italic; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">"${call.comment || 'لا يوجد تعليق'}"</div>
+                    </div>
+                `;
+            });
+            html += `</div>`;
+            
+            body.innerHTML = html;
+            toggleTray(true);
+        }
+
+        // Initialize dynamic polling
+        fetchKpiData();
+        setInterval(fetchKpiData, 10000);
+
+        // Adjust SVG viewports on window resize to ensure fluid layouts
+        window.addEventListener('resize', () => {
+            if (kpiDataGlobal) {
+                drawTrendSpline(kpiDataGlobal.trend);
+                drawDivergingDotPlot(kpiDataGlobal.agents);
+                drawSparklines(kpiDataGlobal.recentCalls);
+            }
+        });
+    </script>
+</body>
+</html>

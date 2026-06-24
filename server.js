@@ -350,6 +350,193 @@ const server = http.createServer(async (req, res) => {
         res.end(JSON.stringify({ error: error.message }));
       }
     });
+  } else if (req.url === '/api/kpi-data' && req.method === 'GET') {
+    try {
+      const clientEmail = "n8n-sheets-tracker@gen-lang-client-0132494438.iam.gserviceaccount.com";
+      const privateKey = `-----BEGIN PRIVATE KEY-----
+MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCgAKA3Jh5/C+wK
+g0R6az/dvjzeeMF6XgpNKuMrnvanoBRYu1hvncRqfIZEmaPk3aNBxMyTmnj3KFJa
+yWJNFdaARb8uANoqd2fpglb36lizEBgAciZ4MEjBDCAuiv2C66S2sUFvMvDy9r8i
+E5zGxizSSTSgoGSFjTI6BO9cDS3xnq4lgO/YkcS/z0zhni5/4uktIfhjqZtTafwJ
+PyOpbGWapdJULJo5Q+X6PYWqBBvTeK2GguR9QLB9QuQdGqvTEMEB3STbYsXgLn+N
+cc6bTLDW2KxJwONiZELpYsSJrkP32HIe7ZKqnrfE6A2z7s1r43aDwKe9khQ2/hYl
+b/aRX0zxAgMBAAECggEABut8AmKWSU+YT+yVMLe0eYg9nPALSxnn12ZKUKPFfmKq
+mptQo/Qmb2YPDwa3i0GIKuMiZ2RUBLl0VVuWEigmgKHzlp9gEBvdrUBPN1Xl6+mf
+Zh6JuiM5dErsVeL6O5gqJaIVJsRk3hcslUJUopalz9rtaSCCtHFyuYZm3TvvL57I
+G6+o3RccyrKdSma2WljpRuRjYFK9KmOULEKEbij0pNJdjqdeAO+BZ7U0nQRAQlVr
+uc1kr40nX5ICKbfPMe0OvpwwemooPqGOr22m8z7npOHIRJBxuvtPkQEdxfjvd4K/
+3mYUtd6qtKmgYxO4lJhwGJ1ZpqhAMUoKd0cmJ6UIWQKBgQDSU9bKhuRMXeEXMAY4
+UEfAZRq/FDTd9FZc6dr5EqtZSHRZB+jxqwg+dMTz7xje8aGgacmD4OoeFTQ0pd7A
+t9XVtLz6nqXEL9lDrD9tRrLTqrZEYiNxpaJUEIURPd+BweJcQk72ULJZDtc2eA67
+oN7uHmFFMyi0xwrhfsCYTlrC+QKBgQDCvzQ0zxPTDuDx8PPfdxTjRodXO3Zd0vre
+TffBFFTXGQI8eiRqiPiYVvUlyg9Iy/dnJA1GMnmwxHzauyVNF+NZnJckWIWgTzNe
+ionU+5qhXboBXEzdH3ZGSxe6cinUOSAg+vXTwW317uF5kLLFbthCQgozYb4j4Q3t
+tcTzDF5fuQKBgQCBcmYcyb6SnajeS4lYeVhfuhonBfmvrSTGFIvXhbz9u1EYRn0A
+1+HABr/83efxtsdh4hnLV87fau9xg7C/7aTm3VD98kxVnZlbRBTZXYzMJyH8nmXw
+GR/6Gxy6ytjXlIuLeqf8gxfxJeggtu1iXxU1em8lVuIzuNkihY9lbbwAiQKBgBgj
+UNo2zHM9hd4XCnMpNFqTNFU4low8iUGiklHJLlbWz7MlRHw76+wd4xbC+6//L/QF
+wOtxeCnTwNHvnkj27AQAZ69mlXFwP6K5MypF4T2c+2ANy60gqC1AQ3mlis+2IOhV
+ksCjWfjAmgvSRoY4He/gdZk2xTV3QJ21COtDHjNpAoGALXo07s3khPVrBHetGyQ/
+qJMcL1WmzbTPwzWKiXDKvSYmL/iGvO7T8fp/sFbB2v6juxqAfjx9v0pNVicl1Qal
+WQTD3N8zAs+SVVR8ZIqqNKOZhHBWtLy5SKWcntjouHsPdIh6dtYs97nFxfXjck8e
+erra6BzpXyWJxdylk4cdvD0=
+-----END PRIVATE KEY-----`;
+      const spreadsheetId = "1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8";
+
+      const jwt = generateGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
+      const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+          assertion: jwt
+        })
+      });
+      
+      if (!tokenRes.ok) {
+        throw new Error(`Failed to exchange JWT for token: ${tokenRes.status} ${await tokenRes.text()}`);
+      }
+      
+      const tokenData = await tokenRes.json();
+      const accessToken = tokenData.access_token;
+
+      const getRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Sheet1!A1:H1000`, {
+        headers: { "Authorization": `Bearer ${accessToken}` }
+      });
+      
+      if (!getRes.ok) {
+        throw new Error(`Failed to get values from sheet: ${getRes.status} ${await getRes.text()}`);
+      }
+      
+      const getData = await getRes.json();
+      const rows = getData.values || [];
+      
+      let totalCalls = 0;
+      let excellentCalls = 0; // 100%
+      let acceptableCalls = 0; // 50%
+      let poorCalls = 0; // 0%
+      let notRated = 0;
+      
+      const parsedRows = [];
+      const trendDataMap = {};
+      const agentMap = {
+        "Standalone Agent": { total: 0, excellent: 0, acceptable: 0, poor: 0 },
+        "ElevenLabs Agent": { total: 0, excellent: 0, acceptable: 0, poor: 0 }
+      };
+
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        if (!row || row.length === 0) continue;
+        
+        const timestamp = row[0] || "";
+        const clientName = row[1] || "مجهول";
+        const phoneNumber = row[2] || "";
+        const clientEmail = row[3] || "";
+        const conversationId = row[4] || "";
+        const status = row[5] || "";
+        const kpi = row[6] || "";
+        const comment = row[7] || "";
+        
+        totalCalls++;
+        let kpiVal = null;
+        if (kpi === "100%") {
+          excellentCalls++;
+          kpiVal = 100;
+        } else if (kpi === "50%") {
+          acceptableCalls++;
+          kpiVal = 50;
+        } else if (kpi === "0%") {
+          poorCalls++;
+          kpiVal = 0;
+        } else {
+          notRated++;
+        }
+        
+        const agent = (conversationId && conversationId.startsWith("standalone_")) ? "Standalone Agent" : "ElevenLabs Agent";
+        agentMap[agent].total++;
+        if (kpiVal === 100) agentMap[agent].excellent++;
+        else if (kpiVal === 50) agentMap[agent].acceptable++;
+        else if (kpiVal === 0) agentMap[agent].poor++;
+
+        parsedRows.push({
+          timestamp,
+          clientName,
+          phoneNumber,
+          clientEmail,
+          conversationId,
+          status,
+          kpi,
+          comment
+        });
+
+        if (timestamp) {
+          try {
+            const dateStr = timestamp.split('T')[0];
+            if (!trendDataMap[dateStr]) {
+              trendDataMap[dateStr] = { total: 0, sum: 0, count: 0 };
+            }
+            if (kpiVal !== null) {
+              trendDataMap[dateStr].total += 1;
+              trendDataMap[dateStr].sum += kpiVal;
+              trendDataMap[dateStr].count += 1;
+            }
+          } catch (e) {}
+        }
+      }
+
+      const trend = Object.keys(trendDataMap).sort().map(date => {
+        const data = trendDataMap[date];
+        return {
+          date,
+          averageKpi: data.count > 0 ? Math.round((data.sum / data.count) * 10) / 10 : 0
+        };
+      });
+
+      const payload = {
+        stats: {
+          totalCalls,
+          excellentCalls,
+          acceptableCalls,
+          poorCalls,
+          notRated,
+          excellentRate: totalCalls > 0 ? Math.round((excellentCalls / totalCalls) * 1000) / 10 : 0,
+          acceptableRate: totalCalls > 0 ? Math.round((acceptableCalls / totalCalls) * 1000) / 10 : 0,
+          poorRate: totalCalls > 0 ? Math.round((poorCalls / totalCalls) * 1000) / 10 : 0
+        },
+        agents: Object.keys(agentMap).map(name => {
+          const a = agentMap[name];
+          return {
+            name,
+            total: a.total,
+            excellentRate: a.total > 0 ? Math.round((a.excellent / a.total) * 1000) / 10 : 0,
+            acceptableRate: a.total > 0 ? Math.round((a.acceptable / a.total) * 1000) / 10 : 0,
+            poorRate: a.total > 0 ? Math.round((a.poor / a.total) * 1000) / 10 : 0
+          };
+        }),
+        trend,
+        recentCalls: parsedRows.slice(-30).reverse()
+      };
+
+      res.writeHead(200, {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      });
+      res.end(JSON.stringify(payload));
+    } catch (err) {
+      console.error("Error fetching KPI stats:", err);
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: err.message }));
+    }
+  } else if (req.url === '/dashboard' || req.url === '/dashboard.html') {
+    fs.readFile(path.join(__dirname, 'dashboard.html'), (err, content) => {
+      if (err) {
+        res.writeHead(500);
+        res.end('Error loading dashboard.html');
+      } else {
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        res.end(content);
+      }
+    });
   } else if (req.url === '/' || req.url === '/index.html') {
     fs.readFile(path.join(__dirname, 'index.html'), (err, content) => {
       if (err) {
