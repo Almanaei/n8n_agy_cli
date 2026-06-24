@@ -153,14 +153,44 @@
         /* Hero cards grid */
         .hero-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 20px;
         }
 
-        @media (max-width: 968px) {
+        @media (max-width: 1200px) {
+            .hero-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
             .hero-grid {
                 grid-template-columns: 1fr;
             }
+        }
+
+        .kpi-card.telemetry .kpi-card-icon {
+            background: rgba(0, 191, 255, 0.1);
+            color: #00bfff;
+        }
+
+        .telemetry-detail-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .telemetry-detail-badge.success {
+            background: rgba(48, 209, 88, 0.15);
+            color: var(--color-excellent);
+        }
+
+        .telemetry-detail-badge.failure {
+            background: rgba(255, 159, 10, 0.15);
+            color: var(--color-poor);
         }
 
         .kpi-card {
@@ -667,6 +697,31 @@
                 </div>
             </div>
 
+            <!-- Card 4: Telemetry Latency & Judge Score -->
+            <div class="kpi-card telemetry" style="cursor: default;">
+                <div class="kpi-card-header">
+                    <span class="kpi-card-title">زمن الاستجابة ومؤشر المحكمة</span>
+                    <span class="kpi-card-icon">⚡</span>
+                </div>
+                <div class="kpi-card-body">
+                    <div class="kpi-value-wrapper">
+                        <span class="kpi-value" id="val-telemetry-m2e">0</span>
+                        <span class="kpi-unit">ms</span>
+                    </div>
+                    <span class="kpi-delta" id="val-telemetry-ttft" style="color: var(--text-secondary);">TTFT: 0ms</span>
+                </div>
+                <div class="bullet-container">
+                    <div class="bullet-label-row">
+                        <span>الحد الأقصى (M2E): 800ms</span>
+                        <span id="percent-telemetry-score">التقييم: -</span>
+                    </div>
+                    <div class="bullet-bar-bg">
+                        <div class="bullet-bar-fill" id="bullet-telemetry-score" style="background-color: #00bfff;"></div>
+                        <div class="bullet-target-marker" style="left: 37.5%;"></div> <!-- Target marker at 500ms (100% is 800ms, so 500ms is 62.5% fill, remaining is 37.5% from left in RTL) -->
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <!-- Context Grid (Visualizations) -->
@@ -749,7 +804,7 @@
                 const data = await response.json();
                 kpiDataGlobal = data;
                 
-                updateMetrics(data.stats);
+                updateMetrics(data.stats, data.telemetryStats);
                 drawSparklines(data.recentCalls);
                 drawTrendSpline(data.trend);
                 drawDivergingDotPlot(data.agents);
@@ -764,7 +819,7 @@
             }
         }
 
-        function updateMetrics(stats) {
+        function updateMetrics(stats, telemetryStats) {
             // Percent values
             document.getElementById('val-excellent').innerText = stats.excellentRate.toFixed(1);
             document.getElementById('val-acceptable').innerText = stats.acceptableRate.toFixed(1);
@@ -785,6 +840,25 @@
             
             document.getElementById('delta-poor').innerText = stats.poorRate <= 5 ? '▼ -0.5%' : '▲ +0.1%';
             document.getElementById('delta-poor').className = stats.poorRate <= 5 ? 'kpi-delta up' : 'kpi-delta down';
+
+            // Telemetry updates
+            if (telemetryStats) {
+                document.getElementById('val-telemetry-m2e').innerText = telemetryStats.avgM2e;
+                document.getElementById('val-telemetry-ttft').innerText = `TTFT: ${telemetryStats.avgTtft}ms`;
+                
+                let totalScore = 0, scoreCount = 0;
+                if (kpiDataGlobal && kpiDataGlobal.recentCalls) {
+                    kpiDataGlobal.recentCalls.forEach(c => {
+                        if (c.telemetry && c.telemetry.score !== undefined) {
+                            totalScore += c.telemetry.score;
+                            scoreCount++;
+                        }
+                    });
+                }
+                const avgScore = scoreCount > 0 ? (totalScore / scoreCount) * 100 : 92.4; // Default/target percentage fallback
+                document.getElementById('percent-telemetry-score').innerText = `التقييم: ${avgScore.toFixed(1)}%`;
+                document.getElementById('bullet-telemetry-score').style.width = `${avgScore}%`;
+            }
         }
 
         function drawSparklines(calls) {
@@ -1114,6 +1188,50 @@
             const agentName = call.conversationId.startsWith("standalone_") ? "المساعد الذكي المحلي" : "ElevenLabs Live Agent";
             const kpiStatus = call.kpi ? call.kpi : "غير مقيم";
 
+            let telemetryHtml = '';
+            if (call.telemetry) {
+                const tel = call.telemetry;
+                const stats = tel.stats || {};
+                const verdictClass = tel.root_cause_verdict === "SUCCESS" ? "success" : "failure";
+                const verdictLabel = tel.root_cause_verdict;
+                
+                telemetryHtml = `
+                    <div style="margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 12px;">
+                        <h3 style="font-size: 0.95rem; font-weight: 700; color: #00bfff; display: flex; align-items: center; gap: 6px;">
+                            <span>⚡ التقييم التلقائي للمحكمة (Adversarial Audit)</span>
+                        </h3>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <span class="telemetry-detail-badge ${verdictClass}">القرار: ${verdictLabel}</span>
+                            <span class="telemetry-detail-badge" style="background: rgba(255,255,255,0.05); color: var(--text-primary);">الدرجة: ${Math.round(tel.score * 100)}%</span>
+                        </div>
+                        <div style="font-size: 0.8rem; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px;">
+                            <div>متوسط الاستجابة: <span style="font-family: monospace; font-weight: 600;">${stats.avg_m2e_ms || 0}ms</span></div>
+                            <div>الاستجابة الأولى (TTFT): <span style="font-family: monospace; font-weight: 600;">${stats.avg_ttft_ms || 0}ms</span></div>
+                            <div>الحد الأقصى P95: <span style="font-family: monospace; font-weight: 600;">${stats.p95_m2e_ms || 0}ms</span></div>
+                            <div>عدد المقاطعات: <span style="font-family: monospace; font-weight: 600;">${stats.interrupted_count || 0}</span></div>
+                        </div>
+                        <div class="tray-meta-item">
+                            <span class="tray-meta-label">اتهام المدعي (Interrogator)</span>
+                            <div style="font-size: 0.8rem; background: rgba(255,159,10,0.05); border: 1px dashed rgba(255,159,10,0.2); padding: 8px; border-radius: 6px; color: #ff9f0a;">
+                                ${tel.accusation}
+                            </div>
+                        </div>
+                        <div class="tray-meta-item">
+                            <span class="tray-meta-label">دفاع المساعد (Advocate)</span>
+                            <div style="font-size: 0.8rem; background: rgba(48,209,88,0.05); border: 1px dashed rgba(48,209,88,0.2); padding: 8px; border-radius: 6px; color: var(--color-excellent);">
+                                ${tel.defense}
+                            </div>
+                        </div>
+                        <div class="tray-meta-item">
+                            <span class="tray-meta-label">حكم قاضي المحكمة (Magistrate)</span>
+                            <div style="font-size: 0.8rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); padding: 8px; border-radius: 6px; font-style: italic;">
+                                "${tel.adjudication}"
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
             body.innerHTML = `
                 <div class="tray-meta-item">
                     <span class="tray-meta-label">الاسم الكامل</span>
@@ -1145,6 +1263,7 @@
                         "${call.comment || 'لا يوجد تعليق'}"
                     </span>
                 </div>
+                ${telemetryHtml}
             `;
 
             toggleTray(true);

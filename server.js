@@ -434,6 +434,51 @@ erra6BzpXyWJxdylk4cdvD0=
         "ElevenLabs Agent": { total: 0, excellent: 0, acceptable: 0, poor: 0 }
       };
 
+      // Read and index local telemetry database
+      let telemetryData = [];
+      try {
+        const telemetryPath = path.join(__dirname, 'standalone', 'telemetry_db.json');
+        if (fs.existsSync(telemetryPath)) {
+          telemetryData = JSON.parse(fs.readFileSync(telemetryPath, 'utf8'));
+        }
+      } catch (err) {
+        console.error("Error reading telemetry_db.json:", err);
+      }
+
+      const telemetryMap = {};
+      let totalM2e = 0, totalTtft = 0, countM2e = 0, countTtft = 0;
+      let maxP95 = 0;
+      const verdictCounts = {
+        "SUCCESS": 0,
+        "FACTUAL_DIVERGENCE": 0,
+        "INTEGRATION_LATENCY_DRAG": 0,
+        "LLM_COMPUTE_WASTAGE": 0,
+        "ACOUSTIC_VAD_CONFLICT": 0,
+        "USER_ABANDONMENT": 0
+      };
+
+      telemetryData.forEach(item => {
+        if (!item || !item.conversation_id) return;
+        telemetryMap[item.conversation_id] = item;
+        
+        const stats = item.stats || {};
+        if (stats.avg_m2e_ms) {
+          totalM2e += stats.avg_m2e_ms;
+          countM2e++;
+        }
+        if (stats.avg_ttft_ms) {
+          totalTtft += stats.avg_ttft_ms;
+          countTtft++;
+        }
+        if (stats.p95_m2e_ms > maxP95) {
+          maxP95 = stats.p95_m2e_ms;
+        }
+        const v = item.root_cause_verdict;
+        if (v in verdictCounts) {
+          verdictCounts[v]++;
+        }
+      });
+
       for (let i = 1; i < rows.length; i++) {
         const row = rows[i];
         if (!row || row.length === 0) continue;
@@ -476,7 +521,8 @@ erra6BzpXyWJxdylk4cdvD0=
           conversationId,
           status,
           kpi,
-          comment
+          comment,
+          telemetry: telemetryMap[conversationId] || null
         });
 
         if (timestamp) {
@@ -524,7 +570,13 @@ erra6BzpXyWJxdylk4cdvD0=
           };
         }),
         trend,
-        recentCalls: parsedRows.slice(-30).reverse()
+        recentCalls: parsedRows.slice(-30).reverse(),
+        telemetryStats: {
+          avgM2e: countM2e > 0 ? Math.round(totalM2e / countM2e) : 0,
+          avgTtft: countTtft > 0 ? Math.round(totalTtft / countTtft) : 0,
+          p95M2e: Math.round(maxP95),
+          verdicts: verdictCounts
+        }
       };
 
       res.writeHead(200, {

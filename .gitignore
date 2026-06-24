@@ -18,6 +18,8 @@ execution_235.json
 raw_transcript.json
 recent_details_output.txt
 sheets_outputs.txt
+standalone/telemetry_db.json
+
 
 # Executables
 cloudflared.exe

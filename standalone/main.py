@@ -4,6 +4,7 @@ import uuid
 import json
 import asyncio
 import re
+import time
 
 # Force standard streams to use UTF-8 to prevent UnicodeEncodeError on Windows
 if hasattr(sys.stdout, 'reconfigure'):
@@ -17,6 +18,7 @@ import io
 
 from standalone.agent_logic import StandaloneAgent
 from standalone.diacritics import diacritize_arabic
+from standalone.tribunal import run_tribunal_evaluation
 
 app = FastAPI(title="Standalone Voice AI Agent API")
 
@@ -54,11 +56,34 @@ async def websocket_endpoint(websocket: WebSocket):
     # Initialize the agent logic handler
     agent = StandaloneAgent(conversation_id=conversation_id)
     current_task = None
-
-    async def handle_response_stream(user_text: str):
+    
+    # Telemetry tracking state
+    telemetry_turns = []
+    
+    async def handle_response_stream(user_text: str, turn_idx: int):
+        # Initialize telemetry record for this turn
+        turn_data = {
+            "turn_index": turn_idx,
+            "user_text": user_text,
+            "agent_text": "",
+            "timestamps": {
+                "user_message_received": time.time(),
+                "llm_first_token": None,
+                "audio_first_sent": None,
+                "audio_final_sent": None
+            },
+            "interrupted": False
+        }
+        telemetry_turns.append(turn_data)
+        
         try:
             sentence_buffer = ""
+            is_first_token = True
+            
             async for text_chunk in agent.get_llm_response_stream(user_text):
+                if is_first_token:
+                    is_first_token = False
+                    turn_data["timestamps"]["llm_first_token"] = time.time()
                 sentence_buffer += text_chunk
                 
                 # Split on sentence end markers: . ? ! \n or Arabic ؟
@@ -73,7 +98,6 @@ async def websocket_endpoint(websocket: WebSocket):
                     sentence_buffer = sentence_buffer[end_idx:]
                 else:
                     # If no punctuation but buffer has grown long, split by word count.
-                    # We require at least 12 completed words (followed by whitespace) to split safely.
                     match = re.match(r'^(\s*(?:\S+\s+){12})', sentence_buffer)
                     if match:
                         completed_chunk = match.group(1).strip()
@@ -82,18 +106,25 @@ async def websocket_endpoint(websocket: WebSocket):
                 if completed_chunk:
                     print(f"[{conversation_id}] Synthesizing stream chunk: {completed_chunk}")
                     audio_chunk = await text_to_speech_mp3(completed_chunk)
+                    
+                    if turn_data["timestamps"]["audio_first_sent"] is None:
+                        turn_data["timestamps"]["audio_first_sent"] = time.time()
+                        
                     await websocket.send_json({
                         "event": "agent_response",
                         "text": completed_chunk,
                         "audio": audio_chunk.hex(),
                         "is_stream_segment": True
                     })
+                    turn_data["agent_text"] += " " + completed_chunk
             
             # Remaining text
             remaining = sentence_buffer.strip()
             if remaining:
                 print(f"[{conversation_id}] Synthesizing remaining stream chunk: {remaining}")
                 audio_chunk = await text_to_speech_mp3(remaining)
+                if turn_data["timestamps"]["audio_first_sent"] is None:
+                    turn_data["timestamps"]["audio_first_sent"] = time.time()
                 await websocket.send_json({
                     "event": "agent_response",
                     "text": remaining,
@@ -101,6 +132,7 @@ async def websocket_endpoint(websocket: WebSocket):
                     "is_stream_segment": True,
                     "is_final_segment": True
                 })
+                turn_data["agent_text"] += " " + remaining
             else:
                 await websocket.send_json({
                     "event": "agent_response",
@@ -109,8 +141,14 @@ async def websocket_endpoint(websocket: WebSocket):
                     "is_stream_segment": True,
                     "is_final_segment": True
                 })
+            
+            turn_data["timestamps"]["audio_final_sent"] = time.time()
+            turn_data["agent_text"] = turn_data["agent_text"].strip()
+            
         except asyncio.CancelledError:
             print(f"[{conversation_id}] Generation task cancelled due to user interruption.")
+            turn_data["interrupted"] = True
+            turn_data["timestamps"]["audio_final_sent"] = time.time()
             raise
         except Exception as e:
             print(f"[{conversation_id}] Error in stream generation: {e}")
@@ -134,6 +172,8 @@ async def websocket_endpoint(websocket: WebSocket):
             "is_final_segment": True
         })
         
+        turn_counter = 0
+        
         # 2. Listening loop (concurrent handling)
         while True:
             data = await websocket.receive_text()
@@ -143,6 +183,9 @@ async def websocket_endpoint(websocket: WebSocket):
             if event_type == "user_interrupted":
                 print(f"[{conversation_id}] Interruption event received. Cancelling active tasks...")
                 if current_task and not current_task.done():
+                    # Mark the active turn as interrupted if present
+                    if telemetry_turns:
+                        telemetry_turns[-1]["interrupted"] = True
                     current_task.cancel()
                     
             elif event_type == "user_message":
@@ -151,20 +194,27 @@ async def websocket_endpoint(websocket: WebSocket):
                 
                 # Cancel any existing task first to ensure clean state
                 if current_task and not current_task.done():
+                    if telemetry_turns:
+                        telemetry_turns[-1]["interrupted"] = True
                     current_task.cancel()
                 
-                current_task = asyncio.create_task(handle_response_stream(user_text))
+                turn_counter += 1
+                current_task = asyncio.create_task(handle_response_stream(user_text, turn_counter))
                 
     except WebSocketDisconnect:
         print(f"Connection closed for session: {conversation_id}. Triggering post-call hooks...")
         if current_task and not current_task.done():
             current_task.cancel()
         agent.trigger_n8n_post_call_webhook()
+        # Run automated evaluation
+        asyncio.create_task(run_tribunal_evaluation(conversation_id, agent, telemetry_turns))
     except Exception as e:
         print(f"WebSocket Error: {e}")
         if current_task and not current_task.done():
             current_task.cancel()
         agent.trigger_n8n_post_call_webhook()
+        # Run automated evaluation
+        asyncio.create_task(run_tribunal_evaluation(conversation_id, agent, telemetry_turns))
 
 if __name__ == "__main__":
     import uvicorn
