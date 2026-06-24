@@ -154,15 +154,65 @@ function updateWorkflowStructure(workflow) {
       console.log("- Google Sheets lead node converted to appendOrUpdate with autoMapInputData.");
     }
 
-    // 2. Add or update the "Prepare Sheets Payload" node
+    // 2. Add or update the "Lookup Existing Lead Info" node
+    const lookupExistingNode = {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Conversation ID",
+              "lookupValue": "={{ $json.body.conversationId || '' }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        380,
+        -100
+      ],
+      "id": "lookup-existing-lead-info-id",
+      "name": "Lookup Existing Lead Info",
+      "credentials": {
+        "googleApi": {
+          "id": "fXHzExTwkxRRpEVc",
+          "name": "Google Sheets account 2"
+        }
+      },
+      "alwaysOutputData": true
+    };
+
+    const lookupIndex = nodesList.findIndex(n => n.id === lookupExistingNode.id);
+    if (lookupIndex !== -1) {
+      nodesList[lookupIndex] = lookupExistingNode;
+    } else {
+      nodesList.push(lookupExistingNode);
+    }
+    console.log("- Added/updated Lookup Existing Lead Info node.");
+
+    // 3. Add or update the "Prepare Sheets Payload" node
     const preparePayloadNode = {
       "parameters": {
-        "jsCode": "const body = $input.item.json.body || {};\nconst payload = {};\n\npayload[\"Conversation ID\"] = body.conversationId;\n\n// Generate Bahrain timestamp\nconst pad = (num) => String(num).padStart(2, '0');\nconst now = new Date();\nconst utc = now.getTime() + (now.getTimezoneOffset() * 60000);\nconst bahrain = new Date(utc + (3600000 * 3));\nconst ms = String(bahrain.getMilliseconds()).padStart(3, '0');\npayload[\"Timestamp\"] = `${bahrain.getFullYear()}-${pad(bahrain.getMonth() + 1)}-${pad(bahrain.getDate())}T${pad(bahrain.getHours())}:${pad(bahrain.getMinutes())}:${pad(bahrain.getSeconds())}.${ms}+03:00`;\n\nif (body.clientName !== undefined && body.clientName !== null && body.clientName !== '') {\n  payload[\"Client Name\"] = body.clientName;\n}\nif (body.phoneNumber !== undefined && body.phoneNumber !== null && body.phoneNumber !== '') {\n  payload[\"Phone Number\"] = body.phoneNumber;\n}\nif (body.clientEmail !== undefined && body.clientEmail !== null && body.clientEmail !== '') {\n  let email = body.clientEmail;\n  email = email.replace(/\\s*\\[at\\]\\s*/gi, '@').replace(/\\[at\\]/gi, '@');\n  email = email.replace(/\\s*\\[dot\\]\\s*/gi, '.').replace(/\\[dot\\]/gi, '.');\n  email = email.replace(/\\s+/g, '');\n  payload[\"Client Email\"] = email;\n}\n\npayload[\"Lead Status\"] = \"New Lead\";\n\nreturn { json: payload };"
+        "jsCode": "const body = $('ElevenLabs Webhook').first().json.body || {};\nconst existing = $input.item.json || {};\nconst payload = {};\n\npayload[\"Conversation ID\"] = body.conversationId;\n\n// Generate Bahrain timestamp\nconst pad = (num) => String(num).padStart(2, '0');\nconst now = new Date();\nconst utc = now.getTime() + (now.getTimezoneOffset() * 60000);\nconst bahrain = new Date(utc + (3600000 * 3));\nconst ms = String(bahrain.getMilliseconds()).padStart(3, '0');\npayload[\"Timestamp\"] = existing.Timestamp || `${bahrain.getFullYear()}-${pad(bahrain.getMonth() + 1)}-${pad(bahrain.getDate())}T${pad(bahrain.getHours())}:${pad(bahrain.getMinutes())}:${pad(bahrain.getSeconds())}.${ms}+03:00`;\n\nif (body.clientName !== undefined && body.clientName !== null && body.clientName !== '') {\n  payload[\"Client Name\"] = body.clientName;\n} else if (existing[\"Client Name\"]) {\n  payload[\"Client Name\"] = existing[\"Client Name\"];\n}\n\nif (body.phoneNumber !== undefined && body.phoneNumber !== null && body.phoneNumber !== '') {\n  payload[\"Phone Number\"] = body.phoneNumber;\n} else if (existing[\"Phone Number\"]) {\n  payload[\"Phone Number\"] = existing[\"Phone Number\"];\n}\n\nif (body.clientEmail !== undefined && body.clientEmail !== null && body.clientEmail !== '') {\n  let email = body.clientEmail;\n  email = email.replace(/\\s*\\[at\\]\\s*/gi, '@').replace(/\\[at\\]/gi, '@');\n  email = email.replace(/\\s*\\[dot\\]\\s*/gi, '.').replace(/\\[dot\\]/gi, '.');\n  email = email.replace(/\\s+/g, '');\n  payload[\"Client Email\"] = email;\n} else if (existing[\"Client Email\"]) {\n  payload[\"Client Email\"] = existing[\"Client Email\"];\n}\n\npayload[\"Lead Status\"] = existing[\"Lead Status\"] || \"New Lead\";\nif (existing[\"KPI\"]) {\n  payload[\"KPI\"] = existing[\"KPI\"];\n}\n\nreturn { json: payload };"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        200,
+        540,
         -100
       ],
       "id": "prepare-sheets-payload-id",
@@ -177,7 +227,7 @@ function updateWorkflowStructure(workflow) {
     }
     console.log("- Added/updated Prepare Sheets Payload node.");
 
-    // 3. Add or update the three new feedback nodes
+    // 4. Add or update the three new feedback nodes
     newNodes.forEach(newNode => {
       const index = nodesList.findIndex(n => n.id === newNode.id);
       if (index !== -1) {
@@ -204,9 +254,23 @@ function updateWorkflowStructure(workflow) {
 
   // Update connections
   const updateConnections = (connections) => {
-    // Reroute Respond to Webhook -> Google Sheets to Respond to Webhook -> Prepare Sheets Payload -> Google Sheets
+    // Reroute Respond to Webhook -> Lookup Existing Lead Info -> Prepare Sheets Payload -> Google Sheets
     if (connections["Respond to Webhook"]) {
       connections["Respond to Webhook"] = {
+        "main": [
+          [
+            {
+              "node": "Lookup Existing Lead Info",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      };
+      console.log("- Updated Respond to Webhook connection to route to Lookup Existing Lead Info.");
+    }
+    if (!connections["Lookup Existing Lead Info"]) {
+      connections["Lookup Existing Lead Info"] = {
         "main": [
           [
             {
@@ -217,9 +281,9 @@ function updateWorkflowStructure(workflow) {
           ]
         ]
       };
-      console.log("- Updated Respond to Webhook connection to route to Prepare Sheets Payload.");
+      console.log("- Added Lookup Existing Lead Info connection to Prepare Sheets Payload.");
     }
-    if (!connections["Prepare Sheets Payload"]) {
+    if (connections["Prepare Sheets Payload"]) {
       connections["Prepare Sheets Payload"] = {
         "main": [
           [
@@ -231,7 +295,7 @@ function updateWorkflowStructure(workflow) {
           ]
         ]
       };
-      console.log("- Added Prepare Sheets Payload connection to Google Sheets.");
+      console.log("- Updated Prepare Sheets Payload connection to Google Sheets.");
     }
 
     if (!connections["Feedback Webhook"]) {
