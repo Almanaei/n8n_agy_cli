@@ -430,9 +430,9 @@ erra6BzpXyWJxdylk4cdvD0=
       const parsedRows = [];
       const trendDataMap = {};
       const agentMap = {
-        "Standalone Agent": { total: 0, excellent: 0, acceptable: 0, poor: 0 },
         "ElevenLabs Agent": { total: 0, excellent: 0, acceptable: 0, poor: 0 }
       };
+
 
       // Read and index local telemetry database
       let telemetryData = [];
@@ -459,6 +459,7 @@ erra6BzpXyWJxdylk4cdvD0=
 
       telemetryData.forEach(item => {
         if (!item || !item.conversation_id) return;
+        if (item.conversation_id.startsWith("standalone_")) return;
         telemetryMap[item.conversation_id] = item;
         
         const stats = item.stats || {};
@@ -488,6 +489,9 @@ erra6BzpXyWJxdylk4cdvD0=
         const phoneNumber = row[2] || "";
         const clientEmail = row[3] || "";
         const conversationId = row[4] || "";
+        if (conversationId && conversationId.startsWith("standalone_")) {
+          continue;
+        }
         const status = row[5] || "";
         const kpi = row[6] || "";
         const comment = row[7] || "";
@@ -507,7 +511,7 @@ erra6BzpXyWJxdylk4cdvD0=
           notRated++;
         }
         
-        const agent = (conversationId && conversationId.startsWith("standalone_")) ? "Standalone Agent" : "ElevenLabs Agent";
+        const agent = "ElevenLabs Agent";
         agentMap[agent].total++;
         if (kpiVal === 100) agentMap[agent].excellent++;
         else if (kpiVal === 50) agentMap[agent].acceptable++;
