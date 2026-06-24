@@ -42,6 +42,9 @@ async def text_to_speech_mp3(text: str) -> bytes:
             audio_data += chunk["data"]
     return audio_data
 
+# Cache for greeting audio to eliminate startup delay
+GREETING_CACHE = None
+
 @app.websocket("/stream")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
@@ -50,14 +53,78 @@ async def websocket_endpoint(websocket: WebSocket):
     
     # Initialize the agent logic handler
     agent = StandaloneAgent(conversation_id=conversation_id)
-    
+    current_task = None
+
+    async def handle_response_stream(user_text: str):
+        try:
+            sentence_buffer = ""
+            async for text_chunk in agent.get_llm_response_stream(user_text):
+                sentence_buffer += text_chunk
+                
+                # Split on sentence end markers: . ? ! \n or Arabic ؟
+                pattern = r'([.?!؟\n])'
+                matches = list(re.finditer(pattern, sentence_buffer))
+                
+                completed_chunk = None
+                if matches:
+                    last_match = matches[-1]
+                    end_idx = last_match.end()
+                    completed_chunk = sentence_buffer[:end_idx].strip()
+                    sentence_buffer = sentence_buffer[end_idx:]
+                else:
+                    # If no punctuation but buffer has grown long, split by word count.
+                    # We require at least 12 completed words (followed by whitespace) to split safely.
+                    match = re.match(r'^(\s*(?:\S+\s+){12})', sentence_buffer)
+                    if match:
+                        completed_chunk = match.group(1).strip()
+                        sentence_buffer = sentence_buffer[match.end():]
+                
+                if completed_chunk:
+                    print(f"[{conversation_id}] Synthesizing stream chunk: {completed_chunk}")
+                    audio_chunk = await text_to_speech_mp3(completed_chunk)
+                    await websocket.send_json({
+                        "event": "agent_response",
+                        "text": completed_chunk,
+                        "audio": audio_chunk.hex(),
+                        "is_stream_segment": True
+                    })
+            
+            # Remaining text
+            remaining = sentence_buffer.strip()
+            if remaining:
+                print(f"[{conversation_id}] Synthesizing remaining stream chunk: {remaining}")
+                audio_chunk = await text_to_speech_mp3(remaining)
+                await websocket.send_json({
+                    "event": "agent_response",
+                    "text": remaining,
+                    "audio": audio_chunk.hex(),
+                    "is_stream_segment": True,
+                    "is_final_segment": True
+                })
+            else:
+                await websocket.send_json({
+                    "event": "agent_response",
+                    "text": "",
+                    "audio": "",
+                    "is_stream_segment": True,
+                    "is_final_segment": True
+                })
+        except asyncio.CancelledError:
+            print(f"[{conversation_id}] Generation task cancelled due to user interruption.")
+            raise
+        except Exception as e:
+            print(f"[{conversation_id}] Error in stream generation: {e}")
+
     try:
         # 1. Send the first greeting message
-        greeting_text = "مرحبا بك في مركز خدمات الإدارة العامة للدفاع المدني .. يرجى تزويدي بالإسم ورقم الهاتف"
+        greeting_text = "مرحباً بك في الدفاع المدني، يرجى تزويدي بالاسم ورقم الهاتف للبدء."
         agent.add_to_transcript("agent", greeting_text)
         
-        # Synthesize audio for the greeting
-        greeting_audio = await text_to_speech_mp3(greeting_text)
+        # Synthesize audio for the greeting (using cache if available)
+        global GREETING_CACHE
+        if GREETING_CACHE is None:
+            GREETING_CACHE = await text_to_speech_mp3(greeting_text)
+        greeting_audio = GREETING_CACHE
         
         await websocket.send_json({
             "event": "agent_response",
@@ -67,71 +134,36 @@ async def websocket_endpoint(websocket: WebSocket):
             "is_final_segment": True
         })
         
-        # 2. Listening loop
+        # 2. Listening loop (concurrent handling)
         while True:
             data = await websocket.receive_text()
             payload = json.loads(data)
+            event_type = payload.get("event")
             
-            if payload.get("event") == "user_message":
+            if event_type == "user_interrupted":
+                print(f"[{conversation_id}] Interruption event received. Cancelling active tasks...")
+                if current_task and not current_task.done():
+                    current_task.cancel()
+                    
+            elif event_type == "user_message":
                 user_text = payload.get("text", "")
                 print(f"[{conversation_id}] User said: {user_text}")
                 
-                # Stream sentences sentence-by-sentence
-                sentence_buffer = ""
-                for text_chunk in agent.get_llm_response_stream(user_text):
-                    sentence_buffer += text_chunk
-                    
-                    # Split on sentence end markers: . ? ! \n or Arabic ، ？
-                    pattern = r'([.?!؟\n]|\s+،\s+)'
-                    matches = list(re.finditer(pattern, sentence_buffer))
-                    
-                    if matches:
-                        # Find the last match index
-                        last_match = matches[-1]
-                        end_idx = last_match.end()
-                        
-                        completed_sentences = sentence_buffer[:end_idx].strip()
-                        sentence_buffer = sentence_buffer[end_idx:]
-                        
-                        if completed_sentences:
-                            print(f"[{conversation_id}] Synthesizing stream chunk: {completed_sentences}")
-                            audio_chunk = await text_to_speech_mp3(completed_sentences)
-                            
-                            await websocket.send_json({
-                                "event": "agent_response",
-                                "text": completed_sentences,
-                                "audio": audio_chunk.hex(),
-                                "is_stream_segment": True
-                            })
+                # Cancel any existing task first to ensure clean state
+                if current_task and not current_task.done():
+                    current_task.cancel()
                 
-                # Synthesize any remaining text
-                remaining = sentence_buffer.strip()
-                if remaining:
-                    print(f"[{conversation_id}] Synthesizing remaining stream chunk: {remaining}")
-                    audio_chunk = await text_to_speech_mp3(remaining)
-                    await websocket.send_json({
-                        "event": "agent_response",
-                        "text": remaining,
-                        "audio": audio_chunk.hex(),
-                        "is_stream_segment": True,
-                        "is_final_segment": True
-                    })
-                else:
-                    # Send a dummy message indicating final completion if nothing remaining
-                    await websocket.send_json({
-                        "event": "agent_response",
-                        "text": "",
-                        "audio": "",
-                        "is_stream_segment": True,
-                        "is_final_segment": True
-                    })
+                current_task = asyncio.create_task(handle_response_stream(user_text))
                 
     except WebSocketDisconnect:
         print(f"Connection closed for session: {conversation_id}. Triggering post-call hooks...")
+        if current_task and not current_task.done():
+            current_task.cancel()
         agent.trigger_n8n_post_call_webhook()
     except Exception as e:
         print(f"WebSocket Error: {e}")
-        # Always attempt to trigger post-call cleanup in case of crash
+        if current_task and not current_task.done():
+            current_task.cancel()
         agent.trigger_n8n_post_call_webhook()
 
 if __name__ == "__main__":

@@ -798,6 +798,65 @@
             font-weight: 500;
         }
 
+        /* Sleek Feedback Pill Toast */
+        .feedback-toast {
+            position: fixed;
+            bottom: -80px;
+            left: 24px;
+            background: rgba(22, 22, 23, 0.7);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 10px 16px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 113, 227, 0.05);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 1100;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .feedback-toast.show {
+            bottom: 24px;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .feedback-emoji-btn {
+            background: none;
+            border: none;
+            font-size: 1.6rem;
+            cursor: pointer;
+            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            outline: none;
+            padding: 2px;
+        }
+
+        .feedback-emoji-btn:hover {
+            transform: scale(1.35) translateY(-4px);
+        }
+
+        .feedback-emoji-btn:active {
+            transform: scale(0.95);
+        }
+
+        .feedback-success-msg {
+            font-size: 0.9rem;
+            color: var(--status-online);
+            font-weight: 700;
+            display: none;
+            margin-left: 4px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         /* Responsive */
         @media (max-width: 968px) {
             .hero-section {
@@ -993,9 +1052,77 @@
         </div>
     </footer>
 
+    <!-- Feedback Pill Component -->
+    <div id="feedback-toast" class="feedback-toast">
+        <button class="feedback-emoji-btn" onclick="submitFeedback(0)">😞</button>
+        <button class="feedback-emoji-btn" onclick="submitFeedback(50)">🙂</button>
+        <button class="feedback-emoji-btn" onclick="submitFeedback(70)">😊</button>
+        <button class="feedback-emoji-btn" onclick="submitFeedback(100)">😀</button>
+        <span id="feedback-success" class="feedback-success-msg">✓</span>
+    </div>
+
         <!-- Standalone Voice Agent Client Script -->
     <script>
         let ws;
+        let feedbackTimeout;
+
+        function showFeedbackToast(convId) {
+            const toast = document.getElementById('feedback-toast');
+            const successMsg = document.getElementById('feedback-success');
+            const btns = toast.querySelectorAll('.feedback-emoji-btn');
+            
+            // Reset state
+            successMsg.style.display = 'none';
+            btns.forEach(btn => btn.style.display = 'inline-block');
+            
+            toast.classList.add('show');
+        }
+
+        function hideFeedbackToast() {
+            const toast = document.getElementById('feedback-toast');
+            toast.classList.remove('show');
+        }
+
+        window.submitFeedback = async function(kpiValue) {
+            if (!conversationId) {
+                console.warn("No active conversation ID to submit feedback for.");
+                return;
+            }
+            
+            const successMsg = document.getElementById('feedback-success');
+            const toast = document.getElementById('feedback-toast');
+            const btns = toast.querySelectorAll('.feedback-emoji-btn');
+            
+            // Show checkmark, hide buttons
+            btns.forEach(btn => btn.style.display = 'none');
+            successMsg.style.display = 'inline-block';
+            
+            try {
+                const response = await fetch('/submit-feedback', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        conversationId: conversationId,
+                        kpi: kpiValue + "%"
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error("Failed to submit feedback to server");
+                }
+                
+                console.log(`Feedback submitted: ${kpiValue}% for ${conversationId}`);
+            } catch (err) {
+                console.error("Error submitting feedback:", err);
+            }
+            
+            // Slide down after a delay
+            setTimeout(() => {
+                hideFeedbackToast();
+            }, 1500);
+        }
         let recognition;
         let audioQueue = [];
         let isPlaying = false;
@@ -1005,6 +1132,34 @@
         let currentAudio = null;
         let lastAgentMessageDiv = null;
         let currentAgentText = "";
+        let lastAgentSpeechEndTime = 0;
+        let recognitionActive = false;
+        let speechAllowed = true;
+        let isAgentActive = false;
+
+        function startSpeechRecognition() {
+            if (!recognition) return;
+            if (recognitionActive) return;
+            if (!speechAllowed) return;
+            try {
+                recognition.start();
+                recognitionActive = true;
+                console.log("Speech recognition started.");
+            } catch (e) {
+                console.error("Failed to start speech recognition:", e);
+            }
+        }
+
+        function stopSpeechRecognition() {
+            if (!recognition) return;
+            try {
+                recognitionActive = false;
+                recognition.stop();
+                console.log("Speech recognition stopped.");
+            } catch (e) {
+                console.error("Failed to stop speech recognition:", e);
+            }
+        }
 
         function normalizeArabicKeepSpaces(text) {
             if (!text) return "";
@@ -1040,6 +1195,12 @@
         }
 
         function isEcho(inputText) {
+            // Echo can ONLY occur if the agent is actively speaking OR has just finished speaking within the last 1.5 seconds
+            const timeSinceLastSpeech = Date.now() - lastAgentSpeechEndTime;
+            if (!isPlaying && timeSinceLastSpeech > 1500) {
+                return false;
+            }
+
             if (!inputText || agentUtteranceHistory.length === 0) return false;
             
             const normInput = normalizeArabicKeepSpaces(inputText);
@@ -1100,10 +1261,25 @@
                 currentAudio = null;
             }
             if (audioQueue.length > 0) {
+                for (const chunk of audioQueue) {
+                    try {
+                        URL.revokeObjectURL(chunk.url);
+                    } catch(e) {}
+                }
                 audioQueue = [];
                 console.log("Audio queue cleared");
             }
             isPlaying = false;
+            isAgentActive = false;
+            lastAgentSpeechEndTime = Date.now();
+            
+            // Notify backend of the interruption immediately!
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    event: "user_interrupted"
+                }));
+                console.log("Sent user_interrupted event to backend.");
+            }
         }
         
         const messagesContainer = document.getElementById('chat-messages');
@@ -1125,31 +1301,44 @@
             recognition.interimResults = true;
             recognition.lang = 'ar-BH';
             
-            recognition.onresult = (event) => {
-                let finalResult = "";
-                let hasInterim = false;
-                let latestSegment = "";
-                
-                for (let i = event.resultIndex; i < event.results.length; ++i) {
-                    const transcript = event.results[i][0].transcript;
-                    if (event.results[i].isFinal) {
-                        finalResult += transcript;
-                    } else {
-                        hasInterim = true;
-                    }
-                    latestSegment += transcript;
+            recognition.onstart = () => {
+                recognitionActive = true;
+                if (statusBadge && ws && ws.readyState === WebSocket.OPEN) {
+                    statusBadge.innerText = "جاهز للاستماع 🎙️";
+                    statusBadge.style.background = "rgba(48, 209, 88, 0.12)";
+                    statusBadge.style.color = "var(--status-online)";
                 }
-                
-                // Real-time interruption check using our robust echo filter
-                if ((finalResult || hasInterim) && isPlaying) {
-                    if (latestSegment.trim().length >= 2 && hasSignificantWord(latestSegment)) {
-                        const isEchoResult = isEcho(latestSegment);
-                        if (!isEchoResult) {
-                            console.log("Interrupted agent speech via unique user speech:", latestSegment);
-                            interruptAgent();
-                        } else {
-                            console.log("Suppressed interruption: detected echo of agent voice:", latestSegment);
-                        }
+            };
+            
+            recognition.onspeechstart = () => {
+                if (statusBadge && ws && ws.readyState === WebSocket.OPEN) {
+                    statusBadge.innerText = "جاري الاستماع... 🔊";
+                    statusBadge.style.background = "rgba(0, 113, 227, 0.15)";
+                    statusBadge.style.color = "#30b0ff";
+                }
+            };
+            
+            recognition.onspeechend = () => {
+                if (statusBadge && ws && ws.readyState === WebSocket.OPEN) {
+                    statusBadge.innerText = "جاري معالجة الصوت... ⏳";
+                    statusBadge.style.background = "rgba(255, 159, 10, 0.15)";
+                    statusBadge.style.color = "var(--status-connecting)";
+                }
+            };
+
+            recognition.onresult = (event) => {
+                // Ignore and discard speech inputs while the agent is active/speaking or immediately after (within 1000ms)
+                // to prevent loopback echoes, self-interruption, and self-answering loops.
+                const timeSinceLastSpeech = Date.now() - lastAgentSpeechEndTime;
+                if (isAgentActive || isPlaying || timeSinceLastSpeech < 1000) {
+                    accumulatedTranscript = "";
+                    return;
+                }
+
+                let finalResult = "";
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        finalResult += event.results[i][0].transcript;
                     }
                 }
                 
@@ -1165,9 +1354,16 @@
                             if (isEchoResult) {
                                 console.log("Discarded user message as it is an echo of the agent's voice:", textToSend);
                                 accumulatedTranscript = "";
+                                if (statusBadge) {
+                                    statusBadge.innerText = "جاهز للاستماع 🎙️";
+                                    statusBadge.style.background = "rgba(48, 209, 88, 0.12)";
+                                    statusBadge.style.color = "var(--status-online)";
+                                }
                                 return;
                             }
                             
+                            isAgentActive = true;
+                            stopSpeechRecognition();
                             interruptAgent();
                             lastAgentMessageDiv = null;
                             appendMessage('user', textToSend);
@@ -1177,24 +1373,57 @@
                             }));
                             accumulatedTranscript = "";
                         }
-                    }, 1500); // 1.5 seconds silence threshold to allow name + number input pauses
+                    }, 600); // 600ms silence threshold to allow name + number input pauses
                 }
             };
             
             recognition.onerror = (event) => {
                 console.error("Speech Recognition Error:", event.error);
-                if (ws && ws.readyState === WebSocket.OPEN && event.error !== 'no-speech') {
-                    try { recognition.start(); } catch(e) {}
+                
+                if (statusBadge) {
+                    statusBadge.style.background = "rgba(255, 69, 58, 0.15)";
+                    statusBadge.style.color = "var(--status-offline)";
+                    if (event.error === 'not-allowed') {
+                        statusBadge.innerText = "خطأ: الميكروفون محجوب 🚫";
+                        speechAllowed = false;
+                    } else if (event.error === 'network') {
+                        statusBadge.innerText = "خطأ: فشل اتصال الشبكة 🌐";
+                    } else if (event.error === 'no-speech') {
+                        if (ws && ws.readyState === WebSocket.OPEN) {
+                            statusBadge.innerText = "جاهز للاستماع 🎙️";
+                            statusBadge.style.background = "rgba(48, 209, 88, 0.12)";
+                            statusBadge.style.color = "var(--status-online)";
+                        }
+                    } else {
+                        statusBadge.innerText = `خطأ بالاستماع: ${event.error}`;
+                    }
                 }
             };
             
             recognition.onend = () => {
-                if (ws && ws.readyState === WebSocket.OPEN) {
-                    try { recognition.start(); } catch(e) {}
+                recognitionActive = false;
+                if (ws && ws.readyState === WebSocket.OPEN && speechAllowed && !isAgentActive && !isPlaying) {
+                    setTimeout(() => {
+                        if (ws && ws.readyState === WebSocket.OPEN && speechAllowed && !recognitionActive && !isAgentActive && !isPlaying) {
+                            startSpeechRecognition();
+                        }
+                    }, 400);
                 }
             };
         } else {
             console.warn("Speech Recognition not supported in this browser. Chat input must be used.");
+            setTimeout(() => {
+                const row = document.querySelector('.controls-row');
+                if (row) {
+                    const infoDiv = document.createElement('div');
+                    infoDiv.style.color = "var(--status-offline)";
+                    infoDiv.style.fontSize = "0.85rem";
+                    infoDiv.style.marginTop = "8px";
+                    infoDiv.style.textAlign = "center";
+                    infoDiv.innerText = "تنبيه: متصفحك لا يدعم ميزة التحدث الصوتي. يرجى استخدام متصفح Chrome أو Edge.";
+                    row.appendChild(infoDiv);
+                }
+            }, 1000);
         }
 
         window.triggerCallFromHero = function() {
@@ -1210,6 +1439,8 @@
         }
 
         async function startCall() {
+            speechAllowed = true;
+            isAgentActive = true;
             statusBadge.innerText = "جاري الاتصال...";
             statusBadge.style.background = "rgba(255, 159, 10, 0.15)";
             statusBadge.style.color = "var(--status-connecting)";
@@ -1257,17 +1488,23 @@
                     currentAgentText = "مرحبا بك في مركز خدمات الإدارة العامة للدفاع المدني .. يرجى تزويدي بالإسم ورقم الهاتف";
                     agentUtteranceHistory = [currentAgentText];
 
-                    // Start speech recognition immediately to allow greeting interruption
-                    if (recognition) {
-                        try { recognition.start(); } catch(e) {}
-                    }
+                    // Speech recognition will be started automatically when the greeting audio finishes playing
                 };
 
                 ws.onmessage = async (event) => {
                     const payload = JSON.parse(event.data);
                     if (payload.event === "agent_response") {
                         if (payload.conversation_id) {
-                            conversationId = payload.conversation_id;
+                            if (!conversationId) {
+                                conversationId = payload.conversation_id;
+                                clearTimeout(feedbackTimeout);
+                                hideFeedbackToast();
+                                feedbackTimeout = setTimeout(() => {
+                                    showFeedbackToast(conversationId);
+                                }, 8000);
+                            } else {
+                                conversationId = payload.conversation_id;
+                            }
                         }
                         
                         if (payload.text) {
@@ -1323,14 +1560,21 @@
 
         async function handleDisconnect() {
             ws = null;
+            
+            // If feedback has not been shown, show it now upon disconnect
+            const toast = document.getElementById('feedback-toast');
+            if (conversationId && toast && !toast.classList.contains('show')) {
+                showFeedbackToast(conversationId);
+            }
+            clearTimeout(feedbackTimeout);
+
             conversationId = "";
+            isAgentActive = false;
             
             // Instantly stop any running audio
             interruptAgent();
             
-            if (recognition) {
-                try { recognition.stop(); } catch(e) {}
-            }
+            stopSpeechRecognition();
             
             clearTimeout(recognitionTimeout);
             accumulatedTranscript = "";
@@ -1359,6 +1603,8 @@
             const text = chatInput.value.trim();
             if (!text || !ws || ws.readyState !== WebSocket.OPEN) return;
 
+            isAgentActive = true;
+            stopSpeechRecognition();
             // Stop agent audio playback
             interruptAgent();
             lastAgentMessageDiv = null;
@@ -1402,38 +1648,57 @@
 
         // --- Audio Player Helper ---
         function queueAudio(hexString) {
-            audioQueue.push(hexString);
-            if (!isPlaying) {
-                playNextAudio();
+            try {
+                const bytes = new Uint8Array(hexString.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+                const blob = new Blob([bytes], { type: 'audio/mp3' });
+                const audioUrl = URL.createObjectURL(blob);
+                
+                const audioEl = new Audio(audioUrl);
+                audioEl.preload = "auto";
+                
+                audioQueue.push({ audioEl, url: audioUrl });
+                
+                if (!isPlaying) {
+                    playNextAudio();
+                }
+            } catch (err) {
+                console.error("Error pre-loading audio chunk:", err);
             }
         }
 
         function playNextAudio() {
             if (audioQueue.length === 0) {
                 isPlaying = false;
+                isAgentActive = false;
+                lastAgentSpeechEndTime = Date.now();
+                setTimeout(() => {
+                    if (!isAgentActive && !isPlaying) {
+                        startSpeechRecognition();
+                    }
+                }, 800);
                 return;
             }
             
             isPlaying = true;
             
-            const hex = audioQueue.shift();
+            const chunk = audioQueue.shift();
+            currentAudio = chunk.audioEl;
             
-            const bytes = new Uint8Array(hex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
-            const blob = new Blob([bytes], { type: 'audio/mp3' });
-            const audioUrl = URL.createObjectURL(blob);
-            
-            currentAudio = new Audio(audioUrl);
             currentAudio.play().catch(err => {
                 console.error("Audio play failed:", err);
+                URL.revokeObjectURL(chunk.url);
                 playNextAudio();
             });
+            
             currentAudio.onended = () => {
-                URL.revokeObjectURL(audioUrl);
+                URL.revokeObjectURL(chunk.url);
                 currentAudio = null;
                 playNextAudio();
             };
+            
             currentAudio.onerror = (e) => {
                 console.error("Audio playback error:", e);
+                URL.revokeObjectURL(chunk.url);
                 currentAudio = null;
                 playNextAudio();
             };

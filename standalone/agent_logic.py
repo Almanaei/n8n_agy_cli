@@ -4,7 +4,7 @@ import json
 import requests
 import re
 from dotenv import load_dotenv
-from openai import OpenAI
+from openai import AsyncOpenAI
 
 # Load environment variables
 load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
@@ -13,6 +13,7 @@ load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 N8N_BASE_URL = "http://127.0.0.1:5678"
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+FIREWORKS_API_KEY = os.getenv("FIREWORKS_API_KEY")
 
 class StandaloneAgent:
     def __init__(self, conversation_id: str):
@@ -65,15 +66,18 @@ class StandaloneAgent:
             "   - BEFORE explaining any services or answering questions, you must explicitly collect the client's "
             "full name (الاسم) and phone number (رقم الهاتف).\n"
             "   - If the user asks a question before providing this information, say:\n"
-            "     \"مرحبا بك في مركز خدمات الإدارة العامة للدفاع المدني .. يرجى تزويدي بالإسم ورقم الهاتف للبدء.\"\n"
-            "   - You must validate this input. Once both name and phone number are provided, trigger the 'save_lead_info' tool.\n"
+            "     \"مرحباً بك في الدفاع المدني، يرجى تزويدي بالاسم ورقم الهاتف للبدء.\"\n"
+            "   - Once they provide name and phone, they are saved automatically. Do not ask for them again, and proceed with their request.\n"
             "4. Email Transcript Option (On-Demand):\n"
             "   - If the user requests a copy of the conversation to be sent to their email, instruct them to write/type their email "
             "address in the chat input box (e.g. \"من فضلك اكتب بريدك الإلكتروني في خانة الكتابة بالأسفل\"). Do not collect email via voice.\n"
-            "   - Once they submit it, trigger the 'save_lead_info' tool passing the 'clientEmail' parameter.\n"
-            "   - Confirm to them: \"تم حفظ بريدك الإلكتروني بنجاح، وسنقوم بإرسال نسخة من المحادثة فور انتهاء المكالمة.\"\n"
+            "   - Once they submit it, it is saved automatically. Confirm to them: \"تم حفظ بريدك الإلكتروني بنجاح، وسنقوم بإرسال نسخة من المحادثة فور انتهاء المكالمة.\"\n"
             "5. Silence & Turn-Taking:\n"
-            "   - If the user stops talking, wait patiently and silently for them to continue.\n\n"
+            "   - If the user stops talking, wait patiently and silently for them to continue.\n"
+            "6. Brevity & Voice Optimization (CRITICAL):\n"
+            "   - Speak in a natural, polite, and conversational manner.\n"
+            "   - Keep your responses extremely short, direct, and concise (1-2 sentences maximum per turn).\n"
+            "   - Never generate lists, long paragraphs, or bullet points. Summarize information in a single short sentence.\n\n"
             "KNOWLEDGE BASE DOCUMENTATION (Use the facts below to answer queries once Name and Phone are collected):\n"
             f"{self.knowledge_text}"
         )
@@ -101,13 +105,24 @@ class StandaloneAgent:
                 i += 2
             self.services_list.append(service_dict)
         
-        # Initialize LLM clients
+        # Initialize LLM clients (using AsyncOpenAI)
         self.groq_client = None
         self.openai_client = None
+        self.fireworks_client = None
         
+        if FIREWORKS_API_KEY:
+            try:
+                self.fireworks_client = AsyncOpenAI(
+                    api_key=FIREWORKS_API_KEY,
+                    base_url="https://api.fireworks.ai/inference/v1"
+                )
+                print("Fireworks client initialized with accounts/fireworks/models/gpt-oss-20b.")
+            except Exception as e:
+                print(f"Error initializing Fireworks client: {e}")
+
         if GROQ_API_KEY and GROQ_API_KEY.startswith("gsk_"):
             try:
-                self.groq_client = OpenAI(
+                self.groq_client = AsyncOpenAI(
                     api_key=GROQ_API_KEY,
                     base_url="https://api.groq.com/openai/v1"
                 )
@@ -115,24 +130,17 @@ class StandaloneAgent:
             except Exception as e:
                 print(f"Error initializing Groq client: {e}")
         
-        if OPENAI_API_KEY:
-            try:
-                self.openai_client = OpenAI(api_key=OPENAI_API_KEY)
-                print("OpenAI client initialized with gpt-4o-mini.")
-            except Exception as e:
-                print(f"Error initializing OpenAI client: {e}")
-                
-        # Prefer OpenAI gpt-4o-mini for robust streaming tool use and Arabic capabilities
-        if self.openai_client:
-            self.llm_client = self.openai_client
-            self.model_name = "gpt-4o-mini"
-        elif self.groq_client:
+        # Prefer Groq (llama-3.3-70b-versatile) -> Fireworks (gpt-oss-20b)
+        if self.groq_client:
             self.llm_client = self.groq_client
             self.model_name = "llama-3.3-70b-versatile"
+        elif self.fireworks_client:
+            self.llm_client = self.fireworks_client
+            self.model_name = "accounts/fireworks/models/gpt-oss-20b"
         else:
             self.llm_client = None
             self.model_name = ""
-            print("WARNING: Neither GROQ_API_KEY nor OPENAI_API_KEY found or valid. Running in Mock Mode.")
+            print("WARNING: No valid LLM client initialized. Running in Mock Mode.")
 
     def add_to_transcript(self, role: str, message: str, original_message: str = None):
         """Append a message turn to local transcript history."""
@@ -143,7 +151,8 @@ class StandaloneAgent:
         })
 
     def trigger_n8n_lead_webhook(self):
-        """Sends lead details to the n8n /webhook/leads endpoint."""
+        """Sends lead details to the n8n /webhook/leads endpoint asynchronously in a background thread."""
+        import threading
         url = f"{N8N_BASE_URL}/webhook/leads"
         payload = {
             "clientName": self.client_name,
@@ -151,17 +160,20 @@ class StandaloneAgent:
             "clientEmail": self.client_email,
             "conversationId": self.conversation_id
         }
-        try:
-            print(f"Triggering n8n leads webhook: {payload}")
-            response = requests.post(url, json=payload, timeout=5)
-            print(f"n8n leads webhook response: {response.status_code} - {response.text}")
-            return response.json()
-        except Exception as e:
-            print(f"Error calling leads webhook: {e}")
-            return {"error": str(e)}
+        def run_post():
+            try:
+                print(f"Triggering n8n leads webhook (bg thread): {payload}")
+                response = requests.post(url, json=payload, timeout=5)
+                print(f"n8n leads webhook response (bg thread): {response.status_code} - {response.text}")
+            except Exception as e:
+                print(f"Error calling leads webhook (bg thread): {e}")
+        
+        threading.Thread(target=run_post, daemon=True).start()
+        return {"status": "triggered"}
 
     def trigger_n8n_post_call_webhook(self):
-        """Sends the full conversation transcript to the n8n /webhook/post-call endpoint."""
+        """Sends the full conversation transcript to the n8n /webhook/post-call endpoint asynchronously in a background thread."""
+        import threading
         url = f"{N8N_BASE_URL}/webhook/post-call"
         payload = {
             "type": "post_call_transcription",
@@ -171,23 +183,30 @@ class StandaloneAgent:
                 "transcript": self.transcript
             }
         }
-        try:
-            print(f"Triggering n8n post-call webhook for {self.conversation_id}")
-            response = requests.post(url, json=payload, timeout=5)
-            print(f"n8n post-call webhook response: {response.status_code} - {response.text}")
-            return response.json()
-        except Exception as e:
-            print(f"Error calling post-call webhook: {e}")
-            return {"error": str(e)}
+        def run_post():
+            try:
+                print(f"Triggering n8n post-call webhook (bg thread) for {self.conversation_id}")
+                response = requests.post(url, json=payload, timeout=5)
+                print(f"n8n post-call webhook response (bg thread): {response.status_code} - {response.text}")
+            except Exception as e:
+                print(f"Error calling post-call webhook (bg thread): {e}")
+                
+        threading.Thread(target=run_post, daemon=True).start()
+        return {"status": "triggered"}
 
-    def _call_llm_with_fallback(self, messages, tools=None, tool_choice=None, stream=False):
-        """Helper to call LLM, falling back between OpenAI and Groq if one fails or is rate-limited."""
-        primary_client = self.llm_client
-        primary_model = self.model_name
-        
-        if not primary_client:
-            raise Exception("No LLM client initialized.")
+    async def _call_llm_with_fallback(self, messages, tools=None, tool_choice=None, stream=False):
+        """Helper to call LLM, falling back between Fireworks and Groq if one fails or is rate-limited."""
+        clients_to_try = []
+        # Add current model first
+        if self.llm_client:
+            clients_to_try.append((self.llm_client, self.model_name))
             
+        # Add others if not already there
+        if self.fireworks_client and (self.fireworks_client, "accounts/fireworks/models/gpt-oss-20b") not in clients_to_try:
+            clients_to_try.append((self.fireworks_client, "accounts/fireworks/models/gpt-oss-20b"))
+        if self.groq_client and (self.groq_client, "llama-3.3-70b-versatile") not in clients_to_try:
+            clients_to_try.append((self.groq_client, "llama-3.3-70b-versatile"))
+
         def get_kwargs(model):
             kwargs = {
                 "model": model,
@@ -199,29 +218,26 @@ class StandaloneAgent:
             if tool_choice:
                 kwargs["tool_choice"] = tool_choice
             return kwargs
-            
-        try:
-            print(f"Attempting query with model={primary_model}...")
-            return primary_client.chat.completions.create(**get_kwargs(primary_model))
-        except Exception as primary_err:
-            print(f"Primary LLM ({primary_model}) failed: {primary_err}")
-            # If primary was OpenAI and Groq is available, fallback to Groq
-            if primary_client == self.openai_client and self.groq_client:
-                print("Falling back to Groq llama-3.3-70b-versatile...")
-                self.llm_client = self.groq_client
-                self.model_name = "llama-3.3-70b-versatile"
-                return self.groq_client.chat.completions.create(**get_kwargs("llama-3.3-70b-versatile"))
-            # If primary was Groq and OpenAI is available, fallback to OpenAI
-            elif primary_client == self.groq_client and self.openai_client:
-                print("Falling back to OpenAI gpt-4o-mini...")
-                self.llm_client = self.openai_client
-                self.model_name = "gpt-4o-mini"
-                return self.openai_client.chat.completions.create(**get_kwargs("gpt-4o-mini"))
-            else:
-                raise primary_err
 
-    def get_llm_response(self, user_message: str) -> str:
-        """Query LLM and process function calls/tool outputs."""
+        last_err = None
+        for client, model in clients_to_try:
+            try:
+                print(f"Attempting query with model={model}...")
+                res = await client.chat.completions.create(**get_kwargs(model))
+                # Update current active client/model
+                self.llm_client = client
+                self.model_name = model
+                return res
+            except Exception as e:
+                print(f"LLM model={model} failed: {e}")
+                last_err = e
+                
+        if last_err:
+            raise last_err
+        raise Exception("No LLM client initialized.")
+
+    async def get_llm_response(self, user_message: str) -> str:
+        """Query LLM and process outputs directly without tool calls for maximum speed."""
         # 1. Unified state extraction
         self._extract_lead_parameters(user_message)
         
@@ -248,65 +264,15 @@ class StandaloneAgent:
             self.llm_history.append({"role": "assistant", "content": ans})
             return ans
 
-        # Define tool schema for save_lead_info
-        tools = [{
-            "type": "function",
-            "function": {
-                "name": "save_lead_info",
-                "description": "Call this to save lead parameters (name, phone, email). Required before answering service queries.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "clientName": {"type": "string", "description": "The client's full name."},
-                        "phoneNumber": {"type": "string", "description": "The client's phone number."},
-                        "clientEmail": {"type": "string", "description": "The client's email address."}
-                    },
-                    "required": []
-                }
-            }
-        }]
-
         try:
-            response = self._call_llm_with_fallback(
+            response = await self._call_llm_with_fallback(
                 messages=self.llm_history,
-                tools=tools,
-                tool_choice="auto",
+                tools=None,
+                tool_choice=None,
                 stream=False
             )
             
-            choice = response.choices[0].message
-            
-            # Handle Tool Calls
-            if choice.tool_calls:
-                self.llm_history.append(choice)
-                
-                for tool_call in choice.tool_calls:
-                    if tool_call.function.name == "save_lead_info":
-                        args = json.loads(tool_call.function.arguments)
-                        if "clientName" in args: self.client_name = args["clientName"]
-                        if "phoneNumber" in args: self.phone_number = args["phoneNumber"]
-                        if "clientEmail" in args: self.client_email = args["clientEmail"]
-                        
-                        # Trigger webhook
-                        self.trigger_n8n_lead_webhook()
-                        self.webhook_triggered = True
-                        
-                        # Append tool response
-                        self.llm_history.append({
-                            "role": "tool",
-                            "tool_call_id": tool_call.id,
-                            "name": tool_call.function.name,
-                            "content": json.dumps({"status": "success", "message": "Lead details saved."})
-                        })
-                
-                # After tool call, run secondary generation to get final verbal response
-                second_response = self._call_llm_with_fallback(
-                    messages=self.llm_history,
-                    stream=False
-                )
-                agent_msg = second_response.choices[0].message.content
-            else:
-                agent_msg = choice.content
+            agent_msg = response.choices[0].message.content
             
             self.llm_history.append({"role": "assistant", "content": agent_msg})
             self.add_to_transcript("agent", agent_msg)
@@ -318,8 +284,8 @@ class StandaloneAgent:
             self.llm_history.append({"role": "assistant", "content": ans})
             return ans
 
-    def get_llm_response_stream(self, user_message: str):
-        """Query LLM and yield response chunks in real-time. Falls back to Heuristics Mock Mode."""
+    async def get_llm_response_stream(self, user_message: str):
+        """Query LLM and yield response chunks in real-time asynchronously. Tools are bypassed to avoid latency."""
         # 1. Unified state extraction
         self._extract_lead_parameters(user_message)
         
@@ -347,98 +313,25 @@ class StandaloneAgent:
             yield ans
             return
 
-        # Define tool schema for save_lead_info
-        tools = [{
-            "type": "function",
-            "function": {
-                "name": "save_lead_info",
-                "description": "Call this to save lead parameters (name, phone, email). Required before answering service queries.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "clientName": {"type": "string", "description": "The client's full name."},
-                        "phoneNumber": {"type": "string", "description": "The client's phone number."},
-                        "clientEmail": {"type": "string", "description": "The client's email address."}
-                    },
-                    "required": []
-                }
-            }
-        }]
-
         try:
-            response = self._call_llm_with_fallback(
+            response = await self._call_llm_with_fallback(
                 messages=self.llm_history,
-                tools=tools,
-                tool_choice="auto",
+                tools=None,
+                tool_choice=None,
                 stream=True
             )
             
-            tool_calls = []
             content_buffer = ""
-            
-            for chunk in response:
+            async for chunk in response:
+                if not chunk.choices:
+                    continue
                 delta = chunk.choices[0].delta
-                if delta.tool_calls:
-                    for tc in delta.tool_calls:
-                        if len(tool_calls) <= tc.index:
-                            tool_calls.append({
-                                "id": tc.id,
-                                "type": "function",
-                                "function": {
-                                    "name": tc.function.name if tc.function and tc.function.name else "",
-                                    "arguments": ""
-                                }
-                            })
-                        if tc.function and tc.function.arguments:
-                            tool_calls[tc.index]["function"]["arguments"] += tc.function.arguments
                 if delta.content:
                     content_buffer += delta.content
                     yield delta.content
             
-            # Handle Tool Calls if any
-            if tool_calls:
-                for tc in tool_calls:
-                    if tc["function"]["name"] == "save_lead_info":
-                        args = json.loads(tc["function"]["arguments"])
-                        if "clientName" in args: self.client_name = args["clientName"]
-                        if "phoneNumber" in args: self.phone_number = args["phoneNumber"]
-                        if "clientEmail" in args: self.client_email = args["clientEmail"]
-                        
-                        # Trigger webhook
-                        self.trigger_n8n_lead_webhook()
-                        self.webhook_triggered = True
-                
-                self.llm_history.append({
-                    "role": "assistant",
-                    "content": None,
-                    "tool_calls": tool_calls
-                })
-                
-                for tc in tool_calls:
-                    self.llm_history.append({
-                        "role": "tool",
-                        "tool_call_id": tc["id"],
-                        "name": tc["function"]["name"],
-                        "content": json.dumps({"status": "success", "message": "Lead details saved."})
-                    })
-                
-                second_response = self._call_llm_with_fallback(
-                    messages=self.llm_history,
-                    stream=True
-                )
-                
-                second_content_buffer = ""
-                for chunk in second_response:
-                    delta = chunk.choices[0].delta
-                    if delta.content:
-                        second_content_buffer += delta.content
-                        yield delta.content
-                
-                self.llm_history.append({"role": "assistant", "content": second_content_buffer})
-                self.add_to_transcript("agent", second_content_buffer)
-            else:
-                self.llm_history.append({"role": "assistant", "content": content_buffer})
-                self.add_to_transcript("agent", content_buffer)
+            self.llm_history.append({"role": "assistant", "content": content_buffer})
+            self.add_to_transcript("agent", content_buffer)
                 
         except Exception as e:
             print(f"Error querying streaming LLM ({e}). Falling back to Heuristics Mock Mode.")

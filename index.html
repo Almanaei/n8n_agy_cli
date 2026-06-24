@@ -798,6 +798,65 @@
             font-weight: 500;
         }
 
+        /* Sleek Feedback Pill Toast */
+        .feedback-toast {
+            position: fixed;
+            bottom: -80px;
+            left: 24px;
+            background: rgba(22, 22, 23, 0.7);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 10px 16px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 113, 227, 0.05);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 1100;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .feedback-toast.show {
+            bottom: 24px;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .feedback-emoji-btn {
+            background: none;
+            border: none;
+            font-size: 1.6rem;
+            cursor: pointer;
+            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            outline: none;
+            padding: 2px;
+        }
+
+        .feedback-emoji-btn:hover {
+            transform: scale(1.35) translateY(-4px);
+        }
+
+        .feedback-emoji-btn:active {
+            transform: scale(0.95);
+        }
+
+        .feedback-success-msg {
+            font-size: 0.9rem;
+            color: var(--status-online);
+            font-weight: 700;
+            display: none;
+            margin-left: 4px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         /* Responsive */
         @media (max-width: 968px) {
             .hero-section {
@@ -993,11 +1052,81 @@
         </div>
     </footer>
 
+    <!-- Feedback Pill Component -->
+    <div id="feedback-toast" class="feedback-toast">
+        <button class="feedback-emoji-btn" onclick="submitFeedback(0)">😞</button>
+        <button class="feedback-emoji-btn" onclick="submitFeedback(50)">🙂</button>
+        <button class="feedback-emoji-btn" onclick="submitFeedback(70)">😊</button>
+        <button class="feedback-emoji-btn" onclick="submitFeedback(100)">😀</button>
+        <span id="feedback-success" class="feedback-success-msg">✓</span>
+    </div>
+
     <!-- ES Module Script to Import Conversation from CDN -->
     <script type="module">
         import { Conversation } from 'https://cdn.jsdelivr.net/npm/@elevenlabs/client/+esm';
 
         let conversation;
+        let feedbackTimeout;
+        let activeConversationId = "";
+
+        function showFeedbackToast(convId) {
+            activeConversationId = convId;
+            const toast = document.getElementById('feedback-toast');
+            const successMsg = document.getElementById('feedback-success');
+            const btns = toast.querySelectorAll('.feedback-emoji-btn');
+            
+            // Reset state
+            successMsg.style.display = 'none';
+            btns.forEach(btn => btn.style.display = 'inline-block');
+            
+            toast.classList.add('show');
+        }
+
+        function hideFeedbackToast() {
+            const toast = document.getElementById('feedback-toast');
+            toast.classList.remove('show');
+        }
+
+        window.submitFeedback = async function(kpiValue) {
+            if (!activeConversationId) {
+                console.warn("No active conversation ID to submit feedback for.");
+                return;
+            }
+            
+            const successMsg = document.getElementById('feedback-success');
+            const toast = document.getElementById('feedback-toast');
+            const btns = toast.querySelectorAll('.feedback-emoji-btn');
+            
+            // Show checkmark, hide buttons
+            btns.forEach(btn => btn.style.display = 'none');
+            successMsg.style.display = 'inline-block';
+            
+            try {
+                const response = await fetch('/submit-feedback', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        conversationId: activeConversationId,
+                        kpi: kpiValue + "%"
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error("Failed to submit feedback to server");
+                }
+                
+                console.log(`Feedback submitted: ${kpiValue}% for ${activeConversationId}`);
+            } catch (err) {
+                console.error("Error submitting feedback:", err);
+            }
+            
+            // Slide down after a delay
+            setTimeout(() => {
+                hideFeedbackToast();
+            }, 1500);
+        }
         const messagesContainer = document.getElementById('chat-messages');
         const chatInput = document.getElementById('chat-input');
         const sendButton = document.getElementById('send-btn');
@@ -1055,7 +1184,7 @@
                 // Start WebRTC session using the signedUrl
                 conversation = await Conversation.startSession({
                     signedUrl: data.signed_url,
-                    onConnect: () => {
+                    onConnect: ({ conversationId }) => {
                         // Update UI states to Connected/Online
                         statusBadge.innerText = "متصل بالمايك";
                         statusBadge.style.background = "rgba(48, 209, 88, 0.12)";
@@ -1076,6 +1205,15 @@
                         // Show visualizer animations
                         bars.forEach(bar => bar.style.display = 'block');
                         messagesContainer.innerHTML = '';
+
+                        // Clear any previous feedback state
+                        clearTimeout(feedbackTimeout);
+                        hideFeedbackToast();
+                        
+                        // Show feedback pill after 8 seconds of active call
+                        feedbackTimeout = setTimeout(() => {
+                            showFeedbackToast(conversationId);
+                        }, 8000);
                     },
                     onDisconnect: () => {
                         handleDisconnect();
@@ -1165,6 +1303,13 @@
             // Hide visualizer animations
             bars.forEach(bar => bar.style.display = 'none');
             
+            // If feedback has not been shown, show it now upon disconnect
+            const toast = document.getElementById('feedback-toast');
+            if (activeConversationId && toast && !toast.classList.contains('show')) {
+                showFeedbackToast(activeConversationId);
+            }
+            clearTimeout(feedbackTimeout);
+
             if (conversation) {
                 const tempConv = conversation;
                 conversation = null;

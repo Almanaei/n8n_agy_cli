@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-20T00:27:50.554Z",
+  "updatedAt": "2026-06-24T06:42:30.053Z",
   "createdAt": "2026-06-15T23:19:47.771Z",
   "id": "VBjr7VIF75yUyP45",
   "name": "ElevenLabs Lead Integration (Testable)",
@@ -27,7 +27,7 @@
     {
       "parameters": {
         "authentication": "serviceAccount",
-        "operation": "append",
+        "operation": "appendOrUpdate",
         "documentId": {
           "__rl": true,
           "value": "https://docs.google.com/spreadsheets/d/1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8/edit?gid=0#gid=0",
@@ -39,15 +39,7 @@
           "mode": "name"
         },
         "columns": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "Timestamp": "={{ $now }}",
-            "Client Name": "={{ $json.body.clientName || '' }}",
-            "Phone Number": "={{ $json.body.phoneNumber || '' }}",
-            "Client Email": "={{ ($json.body.clientEmail || '').replace(' [at] ', '@').replace('[at]', '@') }}",
-            "Conversation ID": "={{ $json.body.conversationId || '' }}",
-            "Lead Status": "New Lead"
-          },
+          "mappingMode": "autoMapInputData",
           "schema": [
             {
               "id": "Timestamp",
@@ -78,7 +70,15 @@
               "id": "Lead Status",
               "displayName": "Lead Status",
               "type": "string"
+            },
+            {
+              "id": "KPI",
+              "displayName": "KPI",
+              "type": "string"
             }
+          ],
+          "matchingColumns": [
+            "Conversation ID"
           ]
         },
         "options": {}
@@ -260,6 +260,129 @@
       ],
       "id": "respond-to-webhook-id",
       "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "feedback",
+        "options": {},
+        "responseMode": "responseNode"
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        600
+      ],
+      "name": "Feedback Webhook",
+      "id": "feedback-webhook-id",
+      "webhookId": "feedback-webhook-generated-id"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "Conversation ID"
+          ],
+          "value": {
+            "Conversation ID": "={{ $json.body.conversationId }}",
+            "KPI": "={{ $json.body.kpi }}"
+          },
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "type": "string"
+            },
+            {
+              "id": "Client Name",
+              "displayName": "Client Name",
+              "type": "string"
+            },
+            {
+              "id": "Phone Number",
+              "displayName": "Phone Number",
+              "type": "string"
+            },
+            {
+              "id": "Client Email",
+              "displayName": "Client Email",
+              "type": "string"
+            },
+            {
+              "id": "Conversation ID",
+              "displayName": "Conversation ID",
+              "type": "string"
+            },
+            {
+              "id": "Lead Status",
+              "displayName": "Lead Status",
+              "type": "string"
+            },
+            {
+              "id": "KPI",
+              "displayName": "KPI",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        256,
+        600
+      ],
+      "id": "update-sheet-kpi-id",
+      "name": "Update Sheet KPI",
+      "credentials": {
+        "googleApi": {
+          "id": "fXHzExTwkxRRpEVc",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"success\",\n  \"message\": \"Feedback saved.\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        512,
+        600
+      ],
+      "id": "respond-to-feedback-id",
+      "name": "Respond to Feedback Webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.item.json.body || {};\nconst payload = {};\n\npayload[\"Conversation ID\"] = body.conversationId;\n\n// Generate Bahrain timestamp\nconst pad = (num) => String(num).padStart(2, '0');\nconst now = new Date();\nconst utc = now.getTime() + (now.getTimezoneOffset() * 60000);\nconst bahrain = new Date(utc + (3600000 * 3));\nconst ms = String(bahrain.getMilliseconds()).padStart(3, '0');\npayload[\"Timestamp\"] = `${bahrain.getFullYear()}-${pad(bahrain.getMonth() + 1)}-${pad(bahrain.getDate())}T${pad(bahrain.getHours())}:${pad(bahrain.getMinutes())}:${pad(bahrain.getSeconds())}.${ms}+03:00`;\n\nif (body.clientName !== undefined && body.clientName !== null && body.clientName !== '') {\n  payload[\"Client Name\"] = body.clientName;\n}\nif (body.phoneNumber !== undefined && body.phoneNumber !== null && body.phoneNumber !== '') {\n  payload[\"Phone Number\"] = body.phoneNumber;\n}\nif (body.clientEmail !== undefined && body.clientEmail !== null && body.clientEmail !== '') {\n  let email = body.clientEmail;\n  email = email.replace(/\\s*\\[at\\]\\s*/gi, '@').replace(/\\[at\\]/gi, '@');\n  email = email.replace(/\\s*\\[dot\\]\\s*/gi, '.').replace(/\\[dot\\]/gi, '.');\n  email = email.replace(/\\s+/g, '');\n  payload[\"Client Email\"] = email;\n}\n\npayload[\"Lead Status\"] = \"New Lead\";\n\nreturn { json: payload };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        200,
+        -100
+      ],
+      "id": "prepare-sheets-payload-id",
+      "name": "Prepare Sheets Payload"
     }
   ],
   "connections": {
@@ -327,6 +450,39 @@
       "main": [
         [
           {
+            "node": "Prepare Sheets Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Feedback Webhook": {
+      "main": [
+        [
+          {
+            "node": "Update Sheet KPI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Sheet KPI": {
+      "main": [
+        [
+          {
+            "node": "Respond to Feedback Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Sheets Payload": {
+      "main": [
+        [
+          {
             "node": "Google Sheets",
             "type": "main",
             "index": 0
@@ -344,10 +500,10 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "8f21e057-7b40-4d65-8f40-20074a468148",
-  "activeVersionId": "8f21e057-7b40-4d65-8f40-20074a468148",
-  "versionCounter": 88,
-  "triggerCount": 2,
+  "versionId": "fe0535f8-8eee-4729-b8a1-d2ae4a3490da",
+  "activeVersionId": "fe0535f8-8eee-4729-b8a1-d2ae4a3490da",
+  "versionCounter": 104,
+  "triggerCount": 3,
   "shared": [
     {
       "updatedAt": "2026-06-15T23:19:47.776Z",
@@ -369,9 +525,9 @@
   ],
   "tags": [],
   "activeVersion": {
-    "updatedAt": "2026-06-20T00:27:50.559Z",
-    "createdAt": "2026-06-20T00:27:50.559Z",
-    "versionId": "8f21e057-7b40-4d65-8f40-20074a468148",
+    "updatedAt": "2026-06-24T06:27:55.305Z",
+    "createdAt": "2026-06-24T06:27:55.305Z",
+    "versionId": "fe0535f8-8eee-4729-b8a1-d2ae4a3490da",
     "workflowId": "VBjr7VIF75yUyP45",
     "nodes": [
       {
@@ -394,7 +550,7 @@
       {
         "parameters": {
           "authentication": "serviceAccount",
-          "operation": "append",
+          "operation": "appendOrUpdate",
           "documentId": {
             "__rl": true,
             "value": "https://docs.google.com/spreadsheets/d/1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8/edit?gid=0#gid=0",
@@ -406,15 +562,7 @@
             "mode": "name"
           },
           "columns": {
-            "mappingMode": "defineBelow",
-            "value": {
-              "Timestamp": "={{ $now }}",
-              "Client Name": "={{ $json.body.clientName || '' }}",
-              "Phone Number": "={{ $json.body.phoneNumber || '' }}",
-              "Client Email": "={{ ($json.body.clientEmail || '').replace(' [at] ', '@').replace('[at]', '@') }}",
-              "Conversation ID": "={{ $json.body.conversationId || '' }}",
-              "Lead Status": "New Lead"
-            },
+            "mappingMode": "autoMapInputData",
             "schema": [
               {
                 "id": "Timestamp",
@@ -445,7 +593,15 @@
                 "id": "Lead Status",
                 "displayName": "Lead Status",
                 "type": "string"
+              },
+              {
+                "id": "KPI",
+                "displayName": "KPI",
+                "type": "string"
               }
+            ],
+            "matchingColumns": [
+              "Conversation ID"
             ]
           },
           "options": {}
@@ -627,6 +783,129 @@
         ],
         "id": "respond-to-webhook-id",
         "name": "Respond to Webhook"
+      },
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "feedback",
+          "options": {},
+          "responseMode": "responseNode"
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 1.1,
+        "position": [
+          0,
+          600
+        ],
+        "name": "Feedback Webhook",
+        "id": "feedback-webhook-id",
+        "webhookId": "feedback-webhook-generated-id"
+      },
+      {
+        "parameters": {
+          "authentication": "serviceAccount",
+          "operation": "appendOrUpdate",
+          "documentId": {
+            "__rl": true,
+            "value": "https://docs.google.com/spreadsheets/d/1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8/edit?gid=0#gid=0",
+            "mode": "url"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Sheet1",
+            "mode": "name"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "matchingColumns": [
+              "Conversation ID"
+            ],
+            "value": {
+              "Conversation ID": "={{ $json.body.conversationId }}",
+              "KPI": "={{ $json.body.kpi }}"
+            },
+            "schema": [
+              {
+                "id": "Timestamp",
+                "displayName": "Timestamp",
+                "type": "string"
+              },
+              {
+                "id": "Client Name",
+                "displayName": "Client Name",
+                "type": "string"
+              },
+              {
+                "id": "Phone Number",
+                "displayName": "Phone Number",
+                "type": "string"
+              },
+              {
+                "id": "Client Email",
+                "displayName": "Client Email",
+                "type": "string"
+              },
+              {
+                "id": "Conversation ID",
+                "displayName": "Conversation ID",
+                "type": "string"
+              },
+              {
+                "id": "Lead Status",
+                "displayName": "Lead Status",
+                "type": "string"
+              },
+              {
+                "id": "KPI",
+                "displayName": "KPI",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          256,
+          600
+        ],
+        "id": "update-sheet-kpi-id",
+        "name": "Update Sheet KPI",
+        "credentials": {
+          "googleApi": {
+            "id": "fXHzExTwkxRRpEVc",
+            "name": "Google Sheets account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "respondWith": "json",
+          "responseBody": "{\n  \"status\": \"success\",\n  \"message\": \"Feedback saved.\"\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1,
+        "position": [
+          512,
+          600
+        ],
+        "id": "respond-to-feedback-id",
+        "name": "Respond to Feedback Webhook"
+      },
+      {
+        "parameters": {
+          "jsCode": "const body = $input.item.json.body || {};\nconst payload = {};\n\npayload[\"Conversation ID\"] = body.conversationId;\n\n// Generate Bahrain timestamp\nconst pad = (num) => String(num).padStart(2, '0');\nconst now = new Date();\nconst utc = now.getTime() + (now.getTimezoneOffset() * 60000);\nconst bahrain = new Date(utc + (3600000 * 3));\nconst ms = String(bahrain.getMilliseconds()).padStart(3, '0');\npayload[\"Timestamp\"] = `${bahrain.getFullYear()}-${pad(bahrain.getMonth() + 1)}-${pad(bahrain.getDate())}T${pad(bahrain.getHours())}:${pad(bahrain.getMinutes())}:${pad(bahrain.getSeconds())}.${ms}+03:00`;\n\nif (body.clientName !== undefined && body.clientName !== null && body.clientName !== '') {\n  payload[\"Client Name\"] = body.clientName;\n}\nif (body.phoneNumber !== undefined && body.phoneNumber !== null && body.phoneNumber !== '') {\n  payload[\"Phone Number\"] = body.phoneNumber;\n}\nif (body.clientEmail !== undefined && body.clientEmail !== null && body.clientEmail !== '') {\n  let email = body.clientEmail;\n  email = email.replace(/\\s*\\[at\\]\\s*/gi, '@').replace(/\\[at\\]/gi, '@');\n  email = email.replace(/\\s*\\[dot\\]\\s*/gi, '.').replace(/\\[dot\\]/gi, '.');\n  email = email.replace(/\\s+/g, '');\n  payload[\"Client Email\"] = email;\n}\n\npayload[\"Lead Status\"] = \"New Lead\";\n\nreturn { json: payload };"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          200,
+          -100
+        ],
+        "id": "prepare-sheets-payload-id",
+        "name": "Prepare Sheets Payload"
       }
     ],
     "connections": {
@@ -694,6 +973,39 @@
         "main": [
           [
             {
+              "node": "Prepare Sheets Payload",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Feedback Webhook": {
+        "main": [
+          [
+            {
+              "node": "Update Sheet KPI",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update Sheet KPI": {
+        "main": [
+          [
+            {
+              "node": "Respond to Feedback Webhook",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Prepare Sheets Payload": {
+        "main": [
+          [
+            {
               "node": "Google Sheets",
               "type": "main",
               "index": 0
@@ -708,34 +1020,26 @@
     "autosaved": false,
     "workflowPublishHistory": [
       {
-        "createdAt": "2026-06-20T00:27:50.640Z",
-        "id": 85,
+        "createdAt": "2026-06-24T06:27:55.396Z",
+        "id": 129,
         "workflowId": "VBjr7VIF75yUyP45",
-        "versionId": "8f21e057-7b40-4d65-8f40-20074a468148",
+        "versionId": "fe0535f8-8eee-4729-b8a1-d2ae4a3490da",
         "event": "activated",
         "userId": "607a0526-257f-48a0-bce6-3462762ff6b2"
       },
       {
-        "createdAt": "2026-06-20T00:27:50.759Z",
-        "id": 87,
+        "createdAt": "2026-06-24T06:42:30.273Z",
+        "id": 131,
         "workflowId": "VBjr7VIF75yUyP45",
-        "versionId": "8f21e057-7b40-4d65-8f40-20074a468148",
+        "versionId": "fe0535f8-8eee-4729-b8a1-d2ae4a3490da",
         "event": "activated",
         "userId": "607a0526-257f-48a0-bce6-3462762ff6b2"
       },
       {
-        "createdAt": "2026-06-20T00:27:50.610Z",
-        "id": 84,
+        "createdAt": "2026-06-24T06:42:29.906Z",
+        "id": 130,
         "workflowId": "VBjr7VIF75yUyP45",
-        "versionId": "8f21e057-7b40-4d65-8f40-20074a468148",
-        "event": "deactivated",
-        "userId": "607a0526-257f-48a0-bce6-3462762ff6b2"
-      },
-      {
-        "createdAt": "2026-06-20T00:27:50.703Z",
-        "id": 86,
-        "workflowId": "VBjr7VIF75yUyP45",
-        "versionId": "8f21e057-7b40-4d65-8f40-20074a468148",
+        "versionId": "fe0535f8-8eee-4729-b8a1-d2ae4a3490da",
         "event": "deactivated",
         "userId": "607a0526-257f-48a0-bce6-3462762ff6b2"
       }

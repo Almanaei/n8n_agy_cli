@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "node server.js",
-    "standalone": "python -m uvicorn standalone.main:app --host 0.0.0.0 --port 8000"
+    "standalone": "python -m uvicorn standalone.main:app --host 0.0.0.0 --port 8000",
+    "dev": "node start_all.js"
   },
   "dependencies": {
     "localtunnel": "^2.0.2",

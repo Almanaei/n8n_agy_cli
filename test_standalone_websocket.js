@@ -24,7 +24,7 @@ ws.on('message', (data) => {
   // Script flow logic
   const normalizedText = payload.text;
   
-  if (normalizedText.includes("مرحبا بك في مركز") && !ws.sentNamePhone) {
+  if ((normalizedText.includes("مرحبا بك في مركز") || normalizedText.includes("الدفاع المدني")) && !ws.sentNamePhone) {
     ws.sentNamePhone = true;
     // Stage 1: Send client name and phone number
     setTimeout(() => {
