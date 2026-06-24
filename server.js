@@ -296,58 +296,68 @@ const server = http.createServer(async (req, res) => {
     req.on('data', chunk => {
       body += chunk.toString();
     });
-    req.on('end', async () => {
+    req.on('end', () => {
       try {
         const feedbackData = JSON.parse(body);
         console.log("Received feedback payload:", feedbackData);
         
-        // Forward feedback to n8n webhook
-        const n8nRes = await fetch('http://localhost:5678/webhook/feedback', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(feedbackData)
-        });
-        
-        if (!n8nRes.ok) {
-          const errText = await n8nRes.text();
-          throw new Error(`n8n webhook returned ${n8nRes.status}: ${errText}`);
-        }
-        
-        // Format Google Sheets KPI cell programmatically
-        try {
-          const conversationId = feedbackData.conversationId;
-          const kpiValue = feedbackData.kpi;
-          if (conversationId && (kpiValue === '100%' || kpiValue === '50%' || kpiValue === '0%')) {
-            console.log(`[Google Sheets Formatter] Triggering programmatic format for ${conversationId} to ${kpiValue}...`);
-            await formatKpiCell(conversationId, kpiValue);
-          }
-        } catch (formatError) {
-          console.error("[Google Sheets Formatter] Error during cell formatting:", formatError);
-        }
-
-        // Write feedback comment to Google Sheets programmatically
-        try {
-          const conversationId = feedbackData.conversationId;
-          const commentText = feedbackData.comment;
-          if (conversationId && commentText !== undefined) {
-            console.log(`[Google Sheets Commenter] Writing comment for ${conversationId}: "${commentText}"...`);
-            await writeFeedbackComment(conversationId, commentText);
-          }
-        } catch (commentError) {
-          console.error("[Google Sheets Commenter] Error writing feedback comment:", commentError);
-        }
-
+        // Respond to the client IMMEDIATELY to prevent UI blocking
         res.writeHead(200, { 
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*'
         });
         res.end(JSON.stringify({ status: 'success' }));
+
+        // Process n8n and Google Sheets integrations asynchronously in the background
+        (async () => {
+          try {
+            // Forward feedback to n8n webhook
+            const n8nRes = await fetch('http://localhost:5678/webhook/feedback', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(feedbackData)
+            });
+            
+            if (!n8nRes.ok) {
+              const errText = await n8nRes.text();
+              console.error(`[Background Task] n8n webhook returned ${n8nRes.status}: ${errText}`);
+            }
+          } catch (n8nError) {
+            console.error("[Background Task] Error forwarding feedback to n8n:", n8nError);
+          }
+          
+          // Format Google Sheets KPI cell programmatically
+          try {
+            const conversationId = feedbackData.conversationId;
+            const kpiValue = feedbackData.kpi;
+            if (conversationId && (kpiValue === '100%' || kpiValue === '50%' || kpiValue === '0%')) {
+              console.log(`[Background Task] [Google Sheets Formatter] Triggering programmatic format for ${conversationId} to ${kpiValue}...`);
+              await formatKpiCell(conversationId, kpiValue);
+            }
+          } catch (formatError) {
+            console.error("[Background Task] [Google Sheets Formatter] Error during cell formatting:", formatError);
+          }
+
+          // Write feedback comment to Google Sheets programmatically
+          try {
+            const conversationId = feedbackData.conversationId;
+            const commentText = feedbackData.comment;
+            if (conversationId && commentText !== undefined) {
+              console.log(`[Background Task] [Google Sheets Commenter] Writing comment for ${conversationId}: "${commentText}"...`);
+              await writeFeedbackComment(conversationId, commentText);
+            }
+          } catch (commentError) {
+            console.error("[Background Task] [Google Sheets Commenter] Error writing feedback comment:", commentError);
+          }
+        })();
       } catch (error) {
-        console.error("Error forwarding feedback to n8n:", error);
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: error.message }));
+        console.error("Error parsing feedback payload:", error);
+        if (!res.headersSent) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: "Invalid JSON" }));
+        }
       }
     });
   } else if (req.url === '/api/kpi-data' && req.method === 'GET') {

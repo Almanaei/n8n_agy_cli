@@ -1210,7 +1210,7 @@
             toast.classList.remove('show');
         }
 
-        window.submitFeedback = async function(kpiValue) {
+        window.submitFeedback = function(kpiValue) {
             if (!activeConversationId) {
                 console.warn("No active conversation ID to submit feedback for.");
                 return;
@@ -1218,27 +1218,22 @@
             
             lastKpiValue = kpiValue;
             
-            // Instantly submit the quantitative vote to the server
-            try {
-                const response = await fetch('/submit-feedback', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        conversationId: activeConversationId,
-                        kpi: kpiValue + "%"
-                    })
-                });
-                
-                if (!response.ok) {
-                    throw new Error("Failed to submit feedback to server");
-                }
-                
-                console.log(`Feedback submitted: ${kpiValue}% for ${activeConversationId}`);
-            } catch (err) {
+            // Instantly submit the quantitative vote to the server in the background
+            fetch('/submit-feedback', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    conversationId: activeConversationId,
+                    kpi: kpiValue + "%"
+                })
+            }).then(response => {
+                if (!response.ok) console.error("Failed to submit feedback to server");
+                else console.log(`Feedback submitted: ${kpiValue}% for ${activeConversationId}`);
+            }).catch(err => {
                 console.error("Error submitting feedback:", err);
-            }
+            });
 
             const toast = document.getElementById('feedback-toast');
             const options = document.getElementById('feedback-options');
@@ -1247,7 +1242,7 @@
             const input = document.getElementById('feedback-comment-input');
             const successMsg = document.getElementById('feedback-success');
 
-            // Hide initial emoji options
+            // Hide initial emoji options instantly
             options.style.display = 'none';
 
             if (kpiValue === 100) {
@@ -1275,7 +1270,7 @@
             }
         }
 
-        window.submitComment = async function() {
+        window.submitComment = function() {
             const input = document.getElementById('feedback-comment-input');
             const commentText = input.value.trim();
             const commentContainer = document.getElementById('feedback-comment-container');
@@ -1283,30 +1278,25 @@
             const toast = document.getElementById('feedback-toast');
 
             if (commentText) {
-                try {
-                    const response = await fetch('/submit-feedback', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            conversationId: activeConversationId,
-                            kpi: lastKpiValue !== null ? lastKpiValue + "%" : undefined,
-                            comment: commentText
-                        })
-                    });
-                    
-                    if (!response.ok) {
-                        throw new Error("Failed to submit comment to server");
-                    }
-                    
-                    console.log(`Comment submitted for ${activeConversationId}: ${commentText}`);
-                } catch (err) {
+                fetch('/submit-feedback', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        conversationId: activeConversationId,
+                        kpi: lastKpiValue !== null ? lastKpiValue + "%" : undefined,
+                        comment: commentText
+                    })
+                }).then(response => {
+                    if (!response.ok) console.error("Failed to submit comment to server");
+                    else console.log(`Comment submitted for ${activeConversationId}: ${commentText}`);
+                }).catch(err => {
                     console.error("Error submitting comment:", err);
-                }
+                });
             }
 
-            // Show success, hide input, shrink toast and slide away
+            // Show success, hide input, shrink toast and slide away instantly
             commentContainer.style.display = 'none';
             toast.classList.remove('expanded');
             successMsg.style.display = 'inline-block';
