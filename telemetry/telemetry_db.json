@@ -160,38 +160,6 @@
     "adjudication": "تم الحفاظ على جودة المحادثة وتم الرد على المستخدم بشكل مناسب، مع متوسط زمن استجابة مقبول"
   },
   {
-    "conversation_id": "conv_4101kvmwrdkeeb58zkhes59hp8hf",
-    "timestamp": 1782346880.701969,
-    "stats": {
-      "avg_m2e_ms": 349.6,
-      "avg_ttft_ms": 317.4,
-      "p95_m2e_ms": 379.5,
-      "interrupted_count": 1,
-      "total_turns": 13
-    },
-    "score": 1,
-    "root_cause_verdict": "SUCCESS",
-    "accusation": "No violations detected.",
-    "defense": "N/A",
-    "adjudication": "The call completed successfully."
-  },
-  {
-    "conversation_id": "conv_8101kvsmbadsfsx9fdhgyv6mkgqs",
-    "timestamp": 1782346880.7348514,
-    "stats": {
-      "avg_m2e_ms": 534.8,
-      "avg_ttft_ms": 483.8,
-      "p95_m2e_ms": 678,
-      "interrupted_count": 1,
-      "total_turns": 13
-    },
-    "score": 1,
-    "root_cause_verdict": "SUCCESS",
-    "accusation": "No violations detected.",
-    "defense": "N/A",
-    "adjudication": "The call completed successfully."
-  },
-  {
     "conversation_id": "conv_3301kvsmhr9rf7qb3w3mzgwg36n1",
     "timestamp": 1782346880.776945,
     "stats": {
@@ -325,7 +293,7 @@
     "stats": {
       "avg_m2e_ms": 536.3,
       "avg_ttft_ms": 465.2,
-      "p95_m2e_ms": 801.0,
+      "p95_m2e_ms": 801,
       "interrupted_count": 5,
       "total_turns": 11
     },
@@ -340,7 +308,7 @@
     "timestamp": 1782347107.7409797,
     "stats": {
       "avg_m2e_ms": 505.4,
-      "avg_ttft_ms": 483.0,
+      "avg_ttft_ms": 483,
       "p95_m2e_ms": 605.8,
       "interrupted_count": 2,
       "total_turns": 13
@@ -361,7 +329,7 @@
       "interrupted_count": 0,
       "total_turns": 17
     },
-    "score": 1.0,
+    "score": 1,
     "root_cause_verdict": "SUCCESS",
     "accusation": "لا توجد اتهامات",
     "defense": "الوكيل يبرر أن جواب العميل كان سليمًا ودقيقًا، واستجاب لجميع أسئلة المستخدم بشكل صحيح",
@@ -405,7 +373,7 @@
     "stats": {
       "avg_m2e_ms": 418.5,
       "avg_ttft_ms": 319.4,
-      "p95_m2e_ms": 549.0,
+      "p95_m2e_ms": 549,
       "interrupted_count": 1,
       "total_turns": 17
     },
@@ -425,7 +393,7 @@
       "interrupted_count": 0,
       "total_turns": 13
     },
-    "score": 1.0,
+    "score": 1,
     "root_cause_verdict": "SUCCESS",
     "accusation": "لا توجد اتهامات",
     "defense": "تم الرد على استفسارات المستخدم بشكل صحيح وتم إرسال المحادثة إلى البريد الإلكتروني الخاص به",
@@ -448,83 +416,835 @@
     "adjudication": "تم تقييم الجلسة بشكل إيجابي، حيث استوفى الوكيل جميع المتطلبات المحددة في القواعد، وتم تزويد المستخدم بنسخة من المحادثة عبر البريد الإلكتروني. ومع ذلك، تم تسجيل تأخيرات طفيفة في الاستجابة، ولكنها لم تتجاوز الحدود المسموح بها."
   },
   {
-    "conversation_id": "conv_2301kvmvky7meveakd6ncxynmzse",
-    "timestamp": 1782347191.751041,
+    "conversation_id": "conv_4301kvsmz0esfyysv96tk98e33",
+    "timestamp": 1782349941.4511187,
     "stats": {
-      "avg_m2e_ms": 459.8,
-      "avg_ttft_ms": 375.6,
-      "p95_m2e_ms": 528.0,
-      "interrupted_count": 1,
-      "total_turns": 15
+      "avg_m2e_ms": 0.0,
+      "avg_ttft_ms": 0.0,
+      "p95_m2e_ms": 0.0,
+      "interrupted_count": 0,
+      "total_turns": 0
     },
-    "score": 1.0,
-    "root_cause_verdict": "SUCCESS",
-    "accusation": "No violations detected.",
+    "score": 0.0,
+    "root_cause_verdict": "NOT_FOUND",
+    "accusation": "Conversation ID not found on ElevenLabs. It might be a test or mock record.",
     "defense": "N/A",
-    "adjudication": "The call completed successfully."
+    "adjudication": "This conversation could not be evaluated because it does not exist in ElevenLabs history."
+  },
+  {
+    "conversation_id": "conv_4101kvmwrdkeeb58zkhes59hp8hf",
+    "timestamp": 1782350165.651802,
+    "stats": {
+      "avg_m2e_ms": 349.6,
+      "avg_ttft_ms": 317.4,
+      "p95_m2e_ms": 379.5,
+      "interrupted_count": 1,
+      "total_turns": 13,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لم يتم تقديم معلومات دقيقة عن رسوم ترخيص محلات الذهب، حيث أن الرسوم المذكورة كانت 20 دينار بحريني فقط، وليس 20 دينار بحريني فقط كما قيل.",
+    "defense": "تم تقديم المعلومات بشكل سريع ومتوافق مع المعايير، ولكن هناك بعض الأخطاء الصغيرة في المعلومات المقدمة.",
+    "adjudication": "تم تقييم المحادثة بناءً على معايير الجودة، وتم تحديد أن المحادثة كانت جيدة بشكل عام، ولكن هناك بعض الأخطاء الصغيرة في المعلومات المقدمة. تم تقديم المعلومات بشكل سريع ومتوافق مع المعايير، ولكن هناك بعض الأخطاء الصغيرة في المعلومات المقدمة. تم تحديد أن الرسوم المذكورة كانت 20 دينار بحريني فقط، وليس 20 دينار بحريني فقط كما قيل. تم تقديم نسخة من المحادثة على بريد الإلكتروني للمستخدم بنجاح، ولكن تم تحديد أن هناك بعض الأخطاء الصغيرة في المعلومات المقدمة. تم تحديد أن المحادثة كانت جيدة بشكل عام، ولكن هناك بعض الأخطاء الصغيرة في المعلومات المقدمة."
   },
   {
     "conversation_id": "conv_3601kvmvrrksezhrksf3vny59chn",
-    "timestamp": 1782347367.0265753,
+    "timestamp": 1782350236.4544737,
     "stats": {
       "avg_m2e_ms": 453.7,
       "avg_ttft_ms": 405.0,
       "p95_m2e_ms": 615.8,
       "interrupted_count": 2,
-      "total_turns": 13
+      "total_turns": 13,
+      "has_audio": true
     },
-    "score": 1.0,
+    "score": 0.8,
     "root_cause_verdict": "SUCCESS",
-    "accusation": "No violations detected.",
-    "defense": "N/A",
-    "adjudication": "The call completed successfully."
-  },
-  {
-    "conversation_id": "conv_7001kvmvsn2wfv8adfqb1h1sfpcz",
-    "timestamp": 1782347372.8609765,
-    "stats": {
-      "avg_m2e_ms": 335.9,
-      "avg_ttft_ms": 354.0,
-      "p95_m2e_ms": 454.2,
-      "interrupted_count": 0,
-      "total_turns": 13
-    },
-    "score": 1.0,
-    "root_cause_verdict": "SUCCESS",
-    "accusation": "No violations detected.",
-    "defense": "N/A",
-    "adjudication": "The call completed successfully."
+    "accusation": "لم يتم تقديم معلومات دقيقة حول رسوم ترخيص محلات الذهب، حيث قام العميل بطرح سؤال غير متصل بالموضوع السابق.",
+    "defense": "من وجهة نظر العميل، كان السؤال حول رسوم ترخيص محلات الذهب سؤالًا منطقيًا، ويمكن أن يكون قد تم إهماله بسبب عدم وجود صلة مباشرة بين السؤالين.",
+    "adjudication": "بعد التحليل، وجدت أن العامل الرئيسي في هذا الحادث هو عدم وجود صلة مباشرة بين السؤالين، مما أدى إلى إهمال السؤال حول رسوم ترخيص محلات الذهب. ومع ذلك، كان السؤال صحيحًا، ويمكن أن يكون قد تم إجابته بشكل أفضل. من وجهة نظر العميل، كان السؤال منطقيًا، ويمكن أن يكون قد تم إهماله بسبب عدم وجود صلة مباشرة بين السؤالين. ومع ذلك، كان السؤال صحيحًا، ويمكن أن يكون قد تم إجابته بشكل أفضل. في النهاية، كان السؤال حول رسوم ترخيص محلات الذهب سؤالًا صحيحًا، ويمكن أن يكون قد تم إجابته بشكل أفضل. من وجهة نظر العميل، كان السؤال منطقيًا، ويمكن أن يكون قد تم إهماله بسبب عدم وجود صلة مباشرة بين السؤالين. ومع ذلك، كان السؤال صحيحًا، ويمكن أن يكون قد تم إجابته بشكل أفضل."
   },
   {
     "conversation_id": "conv_0001kvmvxczteg7vbwdt5sejrqgq",
-    "timestamp": 1782347378.7777793,
+    "timestamp": 1782350310.7818112,
     "stats": {
       "avg_m2e_ms": 444.2,
       "avg_ttft_ms": 375.0,
       "p95_m2e_ms": 598.9,
       "interrupted_count": 2,
-      "total_turns": 19
+      "total_turns": 19,
+      "has_audio": true
     },
-    "score": 1.0,
+    "score": 0.8,
     "root_cause_verdict": "SUCCESS",
-    "accusation": "No violations detected.",
-    "defense": "N/A",
-    "adjudication": "The call completed successfully."
+    "accusation": "The agent responded accurately to the user's questions, but there were minor delays in response times.",
+    "defense": "The agent's responses were within the acceptable latency range, and the user's questions were answered correctly. However, there were two instances of interruption, which may have caused minor delays.",
+    "adjudication": "The conversation session was successful, with the agent providing accurate information to the user. However, the agent's response times were slightly delayed, which may have affected the user experience. The agent's ability to remain in the Bahrain Civil Defense persona was maintained throughout the conversation."
   },
   {
     "conversation_id": "conv_4501kvmwfgyrfb7aqp29zaxhhx7j",
-    "timestamp": 1782347385.0333507,
+    "timestamp": 1782350321.3554125,
     "stats": {
       "avg_m2e_ms": 397.4,
       "avg_ttft_ms": 405.1,
       "p95_m2e_ms": 496.7,
       "interrupted_count": 3,
-      "total_turns": 13
+      "total_turns": 13,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لم يتم تقديم معلومات دقيقة عن رسوم ترخيص محلات الذهب، وتم إرسال نسخة من المحادثة إلى البريد الإلكتروني المحدد.",
+    "defense": "تم تقديم معلومات دقيقة عن رسوم ترخيص محلات الذهب، وتم إرسال نسخة من المحادثة إلى البريد الإلكتروني المحدد.",
+    "adjudication": "تم تحليل المحادثة وتم اكتشاف أن الوكيل قد تقدم معلومات دقيقة عن رسوم ترخيص محلات الذهب، ولكن تم إرسال نسخة من المحادثة إلى البريد الإلكتروني المحدد. ومع ذلك، تم اكتشاف بعض الفجوات في المحادثة، مثل عدم تقديم معلومات دقيقة عن رسوم ترخيص محلات الذهب. بالإضافة إلى ذلك، تم اكتشاف بعض الفجوات في التوقيت، مثل فجوات في التوقيت بين الإجابات. ومع ذلك، تم إرسال نسخة من المحادثة إلى البريد الإلكتروني المحدد، وتم إبلاغ المستخدم بموعد انتهاء المكالمة. وبالتالي، تم اعتبار المكالمة ناجحة."
+  },
+  {
+    "conversation_id": "conv_4401kvmwvhk8eb091b7etb8c1x63",
+    "timestamp": 1782350364.807209,
+    "stats": {
+      "avg_m2e_ms": 393.9,
+      "avg_ttft_ms": 341.0,
+      "p95_m2e_ms": 404.0,
+      "interrupted_count": 1,
+      "total_turns": 7,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "الAGENT لم يُستجيب بشكل سريع بما يكفي في بعض الأحيان، وتم إنهاء المحادثة بشكل مبكر.",
+    "defense": "الAGENT استجاب بشكل سريع في معظم الأحيان، وتم إكمال المحادثة بنجاح. ومع ذلك، تم إنهاؤها بشكل مبكر بسبب إزعاج من خارج المحادثة.",
+    "adjudication": "الAGENT استجاب بشكل جيد في معظم الأحيان، ولكن إزعاج خارج المحادثة أدى إلى إنهاء المحادثة بشكل مبكر. ومع ذلك، تم إكمال المحادثة بنجاح، وتم إصدار المعلومات الصحيحة عن رسوم ترخيص محلات الذهب. ومع ذلك، كان من الضروري إعادة النظر في إجراءات إزعاج المحادثة لضمان استمرارها بشكل سليم."
+  },
+  {
+    "conversation_id": "conv_2101kvmxn3y5egjbc5ga7sgwhkbf",
+    "timestamp": 1782350423.7523215,
+    "stats": {
+      "avg_m2e_ms": 397.3,
+      "avg_ttft_ms": 309.7,
+      "p95_m2e_ms": 521.9,
+      "interrupted_count": 0,
+      "total_turns": 14,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "الAGENT لم يتعرض للاخطاء في الإجابة على أسئلة المستخدم، ولكن هناك بعض الأخطاء في التعامل مع المستخدم، مثل عدم الإجابة على بعض الأسئلة بشكل سريع.",
+    "defense": "الAGENT قام بإجابة الأسئلة بشكل صحيح، ولكن هناك بعض الأخطاء في التعامل مع المستخدم، مثل عدم الإجابة على بعض الأسئلة بشكل سريع. كما أن الAGENT قام بتحديث الاسم بشكل صحيح.",
+    "adjudication": "الAGENT قام بإجابة الأسئلة بشكل صحيح، ولكن هناك بعض الأخطاء في التعامل مع المستخدم، مثل عدم الإجابة على بعض الأسئلة بشكل سريع. كما أن الAGENT قام بتحديث الاسم بشكل صحيح. ومع ذلك، يعتبر الAGENT قد قام بإجابة الأسئلة بشكل سريع، وبالتالي، لا يوجد أي أخطاء في الإجابة على الأسئلة. ولكن، يعتبر الAGENT قد قام بتعامل مع المستخدم بشكل غير سريع، وبالتالي، يعتبر هذا الأخطاء في التعامل مع المستخدم. وبالتالي، يعتبر الAGENT قد قام بإجابة الأسئلة بشكل صحيح، ولكن هناك بعض الأخطاء في التعامل مع المستخدم."
+  },
+  {
+    "conversation_id": "conv_0001kvmxrzytebj8jhjz5sse9f3g",
+    "timestamp": 1782350452.4273138,
+    "stats": {
+      "avg_m2e_ms": 472.1,
+      "avg_ttft_ms": 292.4,
+      "p95_m2e_ms": 640.2,
+      "interrupted_count": 3,
+      "total_turns": 18,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "تم تقديم معلومات غير صحيحة حول مدة إنجاز الخدمة.",
+    "defense": "تم تقديم المعلومات الصحيحة حول الخدمة المطلوبة من قبل المستخدم.",
+    "adjudication": "تم تقديم الخدمة المطلوبة من قبل المستخدم بشكل صحيح، ولكن تم الإشارة إلى فترة زمنية غير صحيحة في إجابة المستخدم حول مدة إنجاز الخدمة."
+  },
+  {
+    "conversation_id": "conv_5301kvnr9s46ekjs5gpfp767ygsb",
+    "timestamp": 1782350466.1107438,
+    "stats": {
+      "avg_m2e_ms": 478.7,
+      "avg_ttft_ms": 335.6,
+      "p95_m2e_ms": 559.3,
+      "interrupted_count": 1,
+      "total_turns": 15,
+      "has_audio": true
+    },
+    "score": 0.0,
+    "root_cause_verdict": "FACTUAL_DIVERGENCE",
+    "accusation": "الAGENT لم يلتزم بالشروط المحددة في الخدمات الإلكترونية، حيث طلب من المستخدم تزويدي باسمه ورقم هاتفه مرتين في المحادثة.",
+    "defense": "الAGENT يعتذر عن الخطأ، ويرى أن الخطأ يعود إلى عدم توافر المعلومات الكافية حول الخدمات الإلكترونية في الخلفية.",
+    "adjudication": "الAGENT لم يلتزم بالشروط المحددة في الخدمات الإلكترونية، حيث طلب من المستخدم تزويدي باسمه ورقم هاتفه مرتين في المحادثة. هذا يعد انتهاكًا للشروط المحددة في الخدمات الإلكترونية، وبالتالي يعتبر هذا الحادث من نوع FACTUAL_DIVERGENCE. يوصى بالAGENT بمراجعة الخدمات الإلكترونية والشروط المحددة لضمان توافر المعلومات الكافية في المستقبل."
+  },
+  {
+    "conversation_id": "conv_1601kvnrd3y7f02rqy300mnegkpz",
+    "timestamp": 1782350509.040102,
+    "stats": {
+      "avg_m2e_ms": 448.3,
+      "avg_ttft_ms": 360.5,
+      "p95_m2e_ms": 519.7,
+      "interrupted_count": 0,
+      "total_turns": 9,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لم يتم الإبلاغ عن أي حالات من الإدخال الخاطئ أو عدم الالتزام بالمعايير الصحية والسلامة العامة خلال هذا الحوار.",
+    "defense": "تم تقديم الإجابات بشكل سريع ومتوافق مع المعايير الصحية والسلامة العامة.",
+    "adjudication": "يجب على الخدمة تقليل التأخيرات في الإجابة لضمان تلبية احتياجات المستخدم بسرعة."
+  },
+  {
+    "conversation_id": "conv_3901kvnthbmjf28s87wn3ezd8efn",
+    "timestamp": 1782350541.7141466,
+    "stats": {
+      "avg_m2e_ms": 537.7,
+      "avg_ttft_ms": 346.2,
+      "p95_m2e_ms": 889.5,
+      "interrupted_count": 2,
+      "total_turns": 31,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "الAGENT لم يكن متوفرًا على قاعدة المعرفة الحالية لرسوم خدمة استيفاء شروط السلامة، مما أدى إلى عدم إمكانية تقديم الإجابة الصحيحة.",
+    "defense": "الAGENT قد قام بتقديم الإجابات الصحيحة لرسوم خدمة إصدار شهادة استيفاء شروط واحتياجات الحماية والوقاية من الحريق وتجديدها، ورسوم خدمة إصدار ترخيص محلات بيع الغاز وتجديد الترخيص. كما قام بتحديث بريد المستخدم الإلكتروني بنجاح.",
+    "adjudication": "الAGENT قد قام بتقديم الإجابات الصحيحة لعدد من الأسئلة المتعلقة بخدمات الدفاع المدني، ولكن قد فشل في تقديم الإجابة الصحيحة لرسوم خدمة استيفاء شروط السلامة. كما قد حدثت بعض الفجوات في التواصل، مثل عدم الإجابة على بعض الأسئلة بشكل سريع. ومع ذلك، فقد قام الAGENT بتقديم الإجابات الصحيحة لعدد من الأسئلة، وتم تحديث بريد المستخدم الإلكتروني بنجاح. لذلك، يعتبر الAGENT قد حقق نجاحًا جيدًا في هذا الحوار."
+  },
+  {
+    "conversation_id": "conv_2101kvnvtffve1ktg3ka13hste78",
+    "timestamp": 1782350601.7346935,
+    "stats": {
+      "avg_m2e_ms": 511.3,
+      "avg_ttft_ms": 430.8,
+      "p95_m2e_ms": 602.3,
+      "interrupted_count": 1,
+      "total_turns": 17,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "الAGENT لم يكن متوافقًا مع قواعد التفاعل الصوتي، حيث تم قطع المكالمة بشكل غير متوقع.",
+    "defense": "الAGENT قد قام بتسجيل المكالمة بشكل صحيح، ولكن هناك بعض التأخيرات في الإجابات، مما أدى إلى قطع المكالمة.",
+    "adjudication": "بعد التحليل، وجدت أن المكالمة قد انتهت بشكل طبيعي، ولكن هناك بعض التأخيرات في الإجابات، مما أدى إلى قطع المكالمة. ومع ذلك، تم تلبية احتياجات المستخدم بشكل جيد، وتم إرسال تفاصيل الخدمة إلى بريد المستخدم. لذلك، سأحكم على المكالمة بنسبة 80% من النجاح."
+  },
+  {
+    "conversation_id": "conv_3401kvq1jsw2evwtdtv0myxkqwyn",
+    "timestamp": 1782350666.2939365,
+    "stats": {
+      "avg_m2e_ms": 731.8,
+      "avg_ttft_ms": 565.5,
+      "p95_m2e_ms": 3389.5,
+      "interrupted_count": 2,
+      "total_turns": 29,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "الAGENT لم يكن متوافقًا تمامًا مع المعايير المحددة لخدمة إصدار شهادة استيفاء شروط السلامة واحتياجات الحماية والوقاية من الحريق وتجديدها، حيث لم يحدد بشكل واضح مدة إنجاز تقرير فحص أنظمة الإطفاء والإنذار.",
+    "defense": "الAGENT قد قام بتقديم المعلومات المتوفرة لديه، ولكن قد يكون هناك بعض الغموض في بعض الجوانب. بالإضافة إلى ذلك، كان هناك بعض التأخيرات في الإجابات، ولكنها لم تكن كبيرة جدًا.",
+    "adjudication": "الAGENT قد قام بتقديم معلومات جيدة بشكل عام، ولكن قد يكون هناك بعض التحسينات فيما يتعلق بالتفاصيل. بالإضافة إلى ذلك، كان هناك بعض التأخيرات في الإجابات، ولكنها لم تكن كبيرة جدًا. من الناحية العامة، كان للAGENT أداء جيد، ولكن قد يكون هناك بعض التحسينات فيما يتعلق بالتفاصيل."
+  },
+  {
+    "conversation_id": "conv_1501kvq5dx4xf7f8w1yhj2rxadwa",
+    "timestamp": 1782350699.0376554,
+    "stats": {
+      "avg_m2e_ms": 493.0,
+      "avg_ttft_ms": 347.1,
+      "p95_m2e_ms": 680.1,
+      "interrupted_count": 5,
+      "total_turns": 17,
+      "has_audio": true
+    },
+    "score": 0.0,
+    "root_cause_verdict": "FACTUAL_DIVERGENCE",
+    "accusation": "الAGENT لم يلتزم بالفهم الصحيح للموضوع المطروح، حيث قام بتحويل المحادثة إلى موضوع مختلف عن خدمة استيفاء شروط السلامة.",
+    "defense": "الAGENT يعتذر عن الخطأ، حيث كان يعتقد أن المحادثة تتعلق بموضوع مختلف، ولكن يقر بأن الخطأ كان من جانبه.",
+    "adjudication": "الAGENT لم يلتزم بالفهم الصحيح للموضوع المطروح، حيث قام بتحويل المحادثة إلى موضوع مختلف عن خدمة استيفاء شروط السلامة. هذا يعد انتهاكًا لشروط التفاعل، حيث يجب على AGENT أن يبقى على مواضيع المحادثة ويتناسب معها. بالإضافة إلى ذلك، يظهر من خلال هذا الحادث أن AGENT يحتاج إلى تحسين في فهمه للمواضيع والمواقف. لذلك، يوصى بتجديد تدريب AGENT على فهم المواضيع والمواقف بشكل أفضل."
+  },
+  {
+    "conversation_id": "conv_3401kvq6g232fnw9zyhd6335kwsg",
+    "timestamp": 1782350755.0778291,
+    "stats": {
+      "avg_m2e_ms": 438.7,
+      "avg_ttft_ms": 322.5,
+      "p95_m2e_ms": 531.4,
+      "interrupted_count": 3,
+      "total_turns": 16,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "LLM_COMPUTE_WASTAGE",
+    "accusation": "الAGENT لم يلتزم بالوقت المحدد في الإجابة على أسئلة المستخدم، مما أدى إلى تأخير في الإجابة على بعض الأسئلة. بالإضافة إلى ذلك، لم يلتزم بالصياغة الصحيحة في بعض الإجابات، مما أدى إلى تأثير سلبي على جودة الإجابة.",
+    "defense": "الAGENT قد يكون قد واجه بعض التحديات في التعامل مع السؤال المتكرر حول رسوم الخدمة، مما أدى إلى تأخير في الإجابة. بالإضافة إلى ذلك، قد يكون قد واجه بعض الصعوبات في فهم السياق الصحيح للجملة \"كتفاهة الجراز\"، مما أدى إلى إجابة غير صحيحة.",
+    "adjudication": "الAGENT قد يكون قد واجه بعض التحديات في التعامل مع السؤال المتكرر حول رسوم الخدمة، مما أدى إلى تأخير في الإجابة. بالإضافة إلى ذلك، قد يكون قد واجه بعض الصعوبات في فهم السياق الصحيح للجملة \"كتفاهة الجراز\"، مما أدى إلى إجابة غير صحيحة. ومع ذلك، يتعين على الAGENT أن يلتزم بالوقت المحدد في الإجابة على الأسئلة، وبالصياغة الصحيحة في الإجابات. هذا سيساعد في تحسين جودة الإجابة وتقليل تأثير السلبيات على المستخدم."
+  },
+  {
+    "conversation_id": "conv_3101kvsmtddne93b8ar0h51fp3f2",
+    "timestamp": 1782350786.6901548,
+    "stats": {
+      "avg_m2e_ms": 490.2,
+      "avg_ttft_ms": 457.7,
+      "p95_m2e_ms": 566.5,
+      "interrupted_count": 2,
+      "total_turns": 13,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لم يتم تقديم معلومات دقيقة عن المدير العام للإدارة العامة للدفاع المدني، حيث تم إرسال البريد الإلكتروني فقط دون إرسال نسخة من المحادثة.",
+    "defense": "تم إرسال البريد الإلكتروني بنجاح، وتم حفظه في قاعدة البيانات. ومع ذلك، لم يتم إرسال نسخة من المحادثة كما هو مخطط.",
+    "adjudication": "تم إجراء تحليل للمكالمة، وتم تحديد أن المدير العام للإدارة العامة للدفاع المدني هو العميد ركن طيّار علي بن محمد الكبيسي. ومع ذلك، لم يتم تقديم هذه المعلومات في المحادثة. تم إرسال البريد الإلكتروني بنجاح، وتم حفظه في قاعدة البيانات. ومع ذلك، لم يتم إرسال نسخة من المحادثة كما هو مخطط. تم تحديد أن المدير العام للإدارة العامة للدفاع المدني هو العميد ركن طيّار علي بن محمد الكبيسي، وتم إرسال البريد الإلكتروني بنجاح. ومع ذلك، لم يتم إرسال نسخة من المحادثة كما هو مخطط."
+  },
+  {
+    "conversation_id": "conv_6901kvsnps1rebvtv5rj6426h310",
+    "timestamp": 1782350852.1416552,
+    "stats": {
+      "avg_m2e_ms": 711.5,
+      "avg_ttft_ms": 638.9,
+      "p95_m2e_ms": 1275.5,
+      "interrupted_count": 8,
+      "total_turns": 62,
+      "has_audio": true
+    },
+    "score": 0.0,
+    "root_cause_verdict": "FACTUAL_DIVERGENCE",
+    "accusation": "Agent failed to provide accurate information about the Bahrain Civil Defense services and personnel, and engaged in a conversation that was unrelated to the services.",
+    "defense": "The agent was attempting to follow the user's conversation flow and provide assistance, but was unable to correct the factual inaccuracies and maintain the conversation within the scope of the Bahrain Civil Defense services.",
+    "adjudication": "The agent's responses were often unrelated to the user's questions and failed to provide accurate information about the Bahrain Civil Defense services and personnel. The agent's inability to correct the factual inaccuracies and maintain the conversation within the scope of the services resulted in a failure to provide accurate and helpful information to the user. The agent's engagement in a conversation that was unrelated to the services and its failure to provide accurate information about the Bahrain Civil Defense services and personnel resulted in a factual divergence from the knowledge base."
+  },
+  {
+    "conversation_id": "conv_2201kvsp3ghnfxkr53qzeags011e",
+    "timestamp": 1782350879.0617142,
+    "stats": {
+      "avg_m2e_ms": 646.9,
+      "avg_ttft_ms": 839.6,
+      "p95_m2e_ms": 687.2,
+      "interrupted_count": 3,
+      "total_turns": 13,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "LLM_COMPUTE_WASTAGE",
+    "accusation": "الAGENT لم يلتزم بالوقت المحدد في كل من 3 حالات من 13 حالة، مما أدى إلى تأخير في الإجابة.",
+    "defense": "الAGENT قد يكون قد واجه بعض التحديات في التعامل مع الطلبات السريعة، مما أدى إلى تأخير في الإجابة.",
+    "adjudication": "الAGENT قد يكون قد واجه بعض التحديات في التعامل مع الطلبات السريعة، مما أدى إلى تأخير في الإجابة. ومع ذلك، كان من المتوقع من AGENT أن يلتزم بالوقت المحدد في كل من 3 حالات من 13 حالة."
+  },
+  {
+    "conversation_id": "conv_2901kvspnnhne6x9vsfy9ngqfrye",
+    "timestamp": 1782350907.5834334,
+    "stats": {
+      "avg_m2e_ms": 674.0,
+      "avg_ttft_ms": 738.0,
+      "p95_m2e_ms": 892.8,
+      "interrupted_count": 2,
+      "total_turns": 13,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لم يتم تلبية متطلبات Voice constraints، حيث تم إرسال 3 رسائل متتالية دون انتظار من المستخدم.",
+    "defense": "تم تلبية متطلبات Voice constraints في معظم الأوقات، ولكن هناك بعض الحالات حيث تم إرسال رسائل متتالية دون انتظار من المستخدم.",
+    "adjudication": "تم تحليل المحادثة وتم تحديد أن المتحدث لم يلتزم بالمتطلبات الصارمة للصوت، حيث تم إرسال 3 رسائل متتالية دون انتظار من المستخدم. ومع ذلك، تم تلبية متطلبات Voice constraints في معظم الأوقات. لذلك، تم تحديد الحكم على النحو التالي: SUCCESS. ومع ذلك، من المهم أن يتم تلبية متطلبات الصوت في جميع الأوقات لضمان جودة المحادثة."
+  },
+  {
+    "conversation_id": "conv_3301kvspswmyf9e9zyasac6hrpx3",
+    "timestamp": 1782350935.2129967,
+    "stats": {
+      "avg_m2e_ms": 742.0,
+      "avg_ttft_ms": 847.9,
+      "p95_m2e_ms": 965.4,
+      "interrupted_count": 3,
+      "total_turns": 13,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "تم تقديم الخدمة بشكل سريع ومتوافق مع المعايير، ولكن هناك بعض التأخيرات في الإجابة عن بعض الأسئلة.",
+    "defense": "تم تقديم الخدمة بشكل سريع ومتوافق مع المعايير، ولكن التأخيرات في الإجابة عن بعض الأسئلة كانت بسبب بعض الأخطاء في النظام.",
+    "adjudication": "تم تقييم الخدمة بشكل جيد، ولكن هناك بعض التأخيرات في الإجابة عن بعض الأسئلة. تم تقديم الخدمة بشكل سريع ومتوافق مع المعايير، ولكن التأخيرات كانت بسبب بعض الأخطاء في النظام. تم إرسال نسخة من المحادثة إلى البريد الإلكتروني بنجاح."
+  },
+  {
+    "conversation_id": "conv_3501kvt0a1bkf8gav09gwxbw19wa",
+    "timestamp": 1782351026.7741113,
+    "stats": {
+      "avg_m2e_ms": 0.0,
+      "avg_ttft_ms": 1116.6,
+      "p95_m2e_ms": 0.0,
+      "interrupted_count": 1,
+      "total_turns": 4,
+      "has_audio": true
+    },
+    "score": 0.0,
+    "root_cause_verdict": "FACTUAL_DIVERGENCE",
+    "accusation": "Agent failed to provide accurate information. The correct director general of the General Directorate of Civil Defense is العميد ركن طيّار علي بن محمد الكبيسي, not mentioned by the agent.",
+    "defense": "The agent's response was a series of empty lines, indicating a possible system failure or misconfiguration. However, the agent's failure to provide accurate information is a critical issue that affects the overall quality of the service.",
+    "adjudication": "The agent's response was not in line with the knowledge base, which clearly states the director general of the General Directorate of Civil Defense. This failure to provide accurate information is a critical issue that affects the trust and reliability of the service. The agent's inability to provide accurate information is a clear violation of the factual grounding pillar, resulting in a score of 0.0."
+  },
+  {
+    "conversation_id": "conv_9601kvt0n5prefhsbs4rrkr79y86",
+    "timestamp": 1782351069.3755891,
+    "stats": {
+      "avg_m2e_ms": 593.8,
+      "avg_ttft_ms": 902.4,
+      "p95_m2e_ms": 593.8,
+      "interrupted_count": 2,
+      "total_turns": 7,
+      "has_audio": true
+    },
+    "score": 0.0,
+    "root_cause_verdict": "FACTUAL_DIVERGENCE",
+    "accusation": "الAGENT لم يتعامل بشكل صحيح مع طلب المستخدم، ولم يفهم بشكل صحيح ما يحتاجه المستخدم.",
+    "defense": "الAGENT لم يكن على دراية بالخدمات التي تقدمها الإدارة العامة للدفاع المدني، وبالتالي لم يتمكن من تقديم الدعم المطلوب.",
+    "adjudication": "الAGENT لم يكن على دراية بالخدمات التي تقدمها الإدارة العامة للدفاع المدني، وبالتالي لم يتمكن من تقديم الدعم المطلوب. في هذه الحالة، يعتبر الAGENT قد انتهك قواعد التفاعل، حيث لم يتمكن من تقديم معلومات دقيقة وموثوقة للمستخدم. هذا يؤدي إلى انخفاض درجات الAGENT، حيث لم يتمكن من تحقيق هدف الدعم المطلوب."
+  },
+  {
+    "conversation_id": "conv_0401kvw691efer4b8smw6rwf6jxv",
+    "timestamp": 1782351108.3448763,
+    "stats": {
+      "avg_m2e_ms": 1421.1,
+      "avg_ttft_ms": 1311.4,
+      "p95_m2e_ms": 2938.4,
+      "interrupted_count": 3,
+      "total_turns": 13,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لم يتم الإجابة بشكل صحيح على سؤال المستخدم حول رسوم ترخيص محلات الذهب، وتم الإجابة بشكل مبهم.",
+    "defense": "تم الإجابة بشكل صحيح على سؤال المستخدم حول رسوم ترخيص محلات الذهب، ولكن تم الإشارة إلى أن هناك حاجة إلى مزيد من المعلومات.",
+    "adjudication": "تم فحص المحادثة وتم تحديد أن هناك بعض الأخطاء في الإجابة على سؤال المستخدم حول رسوم ترخيص محلات الذهب. ومع ذلك، تم الإجابة بشكل صحيح على سؤال المستخدم حول كيفية الحصول على نسخة من المحادثة. بالإضافة إلى ذلك، تم تحديد أن هناك بعض الاضطرابات في الاتصال، مثل الوقوع في الصمت لفترة طويلة وعدم الإجابة بشكل سريع على سؤال المستخدم. ومع ذلك، تم إرسال نسخة من المحادثة إلى البريد الإلكتروني للمستخدم بنجاح. في النهاية، تم تحديد أن المحادثة كانت بنجاح، ولكن مع بعض الأخطاء الصغيرة."
+  },
+  {
+    "conversation_id": "conv_7101kvw6gz8reamavpnfc0dgnpv1",
+    "timestamp": 1782351152.9027328,
+    "stats": {
+      "avg_m2e_ms": 684.5,
+      "avg_ttft_ms": 1068.3,
+      "p95_m2e_ms": 797.5,
+      "interrupted_count": 2,
+      "total_turns": 13,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لم يتم تقديم معلومات دقيقة عن رسوم ترخيص محلات الذهب، حيث قام العميل بطرح سؤال غير متصل بالموضوع السابق.",
+    "defense": "تم تقديم معلومات دقيقة عن رسوم ترخيص محلات وورش الذهب، حيث قام العميل بطرح سؤال متصل بالموضوع السابق.",
+    "adjudication": "تم تحليل المحادثة وتم اكتشاف أن العميل قام بطرح سؤال غير متصل بالموضوع السابق، مما أدى إلى انخفاض درجة النجاح. ومع ذلك، تم تقديم معلومات دقيقة عن رسوم ترخيص محلات وورش الذهب، مما أدى إلى زيادة درجة النجاح. تم حساب درجة النجاح بناءً على هذه العوامل، وتم تحديد الدرجة النهائية على 0.8."
+  },
+  {
+    "conversation_id": "conv_7601kvw6r9rbf3safm08y3v6wk7f",
+    "timestamp": 1782351180.306547,
+    "stats": {
+      "avg_m2e_ms": 1536.0,
+      "avg_ttft_ms": 2029.0,
+      "p95_m2e_ms": 3746.8,
+      "interrupted_count": 1,
+      "total_turns": 15,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "Agent failed to provide accurate information about the director general of the Bahrain Civil Defense in the first response, but corrected it in the subsequent response.",
+    "defense": "The agent provided accurate information about the director general of the Bahrain Civil Defense in the second response, and the user did not express any dissatisfaction with the correction. The agent also provided a clear and concise response to the user's question.",
+    "adjudication": "The agent's initial response contained a factual divergence, but it was corrected in the subsequent response. The agent's overall performance was satisfactory, with an average mouth-to-ear latency of 1536.0ms and an average time-to-first-token of 2029.0ms. However, the P95 latency was high at 3746.8ms, indicating some delays in the system. The agent's responses were generally clear and concise, and the user did not express any dissatisfaction with the service."
+  },
+  {
+    "conversation_id": "conv_0501kvwb0cghfs9vn184a2y6vecq",
+    "timestamp": 1782351256.212166,
+    "stats": {
+      "avg_m2e_ms": 1054.3,
+      "avg_ttft_ms": 955.8,
+      "p95_m2e_ms": 2774.8,
+      "interrupted_count": 1,
+      "total_turns": 17,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "Agent failed to provide accurate information about the director general of the Bahrain Civil Defense in one instance, and also had a high average mouth-to-ear latency of 1054.3ms and a P95 latency of 2774.8ms.",
+    "defense": "The agent provided accurate information about the director general in most instances, and the high latency was due to the average time-to-first-token of 955.8ms and the interruption count of 1. The agent also provided the correct information about the service fee for issuing a certificate of compliance with safety requirements.",
+    "adjudication": "The agent's performance was satisfactory, but there were some issues that need to be addressed. The agent failed to provide accurate information about the director general in one instance, which is a minor issue. However, the high latency is a major concern and needs to be addressed. The agent's average mouth-to-ear latency of 1054.3ms and P95 latency of 2774.8ms are above the acceptable threshold. The agent also had an interruption count of 1, which indicates that there was some issue with the conversation flow. Overall, the agent's performance was satisfactory, but there is room for improvement in terms of latency and accuracy."
+  },
+  {
+    "conversation_id": "conv_8001kvwe02d7ez0937ka5fpb4gxq",
+    "timestamp": 1782351259.3620474,
+    "stats": {
+      "avg_m2e_ms": 869.8,
+      "avg_ttft_ms": 1294.4,
+      "p95_m2e_ms": 949.8,
+      "interrupted_count": 2,
+      "total_turns": 15,
+      "has_audio": true
+    },
+    "score": 0.9,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لا توجد اتهامات",
+    "defense": "الوكيل يدافع عن الجلسة بنجاح، حيث استجاب الوكيل بسرعة وفعالية لاستفسارات المستخدم، وتم تزويد المستخدم بالمعلومات المطلوبة بشكل دقيق.",
+    "adjudication": "الجلسة تمت بنجاح، حيث تم تزويد المستخدم بالمعلومات المطلوبة حول خدمات الإدارة العامة للدفاع المدني، وتم حفظ معلومات المستخدم بنجاح. ومع ذلك، هناك بعض التأخيرات في الاستجابة، ولكنها لم تكن كبيرة بما يكفي لتأثير على جودة الجلسة."
+  },
+  {
+    "conversation_id": "conv_4101kvwg4ka2epwv1259xd9qbt9x",
+    "timestamp": 1782351283.089163,
+    "stats": {
+      "avg_m2e_ms": 752.5,
+      "avg_ttft_ms": 717.5,
+      "p95_m2e_ms": 1002.2,
+      "interrupted_count": 5,
+      "total_turns": 15,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لم يتم تلبية متطلبات Voice constraints، حيث كان هناك 3 حالات من الإجابة عن سؤالين أو أكثر في نفس الجملة.",
+    "defense": "تم تلبية متطلبات Factual grounding، حيث تم الإجابة بشكل صحيح عن سؤال المستخدم حول رسوم خدمة تصريح بيع الغاز. كما تم تلبية متطلبات Turn Dynamics، حيث لم يكن هناك أي حالات من اللاطالة الزائدة.",
+    "adjudication": "تم تلبية متطلبات Factual grounding، حيث تم الإجابة بشكل صحيح عن سؤال المستخدم حول رسوم خدمة تصريح بيع الغاز. ومع ذلك، لم يتم تلبية متطلبات Voice constraints، حيث كان هناك 3 حالات من الإجابة عن سؤالين أو أكثر في نفس الجملة. كما تم تلبية متطلبات Turn Dynamics، حيث لم يكن هناك أي حالات من اللاطالة الزائدة. بالإضافة إلى ذلك، تم تلبية متطلبات Prompt Persona، حيث تم الإجابة بشكل مناسب عن سؤال المستخدم في سياق مركز خدمات الإدارة العامة للدفاع المدني."
+  },
+  {
+    "conversation_id": "conv_7401kvy3148ke7v9at6y5ebndnxb",
+    "timestamp": 1782351339.5776947,
+    "stats": {
+      "avg_m2e_ms": 987.3,
+      "avg_ttft_ms": 868.9,
+      "p95_m2e_ms": 1923.1,
+      "interrupted_count": 2,
+      "total_turns": 15,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "LLM_COMPUTE_WASTAGE",
+    "accusation": "لم يلتزم agent بالوقت المحدد لرد المستخدم، مما أدى إلى تأخير في الخدمة.",
+    "defense": "قد يكون agent قد تعرض لضغوط إضافية من حيث الوقت، مما أدى إلى تأخير الرد.",
+    "adjudication": "agent لم يلتزم بالوقت المحدد لرد المستخدم، مما أدى إلى تأخير في الخدمة. من المهم للagent أن يتحسن في الالتزام بالوقت المحدد لرد المستخدم وتقليل تأخيرات الرد."
+  },
+  {
+    "conversation_id": "conv_3301kvy4hsttermr8h3hnsk25cvy",
+    "timestamp": 1782351369.2150092,
+    "stats": {
+      "avg_m2e_ms": 574.0,
+      "avg_ttft_ms": 620.7,
+      "p95_m2e_ms": 636.1,
+      "interrupted_count": 3,
+      "total_turns": 15,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "تم تقديم الإجابة الصحيحة للمسألة حول المدير العام للدفاع المدني، ولكن تم إرسال التفاصيل عبر البريد الإلكتروني بدلاً من تقديمها بشكل مباشر.",
+    "defense": "تم تقديم الإجابة الصحيحة للمسألة، وتم حفظ معلومات المستخدم بنجاح. كما تم إرسال التفاصيل عبر البريد الإلكتروني بنجاح، مما يظهر أن الخدمة تمت بنجاح.",
+    "adjudication": "تم تقييم الجلسة بنجاح، ولكن تم رصد بعض الإخفاقات في تقديم الخدمة. تم تقديم الإجابة الصحيحة للمسألة، ولكن تم إرسال التفاصيل عبر البريد الإلكتروني بدلاً من تقديمها بشكل مباشر. كما تم رصد بعض الإخفاقات في الرد على المستخدم، مما أدى إلى زيادة في فترة الرد. ومع ذلك، تم تقديم الخدمة بشكل عام بنجاح، وتم إرسال التفاصيل عبر البريد الإلكتروني بنجاح."
+  },
+  {
+    "conversation_id": "conv_4201kvy4z375ejmbw7ykk7s3bkcz",
+    "timestamp": 1782351393.1158152,
+    "stats": {
+      "avg_m2e_ms": 811.6,
+      "avg_ttft_ms": 938.1,
+      "p95_m2e_ms": 1665.4,
+      "interrupted_count": 4,
+      "total_turns": 17,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "LLM_COMPUTE_WASTAGE",
+    "accusation": "الAGENT لم يلتزم بالوقت المحدد في الإجابة على أسئلة المستخدم، مما أدى إلى تأخير في إجراء الخدمة.",
+    "defense": "الAGENT قد قام بإجراء الخدمة بشكل صحيح، ولكن تأخيرات في الإجابة قد أدت إلى تأخير في إجراء الخدمة.",
+    "adjudication": "الAGENT قد قام بإجراء الخدمة بشكل صحيح، ولكن تأخيرات في الإجابة قد أدت إلى تأخير في إجراء الخدمة. بالإضافة إلى ذلك، قد قام الAGENT بإجراء الخدمة بشكل صحيح، ولكن الصيغة المحددة في الإجابة قد أدت إلى تعقيد في فهم المستخدم."
+  },
+  {
+    "conversation_id": "conv_1501kvy6qxd6e1fr2zgv147fps62",
+    "timestamp": 1782351467.3029294,
+    "stats": {
+      "avg_m2e_ms": 686.4,
+      "avg_ttft_ms": 613.9,
+      "p95_m2e_ms": 875.8,
+      "interrupted_count": 2,
+      "total_turns": 11,
+      "has_audio": true
+    },
+    "score": 0.0,
+    "root_cause_verdict": "FACTUAL_DIVERGENCE",
+    "accusation": "الAGENT لم يكن على دراية بالاسم الصحيح للمستخدم، وتم ذكر اسم \"آنا\" بشكل غير صحيح.",
+    "defense": "الAGENT قد قام بتحديث المعلومات المستخدمة في الخدمة، ولكن لم يتم تضمين اسم \"آنا\" في السجلات.",
+    "adjudication": "الAGENT لم يكن على دراية بالاسم الصحيح للمستخدم، وتم ذكر اسم \"آنا\" بشكل غير صحيح. هذا يعد انتهاكاً لشروط الخدمة، حيث يجب على AGENT أن يكون على دراية بالاسم الصحيح للمستخدم. كما أن هذا يعد انتهاكاً لشروط الخدمة، حيث يجب على AGENT أن يكون على دراية بالاسم الصحيح للمستخدم. هذا يعد انتهاكاً لشروط الخدمة، حيث يجب على AGENT أن يكون على دراية بالاسم الصحيح للمستخدم."
+  },
+  {
+    "conversation_id": "conv_8101kvsmbadsfsx9fdhgyv6mkgqs",
+    "timestamp": 1782351486.7943313,
+    "stats": {
+      "avg_m2e_ms": 534.8,
+      "avg_ttft_ms": 483.8,
+      "p95_m2e_ms": 678.0,
+      "interrupted_count": 1,
+      "total_turns": 13,
+      "has_audio": true
     },
     "score": 1.0,
     "root_cause_verdict": "SUCCESS",
-    "accusation": "No violations detected.",
-    "defense": "N/A",
-    "adjudication": "The call completed successfully."
+    "accusation": "**\nلم يتم تسجيل أي مخالفات في هذا الدورة من المحادثة. تم إجراء المحادثة بشكل جيد وتم تلبية احتياجات المستخدم.",
+    "defense": "**\nتم تلبية احتياجات المستخدم بشكل جيد، وتم إرسال المعلومات المطلوبة بشكل سريع. لم يتم تسجيل أي مخالفات في هذا الدورة من المحادثة.",
+    "adjudication": "**\nتم إجراء المحادثة بشكل جيد وتم تلبية احتياجات المستخدم. تم إرسال المعلومات المطلوبة بشكل سريع، وتم حفظ بريد المستخدم الإلكتروني بنجاح. لم يتم تسجيل أي مخالفات في هذا الدورة من المحادثة، وبالتالي يتم اعتبارها محادثة ناجحة."
+  },
+  {
+    "conversation_id": "conv_2301kvmvky7meveakd6ncxynmzse",
+    "timestamp": 1782351510.4216688,
+    "stats": {
+      "avg_m2e_ms": 459.8,
+      "avg_ttft_ms": 375.6,
+      "p95_m2e_ms": 528.0,
+      "interrupted_count": 1,
+      "total_turns": 15,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لم يتم تقديم أي معلومات خاطئة أو مشكوك فيها من قبل الوكيل. ومع ذلك، تم الإبلاغ عن انقطاع في الاتصال لمدة 1 مرة.",
+    "defense": "تم تقديم البيانات بشكل صحيح، وتم حفظ بيانات المستخدم بنجاح. ومع ذلك، تم الإبلاغ عن انقطاع في الاتصال لمدة 1 مرة، مما قد يؤثر على جودة الخدمة.",
+    "adjudication": "تم تقييم هذه المحادثة بناءً على معايير الجودة. تم تقديم البيانات بشكل صحيح، وتم حفظ بيانات المستخدم بنجاح. ومع ذلك، تم الإبلاغ عن انقطاع في الاتصال لمدة 1 مرة، مما قد يؤثر على جودة الخدمة. تم إعطاء هذه المحادثة درجة 0.8 بناءً على جودة الخدمة والاتصال."
+  },
+  {
+    "conversation_id": "conv_7001kvmvsn2wfv8adfqb1h1sfpcz",
+    "timestamp": 1782351538.3725896,
+    "stats": {
+      "avg_m2e_ms": 335.9,
+      "avg_ttft_ms": 354.0,
+      "p95_m2e_ms": 454.2,
+      "interrupted_count": 0,
+      "total_turns": 13,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لم يتم تسجيل أي مخالفات في هذا الدورة من المحادثة.",
+    "defense": "تم تحقيق جميع المتطلبات الأساسية للخدمة، بما في ذلك تقديم المعلومات الصحيحة والمساعدة في إرسال المحادثة عبر البريد الإلكتروني.",
+    "adjudication": "تم تحليل الدورة من المحادثة، وتم تحديد أن جميع المتطلبات الأساسية للخدمة قد تم تحقيقها."
+  },
+  {
+    "conversation_id": "conv_0101kvmxf9m8fsxsaymzsf39x7c8",
+    "timestamp": 1782351569.8426356,
+    "stats": {
+      "avg_m2e_ms": 536.7,
+      "avg_ttft_ms": 422.3,
+      "p95_m2e_ms": 1039.8,
+      "interrupted_count": 2,
+      "total_turns": 21,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "LLM_COMPUTE_WASTAGE",
+    "accusation": "Agent's responses were delayed, causing a high P95 latency of 1039.8ms, and an average mouth-to-ear latency of 536.7ms. This resulted in a total of 2 interruptions and 21 turns, exceeding the acceptable latency threshold.",
+    "defense": "The agent's responses were delayed due to the complexity of the user's queries and the need for the agent to retrieve information from the knowledge base. The agent's training data and algorithms may have contributed to the delays, but the agent's overall performance was still satisfactory.",
+    "adjudication": "The agent's performance was satisfactory, but the high latency and interruptions affected the user experience. The agent's ability to respond accurately and provide relevant information was compromised due to the delays. To improve, the agent's training data and algorithms should be optimized to reduce latency and improve response times."
+  },
+  {
+    "conversation_id": "conv_1601kvntv3twegjrwnsnhbqyjfn8",
+    "timestamp": 1782351601.3208232,
+    "stats": {
+      "avg_m2e_ms": 442.9,
+      "avg_ttft_ms": 373.6,
+      "p95_m2e_ms": 626.2,
+      "interrupted_count": 1,
+      "total_turns": 17,
+      "has_audio": true
+    },
+    "score": 1.0,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "\"تم تسجيل فجوة في الردود خلال المحادثة، حيث تم إرسال الإجابات بشكل غير منتظم. بالإضافة إلى ذلك، تم إنهاء المحادثة بشكل غير متوقع بعد إرسال الإجابة عن السؤال حول خدمة استيفاء شروط السلامة.\"",
+    "defense": "\"تم تحليل البيانات وتحديد أن المتوسط الزمني للفجوات في الردود كان 442.9 مللي ثانية، وتم تسجيل فجوة واحدة في الردود. بالإضافة إلى ذلك، تم إرسال الإجابة عن السؤال حول خدمة استيفاء شروط السلامة بشكل سريع، ولكن تم إنهاء المحادثة بشكل غير متوقع بعد ذلك.\"",
+    "adjudication": "\"تم تحليل البيانات وتحديد أن هناك فجوة في الردود خلال المحادثة، مما أدى إلى تأخير في الإجابات. بالإضافة إلى ذلك، تم إنهاء المحادثة بشكل غير متوقع بعد إرسال الإجابة عن السؤال حول خدمة استيفاء شروط السلامة. من المهم أن يتم تحسين جودة الردود وتقليل الفجوات في الردود لضمان تجربة مستخدمة جيدة.\""
+  },
+  {
+    "conversation_id": "conv_0001kvp2fnshfm0r8z6yertg0k6x",
+    "timestamp": 1782351632.0214758,
+    "stats": {
+      "avg_m2e_ms": 528.2,
+      "avg_ttft_ms": 418.1,
+      "p95_m2e_ms": 618.5,
+      "interrupted_count": 1,
+      "total_turns": 19,
+      "has_audio": true
+    },
+    "score": 1.0,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لم يتم تسجيل أي مخالفات في هذا الدورة. تم تقديم الخدمات بشكل صحيح ومتوافق مع المعايير المطلوبة.",
+    "defense": "تم تقديم الخدمات بشكل سريع ومتوافق مع المعايير المطلوبة. لم يتم تسجيل أي مخالفات في هذا الدورة.",
+    "adjudication": "تم تقديم الخدمات بشكل جيد ومتوافق مع المعايير المطلوبة. تم إجابة الأسئلة بشكل سريع ومتوافق مع المعايير المطلوبة. لم يتم تسجيل أي مخالفات في هذا الدورة."
+  },
+  {
+    "conversation_id": "conv_5401kvq64hnvez8ak2sbnp104e2c",
+    "timestamp": 1782351659.7477765,
+    "stats": {
+      "avg_m2e_ms": 420.1,
+      "avg_ttft_ms": 386.3,
+      "p95_m2e_ms": 547.2,
+      "interrupted_count": 3,
+      "total_turns": 12,
+      "has_audio": true
+    },
+    "score": 0.0,
+    "root_cause_verdict": "FACTUAL_DIVERGENCE",
+    "accusation": "الAGENT لم يلتزم بالصواب في الإجابة على سؤال المستخدم، حيث لم يفهم بشكل صحيح سؤال المستخدم حول الفرم التي يريد الحصول عليها.",
+    "defense": "الAGENT يعتذر عن الخطأ، ويرى أنه كان هناك خلل في فهم السؤال، ويتعهد بالتأكد من فهم السؤال بشكل صحيح في المستقبل.",
+    "adjudication": "الAGENT لم يلتزم بالصواب في الإجابة على سؤال المستخدم، حيث لم يفهم بشكل صحيح سؤال المستخدم حول الفرم التي يريد الحصول عليها. هذا يعد انتهاكًا لفقرة Voice constraints، حيث يجب على AGENT الإجابة بشكل واضح ومتوافق مع المعرفة الأساسية. بالإضافة إلى ذلك، يعد هذا انتهاكًا لفقرة Turn Dynamics، حيث يظهر أن AGENT لم يلتزم بالوقت المناسب للإجابة على السؤال، مما أدى إلى تأخير في الإجابة."
+  },
+  {
+    "conversation_id": "conv_5701kvsnj570fy59d8n8a1bsf3bp",
+    "timestamp": 1782351686.8174338,
+    "stats": {
+      "avg_m2e_ms": 629.3,
+      "avg_ttft_ms": 725.1,
+      "p95_m2e_ms": 702.9,
+      "interrupted_count": 2,
+      "total_turns": 13,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لم يتم تلبية متطلبات Voice constraints، حيث كان هناك 3 حالات من الإجابة المتعددة الجمل. كما تم الإبلاغ عن حالات من اللافتة الزمنية، حيث بلغت المتوسط الزمني للفترة من الفم إلى الأذن 629.3ms، ومتوسط زمن أول توكيد 725.1ms، ومتوسط زمن P95 702.9ms.",
+    "defense": "تم تلبية متطلبات Voice constraints بشكل جيد، حيث تم الإجابة بسرعة وبالكلمات المناسبة. كما تم تلبية متطلبات Turn Dynamics، حيث لم يكن هناك أي حالات من اللافتة الزمنية المفرطة. ومع ذلك، تم الإبلاغ عن حالات من اللافتة الزمنية، حيث بلغت المتوسط الزمني للفترة من الفم إلى الأذن 629.3ms، ومتوسط زمن أول توكيد 725.1ms، ومتوسط زمن P95 702.9ms.",
+    "adjudication": "تم تلبية متطلبات Voice constraints بشكل جيد، حيث تم الإجابة بسرعة وبالكلمات المناسبة. ومع ذلك، تم الإبلاغ عن حالات من اللافتة الزمنية، حيث بلغت المتوسط الزمني للفترة من الفم إلى الأذن 629.3ms، ومتوسط زمن أول توكيد 725.1ms، ومتوسط زمن P95 702.9ms. كما تم تلبية متطلبات Turn Dynamics، حيث لم يكن هناك أي حالات من اللافتة الزمنية المفرطة. ومع ذلك، تم الإبلاغ عن حالات من اللافتة الزمنية، حيث بلغت المتوسط الزمني للفترة من الفم إلى الأذن 629.3ms، ومتوسط زمن أول توكيد 725.1ms، ومتوسط زمن P95 702.9ms. تم تلبية متطلبات Prompt Persona، حيث تم الإجابة بشكل مناسب ومتوافق مع الشخصية المطلوبة. ومع ذلك، تم الإبلاغ عن حالات من اللافتة الزمنية، حيث بلغت المتوسط الزمني للفترة من الفم إلى الأذن 629.3ms، ومتوسط زمن أول توكيد 725.1ms، ومتوسط زمن P95 702.9ms."
+  },
+  {
+    "conversation_id": "conv_4001kvspz2fpeg9rsa2cvezm6674",
+    "timestamp": 1782351716.9352844,
+    "stats": {
+      "avg_m2e_ms": 522.0,
+      "avg_ttft_ms": 683.3,
+      "p95_m2e_ms": 562.1,
+      "interrupted_count": 3,
+      "total_turns": 13,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لم يتم الإجابة بشكل صحيح على سؤال المستخدم حول رسوم ترخيص محلات الذهب، حيث تم الإجابة بشكل مبهم.",
+    "defense": "تم حفظ معلومات المستخدم بنجاح، وتم الإجابة بشكل صحيح على سؤال المستخدم حول رسوم ترخيص محلات الذهب، ولكن تم الإجابة بشكل مبهم.",
+    "adjudication": "تم تحليل المحادثة، وتم اكتشاف أن المستخدم سأل عن رسوم ترخيص محلات الذهب، وتم الإجابة بشكل مبهم. تم حفظ معلومات المستخدم بنجاح، وتم الإجابة بشكل صحيح على سؤال المستخدم حول رسوم ترخيص محلات الذهب، ولكن تم الإجابة بشكل مبهم. تم تحليل التوقيت، وتم اكتشاف أن المتوسط الزمني للتواصل هو 522.0ms، وتم اكتشاف أن المتوسط الزمني للوقت إلى أول كلمة هو 683.3ms، وتم اكتشاف أن نسبة 95% من التوقيت هو 562.1ms. تم تحليل التوقيت، وتم اكتشاف أن عدد التوقفات هو 3، وتم اكتشاف أن عدد الدورات الكاملة هو 13. تم تحليل التوقيت، وتم اكتشاف أن المتوسط الزمني للتواصل هو 522.0ms، وتم اكتشاف أن المتوسط الزمني للوقت إلى أول كلمة هو 683.3ms، وتم اكتشاف أن نسبة 95% من التوقيت هو 562.1ms. تم تحليل التوقيت، وتم اكتشاف أن عدد التوقفات هو 3، وتم اكتشاف أن عدد الدورات الكاملة هو 13. تم تحليل التوقيت، وتم اكتشاف أن المتوسط الزمني للتواصل هو 522.0ms، وتم اكتشاف أن المتوسط الزمني للوقت إلى أول كلمة هو 683.3ms، وتم اكتشاف أن نسبة 95% من التوقيت هو 562.1ms. تم تحليل التوقيت، وتم اكتشاف أن عدد التوقفات هو 3، وتم اكتشاف أن عدد الدورات الكاملة هو 13."
+  },
+  {
+    "conversation_id": "conv_4301kvsq3xnyfg09ynyfwc5pwyrv",
+    "timestamp": 1782351746.2106268,
+    "stats": {
+      "avg_m2e_ms": 2383.9,
+      "avg_ttft_ms": 2182.4,
+      "p95_m2e_ms": 4192.5,
+      "interrupted_count": 4,
+      "total_turns": 13,
+      "has_audio": true
+    },
+    "score": 0.0,
+    "root_cause_verdict": "INTEGRATION_LATENCY_DRAG",
+    "accusation": "الagent لم يلتزم بالوقت المحدد للرد على المستخدم، مما أدى إلى تأخير في إتمام الخدمة.",
+    "defense": "الagent يعتذر عن التأخير في إتمام الخدمة، ويرى أن التأخير يعود إلى مشاكل في النظام، وليس بسبب سوء أداء.",
+    "adjudication": "الagent لم يلتزم بالوقت المحدد للرد على المستخدم، مما أدى إلى تأخير في إتمام الخدمة. هذا التأخير يعد مخالفًا للشروط المحددة في الخدمة، ويتطلب إجراء تحقيق لتحديد الأسباب الدقيقة للانتهاء."
+  },
+  {
+    "conversation_id": "conv_1401kvsqpnj6eh38pk7d1nhds4qg",
+    "timestamp": 1782351775.70755,
+    "stats": {
+      "avg_m2e_ms": 663.5,
+      "avg_ttft_ms": 666.9,
+      "p95_m2e_ms": 1046.9,
+      "interrupted_count": 4,
+      "total_turns": 17,
+      "has_audio": true
+    },
+    "score": 1.0,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "\"الAGENT لم يلتزم بالحوار الصحيح، حيث قام بتقاطع المحادثة بشكل متكرر، مما أدى إلى تأخير في الإجابة على أسئلة المستخدم.\"",
+    "defense": "\"الAGENT يعتذر عن التأخير في الإجابة على أسئلة المستخدم، ويرى أن ذلك كان بسبب تأثيرات خارجية غير متوقعة، مثل تأخيرات في النظام أو مشاكل في الاتصال.\"",
+    "adjudication": "\"الAGENT لم يلتزم بالحوار الصحيح، حيث قام بتقاطع المحادثة بشكل متكرر، مما أدى إلى تأخير في الإجابة على أسئلة المستخدم. على الرغم من ذلك، يعتبر الAGENT قد قام بتقديم بعض الإجابات الصحيحة، مثل الإجابة على سؤال المستخدم حول المدير العام. ومع ذلك، يعتبر التأخير في الإجابة على أسئلة المستخدم هو السبب الرئيسي للفشل في الحوار.\""
+  },
+  {
+    "conversation_id": "conv_1201kvt0p21yem98bf8jgkyht0s8",
+    "timestamp": 1782351803.563384,
+    "stats": {
+      "avg_m2e_ms": 814.2,
+      "avg_ttft_ms": 826.0,
+      "p95_m2e_ms": 1748.9,
+      "interrupted_count": 6,
+      "total_turns": 17,
+      "has_audio": true
+    },
+    "score": 1.0,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "\"الAGENT لم يلتزم بالشروط المحددة لرد السؤال عن المدير العام، وبدلاً من ذلك، قام بتحويل المحادثة إلى خدمة إرسال بريد إلكتروني. هذا يعد انتهاكًا لشروط الخدمة ويتطلب إعادة التدريب على الرد على الأسئلة بشكل صحيح.\"",
+    "defense": "\"الAGENT يعتذر عن الخطأ، ويرى أن هناك مشكلة في التوقيت والاتصالات، مما أدى إلى الاضطراب في المحادثة. يطلب من المجلس النظر في هذه الحالة واعتبارها استثناءً.\"",
+    "adjudication": "\"بعد النظر في الحالة، قرر المجلس أن الAGENT يحتاج إلى إعادة التدريب على الرد على الأسئلة بشكل صحيح، مع التركيز على الالتزام بالشروط المحددة. كما قرر المجلس أن يُمنح الAGENT فرصة للاستفادة من التدريب الإضافي، مع مراعاة التوقيت والاتصالات في المستقبل.\""
+  },
+  {
+    "conversation_id": "conv_3001kvw8tztdf91831g2r64g3j8m",
+    "timestamp": 1782351834.126584,
+    "stats": {
+      "avg_m2e_ms": 818.2,
+      "avg_ttft_ms": 761.5,
+      "p95_m2e_ms": 1095.1,
+      "interrupted_count": 1,
+      "total_turns": 19,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "LLM_COMPUTE_WASTAGE",
+    "accusation": "الAGENT لم يلتزم بالوقت المحدد في بعض الإجابات، مما أدى إلى تأخير في الإجابة على بعض الأسئلة.",
+    "defense": "الAGENT يعتذر عن التأخير في الإجابات، ويرى أنه كان بسبب مشاكل في النظام، وليس بسبب سوء أدائه.",
+    "adjudication": "الAGENT قد فشل في بعض الأحيان في الإجابة بسرعة وضمان دقة الإجابات، مما أدى إلى تأخير في الإجابة على بعض الأسئلة."
+  },
+  {
+    "conversation_id": "conv_7501kvw9kxq8ewmbdzc5yfhn6def",
+    "timestamp": 1782351864.9968464,
+    "stats": {
+      "avg_m2e_ms": 826.5,
+      "avg_ttft_ms": 797.6,
+      "p95_m2e_ms": 1211.3,
+      "interrupted_count": 4,
+      "total_turns": 23,
+      "has_audio": true
+    },
+    "score": 1.0,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "**\nالAGENT لم يكن متأكدًا من معلوماته حول شروط السلامة والحماية في منطقة جند كم بوسطة دماد، مما يشير إلى وجود خلل في قاعدة المعرفة.",
+    "defense": "**\nالAGENT قد قام بتحديث قاعدة المعرفة، ولكن المعلومات قد لم تكن متاحة في الوقت المناسب. بالإضافة إلى ذلك، قد يكون هناك خلل في نظام الحفظ والاسترجاع للمعلومات.",
+    "adjudication": "**\nالAGENT لم يكن متأكدًا من معلوماته حول شروط السلامة والحماية في منطقة جند كم بوسطة دماد، مما يشير إلى وجود خلل في قاعدة المعرفة. على الرغم من أن الAGENT قد قام بتحديث قاعدة المعرفة، إلا أن المعلومات قد لم تكن متاحة في الوقت المناسب. بالإضافة إلى ذلك، قد يكون هناك خلل في نظام الحفظ والاسترجاع للمعلومات. من المهم تحديث قاعدة المعرفة بشكل دوري وتحسين نظام الحفظ والاسترجاع للمعلومات لضمان تقديم معلومات دقيقة ومتاحة في الوقت المناسب."
+  },
+  {
+    "conversation_id": "conv_3001kvwggc2efzhvw5wz7tjdkpe7",
+    "timestamp": 1782351894.2454157,
+    "stats": {
+      "avg_m2e_ms": 739.7,
+      "avg_ttft_ms": 713.5,
+      "p95_m2e_ms": 755.8,
+      "interrupted_count": 0,
+      "total_turns": 10,
+      "has_audio": true
+    },
+    "score": 0.0,
+    "root_cause_verdict": "FACTUAL_DIVERGENCE",
+    "accusation": "Agent failed to provide accurate and relevant information to the user's inquiry about the fees for a gas sales permit. The agent's responses were unclear and confusing, and the user had to repeat their question multiple times.",
+    "defense": "The agent's responses were affected by the user's unclear and confusing language, which made it difficult for the agent to understand the user's inquiry. The agent attempted to clarify the user's question but was unable to provide a clear and accurate answer.",
+    "adjudication": "The agent's failure to provide accurate and relevant information to the user's inquiry is a violation of the Bahrain Civil Defense persona's requirement to provide clear and concise information to users. The agent's responses were also affected by the user's unclear and confusing language, which highlights the importance of clear communication in customer service interactions. The root cause of this issue is the agent's inability to provide accurate and relevant information, which is a critical aspect of the Bahrain Civil Defense persona's role."
+  },
+  {
+    "conversation_id": "conv_1101kvy548r3evvtw0bar266854h",
+    "timestamp": 1782351924.5186994,
+    "stats": {
+      "avg_m2e_ms": 704.0,
+      "avg_ttft_ms": 839.1,
+      "p95_m2e_ms": 1478.1,
+      "interrupted_count": 6,
+      "total_turns": 19,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "LLM_COMPUTE_WASTAGE",
+    "accusation": "الAGENT لم يلتزم بالوقت المحدد في الإجابة على أسئلة المستخدم، مما أدى إلى تأخير في إتمام الخدمة.",
+    "defense": "الAGENT قد قام بتحديثه بشكل دوري، ولكن يبدو أن هناك مشكلة في إدارة الوقت في الإجابات.",
+    "adjudication": "الAGENT قد قام بتقديم معلومات صحيحة حول الخدمة، ولكن يبدو أن هناك مشكلة في إدارة الوقت في الإجابات. بالإضافة إلى ذلك، قد يكون هناك مشكلة في تدريب النموذج على الصياغة الصحيحة للجمل."
+  },
+  {
+    "conversation_id": "conv_4901kvy77tsbe999tg2fwpa8yt04",
+    "timestamp": 1782352034.9921155,
+    "stats": {
+      "avg_m2e_ms": 597.9,
+      "avg_ttft_ms": 569.2,
+      "p95_m2e_ms": 738.2,
+      "interrupted_count": 4,
+      "total_turns": 17,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "LLM_COMPUTE_WASTAGE",
+    "accusation": "الagent لم يلتزم بالوقت المحدد لرد المستخدم، مما يؤدي إلى انخفاض جودة المحادثة.",
+    "defense": "الagent قد قام بإرسال المستندات المطلوبة للمستخدم، وتم إرسال البريد الإلكتروني المطلوب للمستخدم.",
+    "adjudication": "الagent لم يلتزم بالوقت المحدد لرد المستخدم، مما يؤدي إلى انخفاض جودة المحادثة. بالإضافة إلى ذلك، تم قطع المحادثة 4 مرات، مما يؤدي إلى انخفاض جودة المحادثة. ومع ذلك، تم إرسال المستندات المطلوبة للمستخدم، وتم إرسال البريد الإلكتروني المطلوب للمستخدم."
   }
 ]

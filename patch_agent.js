@@ -70,7 +70,8 @@ const patchConfig = {
       first_message: "مرحبا بك في مركز خدمات الإدارة العامة للدفاع المدني .. يرجى تزويدي بالإسم ورقم الهاتف"
     },
     turn: {
-      turn_timeout: 15
+      turn_timeout: 10,
+      silence_end_call_timeout: 30
     }
   }
 };

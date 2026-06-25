@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لوحة إحصائيات الأداء (KPI) - الدفاع المدني</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.documentElement.classList.add('light-theme');
+            }
+        })();
+    </script>
     <style>
         :root {
             --bg-color: #030508;
@@ -19,7 +27,50 @@
             --color-acceptable: #8e8e93; /* Muted Slate (50% KPI) */
             --color-poor: #ff9f0a; /* Warm Amber (0% KPI) */
             
+            --color-blue: #00bfff;
+            --blue-bg: rgba(0, 191, 255, 0.1);
+            --surface-secondary: rgba(0, 0, 0, 0.2);
+            --card-glow-1: rgba(48, 209, 88, 0.05);
+            --card-glow-2: rgba(255, 159, 10, 0.03);
+            --nav-bg: rgba(3, 5, 8, 0.7);
+            
+            /* Shadows */
+            --card-shadow: none;
+            --card-shadow-hover: none;
+            
+            /* Tab Active */
+            --active-tab-bg: rgba(48, 209, 88, 0.08);
+            --active-tab-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+            
             --transition-apple: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        :root.light-theme {
+            --bg-color: #f5f5f7;
+            --surface-color: #ffffff;
+            --surface-hover: #f2f2f7;
+            --border-color: rgba(0, 0, 0, 0.065);
+            --text-primary: #1d1d1f;
+            --text-secondary: #6e6e73;
+            
+            --color-excellent: #24b248; /* Slightly darker green for light mode contrast */
+            --color-acceptable: #86868b;
+            --color-poor: #e07b00; /* Darker amber for light mode contrast */
+            
+            --color-blue: #0071e3;
+            --blue-bg: rgba(0, 113, 227, 0.08);
+            --surface-secondary: #e5e5ea;
+            --card-glow-1: rgba(36, 178, 72, 0.04);
+            --card-glow-2: rgba(224, 123, 0, 0.03);
+            --nav-bg: rgba(255, 255, 255, 0.8);
+            
+            /* Shadows override */
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.015), 0 1px 3px rgba(0, 0, 0, 0.02);
+            --card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.04), 0 2px 6px rgba(0, 0, 0, 0.02);
+            
+            /* Tab active override */
+            --active-tab-bg: rgba(36, 178, 72, 0.06);
+            --active-tab-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
         }
 
         * {
@@ -47,7 +98,7 @@
             left: -10%;
             width: 60%;
             height: 50%;
-            background: radial-gradient(circle, rgba(48, 209, 88, 0.05) 0%, transparent 70%);
+            background: radial-gradient(circle, var(--card-glow-1) 0%, transparent 70%);
             z-index: -1;
             filter: blur(120px);
             pointer-events: none;
@@ -60,7 +111,7 @@
             right: -10%;
             width: 50%;
             height: 50%;
-            background: radial-gradient(circle, rgba(255, 159, 10, 0.03) 0%, transparent 70%);
+            background: radial-gradient(circle, var(--card-glow-2) 0%, transparent 70%);
             z-index: -1;
             filter: blur(120px);
             pointer-events: none;
@@ -74,7 +125,7 @@
             width: 100%;
             height: 56px;
             z-index: 100;
-            background: rgba(3, 5, 8, 0.7);
+            background: var(--nav-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border-color);
@@ -170,8 +221,8 @@
         }
 
         .kpi-card.telemetry .kpi-card-icon {
-            background: rgba(0, 191, 255, 0.1);
-            color: #00bfff;
+            background: var(--blue-bg);
+            color: var(--color-blue);
         }
 
         .telemetry-detail-badge {
@@ -193,6 +244,11 @@
             color: var(--color-poor);
         }
 
+        .telemetry-detail-badge.neutral {
+            background: var(--surface-secondary);
+            color: var(--text-secondary);
+        }
+
         .kpi-card {
             background-color: var(--surface-color);
             border: 1px solid var(--border-color);
@@ -205,12 +261,14 @@
             transition: var(--transition-apple);
             position: relative;
             overflow: hidden;
+            box-shadow: var(--card-shadow);
         }
 
         .kpi-card:hover {
             background-color: var(--surface-hover);
             transform: translateY(-2px);
-            border-color: rgba(255, 255, 255, 0.15);
+            border-color: var(--color-blue);
+            box-shadow: var(--card-shadow-hover);
         }
 
         .kpi-card-header {
@@ -309,7 +367,7 @@
 
         .bullet-bar-bg {
             height: 8px;
-            background-color: rgba(255, 255, 255, 0.05);
+            background-color: var(--surface-secondary);
             border-radius: 4px;
             position: relative;
             overflow: hidden;
@@ -428,6 +486,7 @@
             display: flex;
             flex-direction: column;
             gap: 16px;
+            box-shadow: var(--card-shadow);
         }
 
         .table-wrapper {
@@ -554,7 +613,7 @@
         }
 
         .transcript-box {
-            background-color: rgba(255, 255, 255, 0.02);
+            background-color: var(--surface-secondary);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 16px;
@@ -587,7 +646,7 @@
         /* Tab Navigation Bar Styles */
         .tabs-wrapper {
             display: flex;
-            background: rgba(255, 255, 255, 0.03);
+            background: var(--surface-secondary);
             border: 1px solid var(--border-color);
             padding: 4px;
             border-radius: 10px;
@@ -613,7 +672,7 @@
 
         .tab-btn:hover {
             color: var(--text-primary);
-            background: rgba(255, 255, 255, 0.02);
+            background: var(--surface-hover);
         }
 
         .tab-btn.active {
@@ -685,9 +744,14 @@
             <span>مركز الإحصائيات الذكي</span>
             <span class="badge">الإدارة العامة للدفاع المدني</span>
         </div>
-        <div class="nav-sync">
-            <span class="sync-indicator"></span>
-            <span id="last-sync-time">مزامنة البيانات...</span>
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <button id="theme-toggle" class="theme-btn" onclick="toggleTheme()" style="background: var(--surface-secondary); border: 1px solid var(--border-color); color: var(--text-primary); cursor: pointer; width: 36px; height: 36px; border-radius: 50%; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: var(--transition-apple);" title="تغيير المظهر">
+                <span id="theme-icon">☀️</span>
+            </button>
+            <div class="nav-sync">
+                <span class="sync-indicator"></span>
+                <span id="last-sync-time">مزامنة البيانات...</span>
+            </div>
         </div>
     </div>
 
@@ -737,7 +801,7 @@
                             <span id="percent-system-m2e">0%</span>
                         </div>
                         <div class="bullet-bar-bg">
-                            <div class="bullet-bar-fill" id="bullet-system-m2e" style="background-color: #00bfff;"></div>
+                            <div class="bullet-bar-fill" id="bullet-system-m2e" style="background-color: var(--color-blue);"></div>
                             <div class="bullet-target-marker" style="left: 37.5%;"></div>
                         </div>
                     </div>
@@ -821,7 +885,7 @@
                             <span id="percent-system-score">0%</span>
                         </div>
                         <div class="bullet-bar-bg">
-                            <div class="bullet-bar-fill" id="bullet-system-score" style="background-color: #00bfff;"></div>
+                            <div class="bullet-bar-fill" id="bullet-system-score" style="background-color: var(--color-blue);"></div>
                             <div class="bullet-target-marker" style="left: 15%;"></div>
                         </div>
                     </div>
@@ -853,7 +917,7 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>الوقت</th>
+                                <th>التاريخ والوقت</th>
                                 <th>رمز المحادثة (Session ID)</th>
                                 <th>M2E الاستجابة</th>
                                 <th>TTFT التوليد</th>
@@ -983,7 +1047,7 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>الوقت</th>
+                                <th>التاريخ والوقت</th>
                                 <th>الاسم</th>
                                 <th>رقم الهاتف</th>
                                 <th>البريد الإلكتروني</th>
@@ -1019,6 +1083,28 @@
     <script>
         let kpiDataGlobal = null;
         let activeTab = 'system';
+
+        function toggleTheme() {
+            const root = document.documentElement;
+            const btnIcon = document.getElementById('theme-icon');
+            
+            if (root.classList.contains('light-theme')) {
+                root.classList.remove('light-theme');
+                localStorage.setItem('theme', 'dark');
+                if (btnIcon) btnIcon.innerText = '☀️';
+            } else {
+                root.classList.add('light-theme');
+                localStorage.setItem('theme', 'light');
+                if (btnIcon) btnIcon.innerText = '🌙';
+            }
+        }
+        
+        window.addEventListener('DOMContentLoaded', () => {
+            if (document.documentElement.classList.contains('light-theme')) {
+                const btnIcon = document.getElementById('theme-icon');
+                if (btnIcon) btnIcon.innerText = '🌙';
+            }
+        });
 
         async function fetchKpiData() {
             try {
@@ -1092,21 +1178,23 @@
             // System Telemetry updates
             if (telemetryStats) {
                 // M2E Card
-                document.getElementById('val-system-m2e').innerText = telemetryStats.avgM2e;
-                document.getElementById('val-system-m2e-p95').innerText = `P95: ${telemetryStats.p95M2e}ms`;
-                const m2ePercent = Math.max(0, Math.min(100, Math.round((telemetryStats.avgM2e / 800) * 100)));
-                document.getElementById('percent-system-m2e').innerText = `${telemetryStats.avgM2e}ms`;
+                const hasM2e = telemetryStats.avgM2e > 0;
+                document.getElementById('val-system-m2e').innerText = hasM2e ? telemetryStats.avgM2e : "N/A";
+                document.getElementById('val-system-m2e-p95').innerText = hasM2e ? `P95: ${telemetryStats.p95M2e}ms` : "P95: N/A";
+                const m2ePercent = hasM2e ? Math.max(0, Math.min(100, Math.round((telemetryStats.avgM2e / 800) * 100))) : 0;
+                document.getElementById('percent-system-m2e').innerText = hasM2e ? `${telemetryStats.avgM2e}ms` : "N/A";
                 document.getElementById('bullet-system-m2e').style.width = `${m2ePercent}%`;
 
                 // TTFT Card
-                document.getElementById('val-system-ttft').innerText = telemetryStats.avgTtft;
-                const ttftDesc = telemetryStats.avgTtft < 300 ? 'سريع جداً' : (telemetryStats.avgTtft < 600 ? 'مقبول' : 'بطيء جداً');
-                const ttftColor = telemetryStats.avgTtft < 300 ? 'var(--color-excellent)' : (telemetryStats.avgTtft < 600 ? '#ff9f0a' : 'var(--color-poor)');
+                const hasTtft = telemetryStats.avgTtft > 0;
+                document.getElementById('val-system-ttft').innerText = hasTtft ? telemetryStats.avgTtft : "N/A";
+                const ttftDesc = hasTtft ? (telemetryStats.avgTtft < 300 ? 'سريع جداً' : (telemetryStats.avgTtft < 600 ? 'مقبول' : 'بطيء جداً')) : 'غير متوفر';
+                const ttftColor = hasTtft ? (telemetryStats.avgTtft < 300 ? 'var(--color-excellent)' : (telemetryStats.avgTtft < 600 ? '#ff9f0a' : 'var(--color-poor)')) : 'var(--text-secondary)';
                 const ttftDescEl = document.getElementById('val-system-ttft-desc');
                 ttftDescEl.innerText = ttftDesc;
                 ttftDescEl.style.color = ttftColor;
-                const ttftPercent = Math.max(0, Math.min(100, Math.round((telemetryStats.avgTtft / 600) * 100)));
-                document.getElementById('percent-system-ttft').innerText = `${telemetryStats.avgTtft}ms`;
+                const ttftPercent = hasTtft ? Math.max(0, Math.min(100, Math.round((telemetryStats.avgTtft / 600) * 100))) : 0;
+                document.getElementById('percent-system-ttft').innerText = hasTtft ? `${telemetryStats.avgTtft}ms` : "N/A";
                 const bulletTtft = document.getElementById('bullet-system-ttft');
                 bulletTtft.style.width = `${ttftPercent}%`;
                 bulletTtft.style.backgroundColor = ttftColor;
@@ -1211,17 +1299,17 @@
             const successPoints = [];
             [...telCalls].reverse().forEach(c => {
                 successTotal++;
-                if (c.telemetry.root_cause_verdict === 'SUCCESS') {
+                if (c.telemetry.root_cause_verdict === 'SUCCESS' || (c.telemetry.score !== undefined && c.telemetry.score >= 0.8)) {
                     successCount++;
                 }
                 successPoints.push((successCount / successTotal) * 100);
             });
             const successTrend = successPoints.slice(-15);
 
-            drawSVG('sparkline-system-m2e', m2ePoints, '#00bfff', false);
+            drawSVG('sparkline-system-m2e', m2ePoints, 'var(--color-blue)', false);
             drawSVG('sparkline-system-ttft', ttftPoints, 'var(--color-excellent)', false);
             drawSVG('sparkline-system-success', successTrend, 'var(--color-excellent)', true);
-            drawSVG('sparkline-system-score', scorePoints, '#00bfff', true);
+            drawSVG('sparkline-system-score', scorePoints, 'var(--color-blue)', true);
         }
 
         function drawTrendSpline(trend) {
@@ -1339,9 +1427,9 @@
                 { key: 'SUCCESS', label: 'نجاح الاتصال والهدف (SUCCESS)', color: 'var(--color-excellent)' },
                 { key: 'FACTUAL_DIVERGENCE', label: 'انحراف أو خطأ معرفي (FACTUAL_DIVERGENCE)', color: 'var(--color-poor)' },
                 { key: 'INTEGRATION_LATENCY_DRAG', label: 'بطء الأنظمة الخارجية (LATENCY_DRAG)', color: 'var(--color-poor)' },
-                { key: 'LLM_COMPUTE_WASTAGE', label: 'بطء توليد المساعد الذكي (COMPUTE_WASTAGE)', color: '#ff9f0a' },
-                { key: 'ACOUSTIC_VAD_CONFLICT', label: 'تداخل أو مقاطعة صوتية (VAD_CONFLICT)', color: '#00bfff' },
-                { key: 'USER_ABANDONMENT', label: 'إغلاق مبكر للمكالمة (USER_ABANDONMENT)', color: '#8e8e93' }
+                { key: 'LLM_COMPUTE_WASTAGE', label: 'بطء توليد المساعد الذكي (COMPUTE_WASTAGE)', color: 'var(--color-poor)' },
+                { key: 'ACOUSTIC_VAD_CONFLICT', label: 'تداخل أو مقاطعة صوتية (VAD_CONFLICT)', color: 'var(--color-blue)' },
+                { key: 'USER_ABANDONMENT', label: 'إغلاق مبكر للمكالمة (USER_ABANDONMENT)', color: 'var(--color-acceptable)' }
             ];
 
             verdictConfigs.forEach(cfg => {
@@ -1377,9 +1465,8 @@
                         tr.style.cursor = 'pointer';
 
                         let cleanTime = call.timestamp;
-                        if (cleanTime.includes('T')) {
-                            const timePart = cleanTime.split('T')[1];
-                            cleanTime = timePart.substring(0, 5);
+                        if (cleanTime.includes('T') || cleanTime.includes(' ')) {
+                            cleanTime = cleanTime.replace('T', ' ').substring(0, 16);
                         }
 
                         let kpiBadge = `<span class="badge-status">غير مقيم</span>`;
@@ -1417,9 +1504,8 @@
                         tr.style.cursor = 'pointer';
 
                         let cleanTime = call.timestamp;
-                        if (cleanTime.includes('T')) {
-                            const timePart = cleanTime.split('T')[1];
-                            cleanTime = timePart.substring(0, 5);
+                        if (cleanTime.includes('T') || cleanTime.includes(' ')) {
+                            cleanTime = cleanTime.replace('T', ' ').substring(0, 16);
                         }
 
                         let m2e = '-';
@@ -1433,8 +1519,9 @@
                             ttft = tel.stats ? (tel.stats.avg_ttft_ms ? Math.round(tel.stats.avg_ttft_ms) + 'ms' : '-') : '-';
                             score = tel.score !== undefined ? Math.round(tel.score * 100) + '%' : '-';
                             
-                            const verdictClass = tel.root_cause_verdict === "SUCCESS" ? "excellent" : "poor";
-                            verdictBadge = `<span class="badge-status ${verdictClass}">${tel.root_cause_verdict}</span>`;
+                            const verdictClass = (tel.score !== undefined && tel.score >= 0.8) ? "excellent" : (tel.root_cause_verdict === "SUCCESS" ? "excellent" : "poor");
+                            const verdictText = (tel.score !== undefined && tel.score >= 0.8) ? "SUCCESS" : tel.root_cause_verdict;
+                            verdictBadge = `<span class="badge-status ${verdictClass}">${verdictText}</span>`;
                         }
 
                         const shortSession = call.conversationId.length > 15 ? call.conversationId.substring(0, 12) + '...' : call.conversationId;
@@ -1478,23 +1565,31 @@
             if (call.telemetry) {
                 const tel = call.telemetry;
                 const stats = tel.stats || {};
-                const verdictClass = tel.root_cause_verdict === "SUCCESS" ? "success" : "failure";
-                const verdictLabel = tel.root_cause_verdict;
+                const isNotFound = tel.root_cause_verdict === "NOT_FOUND";
+                const isTextChat = stats.has_audio === false;
+                const verdictClass = isNotFound ? "neutral" : (isTextChat ? "neutral" : (((tel.score !== undefined && tel.score >= 0.8) || tel.root_cause_verdict === "SUCCESS") ? "success" : "failure"));
+                const verdictLabel = isNotFound ? "مكالمة تجريبية / غير مسجلة" : (isTextChat ? "محادثة كتابية (نصية)" : (((tel.score !== undefined && tel.score >= 0.8) || tel.root_cause_verdict === "SUCCESS") ? "SUCCESS" : tel.root_cause_verdict));
                 
+                const avgM2eVal = (isNotFound || isTextChat) ? "غير متوفر (N/A)" : (stats.avg_m2e_ms ? `${stats.avg_m2e_ms}ms` : "0ms");
+                const avgTtftVal = (isNotFound || isTextChat) ? "غير متوفر (N/A)" : (stats.avg_ttft_ms ? `${stats.avg_ttft_ms}ms` : "0ms");
+                const p95M2eVal = (isNotFound || isTextChat) ? "غير متوفر (N/A)" : (stats.p95_m2e_ms ? `${stats.p95_m2e_ms}ms` : "0ms");
+                const interruptedVal = (isNotFound || isTextChat) ? "غير متوفر (N/A)" : (stats.interrupted_count !== undefined ? stats.interrupted_count : "0");
+                const scoreVal = isNotFound ? "N/A" : `${Math.round(tel.score * 100)}%`;
+
                 telemetryHtml = `
                     <div style="margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 12px;">
-                        <h3 style="font-size: 0.95rem; font-weight: 700; color: #00bfff; display: flex; align-items: center; gap: 6px;">
+                        <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--color-blue); display: flex; align-items: center; gap: 6px;">
                             <span>⚡ التقييم التلقائي للمحكمة (Adversarial Audit)</span>
                         </h3>
                         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                             <span class="telemetry-detail-badge ${verdictClass}">القرار: ${verdictLabel}</span>
-                            <span class="telemetry-detail-badge" style="background: rgba(255,255,255,0.05); color: var(--text-primary);">الدرجة: ${Math.round(tel.score * 100)}%</span>
+                            <span class="telemetry-detail-badge" style="background: var(--surface-secondary); color: var(--text-primary);">الدرجة: ${scoreVal}</span>
                         </div>
-                        <div style="font-size: 0.8rem; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px;">
-                            <div>متوسط الاستجابة: <span style="font-family: monospace; font-weight: 600;">${stats.avg_m2e_ms || 0}ms</span></div>
-                            <div>الاستجابة الأولى (TTFT): <span style="font-family: monospace; font-weight: 600;">${stats.avg_ttft_ms || 0}ms</span></div>
-                            <div>الحد الأقصى P95: <span style="font-family: monospace; font-weight: 600;">${stats.p95_m2e_ms || 0}ms</span></div>
-                            <div>عدد المقاطعات: <span style="font-family: monospace; font-weight: 600;">${stats.interrupted_count || 0}</span></div>
+                        <div style="font-size: 0.8rem; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: var(--surface-secondary); padding: 10px; border-radius: 6px;">
+                            <div>متوسط الاستجابة: <span style="font-family: monospace; font-weight: 600;">${avgM2eVal}</span></div>
+                            <div>الاستجابة الأولى (TTFT): <span style="font-family: monospace; font-weight: 600;">${avgTtftVal}</span></div>
+                            <div>الحد الأقصى P95: <span style="font-family: monospace; font-weight: 600;">${p95M2eVal}</span></div>
+                            <div>عدد المقاطعات: <span style="font-family: monospace; font-weight: 600;">${interruptedVal}</span></div>
                         </div>
                         <div class="tray-meta-item">
                             <span class="tray-meta-label">اتهام المدعي (Interrogator)</span>
@@ -1510,7 +1605,7 @@
                         </div>
                         <div class="tray-meta-item">
                             <span class="tray-meta-label">حكم قاضي المحكمة (Magistrate)</span>
-                            <div style="font-size: 0.8rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); padding: 8px; border-radius: 6px; font-style: italic;">
+                            <div style="font-size: 0.8rem; background: var(--surface-secondary); border: 1px solid var(--border-color); padding: 8px; border-radius: 6px; font-style: italic;">
                                 "${tel.adjudication}"
                             </div>
                         </div>
@@ -1574,10 +1669,10 @@
             let html = `<div style="display: flex; flex-direction: column; gap: 14px;">`;
             filtered.forEach(call => {
                 html += `
-                    <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; cursor: pointer;" onclick="showCallDetails(${JSON.stringify(call).replace(/"/g, '&quot;')})">
+                    <div style="background: var(--surface-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; cursor: pointer;" onclick="showCallDetails(${JSON.stringify(call).replace(/"/g, '&quot;')})">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
                             <span style="font-weight: 600;">${call.clientName || 'مجهول'}</span>
-                            <span style="font-size: 0.75rem; color: var(--text-secondary);">${call.timestamp.split('T')[1]?.substring(0,5) || ''}</span>
+                            <span style="font-size: 0.75rem; color: var(--text-secondary);">${call.timestamp.replace('T', ' ').substring(0, 16)}</span>
                         </div>
                         <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 4px;">رقم: ${call.phoneNumber || '-'} | مساعد: ElevenLabs</div>
                         <div style="font-size: 0.8rem; font-style: italic; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">"${call.comment || 'لا يوجد تعليق'}"</div>

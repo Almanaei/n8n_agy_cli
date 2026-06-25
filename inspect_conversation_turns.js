@@ -1,5 +1,5 @@
 const apiKey = "896c43093392d23879dc8d578e7840b4a0b27af2ecf38803e985386b494c427c";
-const conversationId = "conv_6301kvmpaagffs5se53vm0sfdzrv";
+const conversationId = "conv_3301kvy4hsttermr8h3hnsk25cvy";
 const url = `https://api.elevenlabs.io/v1/convai/conversations/${conversationId}`;
 
 async function run() {
