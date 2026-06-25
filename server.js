@@ -297,7 +297,7 @@ function processQueue() {
   console.log(`[Telemetry Queue] Evaluating ${conversationId}... (Remaining in queue: ${evaluationQueue.length})`);
   
   const pythonPath = "C:\\Python313\\python.exe";
-  const evalScript = path.join(__dirname, 'standalone', 'eval_elevenlabs.py');
+  const evalScript = path.join(__dirname, 'telemetry', 'eval_elevenlabs.py');
   
   exec(`"${pythonPath}" "${evalScript}" ${conversationId}`, (error, stdout, stderr) => {
     activeEvaluations.delete(conversationId);
@@ -486,7 +486,7 @@ erra6BzpXyWJxdylk4cdvD0=
       // Read and index local telemetry database
       let telemetryData = [];
       try {
-        const telemetryPath = path.join(__dirname, 'standalone', 'telemetry_db.json');
+        const telemetryPath = path.join(__dirname, 'telemetry', 'telemetry_db.json');
         if (fs.existsSync(telemetryPath)) {
           telemetryData = JSON.parse(fs.readFileSync(telemetryPath, 'utf8'));
         }
@@ -668,80 +668,12 @@ erra6BzpXyWJxdylk4cdvD0=
         res.end(content);
       }
     });
-  } else if (req.url === '/standalone' || req.url === '/standalone.html' || req.url === '/index_standalone.html') {
-    fs.readFile(path.join(__dirname, 'index_standalone.html'), (err, content) => {
-      if (err) {
-        res.writeHead(500);
-        res.end('Error loading index_standalone.html');
-      } else {
-        res.writeHead(200, { 'Content-Type': 'text/html' });
-        res.end(content);
-      }
-    });
   } else {
     res.writeHead(404);
     res.end('Not Found');
   }
 });
 
-// Set up WebSocket server for proxying
-const wss = new WebSocket.Server({ noServer: true });
-
-server.on('upgrade', (request, socket, head) => {
-  const urlObj = new URL(request.url, `http://${request.headers.host || 'localhost'}`);
-  const pathname = urlObj.pathname;
-
-  if (pathname === '/stream') {
-    wss.handleUpgrade(request, socket, head, (ws) => {
-      // Connect to the Python FastAPI backend on port 8000
-      const targetWs = new WebSocket('ws://localhost:8000/stream');
-
-      ws.on('message', (message, isBinary) => {
-        if (targetWs.readyState === WebSocket.OPEN) {
-          if (isBinary) {
-            targetWs.send(message);
-          } else {
-            targetWs.send(message.toString('utf8'));
-          }
-        }
-      });
-
-      targetWs.on('message', (data, isBinary) => {
-        if (ws.readyState === WebSocket.OPEN) {
-          if (isBinary) {
-            ws.send(data);
-          } else {
-            ws.send(data.toString('utf8'));
-          }
-        }
-      });
-
-      ws.on('close', () => {
-        try {
-          if (targetWs.readyState === WebSocket.OPEN || targetWs.readyState === WebSocket.CONNECTING) {
-            targetWs.close();
-          }
-        } catch (e) {
-          console.error("Error closing target WS:", e);
-        }
-      });
-      targetWs.on('close', () => {
-        try {
-          if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
-            ws.close();
-          }
-        } catch (e) {
-          console.error("Error closing client WS:", e);
-        }
-      });
-      
-      ws.on('error', (err) => console.error("Client WS proxy error:", err));
-      targetWs.on('error', (err) => console.error("Target WS proxy error:", err));
-    });
-  } else {
-    socket.destroy();
-  }
-});
 
 server.listen(3000, () => {
   console.log('Test server running at http://localhost:3000');

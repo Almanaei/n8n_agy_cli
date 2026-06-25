@@ -49,8 +49,6 @@ startProcess('Express Server', 'node', ['server.js'], '34');
 // 3. Start Cloudflare Tunnel Manager (Cyan - 36)
 startProcess('Tunnel Manager', 'node', ['cloudflared_manager.js'], '36');
 
-// 4. Start Standalone Voice AI (Magenta - 35)
-startProcess('Python Voice Agent', 'C:\\Python313\\python.exe', ['-m', 'uvicorn', 'standalone.main:app', '--host', '0.0.0.0', '--port', '8000'], '35');
 
 // Handle clean shutdown of all processes
 let isCleaningUp = false;

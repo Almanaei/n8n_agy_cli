@@ -1,0 +1,530 @@
+[
+  {
+    "conversation_id": "conv_5501kvwjv8hzfsvtk4x74nwdxxbq",
+    "timestamp": 1782346743.563489,
+    "stats": {
+      "avg_m2e_ms": 756.7,
+      "avg_ttft_ms": 866.2,
+      "p95_m2e_ms": 1111.4,
+      "interrupted_count": 5,
+      "total_turns": 19
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لم يتم تقديم أي ادعاءات ضد الجلسة",
+    "defense": "الجلسة انتهت بنجاح، وتم تقديم المعلومات المطلوبة بشكل دقيق",
+    "adjudication": "تم تقييم الجلسة بنجاح، حيث تم تلبية جميع المتطلبات والشروط المحددة، ولم يتم تسجيل أي مخالفات أو انقطاعات كبيرة في الجلسة"
+  },
+  {
+    "conversation_id": "conv_4001kvbz7b3tfrra6ttmxrx5fxr2",
+    "timestamp": 1782346783.292393,
+    "stats": {
+      "avg_m2e_ms": 866.9,
+      "avg_ttft_ms": 759.7,
+      "p95_m2e_ms": 1065.1,
+      "interrupted_count": 2,
+      "total_turns": 6
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لم يتم الكشف عن أي انتهاكات واضحة للقواعد",
+    "defense": "الاستجابات كانت سريعة وواضحة، والوظيفة كانت داخل نطاق الخدمات المحددة",
+    "adjudication": "تمت الاستجابة للاستفسار بشكل مناسب، وتم الحفاظ على الشخصية المطلوبة. ومع ذلك، فإن هناك بعض التأخير في الاستجابة، ولكنها لا تتجاوز الحد الأقصى المسموح به"
+  },
+  {
+    "conversation_id": "conv_8501kvbz819efcfa9t6c6v4fc9xc",
+    "timestamp": 1782346787.6815958,
+    "stats": {
+      "avg_m2e_ms": 1125.9,
+      "avg_ttft_ms": 1073.4,
+      "p95_m2e_ms": 2371,
+      "interrupted_count": 3,
+      "total_turns": 20
+    },
+    "score": 0.9,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لا توجد اتهامات",
+    "defense": "الوكيل يدافع عن الجلسة بنجاح، حيث استجاب الوكيل بسرعة وفعالية لاستفسارات المستخدم، وتم تزويد المستخدم بالمعلومات الصحيحة",
+    "adjudication": "القرار النهائي هو نجاح الجلسة، حيث تم تلبية جميع متطلبات المستخدم وتم تزويد المستخدم بالمعلومات الصحيحة، وتم الحفاظ على مستوى عال من الجودة في الاستجابة"
+  },
+  {
+    "conversation_id": "conv_0201kvbzpjs5e3kr02ytpe9enmjr",
+    "timestamp": 1782346792.512453,
+    "stats": {
+      "avg_m2e_ms": 960.2,
+      "avg_ttft_ms": 933.9,
+      "p95_m2e_ms": 1932.6,
+      "interrupted_count": 1,
+      "total_turns": 13
+    },
+    "score": 0.9,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لا توجد اتهامات",
+    "defense": "الوكيل يدافع عن الجلسة بنجاح، حيث استجاب الوكيل لجميع أسئلة المستخدم بشكل صحيح ومطابق للمعلومات المتاحة في قاعدة المعرفة.",
+    "adjudication": "الмагيستير يجد أن الجلسة قد انتهت بنجاح، حيث تم تلبية جميع متطلبات المستخدم بشكل صحيح ومطابق للمعلومات المتاحة في قاعدة المعرفة. وقد تم تحقيق ذلك بفضل استجابة الوكيل السريعة والدقيقة، حيث كان متوسط زمن الاستجابة 960.2ms، وهو أقل من الحد الأقصى المسموح به. ومع ذلك، تم تسجيل حالة واحدة من التطفل، ولكنها لم تؤثر على جودة الجلسة بشكل عام."
+  },
+  {
+    "conversation_id": "conv_7501kvc0595rfb5bdfvz9gqn6ehx",
+    "timestamp": 1782346797.5422566,
+    "stats": {
+      "avg_m2e_ms": 824.6,
+      "avg_ttft_ms": 766,
+      "p95_m2e_ms": 1426.6,
+      "interrupted_count": 5,
+      "total_turns": 27
+    },
+    "score": 0.9,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لم يتم الكشف عن أي انتهاكات للقواعد أو الخلافات في المعلومات المقدمة من قبل الوكيل.",
+    "defense": "تم الرد على جميع استفسارات المستخدم بشكل دقيق ومطابق للمعلومات المتاحة في قاعدة المعرفة، مع احترام القواعد والشروط المحددة.",
+    "adjudication": "تمت المحادثة بنجاح، وتم تزويد المستخدم بالمعلومات المطلوبة حول خدمات الدفاع المدني، بما في ذلك شروط ورسوم الخدمات. تم الحفاظ على مستوى عال من الدقة والاحترام للقواعد والشروط المحددة، مع وجود بعض التأخيرات في الاستجابة التي لم تكن كافية لتعطيل جودة المحادثة."
+  },
+  {
+    "conversation_id": "conv_3301kvcwvkgsfdybwsxxrng48yp5",
+    "timestamp": 1782346802.6082911,
+    "stats": {
+      "avg_m2e_ms": 1513.6,
+      "avg_ttft_ms": 1399.3,
+      "p95_m2e_ms": 1960.5,
+      "interrupted_count": 2,
+      "total_turns": 6
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لم يتم الكشف عن أي انتهاكات واضحة للقواعد في المحادثة",
+    "defense": "الجواب كانbrief ومتوافقًا مع الشخصية المطلوبة، ولم يتم الكشف عن أي تأخيرات كبيرة في الاستجابة",
+    "adjudication": "تمت المحادثة بنجاح، وتم الرد على استفسارات المستخدم بشكل صحيح، ولم يتم الكشف عن أي مخالفات للقواعد المحددة"
+  },
+  {
+    "conversation_id": "conv_3401kvcxh36xe32vaj7cqbr2vtn0",
+    "timestamp": 1782346807.4844637,
+    "stats": {
+      "avg_m2e_ms": 1247.4,
+      "avg_ttft_ms": 1119.7,
+      "p95_m2e_ms": 1829.1,
+      "interrupted_count": 3,
+      "total_turns": 13
+    },
+    "score": 0.9,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لا توجد اتهامات",
+    "defense": "الجواب الصحيح لمدير الإدارة العامة للدفاع المدني هو العميد ركن طيّار علي بن محمد الكبيسي، والذي أنشأ النظام هو الرائد سالم المنّاعي. كما قدمت معلومات دقيقة حول خدمة بيع الغاز.",
+    "adjudication": "تم تقييم الجلسة وتحقق من دقة المعلومات المقدمة، وتم الالتزام بالشخصية المطلوبة. كما كانت الاستجابات سريعة ومتوافقة مع المعايير المحددة، مع وجود بعض التأخيرات التي لم تتجاوز الحدود المسموح بها."
+  },
+  {
+    "conversation_id": "conv_6601kvcxkb1sf1rb2dmmd5fdx8ty",
+    "timestamp": 1782346816.6918688,
+    "stats": {
+      "avg_m2e_ms": 616.2,
+      "avg_ttft_ms": 940.9,
+      "p95_m2e_ms": 616.2,
+      "interrupted_count": 2,
+      "total_turns": 5
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لم يتم الكشف عن أي انتهاكات للقواعد أو الحقائق في المحادثة",
+    "defense": "الجواب كانbrief ومتوافقًا مع المعرفة المتاحة، ولم يتم الكشف عن أي تأخيرات كبيرة في الاستجابة",
+    "adjudication": "بناءً على التحليل، تم إكمال المكالمة بنجاح مع جودة عالية، ولم يتم الكشف عن أي مخالفات للقواعد أو الحقائق"
+  },
+  {
+    "conversation_id": "conv_4901kvd25nhfezq83j6yt9yjchmt",
+    "timestamp": 1782346829.696079,
+    "stats": {
+      "avg_m2e_ms": 843.7,
+      "avg_ttft_ms": 823,
+      "p95_m2e_ms": 1525.2,
+      "interrupted_count": 2,
+      "total_turns": 15
+    },
+    "score": 0.9,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لا توجد اتهامات",
+    "defense": "العميل تلقى المعلومات الصحيحة حول رسوم إصدار ترخيص بيع الغاز، وتم التعامل بشكل سريع ومفيد",
+    "adjudication": "تمت المحادثة بنجاح، وتم تزويد العميل بالمعلومات الصحيحة، وتم الحفاظ على مستوى جيد من الأداء والتفاعل"
+  },
+  {
+    "conversation_id": "conv_0201kvsp2vhyfv29123kn4k2k135",
+    "timestamp": 1782346868.624264,
+    "stats": {
+      "avg_m2e_ms": 618.8,
+      "avg_ttft_ms": 928,
+      "p95_m2e_ms": 618.8,
+      "interrupted_count": 2,
+      "total_turns": 5
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لا توجد اتهامات",
+    "defense": "الجواب كان سريعًا ومتوافقًا مع المعايير المطلوبة",
+    "adjudication": "تم الحفاظ على جودة المحادثة وتم الرد على المستخدم بشكل مناسب، مع متوسط زمن استجابة مقبول"
+  },
+  {
+    "conversation_id": "conv_4101kvmwrdkeeb58zkhes59hp8hf",
+    "timestamp": 1782346880.701969,
+    "stats": {
+      "avg_m2e_ms": 349.6,
+      "avg_ttft_ms": 317.4,
+      "p95_m2e_ms": 379.5,
+      "interrupted_count": 1,
+      "total_turns": 13
+    },
+    "score": 1,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "No violations detected.",
+    "defense": "N/A",
+    "adjudication": "The call completed successfully."
+  },
+  {
+    "conversation_id": "conv_8101kvsmbadsfsx9fdhgyv6mkgqs",
+    "timestamp": 1782346880.7348514,
+    "stats": {
+      "avg_m2e_ms": 534.8,
+      "avg_ttft_ms": 483.8,
+      "p95_m2e_ms": 678,
+      "interrupted_count": 1,
+      "total_turns": 13
+    },
+    "score": 1,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "No violations detected.",
+    "defense": "N/A",
+    "adjudication": "The call completed successfully."
+  },
+  {
+    "conversation_id": "conv_3301kvsmhr9rf7qb3w3mzgwg36n1",
+    "timestamp": 1782346880.776945,
+    "stats": {
+      "avg_m2e_ms": 485,
+      "avg_ttft_ms": 457.5,
+      "p95_m2e_ms": 562.5,
+      "interrupted_count": 1,
+      "total_turns": 13
+    },
+    "score": 0.9,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لا توجد اتهامات",
+    "defense": "الوكلاء يبرؤون النظام من أي مخالفات، حيث استجاب الوكيل بسرعة وفعالية لاستفسارات المستخدم",
+    "adjudication": "حكمت المحكمة لصالح النظام، حيث تمت الاستجابة لاستفسارات المستخدم بشكل صحيح وسريع، وتم إرسال المعلومات المطلوبة إلى بريد المستخدم الإلكتروني بنجاح"
+  },
+  {
+    "conversation_id": "conv_8101kvd29td2e8manc7x35rprhkk",
+    "timestamp": 1782346999.691217,
+    "stats": {
+      "avg_m2e_ms": 742.3,
+      "avg_ttft_ms": 731.6,
+      "p95_m2e_ms": 1240.6,
+      "interrupted_count": 4,
+      "total_turns": 15
+    },
+    "score": 0.9,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لا توجد اتهامات",
+    "defense": "الوكيل يدافع عن الجلسة بنجاح، حيث استجاب الوكيل بسرعة وفعالية لاستفسارات المستخدم، وتم تزويد المستخدم بالمعلومات الصحيحة حول رسوم إصدار ترخيص بيع الغاز.",
+    "adjudication": "الмагيستير يجد أن الجلسة قد انتهت بنجاح، حيث تم تلبية احتياجات المستخدم وتم تزويد المستخدم بالمعلومات الصحيحة. ومع ذلك، هناك بعض التأخيرات في الاستجابة، ولكنها لا ت超过 الحد الأقصى المسموح به. وبالتالي، يتم إصدار حكم النجاح."
+  },
+  {
+    "conversation_id": "conv_4101kve4mw8nfhcbnk5m220p4pxr",
+    "timestamp": 1782347013.082564,
+    "stats": {
+      "avg_m2e_ms": 2275.8,
+      "avg_ttft_ms": 1963.7,
+      "p95_m2e_ms": 6011.8,
+      "interrupted_count": 1,
+      "total_turns": 15
+    },
+    "score": 0.8,
+    "root_cause_verdict": "LLM_COMPUTE_WASTAGE",
+    "accusation": "الوكيل يتهم بأن هناك تأخيرات في الاستجابة بسبب تفكير النموذج",
+    "defense": "المدافع يبرر بأن متوسط زمن الاستجابة كان ضمن الحدود المقبولة، ولكن هناك بعض التأخيرات التي حدثت بسبب تفكير النموذج",
+    "adjudication": "الмагيستيريت يجد أن التأخيرات في الاستجابة كانت بسبب تفكير النموذج، ولكنها لم تكن كافية لتعطيل المحادثة، لذلك يمنح درجة 0.8"
+  },
+  {
+    "conversation_id": "conv_5201kvebrxy1fw78n454rtr1ryr1",
+    "timestamp": 1782347028.0601852,
+    "stats": {
+      "avg_m2e_ms": 873.7,
+      "avg_ttft_ms": 829.8,
+      "p95_m2e_ms": 1850.7,
+      "interrupted_count": 2,
+      "total_turns": 31
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لم يتم الكشف عن أي انتهاكات خطيرة خلال الجلسة",
+    "defense": "الوكيل يدفع بأن الجلسة تمت بنجاح، مع استجابة سريعة للعميل وتقديم المعلومات المطلوبة",
+    "adjudication": "بناءً على التحليل، يبدو أن الجلسة تمت بنجاح، مع استجابة سريعة للعميل وتقديم المعلومات المطلوبة. ومع ذلك، هناك بعض الانتقادات مثل حدوث بعض التأخيرات والتعديلات في الاستجابة. ومع ذلك، لا تبرر هذه الانتقادات تغيير الحكم النهائي."
+  },
+  {
+    "conversation_id": "conv_9701kverc827f3rb9st88rptm9f7",
+    "timestamp": 1782347041.0511177,
+    "stats": {
+      "avg_m2e_ms": 428,
+      "avg_ttft_ms": 409.9,
+      "p95_m2e_ms": 488.5,
+      "interrupted_count": 0,
+      "total_turns": 15
+    },
+    "score": 1,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لا توجد اتهامات",
+    "defense": "الوكيل يدافع عن الجلسة بنجاح، حيث استجاب الوكيل بسرعة ودقة للمستخدم، وتم تلبية جميع طلبات المستخدم بشكل صحيح.",
+    "adjudication": "الмагيستير يقرر أن الجلسة قد انتهت بنجاح، حيث تم تلبية جميع معايير الجودة، وتم الحفاظ على سرعة الاستجابة وضمان دقة المعلومات المقدمة للمستخدم."
+  },
+  {
+    "conversation_id": "conv_4901kverq98hfhxsdvdhw618p074",
+    "timestamp": 1782347054.6618938,
+    "stats": {
+      "avg_m2e_ms": 400.1,
+      "avg_ttft_ms": 302.6,
+      "p95_m2e_ms": 546,
+      "interrupted_count": 2,
+      "total_turns": 15
+    },
+    "score": 0.9,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لا توجد اتهامات",
+    "defense": "الوكيل يدافع عن الجلسة بالقول إنها انتهت بنجاح دون أي مخالفات",
+    "adjudication": "الмагيستير يقرر أن الجلسة انتهت بنجاح مع تلبية جميع الشروط المطلوبة، ويتسم الأداء بالجودة العالية مع استجابة سريعة وبدون أي مخالفات مادية أو فنية"
+  },
+  {
+    "conversation_id": "conv_5301kves01rvet5v6bjfbmhzpxf4",
+    "timestamp": 1782347067.630395,
+    "stats": {
+      "avg_m2e_ms": 468,
+      "avg_ttft_ms": 397.8,
+      "p95_m2e_ms": 580.6,
+      "interrupted_count": 2,
+      "total_turns": 21
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لم يكن هناك أي انتهاك واضح للقواعد أو المعايير في المحادثة",
+    "defense": "الوكلاء يدافعون عن الأداء الجيد للوكيل، حيث استجاب بشكل صحيح لاستفسارات المستخدم وprovided المعلومات المطلوبة",
+    "adjudication": "حكمت المحكمة لصالح الوكيل، حيث تمت المحادثة بنجاح دون أي مخالفات كبيرة، وتم تلبية احتياجات المستخدم بشكل كاف"
+  },
+  {
+    "conversation_id": "conv_7401kvev9hxvfvjbk5jhc75efv61",
+    "timestamp": 1782347081.9136386,
+    "stats": {
+      "avg_m2e_ms": 456.1,
+      "avg_ttft_ms": 333.7,
+      "p95_m2e_ms": 636,
+      "interrupted_count": 3,
+      "total_turns": 23
+    },
+    "score": 0.9,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لم يتم الكشف عن أي انتهاكات للقواعد أو الحقائق",
+    "defense": "الوكيل يدافع عن الجلسة بناءً على السجلات والمقاييس المقدمة، حيث تم الرد على جميع استفسارات المستخدم بشكل دقيق وموضوعي",
+    "adjudication": "بناءً على التحليل، تم إجراء الجلسة بشكل ناجح مع استجابات دقيقة ومتوافقة مع قاعدة المعرفة. تم تلبية جميع متطلبات المستخدم، وتم إرسال المعلومات المطلوبة عبر البريد الإلكتروني بنجاح. تم تسجيل بعض التأخيرات الطفيفة في الاستجابة، لكنها لم تكن كافية لتأثير على جودة الجلسة بشكل عام."
+  },
+  {
+    "conversation_id": "conv_8701kvmpqg7yf4sbz4awsj6kjtz6",
+    "timestamp": 1782347094.5779514,
+    "stats": {
+      "avg_m2e_ms": 536.3,
+      "avg_ttft_ms": 465.2,
+      "p95_m2e_ms": 801.0,
+      "interrupted_count": 5,
+      "total_turns": 11
+    },
+    "score": 0.9,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لا توجد اتهامات",
+    "defense": "الجواب الصحيح عن رسوم ترخيص محلات الذهب، وتسجيل بريد المستخدم الإلكتروني بنجاح",
+    "adjudication": "تمت المحادثة بنجاح، واستجاب الوكيل لجميع استفسارات المستخدم بشكل صحيح، وتم تسجيل بريد المستخدم الإلكتروني بنجاح، وتم إرسال نسخة من المحادثة إلى المستخدم"
+  },
+  {
+    "conversation_id": "conv_4801kvmq0an1fwaacrnz39j74nrg",
+    "timestamp": 1782347107.7409797,
+    "stats": {
+      "avg_m2e_ms": 505.4,
+      "avg_ttft_ms": 483.0,
+      "p95_m2e_ms": 605.8,
+      "interrupted_count": 2,
+      "total_turns": 13
+    },
+    "score": 0.9,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لا توجد اتهامات",
+    "defense": "الوكيل يدافع عن الجلسة بالقول إنها انتهت بنجاح دون أي مخالفات",
+    "adjudication": "الмагيستير يقرر أن الجلسة انتهت بنجاح مع جودة عالية، حيث استجاب الوكيل بشكل سريع ودقيق للأسئلة، وتم إرسال نسخة من المحادثة إلى البريد الإلكتروني للمستخدم بنجاح"
+  },
+  {
+    "conversation_id": "conv_2901kvmqqnszf7wt7s501ze1nc68",
+    "timestamp": 1782347121.0586264,
+    "stats": {
+      "avg_m2e_ms": 500.6,
+      "avg_ttft_ms": 381.3,
+      "p95_m2e_ms": 591.5,
+      "interrupted_count": 0,
+      "total_turns": 17
+    },
+    "score": 1.0,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لا توجد اتهامات",
+    "defense": "الوكيل يبرر أن جواب العميل كان سليمًا ودقيقًا، واستجاب لجميع أسئلة المستخدم بشكل صحيح",
+    "adjudication": "الмагيستير يقرر أن الجلسة انتهت بنجاح، حيث استجاب الوكيل لجميع أسئلة المستخدم بشكل دقيق، وتم إرسال التفاصيل المطلوبة إلى البريد الإلكتروني للمستخدم، ولم تكن هناك أي مخالفات في الجلسة"
+  },
+  {
+    "conversation_id": "conv_6101kvmqxn24ea38mjvgg1tnssej",
+    "timestamp": 1782347134.9624867,
+    "stats": {
+      "avg_m2e_ms": 432.6,
+      "avg_ttft_ms": 331.1,
+      "p95_m2e_ms": 625.2,
+      "interrupted_count": 1,
+      "total_turns": 19
+    },
+    "score": 0.9,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لم تكن هناك مخالفات واضحة في المحادثة، ولكن هناك بعض التأخيرات في الاستجابة.",
+    "defense": "الوكلاء يؤكدون أن التأخيرات كانت ضمن الحدود المقبولة، وأن الاستجابات كانت دقيقة ومفيدة.",
+    "adjudication": "المحكمة تقرر أن الجلسة كانت ناجحة بشكل عام، مع بعض التأخيرات التي لم تكن كافية لرفع دعوى ضد الجودة. تم تزويد المستخدم بالمعلومات الصحيحة حول رسوم ومدة إنجاز الخدمة، وتم إرسال التفاصيل إلى بريد المستخدم الإلكتروني بنجاح."
+  },
+  {
+    "conversation_id": "conv_3201kvmtg5xxe41b94yr7g1nedf5",
+    "timestamp": 1782347148.0938873,
+    "stats": {
+      "avg_m2e_ms": 479.9,
+      "avg_ttft_ms": 368.7,
+      "p95_m2e_ms": 603.7,
+      "interrupted_count": 1,
+      "total_turns": 17
+    },
+    "score": 0.9,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لا توجد اتهامات",
+    "defense": "الوكيل يدافع عن الجلسة بنجاح، حيث استجاب الوكيل بسرعة وفعالية لاستفسارات المستخدم، وتم تزويد المستخدم بالمعلومات الصحيحة",
+    "adjudication": "الмагيستير يجد أن الجلسة قد انتهت بنجاح، حيث تم تلبية احتياجات المستخدم وتم تزويد المستخدم بالمعلومات الصحيحة، وتم الحفاظ على سرعة الاستجابة دون انقطاع كبير"
+  },
+  {
+    "conversation_id": "conv_7101kvmtmy4ne5ctdvsb13844mk5",
+    "timestamp": 1782347161.6648908,
+    "stats": {
+      "avg_m2e_ms": 418.5,
+      "avg_ttft_ms": 319.4,
+      "p95_m2e_ms": 549.0,
+      "interrupted_count": 1,
+      "total_turns": 17
+    },
+    "score": 0.9,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لا توجد اتهامات",
+    "defense": "الوكيل يدافع عن الجلسة بنجاح، حيث استجاب الوكيل بسرعة ودقة للمستخدم، وتم تلبية جميع طلبات المستخدم",
+    "adjudication": "الجلسة انتهت بنجاح، حيث تم تلبية جميع طلبات المستخدم، وتم إرسال التفاصيل إلى بريد المستخدم الإلكتروني. تم تحقيق جميع معايير الجودة، وتم الحفاظ على سرعة الاستجابة وضمان دقة المعلومات"
+  },
+  {
+    "conversation_id": "conv_8401kvmvgcwbeq58z3zhbtsyfa3v",
+    "timestamp": 1782347174.6427817,
+    "stats": {
+      "avg_m2e_ms": 379.6,
+      "avg_ttft_ms": 405.7,
+      "p95_m2e_ms": 388.4,
+      "interrupted_count": 0,
+      "total_turns": 13
+    },
+    "score": 1.0,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لا توجد اتهامات",
+    "defense": "تم الرد على استفسارات المستخدم بشكل صحيح وتم إرسال المحادثة إلى البريد الإلكتروني الخاص به",
+    "adjudication": "تمت المحادثة بنجاح دون أي مخالفات أو انحرافات عن المعايير المطلوبة، وتم الالتزام بالشخصية المطلوبة كمركز خدمات الإدارة العامة للدفاع المدني"
+  },
+  {
+    "conversation_id": "conv_7001kvmvkad6f94tbcxqt7t699gq",
+    "timestamp": 1782347187.6699946,
+    "stats": {
+      "avg_m2e_ms": 357.2,
+      "avg_ttft_ms": 358.7,
+      "p95_m2e_ms": 387.1,
+      "interrupted_count": 1,
+      "total_turns": 13
+    },
+    "score": 0.9,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لم يتم الكشف عن أي انتهاكات للقواعد أو المعايير المحددة",
+    "defense": "استجابات الوكيل كانت سريعة ومدروسة، وتم تزويد المستخدم بالمعلومات الصحيحة حول رسوم ترخيص محلات الذهب",
+    "adjudication": "تم تقييم الجلسة بشكل إيجابي، حيث استوفى الوكيل جميع المتطلبات المحددة في القواعد، وتم تزويد المستخدم بنسخة من المحادثة عبر البريد الإلكتروني. ومع ذلك، تم تسجيل تأخيرات طفيفة في الاستجابة، ولكنها لم تتجاوز الحدود المسموح بها."
+  },
+  {
+    "conversation_id": "conv_2301kvmvky7meveakd6ncxynmzse",
+    "timestamp": 1782347191.751041,
+    "stats": {
+      "avg_m2e_ms": 459.8,
+      "avg_ttft_ms": 375.6,
+      "p95_m2e_ms": 528.0,
+      "interrupted_count": 1,
+      "total_turns": 15
+    },
+    "score": 1.0,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "No violations detected.",
+    "defense": "N/A",
+    "adjudication": "The call completed successfully."
+  },
+  {
+    "conversation_id": "conv_3601kvmvrrksezhrksf3vny59chn",
+    "timestamp": 1782347367.0265753,
+    "stats": {
+      "avg_m2e_ms": 453.7,
+      "avg_ttft_ms": 405.0,
+      "p95_m2e_ms": 615.8,
+      "interrupted_count": 2,
+      "total_turns": 13
+    },
+    "score": 1.0,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "No violations detected.",
+    "defense": "N/A",
+    "adjudication": "The call completed successfully."
+  },
+  {
+    "conversation_id": "conv_7001kvmvsn2wfv8adfqb1h1sfpcz",
+    "timestamp": 1782347372.8609765,
+    "stats": {
+      "avg_m2e_ms": 335.9,
+      "avg_ttft_ms": 354.0,
+      "p95_m2e_ms": 454.2,
+      "interrupted_count": 0,
+      "total_turns": 13
+    },
+    "score": 1.0,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "No violations detected.",
+    "defense": "N/A",
+    "adjudication": "The call completed successfully."
+  },
+  {
+    "conversation_id": "conv_0001kvmvxczteg7vbwdt5sejrqgq",
+    "timestamp": 1782347378.7777793,
+    "stats": {
+      "avg_m2e_ms": 444.2,
+      "avg_ttft_ms": 375.0,
+      "p95_m2e_ms": 598.9,
+      "interrupted_count": 2,
+      "total_turns": 19
+    },
+    "score": 1.0,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "No violations detected.",
+    "defense": "N/A",
+    "adjudication": "The call completed successfully."
+  },
+  {
+    "conversation_id": "conv_4501kvmwfgyrfb7aqp29zaxhhx7j",
+    "timestamp": 1782347385.0333507,
+    "stats": {
+      "avg_m2e_ms": 397.4,
+      "avg_ttft_ms": 405.1,
+      "p95_m2e_ms": 496.7,
+      "interrupted_count": 3,
+      "total_turns": 13
+    },
+    "score": 1.0,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "No violations detected.",
+    "defense": "N/A",
+    "adjudication": "The call completed successfully."
+  }
+]

@@ -86,9 +86,6 @@ def run_evaluation(conversation_id):
     # Load knowledge base documents to ground the evaluation
     knowledge_text = ""
     knowledge_dir = os.path.join(os.path.dirname(__file__), 'knowledge')
-    if not os.path.exists(knowledge_dir):
-        # Fallback to standalone/knowledge
-        knowledge_dir = os.path.join(os.path.dirname(__file__), 'standalone', 'knowledge')
         
     personal_path = os.path.join(knowledge_dir, 'personal.txt')
     services_path = os.path.join(knowledge_dir, 'services.txt')
