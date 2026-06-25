@@ -26,6 +26,23 @@
             --color-excellent: #30d158; /* Cyan/Teal (100% KPI) */
             --color-acceptable: #8e8e93; /* Muted Slate (50% KPI) */
             --color-poor: #ff9f0a; /* Warm Amber (0% KPI) */
+            --color-error: #ff453a;
+            
+            /* Translucent semantic backgrounds */
+            --success-bg-trans: rgba(48, 209, 88, 0.15);
+            --poor-bg-trans: rgba(255, 159, 10, 0.15);
+            --acceptable-bg-trans: rgba(142, 142, 147, 0.15);
+            --error-bg-trans: rgba(255, 69, 58, 0.15);
+            
+            /* Light transparent backgrounds for tray boxes */
+            --success-bg-trans-light: rgba(48, 209, 88, 0.05);
+            --poor-bg-trans-light: rgba(255, 159, 10, 0.05);
+            
+            /* KPI card icons backgrounds */
+            --excellent-icon-bg: rgba(48, 209, 88, 0.1);
+            --acceptable-icon-bg: rgba(142, 142, 147, 0.1);
+            --poor-icon-bg: rgba(255, 159, 10, 0.1);
+            --blue-icon-bg: rgba(0, 191, 255, 0.1);
             
             --color-blue: #00bfff;
             --blue-bg: rgba(0, 191, 255, 0.1);
@@ -37,40 +54,67 @@
             /* Shadows */
             --card-shadow: none;
             --card-shadow-hover: none;
+            --tray-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
             
             /* Tab Active */
             --active-tab-bg: rgba(48, 209, 88, 0.08);
             --active-tab-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
             
             --transition-apple: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            
+            /* Theme-adaptive scrollbar variables */
+            --scrollbar-thumb: rgba(255, 255, 255, 0.12);
+            --scrollbar-thumb-hover: rgba(255, 255, 255, 0.24);
         }
 
         :root.light-theme {
-            --bg-color: #f5f5f7;
+            --bg-color: #f6f6f9;
             --surface-color: #ffffff;
-            --surface-hover: #f2f2f7;
-            --border-color: rgba(0, 0, 0, 0.065);
-            --text-primary: #1d1d1f;
-            --text-secondary: #6e6e73;
+            --surface-hover: #f0f1f5;
+            --border-color: rgba(9, 30, 66, 0.08);
+            --text-primary: #172b4d;
+            --text-secondary: #5e6c84;
             
-            --color-excellent: #24b248; /* Slightly darker green for light mode contrast */
-            --color-acceptable: #86868b;
-            --color-poor: #e07b00; /* Darker amber for light mode contrast */
+            --color-excellent: #15803d; /* Darker green (WCAG AA accessible) */
+            --color-acceptable: #64748b; /* Slate grey */
+            --color-poor: #b45309; /* Deep warm amber (WCAG AA accessible) */
+            --color-error: #b91c1c; /* Crimson red */
             
-            --color-blue: #0071e3;
-            --blue-bg: rgba(0, 113, 227, 0.08);
-            --surface-secondary: #e5e5ea;
-            --card-glow-1: rgba(36, 178, 72, 0.04);
-            --card-glow-2: rgba(224, 123, 0, 0.03);
-            --nav-bg: rgba(255, 255, 255, 0.8);
+            /* Translucent semantic backgrounds */
+            --success-bg-trans: rgba(21, 128, 61, 0.08);
+            --poor-bg-trans: rgba(180, 83, 9, 0.08);
+            --acceptable-bg-trans: rgba(100, 116, 139, 0.08);
+            --error-bg-trans: rgba(185, 28, 28, 0.08);
+            
+            /* Light transparent backgrounds for tray boxes */
+            --success-bg-trans-light: rgba(21, 128, 61, 0.03);
+            --poor-bg-trans-light: rgba(180, 83, 9, 0.03);
+            
+            /* KPI card icons backgrounds */
+            --excellent-icon-bg: rgba(21, 128, 61, 0.08);
+            --acceptable-icon-bg: rgba(100, 116, 139, 0.08);
+            --poor-icon-bg: rgba(180, 83, 9, 0.08);
+            --blue-icon-bg: rgba(9, 105, 218, 0.08);
+            
+            --color-blue: #0969da; /* Accessible brand blue */
+            --blue-bg: rgba(9, 105, 218, 0.08);
+            --surface-secondary: #f2f2f7;
+            --card-glow-1: rgba(9, 105, 218, 0.03);
+            --card-glow-2: rgba(139, 92, 246, 0.02);
+            --nav-bg: rgba(255, 255, 255, 0.75);
             
             /* Shadows override */
-            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.015), 0 1px 3px rgba(0, 0, 0, 0.02);
-            --card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.04), 0 2px 6px rgba(0, 0, 0, 0.02);
+            --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+            --card-shadow-hover: 0 12px 28px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.03);
+            --tray-shadow: -10px 0 30px rgba(0, 0, 0, 0.05);
             
             /* Tab active override */
-            --active-tab-bg: rgba(36, 178, 72, 0.06);
-            --active-tab-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+            --active-tab-bg: #ffffff;
+            --active-tab-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+            
+            /* Theme-adaptive scrollbar variables */
+            --scrollbar-thumb: rgba(0, 0, 0, 0.12);
+            --scrollbar-thumb-hover: rgba(0, 0, 0, 0.24);
         }
 
         * {
@@ -78,6 +122,25 @@
             margin: 0;
             padding: 0;
             font-family: 'Cairo', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        /* Custom scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--scrollbar-thumb-hover);
         }
 
         body {
@@ -145,7 +208,7 @@
         }
 
         .nav-logo .badge {
-            background: rgba(48, 209, 88, 0.15);
+            background: var(--success-bg-trans);
             color: var(--color-excellent);
             font-size: 0.75rem;
             padding: 2px 8px;
@@ -235,12 +298,12 @@
         }
 
         .telemetry-detail-badge.success {
-            background: rgba(48, 209, 88, 0.15);
+            background: var(--success-bg-trans);
             color: var(--color-excellent);
         }
 
         .telemetry-detail-badge.failure {
-            background: rgba(255, 159, 10, 0.15);
+            background: var(--poor-bg-trans);
             color: var(--color-poor);
         }
 
@@ -267,8 +330,23 @@
         .kpi-card:hover {
             background-color: var(--surface-hover);
             transform: translateY(-2px);
-            border-color: var(--color-blue);
             box-shadow: var(--card-shadow-hover);
+        }
+
+        .kpi-card.telemetry:hover {
+            border-color: var(--color-blue);
+        }
+
+        .kpi-card.excellent:hover {
+            border-color: var(--color-excellent);
+        }
+
+        .kpi-card.acceptable:hover {
+            border-color: var(--color-acceptable);
+        }
+
+        .kpi-card.poor:hover {
+            border-color: var(--color-poor);
         }
 
         .kpi-card-header {
@@ -296,17 +374,17 @@
         }
 
         .kpi-card.excellent .kpi-card-icon {
-            background: rgba(48, 209, 88, 0.1);
+            background: var(--excellent-icon-bg);
             color: var(--color-excellent);
         }
 
         .kpi-card.acceptable .kpi-card-icon {
-            background: rgba(142, 142, 147, 0.1);
+            background: var(--acceptable-icon-bg);
             color: var(--color-acceptable);
         }
 
         .kpi-card.poor .kpi-card-icon {
-            background: rgba(255, 159, 10, 0.1);
+            background: var(--poor-icon-bg);
             color: var(--color-poor);
         }
 
@@ -512,12 +590,12 @@
 
         td {
             padding: 14px 16px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid var(--border-color);
             color: var(--text-primary);
         }
 
         tr:hover td {
-            background-color: rgba(255, 255, 255, 0.015);
+            background-color: var(--surface-hover);
         }
 
         .badge-status {
@@ -530,17 +608,17 @@
         }
 
         .badge-status.excellent {
-            background: rgba(48, 209, 88, 0.12);
+            background: var(--success-bg-trans);
             color: var(--color-excellent);
         }
 
         .badge-status.acceptable {
-            background: rgba(142, 142, 147, 0.12);
+            background: var(--acceptable-bg-trans);
             color: var(--color-acceptable);
         }
 
         .badge-status.poor {
-            background: rgba(255, 159, 10, 0.12);
+            background: var(--poor-bg-trans);
             color: var(--color-poor);
         }
 
@@ -555,7 +633,7 @@
             border-left: 1px solid var(--border-color);
             z-index: 1000;
             transition: var(--transition-apple);
-            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+            box-shadow: var(--tray-shadow);
             display: flex;
             flex-direction: column;
             padding: 30px;
@@ -670,15 +748,16 @@
             transition: var(--transition-apple);
         }
 
-        .tab-btn:hover {
+        .tab-btn:not(.active):hover {
             color: var(--text-primary);
             background: var(--surface-hover);
         }
 
         .tab-btn.active {
-            color: #30d158; /* Excellent color theme */
-            background: rgba(48, 209, 88, 0.08);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+            color: var(--color-excellent);
+            background: var(--active-tab-bg);
+            box-shadow: var(--active-tab-shadow);
+            cursor: default;
         }
 
         .dashboard-section {
@@ -722,10 +801,58 @@
 
         .verdict-bar-bg {
             height: 12px;
-            background-color: rgba(255, 255, 255, 0.03);
+            background-color: var(--surface-secondary);
             border-radius: 6px;
             overflow: hidden;
             position: relative;
+        }
+
+        /* Theme toggle button styling */
+        .theme-btn {
+            background: var(--surface-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-apple);
+        }
+
+        .theme-btn:hover {
+            background: var(--surface-hover);
+            transform: scale(1.05);
+        }
+
+        /* Drawer Details Boxes */
+        .tray-box {
+            font-size: 0.8rem;
+            padding: 10px;
+            border-radius: 8px;
+            line-height: 1.5;
+        }
+
+        .tray-box.accusation {
+            background: var(--poor-bg-trans-light);
+            border: 1px dashed var(--poor-bg-trans);
+            color: var(--color-poor);
+        }
+
+        .tray-box.defense {
+            background: var(--success-bg-trans-light);
+            border: 1px dashed var(--success-bg-trans);
+            color: var(--color-excellent);
+        }
+
+        .tray-box.adjudication {
+            background: var(--surface-secondary);
+            border: 1px solid var(--border-color);
+            font-style: italic;
+            color: var(--text-primary);
         }
 
         .verdict-bar-fill {
@@ -745,7 +872,7 @@
             <span class="badge">الإدارة العامة للدفاع المدني</span>
         </div>
         <div style="display: flex; align-items: center; gap: 16px;">
-            <button id="theme-toggle" class="theme-btn" onclick="toggleTheme()" style="background: var(--surface-secondary); border: 1px solid var(--border-color); color: var(--text-primary); cursor: pointer; width: 36px; height: 36px; border-radius: 50%; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: var(--transition-apple);" title="تغيير المظهر">
+            <button id="theme-toggle" class="theme-btn" onclick="toggleTheme()" title="تغيير المظهر">
                 <span id="theme-icon">☀️</span>
             </button>
             <div class="nav-sync">
@@ -1189,7 +1316,7 @@
                 const hasTtft = telemetryStats.avgTtft > 0;
                 document.getElementById('val-system-ttft').innerText = hasTtft ? telemetryStats.avgTtft : "N/A";
                 const ttftDesc = hasTtft ? (telemetryStats.avgTtft < 300 ? 'سريع جداً' : (telemetryStats.avgTtft < 600 ? 'مقبول' : (telemetryStats.avgTtft < 800 ? 'طبيعي' : 'بطيء جداً'))) : 'غير متوفر';
-                const ttftColor = hasTtft ? (telemetryStats.avgTtft < 300 ? 'var(--color-excellent)' : (telemetryStats.avgTtft < 600 ? 'var(--color-blue)' : (telemetryStats.avgTtft < 800 ? 'var(--color-poor)' : '#ff453a'))) : 'var(--text-secondary)';
+                const ttftColor = hasTtft ? (telemetryStats.avgTtft < 300 ? 'var(--color-excellent)' : (telemetryStats.avgTtft < 600 ? 'var(--color-blue)' : (telemetryStats.avgTtft < 800 ? 'var(--color-poor)' : 'var(--color-error)'))) : 'var(--text-secondary)';
                 const ttftDescEl = document.getElementById('val-system-ttft-desc');
                 ttftDescEl.innerText = ttftDesc;
                 ttftDescEl.style.color = ttftColor;
@@ -1226,7 +1353,7 @@
                 document.getElementById('percent-system-score').innerText = `${avgScore.toFixed(1)}%`;
                 document.getElementById('bullet-system-score').style.width = `${avgScore}%`;
                 document.getElementById('val-system-score-desc').innerText = avgScore >= 85 ? 'مستقر' : 'تراجع بالأداء';
-                document.getElementById('val-system-score-desc').style.color = avgScore >= 85 ? 'var(--color-excellent)' : '#ff9f0a';
+                document.getElementById('val-system-score-desc').style.color = avgScore >= 85 ? 'var(--color-excellent)' : 'var(--color-poor)';
             }
         }
 
@@ -1344,7 +1471,7 @@
                 line.setAttribute("y1", y);
                 line.setAttribute("x2", width - padding);
                 line.setAttribute("y2", y);
-                line.setAttribute("stroke", "rgba(255, 255, 255, 0.05)");
+                line.setAttribute("stroke", "var(--border-color)");
                 line.setAttribute("stroke-width", "1");
                 canvas.appendChild(line);
 
@@ -1593,19 +1720,19 @@
                         </div>
                         <div class="tray-meta-item">
                             <span class="tray-meta-label">اتهام المدعي (Interrogator)</span>
-                            <div style="font-size: 0.8rem; background: rgba(255,159,10,0.05); border: 1px dashed rgba(255,159,10,0.2); padding: 8px; border-radius: 6px; color: #ff9f0a;">
+                            <div class="tray-box accusation">
                                 ${tel.accusation}
                             </div>
                         </div>
                         <div class="tray-meta-item">
                             <span class="tray-meta-label">دفاع المساعد (Advocate)</span>
-                            <div style="font-size: 0.8rem; background: rgba(48,209,88,0.05); border: 1px dashed rgba(48,209,88,0.2); padding: 8px; border-radius: 6px; color: var(--color-excellent);">
+                            <div class="tray-box defense">
                                 ${tel.defense}
                             </div>
                         </div>
                         <div class="tray-meta-item">
                             <span class="tray-meta-label">حكم قاضي المحكمة (Magistrate)</span>
-                            <div style="font-size: 0.8rem; background: var(--surface-secondary); border: 1px solid var(--border-color); padding: 8px; border-radius: 6px; font-style: italic;">
+                            <div class="tray-box adjudication">
                                 "${tel.adjudication}"
                             </div>
                         </div>
