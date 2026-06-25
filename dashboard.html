@@ -1242,7 +1242,7 @@
                 const data = await response.json();
                 kpiDataGlobal = data;
                 
-                updateMetrics(data.stats, data.telemetryStats);
+                updateMetrics(data.stats, data.telemetryStats, data.config);
                 drawSparklines(data.recentCalls);
                 drawTrendSpline(data.trend);
                 drawVerdictDistribution(data.telemetryStats);
@@ -1280,7 +1280,7 @@
             }
         }
 
-        function updateMetrics(stats, telemetryStats) {
+        function updateMetrics(stats, telemetryStats, config) {
             // User Percent values
             document.getElementById('val-excellent').innerText = stats.excellentRate.toFixed(1);
             document.getElementById('val-acceptable').innerText = stats.acceptableRate.toFixed(1);
@@ -1313,7 +1313,7 @@
                 document.getElementById('bullet-system-m2e').style.width = `${m2ePercent}%`;
 
                 // TTFT Card
-                const defaultTtftMs = (data.config && data.config.defaultTtftMs) ? data.config.defaultTtftMs : 663;
+                const defaultTtftMs = (config && config.defaultTtftMs) ? config.defaultTtftMs : 663;
                 const targetLabelEl = document.getElementById('lbl-system-ttft-target');
                 if (targetLabelEl) {
                     targetLabelEl.innerText = `المستهدف: < ${defaultTtftMs}ms`;
