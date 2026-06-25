@@ -952,12 +952,12 @@
                     </div>
                     <div class="bullet-container">
                         <div class="bullet-label-row">
-                            <span>المستهدف: &lt; 300ms</span>
+                            <span id="lbl-system-ttft-target">المستهدف: &lt; 300ms</span>
                             <span id="percent-system-ttft">0%</span>
                         </div>
                         <div class="bullet-bar-bg">
                             <div class="bullet-bar-fill" id="bullet-system-ttft" style="background-color: var(--color-excellent);"></div>
-                            <div class="bullet-target-marker" style="left: 50%;"></div>
+                            <div class="bullet-target-marker" id="marker-system-ttft-target" style="left: 50%;"></div>
                         </div>
                     </div>
                     <div class="kpi-card-sparkline">
@@ -1313,14 +1313,29 @@
                 document.getElementById('bullet-system-m2e').style.width = `${m2ePercent}%`;
 
                 // TTFT Card
+                const defaultTtftMs = (data.config && data.config.defaultTtftMs) ? data.config.defaultTtftMs : 663;
+                const targetLabelEl = document.getElementById('lbl-system-ttft-target');
+                if (targetLabelEl) {
+                    targetLabelEl.innerText = `المستهدف: < ${defaultTtftMs}ms`;
+                }
+
+                const excellentThreshold = defaultTtftMs;
+                const acceptableThreshold = Math.round(defaultTtftMs * 1.2);
+                const poorThreshold = Math.round(defaultTtftMs * 1.5);
+
+                const targetMarker = document.getElementById('marker-system-ttft-target');
+                if (targetMarker) {
+                    targetMarker.style.left = `${Math.round((defaultTtftMs / poorThreshold) * 100)}%`;
+                }
+
                 const hasTtft = telemetryStats.avgTtft > 0;
                 document.getElementById('val-system-ttft').innerText = hasTtft ? telemetryStats.avgTtft : "N/A";
-                const ttftDesc = hasTtft ? (telemetryStats.avgTtft < 300 ? 'سريع جداً' : (telemetryStats.avgTtft < 600 ? 'مقبول' : (telemetryStats.avgTtft < 800 ? 'طبيعي' : 'بطيء جداً'))) : 'غير متوفر';
-                const ttftColor = hasTtft ? (telemetryStats.avgTtft < 300 ? 'var(--color-excellent)' : (telemetryStats.avgTtft < 600 ? 'var(--color-blue)' : (telemetryStats.avgTtft < 800 ? 'var(--color-poor)' : 'var(--color-error)'))) : 'var(--text-secondary)';
+                const ttftDesc = hasTtft ? (telemetryStats.avgTtft < excellentThreshold ? 'سريع جداً' : (telemetryStats.avgTtft < acceptableThreshold ? 'مقبول' : (telemetryStats.avgTtft < poorThreshold ? 'طبيعي' : 'بطيء جداً'))) : 'غير متوفر';
+                const ttftColor = hasTtft ? (telemetryStats.avgTtft < excellentThreshold ? 'var(--color-excellent)' : (telemetryStats.avgTtft < acceptableThreshold ? 'var(--color-blue)' : (telemetryStats.avgTtft < poorThreshold ? 'var(--color-poor)' : 'var(--color-error)'))) : 'var(--text-secondary)';
                 const ttftDescEl = document.getElementById('val-system-ttft-desc');
                 ttftDescEl.innerText = ttftDesc;
                 ttftDescEl.style.color = ttftColor;
-                const ttftPercent = hasTtft ? Math.max(0, Math.min(100, Math.round((telemetryStats.avgTtft / 1000) * 100))) : 0;
+                const ttftPercent = hasTtft ? Math.max(0, Math.min(100, Math.round((telemetryStats.avgTtft / poorThreshold) * 100))) : 0;
                 document.getElementById('percent-system-ttft').innerText = hasTtft ? `${telemetryStats.avgTtft}ms` : "N/A";
                 const bulletTtft = document.getElementById('bullet-system-ttft');
                 bulletTtft.style.width = `${ttftPercent}%`;

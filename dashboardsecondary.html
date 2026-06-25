@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>تحليلات الذكاء الاصطناعي - الدفاع المدني</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script>
+        // Tailwind configuration mirroring the frontend-ui-dark-ts skill tokens
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Segoe UI', 'Cairo', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            DEFAULT: '#8251EE',
+                            hover: '#9366F5',
+                            light: '#A37EF5',
+                            subtle: 'rgba(130, 81, 238, 0.15)',
+                        },
+                        neutral: {
+                            bg1: 'hsl(240, 6%, 10%)',
+                            bg2: 'hsl(240, 5%, 12%)',
+                            bg3: 'hsl(240, 5%, 14%)',
+                            bg4: 'hsl(240, 4%, 18%)',
+                            bg5: 'hsl(240, 4%, 22%)',
+                            bg6: 'hsl(240, 4%, 26%)',
+                        },
+                        text: {
+                            primary: '#FFFFFF',
+                            secondary: '#A1A1AA',
+                            muted: '#71717A',
+                        },
+                        border: {
+                            subtle: 'hsla(0, 0%, 100%, 0.08)',
+                            DEFAULT: 'hsla(0, 0%, 100%, 0.12)',
+                            strong: 'hsla(0, 0%, 100%, 0.20)',
+                        },
+                        status: {
+                            success: '#10B981',
+                            warning: '#F59E0B',
+                            error: '#EF4444',
+                            info: '#3B82F6',
+                        }
+                    },
+                    borderRadius: {
+                        DEFAULT: '0.5rem',
+                        lg: '0.75rem',
+                        xl: '1rem',
+                    },
+                    boxShadow: {
+                        glow: '0 0 20px rgba(130, 81, 238, 0.3)',
+                        'glow-lg': '0 0 40px rgba(130, 81, 238, 0.4)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Base styles with premium aura glow and custom scrollbar */
+        body {
+            background-color: hsl(240, 6%, 10%);
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(130, 81, 238, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 85% 80%, rgba(16, 185, 129, 0.04) 0%, transparent 45%);
+            background-attachment: fixed;
+            color: #FFFFFF;
+            font-family: 'Segoe UI', 'Cairo', sans-serif;
+            min-height: 100vh;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: hsl(240, 5%, 12%);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: hsl(240, 4%, 22%);
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: hsl(240, 4%, 26%);
+        }
+
+        /* Glassmorphism effects */
+        .glass {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-card {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 0.75rem;
+        }
+        .glass-panel {
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            background: rgba(0, 0, 0, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .glass-overlay {
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            background: rgba(0, 0, 0, 0.6);
+        }
+        .glass-input {
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Theme-aware spring scale hover styles */
+        .spring-scale-brand {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .spring-scale-brand:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(130, 81, 238, 0.25);
+            border-color: rgba(130, 81, 238, 0.4);
+        }
+        .spring-scale-brand:active {
+            transform: scale(0.98);
+        }
+
+        .spring-scale-success {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .spring-scale-success:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.25);
+            border-color: rgba(16, 185, 129, 0.4);
+        }
+        .spring-scale-success:active {
+            transform: scale(0.98);
+        }
+
+        .spring-scale-info {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .spring-scale-info:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.25);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+        .spring-scale-info:active {
+            transform: scale(0.98);
+        }
+
+        .spring-scale-warning {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .spring-scale-warning:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.25);
+            border-color: rgba(245, 158, 11, 0.4);
+        }
+        .spring-scale-warning:active {
+            transform: scale(0.98);
+        }
+
+        .spring-scale-error {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .spring-scale-error:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.25);
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+        .spring-scale-error:active {
+            transform: scale(0.98);
+        }
+
+        /* Slide-over Tray animations */
+        .tray-transition {
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+    </style>
+</head>
+<body class="h-full overflow-hidden">
+    <!-- App Shell (RTL AppShell Layout) -->
+    <div class="flex h-full w-full overflow-hidden">
+        
+        <!-- Sidebar (Representing Sidebar.tsx / glass-panel) -->
+        <aside class="glass-panel w-72 hidden md:flex flex-col h-full border-l border-white/5 p-5 shrink-0 z-30">
+            <!-- Sidebar Header -->
+            <div class="flex items-center gap-3 pb-6 border-b border-white/5">
+                <div class="w-10 h-10 rounded-lg bg-brand flex items-center justify-center shadow-glow shrink-0">
+                    <span class="text-white text-xl font-bold">🚒</span>
+                </div>
+                <div class="overflow-hidden">
+                    <h1 class="text-sm font-semibold text-white truncate">نظام الدفاع المدني الذكي</h1>
+                    <span class="text-xs text-brand truncate block">المساعد الصوتي AI</span>
+                </div>
+            </div>
+
+            <!-- Sidebar Navigation Links -->
+            <nav class="flex-1 space-y-2 mt-6">
+                <a href="/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-lg text-text-secondary hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <span class="text-lg">📊</span>
+                    <span>لوحة أداء النظام (الرئيسية)</span>
+                </a>
+                <a href="/dashboardsecondary" class="flex items-center gap-3 px-4 py-3 rounded-lg text-white bg-brand/10 border border-brand/20 transition-all text-sm font-medium shadow-glow">
+                    <span class="text-lg">⚡</span>
+                    <span>تحليلات المحاكاة والتلفزة</span>
+                </a>
+            </nav>
+
+            <!-- Sidebar Footer -->
+            <div class="pt-4 border-t border-white/5 flex flex-col gap-2">
+                <div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-white/5">
+                    <div class="w-2 h-2 rounded-full bg-status-success animate-pulse shadow-[0_0_8px_#10B981]"></div>
+                    <span class="text-xs text-text-secondary">الاتصال بالخادم نشط</span>
+                </div>
+                <div class="text-[10px] text-text-muted text-center">الإصدار v2.4.0 (Dark Glass)</div>
+            </div>
+        </aside>
+
+        <!-- Main Dashboard Container -->
+        <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+            
+            <!-- Top Header (PageHeader.tsx) -->
+            <header class="h-16 border-b border-white/5 flex items-center justify-between px-6 z-20 bg-neutral-bg1/80 backdrop-blur-md">
+                <div class="flex items-center gap-3">
+                    <button class="md:hidden text-2xl" onclick="toggleMobileSidebar(true)">☰</button>
+                    <div>
+                        <h2 class="text-base font-semibold text-white">لوحة التحليلات المتقدمة للذكاء الاصطناعي</h2>
+                        <p class="text-xs text-text-secondary hidden sm:block">سحب وإدارة مؤشرات الأداء الخاصة بالمكالمات الصوتية والمحاكاة</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <div class="text-xs text-text-secondary bg-neutral-bg3 px-3 py-1.5 rounded-lg border border-white/5 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-brand animate-ping"></span>
+                        <span id="sync-time">مزامنة البيانات...</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content Area (Scrollable body) -->
+            <div class="flex-1 overflow-y-auto p-6 space-y-6">
+                
+                <!-- Tab Navigation Bar -->
+                <div class="flex bg-neutral-bg3 border border-white/5 p-1 rounded-xl gap-1 w-fit mb-2">
+                    <button class="tab-btn px-5 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 bg-brand/10 text-white border border-brand/20 shadow-glow" id="btn-tab-system" onclick="switchTab('system')">
+                        <span>⚡</span>
+                        <span>لوحة أداء النظام (System KPIs)</span>
+                    </button>
+                    <button class="tab-btn px-5 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 text-text-secondary hover:text-white hover:bg-white/5" id="btn-tab-user" onclick="switchTab('user')">
+                        <span>👥</span>
+                        <span>لوحة أداء المستخدمين (User KPIs)</span>
+                    </button>
+                </div>
+
+                <!-- Tab 1: System KPI Dashboard Section -->
+                <div id="section-system" class="dashboard-section space-y-6">
+                    <!-- KPI Cards Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                        
+                        <!-- KPI 1: Sentiment Success Rate -->
+                        <div class="glass-card spring-scale-brand p-5 flex flex-col gap-3 cursor-pointer relative overflow-hidden">
+                            <!-- Top glow line -->
+                            <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-brand to-transparent"></div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-semibold text-text-secondary tracking-wider">معدل نجاح المكالمات</span>
+                                <span class="text-lg bg-brand/10 text-brand w-8 h-8 rounded-lg flex items-center justify-center">🎯</span>
+                            </div>
+                            <div class="flex items-baseline gap-2">
+                                <span class="text-3xl font-mono font-bold" id="kpi-success-rate">0.0</span>
+                                <span class="text-sm text-text-secondary font-medium">%</span>
+                            </div>
+                            <div class="w-full bg-neutral-bg4 h-1 rounded-full overflow-hidden">
+                                <div class="h-full bg-brand rounded-full transition-all duration-1000" id="bar-success-rate" style="width: 0%"></div>
+                            </div>
+                            <div class="h-8 w-full mt-1">
+                                <svg id="sparkline-system-success" class="w-full h-full overflow-visible"></svg>
+                            </div>
+                        </div>
+
+                        <!-- KPI 2: Average TTFT Delay -->
+                        <div class="glass-card spring-scale-success p-5 flex flex-col gap-3 cursor-pointer relative overflow-hidden">
+                            <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-status-success to-transparent"></div>
+                            <div class="flex justify-between items-center">
+                                <div class="flex flex-col">
+                                    <span class="text-xs font-semibold text-text-secondary tracking-wider">سرعة الاستجابة الأولى (TTFT)</span>
+                                    <span class="text-[10px] text-text-secondary mt-0.5" id="kpi-ttft-target">المستهدف: --ms</span>
+                                </div>
+                                <span class="text-lg bg-status-success/10 text-status-success w-8 h-8 rounded-lg flex items-center justify-center">⏱️</span>
+                            </div>
+                            <div class="flex items-baseline gap-2">
+                                <span class="text-3xl font-mono font-bold" id="kpi-ttft">0</span>
+                                <span class="text-sm text-text-secondary font-medium">ms</span>
+                            </div>
+                            <div class="w-full bg-neutral-bg4 h-1 rounded-full overflow-hidden">
+                                <div class="h-full bg-status-success rounded-full transition-all duration-1000" id="bar-ttft" style="width: 0%"></div>
+                            </div>
+                            <div class="h-8 w-full mt-1">
+                                <svg id="sparkline-system-ttft" class="w-full h-full overflow-visible"></svg>
+                            </div>
+                        </div>
+
+                        <!-- KPI 3: Average M2E Latency -->
+                        <div class="glass-card spring-scale-info p-5 flex flex-col gap-3 cursor-pointer relative overflow-hidden">
+                            <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-status-info to-transparent"></div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-semibold text-text-secondary tracking-wider">زمن الاستجابة للنهاية (M2E)</span>
+                                <span class="text-lg bg-status-info/10 text-status-info w-8 h-8 rounded-lg flex items-center justify-center">⚡</span>
+                            </div>
+                            <div class="flex items-baseline gap-2">
+                                <span class="text-3xl font-mono font-bold" id="kpi-m2e">0</span>
+                                <span class="text-sm text-text-secondary font-medium">ms</span>
+                            </div>
+                            <div class="w-full bg-neutral-bg4 h-1 rounded-full overflow-hidden">
+                                <div class="h-full bg-status-info rounded-full transition-all duration-1000" id="bar-m2e" style="width: 0%"></div>
+                            </div>
+                            <div class="h-8 w-full mt-1">
+                                <svg id="sparkline-system-m2e" class="w-full h-full overflow-visible"></svg>
+                            </div>
+                        </div>
+
+                        <!-- KPI 4: Adversarial Score -->
+                        <div class="glass-card spring-scale-warning p-5 flex flex-col gap-3 cursor-pointer relative overflow-hidden">
+                            <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-status-warning to-transparent"></div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-semibold text-text-secondary tracking-wider">تقييم قاضي المحكمة</span>
+                                <span class="text-lg bg-status-warning/10 text-status-warning w-8 h-8 rounded-lg flex items-center justify-center">⚖️</span>
+                            </div>
+                            <div class="flex items-baseline gap-2">
+                                <span class="text-3xl font-mono font-bold" id="kpi-magistrate-score">0.0</span>
+                                <span class="text-sm text-text-secondary font-medium">%</span>
+                            </div>
+                            <div class="w-full bg-neutral-bg4 h-1 rounded-full overflow-hidden">
+                                <div class="h-full bg-status-warning rounded-full transition-all duration-1000" id="bar-magistrate" style="width: 0%"></div>
+                            </div>
+                            <div class="h-8 w-full mt-1">
+                                <svg id="sparkline-system-score" class="w-full h-full overflow-visible"></svg>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Main Graphs Content -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        
+                        <!-- Spline Trend Graph -->
+                        <div class="glass-card p-6 lg:col-span-2 flex flex-col gap-4">
+                            <div>
+                                <h3 class="text-sm font-semibold text-white">مسار الأداء الزمني ومعدل الجودة</h3>
+                                <p class="text-xs text-text-secondary mt-1">تتبع التغير اليومي لتقييم KPI العام والاتصالات</p>
+                            </div>
+                            <!-- Canvas container -->
+                            <div class="w-full h-80 relative mt-2">
+                                <svg id="trend-graph-svg" class="w-full h-full overflow-visible"></svg>
+                            </div>
+                        </div>
+
+                        <!-- Verdict distribution -->
+                        <div class="glass-card p-6 flex flex-col gap-4">
+                            <div>
+                                <h3 class="text-sm font-semibold text-white">توزيع أحكام المحاكمة وقرارات النظام</h3>
+                                <p class="text-xs text-text-secondary mt-1">تصنيف الأخطاء ونوعية التداخل الصوتي المستكشف</p>
+                            </div>
+                            <div class="flex-1 flex flex-col justify-center gap-4" id="verdict-chart-rows">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Live Stream Records -->
+                    <div class="glass-card p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <div>
+                                <h3 class="text-sm font-semibold text-white">سجل المكالمات والقرارات التلقائية الأخيرة</h3>
+                                <p class="text-xs text-text-secondary mt-1">قائمة تفصيلية للمكالمات المقيمة تلقائياً من خادم المحكمة</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Table wrapper -->
+                        <div class="w-full overflow-x-auto">
+                            <table class="w-full text-right border-collapse">
+                                <thead>
+                                    <tr class="border-b border-white/5">
+                                        <th class="py-3 px-4 text-xs font-semibold text-text-secondary uppercase">التاريخ والوقت</th>
+                                        <th class="py-3 px-4 text-xs font-semibold text-text-secondary uppercase">المستخدم</th>
+                                        <th class="py-3 px-4 text-xs font-semibold text-text-secondary uppercase">رقم الهاتف</th>
+                                        <th class="py-3 px-4 text-xs font-semibold text-text-secondary uppercase">منفذ الاستجابة</th>
+                                        <th class="py-3 px-4 text-xs font-semibold text-text-secondary uppercase">تقييم الأداء</th>
+                                        <th class="py-3 px-4 text-xs font-semibold text-text-secondary uppercase">القرار النهائي</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="calls-table-rows" class="divide-y divide-white/[0.03]">
+                                    <tr>
+                                        <td colspan="6" class="py-12 text-center text-text-secondary text-sm">جاري جلب أحدث سجلات الاتصال...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: User KPI Dashboard Section -->
+                <div id="section-user" class="dashboard-section hidden space-y-6">
+                    <!-- User Hero Metric Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                        
+                        <!-- Card 1: Excellent (100% KPI) -->
+                        <div class="glass-card spring-scale-success p-5 flex flex-col gap-3 cursor-pointer relative overflow-hidden" onclick="showCategoryDetails('100%')">
+                            <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-status-success to-transparent"></div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-semibold text-text-secondary tracking-wider">معدل الاتصالات الممتازة</span>
+                                <span class="text-lg bg-status-success/10 text-status-success w-8 h-8 rounded-lg flex items-center justify-center">▲</span>
+                            </div>
+                            <div class="flex items-baseline gap-2">
+                                <span class="text-3xl font-mono font-bold" id="kpi-excellent">0.0</span>
+                                <span class="text-sm text-text-secondary font-medium">%</span>
+                            </div>
+                            <div class="w-full bg-neutral-bg4 h-1 rounded-full overflow-hidden">
+                                <div class="h-full bg-status-success rounded-full transition-all duration-1000" id="bar-excellent" style="width: 0%"></div>
+                            </div>
+                            <div class="h-8 w-full mt-1">
+                                <svg id="sparkline-excellent" class="w-full h-full overflow-visible"></svg>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Acceptable (50% KPI) -->
+                        <div class="glass-card spring-scale-info p-5 flex flex-col gap-3 cursor-pointer relative overflow-hidden" onclick="showCategoryDetails('50%')">
+                            <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-status-info to-transparent"></div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-semibold text-text-secondary tracking-wider">معدل الاتصالات المقبولة</span>
+                                <span class="text-lg bg-status-info/10 text-status-info w-8 h-8 rounded-lg flex items-center justify-center">●</span>
+                            </div>
+                            <div class="flex items-baseline gap-2">
+                                <span class="text-3xl font-mono font-bold" id="kpi-acceptable">0.0</span>
+                                <span class="text-sm text-text-secondary font-medium">%</span>
+                            </div>
+                            <div class="w-full bg-neutral-bg4 h-1 rounded-full overflow-hidden">
+                                <div class="h-full bg-status-info rounded-full transition-all duration-1000" id="bar-acceptable" style="width: 0%"></div>
+                            </div>
+                            <div class="h-8 w-full mt-1">
+                                <svg id="sparkline-acceptable" class="w-full h-full overflow-visible"></svg>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Poor (0% KPI) -->
+                        <div class="glass-card spring-scale-error p-5 flex flex-col gap-3 cursor-pointer relative overflow-hidden" onclick="showCategoryDetails('0%')">
+                            <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-status-error to-transparent"></div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-semibold text-text-secondary tracking-wider">معدل الاتصالات غير المرضية</span>
+                                <span class="text-lg bg-status-error/10 text-status-error w-8 h-8 rounded-lg flex items-center justify-center">▼</span>
+                            </div>
+                            <div class="flex items-baseline gap-2">
+                                <span class="text-3xl font-mono font-bold" id="kpi-poor">0.0</span>
+                                <span class="text-sm text-text-secondary font-medium">%</span>
+                            </div>
+                            <div class="w-full bg-neutral-bg4 h-1 rounded-full overflow-hidden">
+                                <div class="h-full bg-status-error rounded-full transition-all duration-1000" id="bar-poor" style="width: 0%"></div>
+                            </div>
+                            <div class="h-8 w-full mt-1">
+                                <svg id="sparkline-poor" class="w-full h-full overflow-visible"></svg>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- User Trend Spline area chart -->
+                    <div class="glass-card p-6 flex flex-col gap-4">
+                        <div>
+                            <h3 class="text-sm font-semibold text-white">مسار تقييم جودة الاتصال التاريخي للمستخدمين</h3>
+                            <p class="text-xs text-text-secondary mt-1">متوسط تقييم KPI اليومي عبر خطوط الزمن للتحقق من الاتجاه العام للمستخدمين</p>
+                        </div>
+                        <div class="w-full h-80 relative mt-2">
+                            <svg id="user-trend-graph-svg" class="w-full h-full overflow-visible"></svg>
+                        </div>
+                    </div>
+
+                    <!-- User Calls Table -->
+                    <div class="glass-card p-6">
+                        <div>
+                            <h3 class="text-sm font-semibold text-white">سجل الاتصالات والتعليقات النوعية الواردة مؤخراً</h3>
+                            <p class="text-xs text-text-secondary mt-1">مراجعة تقييم العملاء وتعليقاتهم المباشرة من قاعدة البيانات</p>
+                        </div>
+                        <div class="w-full overflow-x-auto mt-4">
+                            <table class="w-full text-right border-collapse">
+                                <thead>
+                                    <tr class="border-b border-white/5">
+                                        <th class="py-3 px-4 text-xs font-semibold text-text-secondary uppercase">التاريخ والوقت</th>
+                                        <th class="py-3 px-4 text-xs font-semibold text-text-secondary uppercase">الاسم</th>
+                                        <th class="py-3 px-4 text-xs font-semibold text-text-secondary uppercase">رقم الهاتف</th>
+                                        <th class="py-3 px-4 text-xs font-semibold text-text-secondary uppercase">البريد الإلكتروني</th>
+                                        <th class="py-3 px-4 text-xs font-semibold text-text-secondary uppercase">مؤشر الأداء (KPI)</th>
+                                        <th class="py-3 px-4 text-xs font-semibold text-text-secondary uppercase">تعليق العميل</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="user-calls-table-rows" class="divide-y divide-white/[0.03]">
+                                    <tr>
+                                        <td colspan="6" class="py-12 text-center text-text-secondary text-sm">جاري جلب أحدث سجلات الاتصال للمسجلين...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- Slide-over Drawer (Representing Dialog.tsx / glass-panel) -->
+        <div id="drawer-backdrop" class="fixed inset-0 glass-overlay opacity-0 pointer-events-none z-40 transition-opacity duration-300" onclick="toggleDetailsDrawer(false)"></div>
+        
+        <aside id="details-drawer" class="fixed top-0 bottom-0 left-0 w-full sm:w-[480px] glass-panel border-r border-white/5 z-50 translate-x-[-100%] tray-transition flex flex-col p-6 gap-6">
+            <!-- Drawer Header -->
+            <div class="flex justify-between items-center pb-4 border-b border-white/5">
+                <div>
+                    <h3 class="text-base font-semibold text-white" id="drawer-title">تفاصيل المكالمة</h3>
+                    <p class="text-xs text-text-secondary mt-1">تقرير تفصيلي لتقييم المساعد الذكي</p>
+                </div>
+                <button class="text-text-secondary hover:text-white text-2xl font-bold w-10 h-10 rounded-lg flex items-center justify-center hover:bg-white/5" onclick="toggleDetailsDrawer(false)">×</button>
+            </div>
+
+            <!-- Drawer Scrollable Body -->
+            <div class="flex-1 overflow-y-auto space-y-5 pr-1 text-sm text-text-secondary" id="drawer-body">
+                <!-- Dynamically populated -->
+            </div>
+        </aside>
+
+        <!-- Mobile Sidebar Menu Overlay -->
+        <div id="mobile-sidebar-backdrop" class="fixed inset-0 bg-black/60 opacity-0 pointer-events-none z-40 transition-opacity duration-300 md:hidden" onclick="toggleMobileSidebar(false)"></div>
+        <aside id="mobile-sidebar" class="fixed top-0 bottom-0 right-0 w-64 bg-neutral-bg2 border-l border-white/5 z-50 translate-x-[100%] tray-transition flex flex-col p-5 md:hidden">
+            <div class="flex items-center justify-between pb-6 border-b border-white/5">
+                <span class="font-bold text-sm text-white">القائمة الرئيسية</span>
+                <button class="text-xl font-bold" onclick="toggleMobileSidebar(false)">×</button>
+            </div>
+            <nav class="flex-1 space-y-2 mt-6">
+                <a href="/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-lg text-text-secondary hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    <span>📊</span>
+                    <span>لوحة أداء النظام (الرئيسية)</span>
+                </a>
+                <a href="/dashboardsecondary" class="flex items-center gap-3 px-4 py-3 rounded-lg text-white bg-brand/10 border border-brand/20 transition-all text-sm font-medium shadow-glow">
+                    <span>⚡</span>
+                    <span>تحليلات المحاكاة والتلفزة</span>
+                </a>
+            </nav>
+        </aside>
+
+    </div>
+
+    <!-- Script Block -->
+    <script>
+        let apiData = null;
+        let activeTab = 'system';
+
+        // Formats time strings legibly
+        function cleanTimeFormat(rawTimestamp) {
+            if (!rawTimestamp) return '';
+            let cleaned = rawTimestamp.replace('T', ' ');
+            return cleaned.length > 16 ? cleaned.substring(0, 16) : cleaned;
+        }
+
+        // Switch Tab views dynamically
+        function switchTab(tabId) {
+            activeTab = tabId;
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-brand/10', 'text-white', 'border-brand/20', 'shadow-glow');
+                btn.classList.add('text-text-secondary', 'hover:text-white', 'hover:bg-white/5');
+            });
+            document.querySelectorAll('.dashboard-section').forEach(sec => sec.classList.add('hidden'));
+
+            if (tabId === 'system') {
+                document.getElementById('btn-tab-system').classList.add('bg-brand/10', 'text-white', 'border-brand/20', 'shadow-glow');
+                document.getElementById('btn-tab-system').classList.remove('text-text-secondary', 'hover:text-white', 'hover:bg-white/5');
+                document.getElementById('section-system').classList.remove('hidden');
+            } else {
+                document.getElementById('btn-tab-user').classList.add('bg-brand/10', 'text-white', 'border-brand/20', 'shadow-glow');
+                document.getElementById('btn-tab-user').classList.remove('text-text-secondary', 'hover:text-white', 'hover:bg-white/5');
+                document.getElementById('section-user').classList.remove('hidden');
+            }
+
+            // Force redraw of SVG trend graphs and sparklines on tab switches
+            if (apiData) {
+                setTimeout(() => {
+                    renderTrendChart(apiData.trend);
+                    drawSparklines(apiData.recentCalls);
+                }, 50);
+            }
+        }
+
+        // Toggle Details Tray Drawer
+        function toggleDetailsDrawer(isOpen) {
+            const drawer = document.getElementById('details-drawer');
+            const backdrop = document.getElementById('drawer-backdrop');
+            if (isOpen) {
+                drawer.classList.remove('translate-x-[-100%]');
+                backdrop.classList.remove('opacity-0', 'pointer-events-none');
+            } else {
+                drawer.classList.add('translate-x-[-100%]');
+                backdrop.classList.add('opacity-0', 'pointer-events-none');
+            }
+        }
+
+        // Toggle Mobile Sidebar Menu
+        function toggleMobileSidebar(isOpen) {
+            const sidebar = document.getElementById('mobile-sidebar');
+            const backdrop = document.getElementById('mobile-sidebar-backdrop');
+            if (isOpen) {
+                sidebar.classList.remove('translate-x-[100%]');
+                backdrop.classList.remove('opacity-0', 'pointer-events-none');
+            } else {
+                sidebar.classList.add('translate-x-[100%]');
+                backdrop.classList.add('opacity-0', 'pointer-events-none');
+            }
+        }
+
+        // Poll API Data
+        async function loadKpiData() {
+            try {
+                const res = await fetch('/api/kpi-data');
+                if (!res.ok) throw new Error('Network error');
+                
+                const data = await res.json();
+                apiData = data;
+
+                syncDashboardWidgets(data);
+                renderVerdictDistribution(data.telemetryStats);
+                renderCallsTable(data.recentCalls);
+                renderTrendChart(data.trend);
+                drawSparklines(data.recentCalls);
+
+                const now = new Date();
+                document.getElementById('sync-time').innerText = `مزامنة: ${now.toLocaleTimeString('ar-BH')}`;
+            } catch(e) {
+                console.error("Error loading API stats:", e);
+                document.getElementById('sync-time').innerText = 'خطأ مزامنة';
+            }
+        }
+
+        // Sync KPI Metric Cards (System & User)
+        function syncDashboardWidgets(data) {
+            const stats = data.stats || {};
+            const telemetry = data.telemetryStats || {};
+
+            // Success Rate Card (System)
+            const totalVerdicts = Object.values(telemetry.verdicts || {}).reduce((a, b) => a + b, 0);
+            const successVerdicts = (telemetry.verdicts || {})['SUCCESS'] || 0;
+            const successRate = totalVerdicts > 0 ? (successVerdicts / totalVerdicts) * 100 : 100.0;
+            
+            document.getElementById('kpi-success-rate').innerText = successRate.toFixed(1);
+            document.getElementById('bar-success-rate').style.width = `${successRate}%`;
+
+            // TTFT Card
+            const defaultTtftMs = (data.config && data.config.defaultTtftMs) ? data.config.defaultTtftMs : 663;
+            const targetLabelEl = document.getElementById('kpi-ttft-target');
+            if (targetLabelEl) {
+                targetLabelEl.innerText = `المستهدف: < ${defaultTtftMs}ms`;
+            }
+
+            const excellentThreshold = defaultTtftMs;
+            const acceptableThreshold = Math.round(defaultTtftMs * 1.2);
+            const poorThreshold = Math.round(defaultTtftMs * 1.5);
+
+            const hasTtft = telemetry.avgTtft > 0;
+            document.getElementById('kpi-ttft').innerText = hasTtft ? telemetry.avgTtft : "N/A";
+            
+            let ttftColorClass = 'bg-status-success';
+            if (hasTtft) {
+                if (telemetry.avgTtft < excellentThreshold) {
+                    ttftColorClass = 'bg-status-success';
+                } else if (telemetry.avgTtft < acceptableThreshold) {
+                    ttftColorClass = 'bg-status-info';
+                } else if (telemetry.avgTtft < poorThreshold) {
+                    ttftColorClass = 'bg-status-warning';
+                } else {
+                    ttftColorClass = 'bg-status-error';
+                }
+            }
+            const barTtft = document.getElementById('bar-ttft');
+            if (barTtft) {
+                barTtft.className = `h-full rounded-full transition-all duration-1000 ${ttftColorClass}`;
+                const ttftPercent = hasTtft ? Math.max(0, Math.min(100, Math.round((telemetry.avgTtft / poorThreshold) * 100))) : 0;
+                barTtft.style.width = `${ttftPercent}%`;
+            }
+
+            // M2E Card
+            const hasM2e = telemetry.avgM2e > 0;
+            document.getElementById('kpi-m2e').innerText = hasM2e ? telemetry.avgM2e : "N/A";
+            const m2ePercent = hasM2e ? Math.max(0, Math.min(100, Math.round((telemetry.avgM2e / 800) * 100))) : 0;
+            document.getElementById('bar-m2e').style.width = `${m2ePercent}%`;
+
+            // Magistrate Score Card
+            let scoreCount = 0, scoreSum = 0;
+            (data.recentCalls || []).forEach(c => {
+                if (c.telemetry && c.telemetry.score !== undefined) {
+                    scoreSum += c.telemetry.score;
+                    scoreCount++;
+                }
+            });
+            const magistrateScore = scoreCount > 0 ? (scoreSum / scoreCount) * 100 : 92.4;
+            document.getElementById('kpi-magistrate-score').innerText = magistrateScore.toFixed(1);
+            document.getElementById('bar-magistrate').style.width = `${magistrateScore}%`;
+
+            // User KPIs
+            document.getElementById('kpi-excellent').innerText = stats.excellentRate.toFixed(1);
+            document.getElementById('bar-excellent').style.width = `${Math.min(stats.excellentRate, 100)}%`;
+
+            document.getElementById('kpi-acceptable').innerText = stats.acceptableRate.toFixed(1);
+            document.getElementById('bar-acceptable').style.width = `${Math.min(stats.acceptableRate, 100)}%`;
+
+            document.getElementById('kpi-poor').innerText = stats.poorRate.toFixed(1);
+            document.getElementById('bar-poor').style.width = `${Math.min(stats.poorRate, 100)}%`;
+        }
+
+        // Render Verdict Breakdown bars
+        function renderVerdictDistribution(telemetry) {
+            const chartRows = document.getElementById('verdict-chart-rows');
+            if (!chartRows) return;
+            chartRows.innerHTML = '';
+
+            const verdicts = telemetry ? telemetry.verdicts || {} : {};
+            const total = Object.values(verdicts).reduce((a, b) => a + b, 0);
+
+            const configs = [
+                { key: 'SUCCESS', name: 'مكالمات ناجحة (SUCCESS)', color: '#10B981' },
+                { key: 'FACTUAL_DIVERGENCE', name: 'أخطاء معلوماتية (FACTUAL_DIVERGENCE)', color: '#EF4444' },
+                { key: 'INTEGRATION_LATENCY_DRAG', name: 'تأخر الأنظمة (LATENCY_DRAG)', color: '#EF4444' },
+                { key: 'LLM_COMPUTE_WASTAGE', name: 'أخطاء المساعد (COMPUTE_WASTAGE)', color: '#F59E0B' },
+                { key: 'ACOUSTIC_VAD_CONFLICT', name: 'مقاطعات صوتية (VAD_CONFLICT)', color: '#3B82F6' }
+            ];
+
+            configs.forEach(cfg => {
+                const val = verdicts[cfg.key] || 0;
+                const percentage = total > 0 ? (val / total) * 100 : 0;
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'space-y-1';
+                wrapper.innerHTML = `
+                    <div class="flex justify-between text-xs font-semibold">
+                        <span class="text-text-secondary">${cfg.name}</span>
+                        <span class="text-white font-mono">${val} (${percentage.toFixed(0)}%)</span>
+                    </div>
+                    <div class="w-full bg-neutral-bg4 h-2 rounded-full overflow-hidden">
+                        <div class="h-full rounded-full" style="width: ${percentage}%; background-color: ${cfg.color};"></div>
+                    </div>
+                `;
+                chartRows.appendChild(wrapper);
+            });
+        }
+
+        // Populate Main Conversation Tables
+        function renderCallsTable(calls) {
+            // System Table
+            const tableRows = document.getElementById('calls-table-rows');
+            if (tableRows) {
+                tableRows.innerHTML = '';
+                if (!calls || calls.length === 0) {
+                    tableRows.innerHTML = `<tr><td colspan="6" class="py-12 text-center text-text-secondary text-sm">لا توجد سجلات مكالمات حالياً</td></tr>`;
+                } else {
+                    calls.forEach(call => {
+                        const tr = document.createElement('tr');
+                        tr.className = 'hover:bg-white/[0.02] cursor-pointer transition-all duration-200';
+                        tr.onclick = () => showCallDetails(call);
+
+                        let kpiBadge = '<span class="text-text-muted text-xs">غير مقيم</span>';
+                        if (call.kpi === "100%") {
+                            kpiBadge = '<span class="px-2 py-0.5 rounded text-xs font-semibold bg-status-success/10 text-status-success border border-status-success/20">ممتاز (100%)</span>';
+                        } else if (call.kpi === "50%") {
+                            kpiBadge = '<span class="px-2 py-0.5 rounded text-xs font-semibold bg-status-info/10 text-status-info border border-status-info/20">مقبول (50%)</span>';
+                        } else if (call.kpi === "0%") {
+                            kpiBadge = '<span class="px-2 py-0.5 rounded text-xs font-semibold bg-status-error/10 text-status-error border border-status-error/20">سيء (0%)</span>';
+                        }
+
+                        let scoreBadge = '-';
+                        let verdictBadge = '<span class="text-text-muted text-xs">N/A</span>';
+                        if (call.telemetry) {
+                            scoreBadge = call.telemetry.score !== undefined ? `${Math.round(call.telemetry.score * 100)}%` : '-';
+                            const isSuccess = call.telemetry.root_cause_verdict === 'SUCCESS' || (call.telemetry.score !== undefined && call.telemetry.score >= 0.8);
+                            
+                            if (isSuccess) {
+                                verdictBadge = `<span class="px-2 py-0.5 rounded text-xs font-semibold bg-status-success/15 text-status-success border border-status-success/20">SUCCESS</span>`;
+                            } else {
+                                verdictBadge = `<span class="px-2 py-0.5 rounded text-xs font-semibold bg-status-error/15 text-status-error border border-status-error/20">${call.telemetry.root_cause_verdict}</span>`;
+                            }
+                        }
+
+                        tr.innerHTML = `
+                            <td class="py-3.5 px-4 text-xs font-medium text-text-secondary">${cleanTimeFormat(call.timestamp)}</td>
+                            <td class="py-3.5 px-4 text-sm font-semibold text-white">${call.clientName || 'مجهول'}</td>
+                            <td class="py-3.5 px-4 text-xs font-mono text-text-secondary">${call.phoneNumber || '-'}</td>
+                            <td class="py-3.5 px-4 text-xs font-mono text-text-secondary">${scoreBadge}</td>
+                            <td class="py-3.5 px-4 text-xs">${kpiBadge}</td>
+                            <td class="py-3.5 px-4 text-xs">${verdictBadge}</td>
+                        `;
+                        tableRows.appendChild(tr);
+                    });
+                }
+            }
+
+            // User Table
+            const userTableRows = document.getElementById('user-calls-table-rows');
+            if (userTableRows) {
+                userTableRows.innerHTML = '';
+                if (!calls || calls.length === 0) {
+                    userTableRows.innerHTML = `<tr><td colspan="6" class="py-12 text-center text-text-secondary text-sm">لا توجد سجلات مكالمات حالياً</td></tr>`;
+                } else {
+                    calls.forEach(call => {
+                        const tr = document.createElement('tr');
+                        tr.className = 'hover:bg-white/[0.02] cursor-pointer transition-all duration-200';
+                        tr.onclick = () => showCallDetails(call);
+
+                        let kpiBadge = '<span class="text-text-muted text-xs">غير مقيم</span>';
+                        if (call.kpi === "100%") {
+                            kpiBadge = '<span class="px-2 py-0.5 rounded text-xs font-semibold bg-status-success/10 text-status-success border border-status-success/20">ممتاز (100%)</span>';
+                        } else if (call.kpi === "50%") {
+                            kpiBadge = '<span class="px-2 py-0.5 rounded text-xs font-semibold bg-status-info/10 text-status-info border border-status-info/20">مقبول (50%)</span>';
+                        } else if (call.kpi === "0%") {
+                            kpiBadge = '<span class="px-2 py-0.5 rounded text-xs font-semibold bg-status-error/10 text-status-error border border-status-error/20">سيء (0%)</span>';
+                        }
+
+                        tr.innerHTML = `
+                            <td class="py-3.5 px-4 text-xs font-medium text-text-secondary">${cleanTimeFormat(call.timestamp)}</td>
+                            <td class="py-3.5 px-4 text-sm font-semibold text-white">${call.clientName || 'مجهول'}</td>
+                            <td class="py-3.5 px-4 text-xs font-mono text-text-secondary">${call.phoneNumber || '-'}</td>
+                            <td class="py-3.5 px-4 text-xs font-mono text-text-secondary">${call.clientEmail || '-'}</td>
+                            <td class="py-3.5 px-4 text-xs">${kpiBadge}</td>
+                            <td class="py-3.5 px-4 text-sm text-white truncate max-w-[200px]" title="${call.comment || ''}">${call.comment || '<span class="text-text-muted text-xs">لا يوجد تعليق</span>'}</td>
+                        `;
+                        userTableRows.appendChild(tr);
+                    });
+                }
+            }
+        }
+
+        // Show Slide-over Details Drawer
+        function showCallDetails(call) {
+            const drawerTitle = document.getElementById('drawer-title');
+            const drawerBody = document.getElementById('drawer-body');
+
+            drawerTitle.innerText = `مكالمة: ${call.clientName || 'مجهول'}`;
+            
+            let telemetryHtml = '';
+            if (call.telemetry) {
+                const tel = call.telemetry;
+                const stats = tel.stats || {};
+                const isNotFound = tel.root_cause_verdict === 'NOT_FOUND';
+                const isTextChat = stats.has_audio === false;
+
+                const scorePercent = isNotFound ? 'N/A' : `${Math.round(tel.score * 100)}%`;
+                const verdictClass = isNotFound ? "text-text-secondary bg-white/5 border-white/10" : (isTextChat ? "text-text-secondary bg-white/5 border-white/10" : (((tel.score !== undefined && tel.score >= 0.8) || tel.root_cause_verdict === "SUCCESS") ? "text-status-success bg-status-success/10 border-status-success/20" : "text-status-error bg-status-error/10 border-status-error/20"));
+                const verdictLabel = isNotFound ? "مكالمة تجريبية / غير مسجلة" : (isTextChat ? "محادثة كتابية" : (((tel.score !== undefined && tel.score >= 0.8) || tel.root_cause_verdict === "SUCCESS") ? "SUCCESS" : tel.root_cause_verdict));
+
+                const avgM2e = (isNotFound || isTextChat) ? "N/A" : (stats.avg_m2e_ms ? `${stats.avg_m2e_ms}ms` : "0ms");
+                const avgTtft = (isNotFound || isTextChat) ? "N/A" : (stats.avg_ttft_ms ? `${stats.avg_ttft_ms}ms` : "0ms");
+                const p95M2e = (isNotFound || isTextChat) ? "N/A" : (stats.p95_m2e_ms ? `${stats.p95_m2e_ms}ms` : "0ms");
+                const interrupted = (isNotFound || isTextChat) ? "N/A" : (stats.interrupted_count !== undefined ? stats.interrupted_count : "0");
+
+                telemetryHtml = `
+                    <div class="pt-4 border-t border-white/5 space-y-4">
+                        <h4 class="text-xs font-bold text-brand uppercase tracking-wider">⚡ التقييم التلقائي للمحكمة (Adversarial Audit)</h4>
+                        <div class="flex gap-2 flex-wrap">
+                            <span class="px-2.5 py-1 rounded text-xs font-semibold border ${verdictClass}">القرار: ${verdictLabel}</span>
+                            <span class="px-2.5 py-1 rounded text-xs font-semibold bg-white/5 border border-white/10 text-white">الدرجة: ${scorePercent}</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 bg-white/[0.02] border border-white/5 p-3 rounded-lg text-xs font-medium">
+                            <div>متوسط الاستجابة: <span class="font-mono text-white">${avgM2e}</span></div>
+                            <div>الاستجابة الأولى (TTFT): <span class="font-mono text-white">${avgTtft}</span></div>
+                            <div>الحد الأقصى P95: <span class="font-mono text-white">${p95M2e}</span></div>
+                            <div>عدد المقاطعات: <span class="font-mono text-white">${interrupted}</span></div>
+                        </div>
+                        <div class="space-y-1">
+                            <span class="text-[11px] font-semibold text-text-muted uppercase">اتهام المدعي (Interrogator)</span>
+                            <div class="tray-box bg-status-error/5 border border-dashed border-status-error/20 text-status-error text-xs p-3 rounded-lg leading-relaxed">
+                                ${tel.accusation}
+                            </div>
+                        </div>
+                        <div class="space-y-1">
+                            <span class="text-[11px] font-semibold text-text-muted uppercase">دفاع المساعد (Advocate)</span>
+                            <div class="tray-box bg-status-success/5 border border-dashed border-status-success/20 text-status-success text-xs p-3 rounded-lg leading-relaxed">
+                                ${tel.defense}
+                            </div>
+                        </div>
+                        <div class="space-y-1">
+                            <span class="text-[11px] font-semibold text-text-muted uppercase">حكم قاضي المحكمة (Magistrate)</span>
+                            <div class="tray-box bg-white/[0.02] border border-white/5 text-white text-xs p-3 rounded-lg leading-relaxed italic">
+                                ${tel.adjudication}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            drawerBody.innerHTML = `
+                <div class="space-y-3.5">
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[10px] text-text-muted uppercase">الاسم الكامل</span>
+                        <span class="text-sm font-semibold text-white">${call.clientName || 'مجهول'}</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="flex flex-col gap-1">
+                            <span class="text-[10px] text-text-muted uppercase">رقم الهاتف</span>
+                            <span class="text-sm font-medium text-white">${call.phoneNumber || '-'}</span>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <span class="text-[10px] text-text-muted uppercase">البريد الإلكتروني</span>
+                            <span class="text-sm font-medium text-white truncate">${call.clientEmail || '-'}</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="flex flex-col gap-1">
+                            <span class="text-[10px] text-text-muted uppercase">مؤشر الأداء (KPI)</span>
+                            <span class="text-sm font-semibold text-brand">${call.kpi || 'غير مقيم'}</span>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <span class="text-[10px] text-text-muted uppercase">معرف الجلسة</span>
+                            <span class="text-[11px] font-mono text-text-secondary truncate">${call.conversationId}</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[10px] text-text-muted uppercase">تعليق العميل</span>
+                        <span class="text-sm italic text-white bg-white/[0.02] border border-white/5 p-3 rounded-lg">"${call.comment || 'لا يوجد تعليق'}"</span>
+                    </div>
+                </div>
+                ${telemetryHtml}
+            `;
+
+            toggleDetailsDrawer(true);
+        }
+
+        // Show specific category details in the drawer (Bulletproof DOM Builder)
+        function showCategoryDetails(kpiCategory) {
+            if (!apiData) return;
+            
+            const filtered = apiData.recentCalls.filter(c => c.kpi === kpiCategory);
+            const title = document.getElementById('drawer-title');
+            const body = document.getElementById('drawer-body');
+            
+            const categoryName = kpiCategory === "100%" ? "الممتازة" : (kpiCategory === "50%" ? "المقبولة" : "غير المرضية (السيئة)");
+            title.innerText = `قائمة المكالمات ${categoryName}`;
+
+            if (filtered.length === 0) {
+                body.innerHTML = `<p class="text-text-secondary text-center py-8 text-xs">لا توجد مكالمات مسجلة تحت هذا التصنيف حالياً</p>`;
+                toggleDetailsDrawer(true);
+                return;
+            }
+
+            body.innerHTML = '';
+            const container = document.createElement('div');
+            container.className = 'flex flex-col gap-3';
+            
+            filtered.forEach(call => {
+                const item = document.createElement('div');
+                item.className = 'bg-white/5 border border-white/10 rounded-lg p-3 cursor-pointer hover:bg-white/10 transition-all';
+                item.onclick = () => showCallDetails(call);
+                
+                const timeText = call.timestamp.replace('T', ' ').substring(0, 16);
+                const shortId = call.conversationId ? call.conversationId.substring(0, 8) : '';
+                
+                item.innerHTML = `
+                    <div class="flex justify-between mb-1.5">
+                        <span class="font-semibold text-white">${call.clientName || 'مجهول'}</span>
+                        <span class="text-[10px] text-text-secondary">${timeText}</span>
+                    </div>
+                    <div class="text-[11px] text-text-secondary mb-1">رقم: ${call.phoneNumber || '-'} | معرف: ${shortId}...</div>
+                    <div class="text-xs italic text-white truncate">"${call.comment || 'لا يوجد تعليق'}"</div>
+                `;
+                container.appendChild(item);
+            });
+            body.appendChild(container);
+            toggleDetailsDrawer(true);
+        }
+
+        // Render Dynamic SVG spline charts
+        function renderTrendChart(trend) {
+            drawSingleTrendGraph('trend-graph-svg', trend);
+            drawSingleTrendGraph('user-trend-graph-svg', trend);
+        }
+
+        // Helper to draw single SVG trend spline chart
+        function drawSingleTrendGraph(svgId, trend) {
+            const svg = document.getElementById(svgId);
+            if (!svg) return;
+            svg.innerHTML = '';
+            if (!trend || trend.length === 0) return;
+
+            const width = svg.clientWidth || 600;
+            const height = svg.clientHeight || 320;
+            const padding = 40;
+
+            const maxVal = 100;
+            const stepX = (width - padding * 2) / (trend.length - 1 || 1);
+            const getPt = (t, i) => {
+                const x = padding + i * stepX;
+                const y = height - padding - (t.averageKpi / maxVal) * (height - padding * 2);
+                return { x, y };
+            };
+
+            const coords = trend.map((t, i) => getPt(t, i));
+
+            // Gridlines
+            const gridPoints = [0, 50, 100];
+            gridPoints.forEach(val => {
+                const y = height - padding - (val / maxVal) * (height - padding * 2);
+                
+                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                line.setAttribute("x1", padding);
+                line.setAttribute("y1", y);
+                line.setAttribute("x2", width - padding);
+                line.setAttribute("y2", y);
+                line.setAttribute("stroke", "hsla(0, 0%, 100%, 0.08)");
+                line.setAttribute("stroke-width", "1");
+                svg.appendChild(line);
+
+                const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                label.setAttribute("x", padding - 8);
+                label.setAttribute("y", y + 4);
+                label.setAttribute("fill", "#A1A1AA");
+                label.setAttribute("font-size", "10px");
+                label.setAttribute("text-anchor", "end");
+                label.textContent = `${val}%`;
+                svg.appendChild(label);
+            });
+
+            // Draw spline path
+            if (coords.length > 1) {
+                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                let d = `M ${coords[0].x} ${coords[0].y}`;
+                for (let i = 0; i < coords.length - 1; i++) {
+                    const curr = coords[i];
+                    const next = coords[i+1];
+                    const ctrlX = curr.x + (next.x - curr.x) / 2;
+                    d += ` C ${ctrlX} ${curr.y}, ${ctrlX} ${next.y}, ${next.x} ${next.y}`;
+                }
+                path.setAttribute("d", d);
+                path.setAttribute("fill", "none");
+                path.setAttribute("stroke", "#8251EE");
+                path.setAttribute("stroke-width", "2");
+                svg.appendChild(path);
+
+                // Area under line with gradient overlay
+                const area = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                const areaD = `${d} L ${coords[coords.length - 1].x} ${height - padding} L ${coords[0].x} ${height - padding} Z`;
+                area.setAttribute("d", areaD);
+                area.setAttribute("fill", `url(#purple-grad-${svgId})`);
+                svg.appendChild(area);
+
+                // Define SVG Gradient overlay
+                const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+                defs.innerHTML = `
+                    <linearGradient id="purple-grad-${svgId}" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#8251EE" stop-opacity="0.15" />
+                        <stop offset="100%" stop-color="#8251EE" stop-opacity="0.00" />
+                    </linearGradient>
+                `;
+                svg.appendChild(defs);
+            }
+
+            // Draw interaction circles
+            trend.forEach((t, i) => {
+                const pt = coords[i];
+                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circle.setAttribute("cx", pt.x);
+                circle.setAttribute("cy", pt.y);
+                circle.setAttribute("r", "4");
+                circle.setAttribute("fill", "hsl(240, 6%, 10%)");
+                circle.setAttribute("stroke", "#8251EE");
+                circle.setAttribute("stroke-width", "2");
+                svg.appendChild(circle);
+
+                const hoverTitle = document.createElementNS("http://www.w3.org/2000/svg", "title");
+                hoverTitle.textContent = `تاريخ: ${t.date}
+متوسط الأداء: ${t.averageKpi.toFixed(1)}%`;
+                circle.appendChild(hoverTitle);
+
+                // Date Label
+                const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                label.setAttribute("x", pt.x);
+                label.setAttribute("y", height - padding + 18);
+                label.setAttribute("fill", "#A1A1AA");
+                label.setAttribute("font-size", "9px");
+                label.setAttribute("text-anchor", "middle");
+                
+                const parts = t.date.split('-');
+                label.textContent = parts.length > 2 ? `${parts[1]}/${parts[2]}` : t.date;
+                svg.appendChild(label);
+            });
+        }
+
+        // Draw card sparkline charts
+        function drawSparklines(calls) {
+            if (!calls || calls.length === 0) return;
+
+            const getSparkPoints = (checkKpi) => {
+                let currentTotal = 0;
+                let matchCount = 0;
+                const points = [];
+                const chronological = [...calls].reverse();
+                chronological.forEach((c) => {
+                    currentTotal++;
+                    if (c.kpi === checkKpi) {
+                        matchCount++;
+                    }
+                    points.push(currentTotal > 0 ? (matchCount / currentTotal) * 100 : 0);
+                });
+                return points.slice(-15);
+            };
+
+            const drawSVG = (svgId, points, strokeColor) => {
+                const svg = document.getElementById(svgId);
+                if (!svg) return;
+                svg.innerHTML = '';
+                if (points.length < 2) return;
+                
+                const width = svg.clientWidth || 150;
+                const height = svg.clientHeight || 32;
+                
+                const maxVal = Math.max(...points, 10);
+                const minVal = 0;
+                const range = maxVal - minVal || 1;
+
+                const stepX = width / (points.length - 1);
+                const coords = points.map((p, i) => {
+                    const x = i * stepX;
+                    const y = height - ((p - minVal) / range) * (height - 4) - 2;
+                    return { x, y };
+                });
+
+                const pathData = `M ${coords.map(c => `${c.x} ${c.y}`).join(' L ')}`;
+                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                path.setAttribute("d", pathData);
+                path.setAttribute("fill", "none");
+                path.setAttribute("stroke", strokeColor);
+                path.setAttribute("stroke-width", "1.5");
+                path.setAttribute("stroke-linecap", "round");
+                svg.appendChild(path);
+
+                const areaData = `${pathData} L ${coords[coords.length - 1].x} ${height} L ${coords[0].x} ${height} Z`;
+                const area = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                area.setAttribute("d", areaData);
+                area.setAttribute("fill", `url(#grad-${svgId})`);
+                svg.appendChild(area);
+
+                const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+                defs.innerHTML = `
+                    <linearGradient id="grad-${svgId}" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="${strokeColor}" stop-opacity="0.1" />
+                        <stop offset="100%" stop-color="${strokeColor}" stop-opacity="0" />
+                    </linearGradient>
+                `;
+                svg.appendChild(defs);
+            };
+
+            // Draw User Card Sparklines
+            drawSVG('sparkline-excellent', getSparkPoints('100%'), '#10B981');
+            drawSVG('sparkline-acceptable', getSparkPoints('50%'), '#3B82F6');
+            drawSVG('sparkline-poor', getSparkPoints('0%'), '#EF4444');
+
+            // Draw System Card Sparklines
+            const telCalls = calls.filter(c => c.telemetry);
+            const m2ePoints = telCalls.map(c => c.telemetry.stats ? c.telemetry.stats.avg_m2e_ms || 0 : 0).reverse().slice(-15);
+            const ttftPoints = telCalls.map(c => c.telemetry.stats ? c.telemetry.stats.avg_ttft_ms || 0 : 0).reverse().slice(-15);
+            const scorePoints = telCalls.map(c => (c.telemetry.score !== undefined ? c.telemetry.score * 100 : 0)).reverse().slice(-15);
+            
+            let successTotal = 0;
+            let successCount = 0;
+            const successPoints = [];
+            [...telCalls].reverse().forEach(c => {
+                successTotal++;
+                if (c.telemetry.root_cause_verdict === 'SUCCESS' || (c.telemetry.score !== undefined && c.telemetry.score >= 0.8)) {
+                    successCount++;
+                }
+                successPoints.push((successCount / successTotal) * 100);
+            });
+            const successTrend = successPoints.slice(-15);
+
+            drawSVG('sparkline-system-success', successTrend, '#8251EE');
+            drawSVG('sparkline-system-ttft', ttftPoints, '#10B981');
+            drawSVG('sparkline-system-m2e', m2ePoints, '#3B82F6');
+            drawSVG('sparkline-system-score', scorePoints, '#F59E0B');
+        }
+
+        // Initialize and setup polling
+        loadKpiData();
+        setInterval(loadKpiData, 10000);
+
+        // Resize support
+        window.addEventListener('resize', () => {
+            if (apiData) {
+                renderTrendChart(apiData.trend);
+                drawSparklines(apiData.recentCalls);
+            }
+        });
+    </script>
+</body>
+</html>

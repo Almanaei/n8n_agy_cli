@@ -4,6 +4,29 @@ const path = require('path');
 const WebSocket = require('ws');
 const crypto = require('crypto');
 
+// Load environment variables from .env if it exists
+try {
+  const envPath = path.join(__dirname, '.env');
+  if (fs.existsSync(envPath)) {
+    const envContent = fs.readFileSync(envPath, 'utf8');
+    envContent.split(/\r?\n/).forEach(line => {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) return;
+      const index = trimmed.indexOf('=');
+      if (index > 0) {
+        const key = trimmed.substring(0, index).trim();
+        let value = trimmed.substring(index + 1).trim();
+        if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+          value = value.substring(1, value.length - 1);
+        }
+        process.env[key] = value;
+      }
+    });
+  }
+} catch (e) {
+  console.error("Error loading .env file:", e);
+}
+
 process.on('uncaughtException', (err) => {
   console.error("UNCAUGHT EXCEPTION:", err.stack || err);
 });
@@ -608,6 +631,10 @@ erra6BzpXyWJxdylk4cdvD0=
       });
 
       const payload = {
+        config: {
+          llmModel: process.env.LLM_MODEL || "gpt-4o-mini",
+          defaultTtftMs: parseInt(process.env.DEFAULT_LLM_TTFT_MS, 10) || 663
+        },
         stats: {
           totalCalls,
           excellentCalls,

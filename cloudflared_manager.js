@@ -1,4 +1,30 @@
 const { spawn } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+// Load environment variables from .env if it exists
+try {
+  const envPath = path.join(__dirname, '.env');
+  if (fs.existsSync(envPath)) {
+    const envContent = fs.readFileSync(envPath, 'utf8');
+    envContent.split(/\r?\n/).forEach(line => {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) return;
+      const index = trimmed.indexOf('=');
+      if (index > 0) {
+        const key = trimmed.substring(0, index).trim();
+        let value = trimmed.substring(index + 1).trim();
+        if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+          value = value.substring(1, value.length - 1);
+        }
+        process.env[key] = value;
+      }
+    });
+  }
+} catch (e) {
+  console.error("Error loading .env file:", e);
+}
+
 const apiKey = "896c43093392d23879dc8d578e7840b4a0b27af2ecf38803e985386b494c427c";
 const agentId = "agent_1601kv6ytcwwfh1sfk46qqhrrq3j";
 const webhookId = "b78ba4ce83d64a8ca92dafb87447b48b";
@@ -212,7 +238,7 @@ async function patchElevenLabs(baseUrl) {
       agent: {
         prompt: {
           prompt: systemPrompt,
-          llm: "gpt-4o-mini",
+          llm: process.env.LLM_MODEL || "gpt-4o-mini",
           tool_ids: [activeToolId]
         },
         first_message: "مرحبا بك في مركز خدمات الإدارة العامة للدفاع المدني .. يرجى تزويدي بالإسم ورقم الهاتف"

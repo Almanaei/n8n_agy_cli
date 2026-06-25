@@ -18,6 +18,8 @@ load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 ELEVENLABS_API_KEY = "896c43093392d23879dc8d578e7840b4a0b27af2ecf38803e985386b494c427c"
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4o-mini")
+DEFAULT_LLM_TTFT_MS = int(os.getenv("DEFAULT_LLM_TTFT_MS", "663"))
 
 TELEMETRY_DB_PATH = os.path.join(os.path.dirname(__file__), 'telemetry_db.json')
 
