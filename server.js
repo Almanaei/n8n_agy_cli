@@ -265,6 +265,55 @@ erra6BzpXyWJxdylk4cdvD0=
   console.log(`[Google Sheets Commenter] Successfully wrote comment to Row ${rowIndex + 1} Column H! 🎉`);
 }
 
+const { exec } = require('child_process');
+const activeEvaluations = new Set();
+const evaluationQueue = [];
+let isProcessingQueue = false;
+
+function triggerEvaluation(conversationId) {
+  if (!conversationId || !conversationId.startsWith("conv_") || conversationId.includes("test")) {
+    return;
+  }
+  if (activeEvaluations.has(conversationId) || evaluationQueue.includes(conversationId)) {
+    return;
+  }
+  evaluationQueue.push(conversationId);
+  console.log(`[Telemetry Queue] Enqueued conversation: ${conversationId}. Current queue size: ${evaluationQueue.length}`);
+  processQueue();
+}
+
+function processQueue() {
+  if (isProcessingQueue) {
+    return;
+  }
+  if (evaluationQueue.length === 0) {
+    isProcessingQueue = false;
+    return;
+  }
+  isProcessingQueue = true;
+  const conversationId = evaluationQueue.shift();
+  activeEvaluations.add(conversationId);
+  
+  console.log(`[Telemetry Queue] Evaluating ${conversationId}... (Remaining in queue: ${evaluationQueue.length})`);
+  
+  const pythonPath = "C:\\Python313\\python.exe";
+  const evalScript = path.join(__dirname, 'standalone', 'eval_elevenlabs.py');
+  
+  exec(`"${pythonPath}" "${evalScript}" ${conversationId}`, (error, stdout, stderr) => {
+    activeEvaluations.delete(conversationId);
+    isProcessingQueue = false;
+    
+    if (error) {
+      console.error(`[Telemetry Queue] Evaluation failed for ${conversationId}:`, error);
+    } else {
+      console.log(`[Telemetry Queue] Evaluation complete for ${conversationId}`);
+    }
+    
+    // Tiny delay to respect API rate limits before the next run
+    setTimeout(processQueue, 500);
+  });
+}
+
 const server = http.createServer(async (req, res) => {
   if (req.url === '/get-signed-url') {
     try {
@@ -492,6 +541,12 @@ erra6BzpXyWJxdylk4cdvD0=
         if (conversationId && conversationId.startsWith("standalone_")) {
           continue;
         }
+        
+        // Trigger evaluation if it's a real ElevenLabs ID and not in telemetryMap
+        if (conversationId && conversationId.startsWith("conv_") && !conversationId.includes("test") && !telemetryMap[conversationId]) {
+          triggerEvaluation(conversationId);
+        }
+
         const status = row[5] || "";
         const kpi = row[6] || "";
         const comment = row[7] || "";
