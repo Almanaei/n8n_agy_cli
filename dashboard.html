@@ -42,6 +42,7 @@
             --excellent-icon-bg: rgba(48, 209, 88, 0.1);
             --acceptable-icon-bg: rgba(142, 142, 147, 0.1);
             --poor-icon-bg: rgba(255, 159, 10, 0.1);
+            --error-icon-bg: rgba(255, 69, 58, 0.1);
             --blue-icon-bg: rgba(0, 191, 255, 0.1);
             
             --color-blue: #00bfff;
@@ -94,6 +95,7 @@
             --excellent-icon-bg: rgba(21, 128, 61, 0.08);
             --acceptable-icon-bg: rgba(100, 116, 139, 0.08);
             --poor-icon-bg: rgba(180, 83, 9, 0.08);
+            --error-icon-bg: rgba(185, 28, 28, 0.08);
             --blue-icon-bg: rgba(9, 105, 218, 0.08);
             
             --color-blue: #0969da; /* Accessible brand blue */
@@ -349,6 +351,10 @@
             border-color: var(--color-poor);
         }
 
+        .kpi-card.error:hover {
+            border-color: var(--color-error);
+        }
+
         .kpi-card-header {
             display: flex;
             justify-content: space-between;
@@ -386,6 +392,11 @@
         .kpi-card.poor .kpi-card-icon {
             background: var(--poor-icon-bg);
             color: var(--color-poor);
+        }
+
+        .kpi-card.error .kpi-card-icon {
+            background: var(--error-icon-bg);
+            color: var(--color-error);
         }
 
         .kpi-card-body {
@@ -429,6 +440,10 @@
             color: var(--color-poor);
         }
 
+        .kpi-delta.critical {
+            color: var(--color-error);
+        }
+
         /* Bullet chart */
         .bullet-container {
             display: flex;
@@ -452,6 +467,9 @@
         }
 
         .bullet-bar-fill {
+            position: absolute;
+            right: 0;
+            top: 0;
             height: 100%;
             border-radius: 4px;
             width: 0;
@@ -468,6 +486,10 @@
 
         .kpi-card.poor .bullet-bar-fill {
             background-color: var(--color-poor);
+        }
+
+        .kpi-card.error .bullet-bar-fill {
+            background-color: var(--color-error);
         }
 
         .bullet-target-marker {
@@ -861,6 +883,73 @@
             width: 0;
             transition: width 1s ease-in-out;
         }
+
+        /* Info Modal Styling */
+        .info-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .info-modal-overlay.active {
+            opacity: 1;
+        }
+        .info-modal-content {
+            background-color: var(--surface-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 450px;
+            padding: 24px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        .info-modal-overlay.active .info-modal-content {
+            transform: scale(1);
+        }
+        .info-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+        .info-modal-header h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        .info-modal-close-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: 4px;
+            transition: color 0.2s ease;
+        }
+        .info-modal-close-btn:hover {
+            color: var(--text-primary);
+        }
+        .info-modal-body p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -910,26 +999,26 @@
             <div class="hero-grid">
                 
                 <!-- Card 1: Avg M2E Latency -->
-                <div class="kpi-card telemetry" style="cursor: default;">
+                <div class="kpi-card telemetry" id="card-system-m2e" style="cursor: pointer;" onclick="showInfoModal('m2e')">
                     <div class="kpi-card-header">
                         <span class="kpi-card-title">متوسط زمن الاستجابة (M2E)</span>
-                        <span class="kpi-card-icon">⚡</span>
+                        <span class="kpi-card-icon" id="icon-system-m2e">⚡</span>
                     </div>
                     <div class="kpi-card-body">
                         <div class="kpi-value-wrapper">
                             <span class="kpi-value" id="val-system-m2e">0</span>
                             <span class="kpi-unit">ms</span>
+                            <span id="val-system-m2e-p95" style="color: var(--text-secondary); margin-right: 8px; font-size: 0.85rem; font-weight: 500;">P95: 0ms</span>
                         </div>
-                        <span class="kpi-delta" id="val-system-m2e-p95" style="color: var(--text-secondary);">P95: 0ms</span>
+                        <span class="kpi-delta" id="val-system-m2e-desc">طبيعي</span>
                     </div>
                     <div class="bullet-container">
                         <div class="bullet-label-row">
-                            <span>المستهدف: &lt; 500ms</span>
-                            <span id="percent-system-m2e">0%</span>
+                            <span>سريع</span>
+                            <span id="percent-system-m2e">الحد الأقصى: 2000ms (بطيء)</span>
                         </div>
                         <div class="bullet-bar-bg">
                             <div class="bullet-bar-fill" id="bullet-system-m2e" style="background-color: var(--color-blue);"></div>
-                            <div class="bullet-target-marker" style="left: 37.5%;"></div>
                         </div>
                     </div>
                     <div class="kpi-card-sparkline">
@@ -938,7 +1027,7 @@
                 </div>
 
                 <!-- Card 2: Avg TTFT -->
-                <div class="kpi-card telemetry" style="cursor: default;">
+                <div class="kpi-card telemetry" id="card-system-ttft" style="cursor: pointer;" onclick="showInfoModal('ttft')">
                     <div class="kpi-card-header">
                         <span class="kpi-card-title">سرعة الاستجابة الأولى (TTFT)</span>
                         <span class="kpi-card-icon">⏱️</span>
@@ -952,12 +1041,11 @@
                     </div>
                     <div class="bullet-container">
                         <div class="bullet-label-row">
-                            <span id="lbl-system-ttft-target">المستهدف: &lt; 300ms</span>
-                            <span id="percent-system-ttft">0%</span>
+                            <span id="lbl-system-ttft-target">سريع</span>
+                            <span id="percent-system-ttft">الحد الأقصى: 2000ms (بطيء)</span>
                         </div>
                         <div class="bullet-bar-bg">
                             <div class="bullet-bar-fill" id="bullet-system-ttft" style="background-color: var(--color-excellent);"></div>
-                            <div class="bullet-target-marker" id="marker-system-ttft-target" style="left: 50%;"></div>
                         </div>
                     </div>
                     <div class="kpi-card-sparkline">
@@ -966,10 +1054,10 @@
                 </div>
 
                 <!-- Card 3: Success Rate -->
-                <div class="kpi-card excellent" style="cursor: default;">
+                <div class="kpi-card excellent" id="card-system-success" style="cursor: pointer;" onclick="showInfoModal('success')">
                     <div class="kpi-card-header">
                         <span class="kpi-card-title">معدل النجاح للمحكمة</span>
-                        <span class="kpi-card-icon">▲</span>
+                        <span class="kpi-card-icon" id="icon-system-success">▲</span>
                     </div>
                     <div class="kpi-card-body">
                         <div class="kpi-value-wrapper">
@@ -980,12 +1068,11 @@
                     </div>
                     <div class="bullet-container">
                         <div class="bullet-label-row">
-                            <span>الهدف: 90%</span>
-                            <span id="percent-system-success">0%</span>
+                            <span id="lbl-system-success-target"></span>
+                            <span id="percent-system-success">الحد الأقصى: 100%</span>
                         </div>
                         <div class="bullet-bar-bg">
                             <div class="bullet-bar-fill" id="bullet-system-success"></div>
-                            <div class="bullet-target-marker" style="left: 10%;"></div>
                         </div>
                     </div>
                     <div class="kpi-card-sparkline">
@@ -994,7 +1081,7 @@
                 </div>
 
                 <!-- Card 4: Judge Score -->
-                <div class="kpi-card telemetry" style="cursor: default;">
+                <div class="kpi-card telemetry" id="card-system-score" style="cursor: pointer;" onclick="showInfoModal('score')">
                     <div class="kpi-card-header">
                         <span class="kpi-card-title">مؤشر تقييم القاضي</span>
                         <span class="kpi-card-icon">⚖️</span>
@@ -1008,12 +1095,11 @@
                     </div>
                     <div class="bullet-container">
                         <div class="bullet-label-row">
-                            <span>الحد الأدنى: 85%</span>
-                            <span id="percent-system-score">0%</span>
+                            <span id="lbl-system-score-target"></span>
+                            <span id="percent-system-score">الحد الأقصى: 100%</span>
                         </div>
                         <div class="bullet-bar-bg">
-                            <div class="bullet-bar-fill" id="bullet-system-score" style="background-color: var(--color-blue);"></div>
-                            <div class="bullet-target-marker" style="left: 15%;"></div>
+                            <div class="bullet-bar-fill" id="bullet-system-score"></div>
                         </div>
                     </div>
                     <div class="kpi-card-sparkline">
@@ -1087,7 +1173,7 @@
                         </div>
                         <div class="bullet-bar-bg">
                             <div class="bullet-bar-fill" id="bullet-excellent"></div>
-                            <div class="bullet-target-marker" style="left: 10%;"></div>
+                            <div class="bullet-target-marker" style="right: 90%;"></div>
                         </div>
                     </div>
                     <div class="kpi-card-sparkline">
@@ -1115,7 +1201,7 @@
                         </div>
                         <div class="bullet-bar-bg">
                             <div class="bullet-bar-fill" id="bullet-acceptable"></div>
-                            <div class="bullet-target-marker" style="left: 85%;"></div>
+                            <div class="bullet-target-marker" style="right: 15%;"></div>
                         </div>
                     </div>
                     <div class="kpi-card-sparkline">
@@ -1143,7 +1229,7 @@
                         </div>
                         <div class="bullet-bar-bg">
                             <div class="bullet-bar-fill" id="bullet-poor"></div>
-                            <div class="bullet-target-marker" style="left: 95%;"></div>
+                            <div class="bullet-target-marker" style="right: 5%;"></div>
                         </div>
                     </div>
                     <div class="kpi-card-sparkline">
@@ -1210,6 +1296,10 @@
     <script>
         let kpiDataGlobal = null;
         let activeTab = 'system';
+        let globalM2eColor = 'var(--color-blue)';
+        let globalTtftColor = 'var(--color-excellent)';
+        let globalSuccessColor = 'var(--color-excellent)';
+        let globalScoreColor = 'var(--color-blue)';
 
         function toggleTheme() {
             const root = document.documentElement;
@@ -1308,50 +1398,204 @@
                 const hasM2e = telemetryStats.avgM2e > 0;
                 document.getElementById('val-system-m2e').innerText = hasM2e ? telemetryStats.avgM2e : "N/A";
                 document.getElementById('val-system-m2e-p95').innerText = hasM2e ? `P95: ${telemetryStats.p95M2e}ms` : "P95: N/A";
-                const m2ePercent = hasM2e ? Math.max(0, Math.min(100, Math.round((telemetryStats.avgM2e / 800) * 100))) : 0;
-                document.getElementById('percent-system-m2e').innerText = hasM2e ? `${telemetryStats.avgM2e}ms` : "N/A";
-                document.getElementById('bullet-system-m2e').style.width = `${m2ePercent}%`;
+                
+                // M2E Threshold logic:
+                // - Excellent: < 600ms -> Green ("سريع جداً")
+                // - Acceptable: 600ms - 1200ms -> Blue ("طبيعي")
+                // - Warning: 1200ms - 2000ms -> Orange ("قابل للتحسّن")
+                // - Failing: >= 2000ms -> Red ("متأخر")
+                const m2eExcellentLimit = 600;
+                const m2eAcceptableLimit = 1200;
+                const m2ePoorLimit = 2000;
+                
+                let m2eColor, m2eBg, m2eText, m2eDeltaClass, m2eCardClass;
+                if (hasM2e) {
+                    if (telemetryStats.avgM2e < m2eExcellentLimit) {
+                        m2eColor = 'var(--color-excellent)';
+                        m2eBg = 'var(--excellent-icon-bg)';
+                        m2eText = 'سريع جداً';
+                        m2eDeltaClass = 'kpi-delta up';
+                        m2eCardClass = 'kpi-card excellent';
+                    } else if (telemetryStats.avgM2e < m2eAcceptableLimit) {
+                        m2eColor = 'var(--color-blue)';
+                        m2eBg = 'var(--blue-icon-bg)';
+                        m2eText = 'طبيعي';
+                        m2eDeltaClass = 'kpi-delta';
+                        m2eCardClass = 'kpi-card acceptable';
+                    } else if (telemetryStats.avgM2e < m2ePoorLimit) {
+                        m2eColor = 'var(--color-poor)';
+                        m2eBg = 'var(--poor-icon-bg)';
+                        m2eText = 'قابل للتحسّن';
+                        m2eDeltaClass = 'kpi-delta down';
+                        m2eCardClass = 'kpi-card poor';
+                    } else {
+                        m2eColor = 'var(--color-error)';
+                        m2eBg = 'var(--error-icon-bg)';
+                        m2eText = 'متأخر';
+                        m2eDeltaClass = 'kpi-delta critical';
+                        m2eCardClass = 'kpi-card error';
+                    }
+                } else {
+                    m2eColor = 'var(--text-secondary)';
+                    m2eBg = 'var(--surface-secondary)';
+                    m2eText = 'غير متوفر';
+                    m2eDeltaClass = 'kpi-delta';
+                    m2eCardClass = 'kpi-card telemetry';
+                }
+                
+                const m2eCard = document.getElementById('card-system-m2e');
+                if (m2eCard) {
+                    m2eCard.className = m2eCardClass;
+                    const m2eIcon = m2eCard.querySelector('.kpi-card-icon');
+                    if (m2eIcon) {
+                        m2eIcon.style.color = m2eColor;
+                        m2eIcon.style.backgroundColor = m2eBg;
+                    }
+                }
+                
+                const m2eDescEl = document.getElementById('val-system-m2e-desc');
+                if (m2eDescEl) {
+                    m2eDescEl.innerText = m2eText;
+                    m2eDescEl.className = m2eDeltaClass;
+                    m2eDescEl.style.color = m2eColor;
+                }
+                
+                const m2ePercent = hasM2e ? Math.max(0, Math.min(100, Math.round((telemetryStats.avgM2e / m2ePoorLimit) * 100))) : 0;
+                const bulletM2e = document.getElementById('bullet-system-m2e');
+                if (bulletM2e) {
+                    bulletM2e.style.width = `${m2ePercent}%`;
+                    bulletM2e.style.backgroundColor = m2eColor;
+                }
+                globalM2eColor = m2eColor;
 
                 // TTFT Card
                 const defaultTtftMs = (config && config.defaultTtftMs) ? config.defaultTtftMs : 663;
-                const targetLabelEl = document.getElementById('lbl-system-ttft-target');
-                if (targetLabelEl) {
-                    targetLabelEl.innerText = `المستهدف: < ${defaultTtftMs}ms`;
-                }
 
-                const excellentThreshold = defaultTtftMs;
-                const acceptableThreshold = Math.round(defaultTtftMs * 1.2);
-                const poorThreshold = Math.round(defaultTtftMs * 1.5);
-
-                const targetMarker = document.getElementById('marker-system-ttft-target');
-                if (targetMarker) {
-                    targetMarker.style.left = `${Math.round((defaultTtftMs / poorThreshold) * 100)}%`;
-                }
+                // Mathematical definition of thresholds based on the target (defaultTtftMs = 663ms):
+                // - Excellent (Great): < 700ms (scale factor: ~1.0558 * defaultTtftMs) - Green ("ممتاز")
+                // - Acceptable (Normal): 700ms to 899ms (scale factor: ~1.3560 * defaultTtftMs) - Blue ("طبيعي")
+                // - Warning (Can be improved): 899ms to 2000ms - Orange ("جيّد")
+                // - Failing (Error): >= 2000ms - Red ("مقبول")
+                const excellentThreshold = Math.round(defaultTtftMs * 1.0558); // 700ms
+                const acceptableThreshold = Math.round(defaultTtftMs * 1.3560); // 899ms
+                const poorThreshold = 2000;
 
                 const hasTtft = telemetryStats.avgTtft > 0;
                 document.getElementById('val-system-ttft').innerText = hasTtft ? telemetryStats.avgTtft : "N/A";
-                const ttftDesc = hasTtft ? (telemetryStats.avgTtft < excellentThreshold ? 'سريع جداً' : (telemetryStats.avgTtft < acceptableThreshold ? 'مقبول' : (telemetryStats.avgTtft < poorThreshold ? 'طبيعي' : 'بطيء جداً'))) : 'غير متوفر';
+                const ttftDesc = hasTtft ? (telemetryStats.avgTtft < excellentThreshold ? 'ممتاز' : (telemetryStats.avgTtft < acceptableThreshold ? 'طبيعي' : (telemetryStats.avgTtft < poorThreshold ? 'جيّد' : 'مقبول'))) : 'غير متوفر';
                 const ttftColor = hasTtft ? (telemetryStats.avgTtft < excellentThreshold ? 'var(--color-excellent)' : (telemetryStats.avgTtft < acceptableThreshold ? 'var(--color-blue)' : (telemetryStats.avgTtft < poorThreshold ? 'var(--color-poor)' : 'var(--color-error)'))) : 'var(--text-secondary)';
+                
+                // Determine delta styling class and card theme class based on performance
+                let ttftDeltaClass = 'kpi-delta';
+                let ttftCardClass = 'kpi-card telemetry';
+                if (hasTtft) {
+                    if (telemetryStats.avgTtft < excellentThreshold) {
+                        ttftDeltaClass = 'kpi-delta up';
+                        ttftCardClass = 'kpi-card excellent';
+                    } else if (telemetryStats.avgTtft < acceptableThreshold) {
+                        ttftDeltaClass = 'kpi-delta'; // neutral blue state
+                        ttftCardClass = 'kpi-card acceptable';
+                    } else if (telemetryStats.avgTtft < poorThreshold) {
+                        ttftDeltaClass = 'kpi-delta down';
+                        ttftCardClass = 'kpi-card poor';
+                    } else {
+                        ttftDeltaClass = 'kpi-delta critical';
+                        ttftCardClass = 'kpi-card error';
+                    }
+                }
+                
+                const ttftCard = document.getElementById('card-system-ttft');
+                if (ttftCard) {
+                    ttftCard.className = ttftCardClass;
+                    const ttftIcon = ttftCard.querySelector('.kpi-card-icon');
+                    if (ttftIcon) {
+                        let ttftBg = 'var(--blue-icon-bg)';
+                        if (hasTtft) {
+                            if (telemetryStats.avgTtft < excellentThreshold) ttftBg = 'var(--excellent-icon-bg)';
+                            else if (telemetryStats.avgTtft < acceptableThreshold) ttftBg = 'var(--blue-icon-bg)';
+                            else if (telemetryStats.avgTtft < poorThreshold) ttftBg = 'var(--poor-icon-bg)';
+                            else ttftBg = 'var(--error-icon-bg)';
+                        }
+                        ttftIcon.style.color = ttftColor;
+                        ttftIcon.style.backgroundColor = ttftBg;
+                    }
+                }
+                
                 const ttftDescEl = document.getElementById('val-system-ttft-desc');
-                ttftDescEl.innerText = ttftDesc;
-                ttftDescEl.style.color = ttftColor;
+                if (ttftDescEl) {
+                    ttftDescEl.innerText = ttftDesc;
+                    ttftDescEl.className = ttftDeltaClass;
+                    ttftDescEl.style.color = ttftColor;
+                }
+                
                 const ttftPercent = hasTtft ? Math.max(0, Math.min(100, Math.round((telemetryStats.avgTtft / poorThreshold) * 100))) : 0;
-                document.getElementById('percent-system-ttft').innerText = hasTtft ? `${telemetryStats.avgTtft}ms` : "N/A";
                 const bulletTtft = document.getElementById('bullet-system-ttft');
-                bulletTtft.style.width = `${ttftPercent}%`;
-                bulletTtft.style.backgroundColor = ttftColor;
+                if (bulletTtft) {
+                    bulletTtft.style.width = `${ttftPercent}%`;
+                    bulletTtft.style.backgroundColor = ttftColor;
+                }
+                globalTtftColor = ttftColor;
 
-                // Success Rate Card
+                // Success Rate Card (excluding USER_ABANDONMENT)
                 const verdicts = telemetryStats.verdicts || {};
-                const totalTel = Object.values(verdicts).reduce((a, b) => a + b, 0);
+                let totalTel = 0;
+                Object.keys(verdicts).forEach(k => {
+                    if (k !== 'USER_ABANDONMENT') {
+                        totalTel += verdicts[k];
+                    }
+                });
                 const successCalls = verdicts['SUCCESS'] || 0;
                 const successRate = totalTel > 0 ? (successCalls / totalTel) * 100 : 100.0;
                 
                 document.getElementById('val-system-success').innerText = successRate.toFixed(1);
-                document.getElementById('percent-system-success').innerText = `${successRate.toFixed(1)}%`;
-                document.getElementById('bullet-system-success').style.width = `${successRate}%`;
-                document.getElementById('val-system-success-desc').innerText = successRate >= 90 ? 'ممتاز' : 'يحتاج تحسين';
-                document.getElementById('val-system-success-desc').className = successRate >= 90 ? 'kpi-delta up' : 'kpi-delta down';
+                
+                const successCard = document.getElementById('card-system-success');
+                const successIcon = document.getElementById('icon-system-success');
+                const successDesc = document.getElementById('val-system-success-desc');
+                const bulletSuccess = document.getElementById('bullet-system-success');
+                
+                let successColor, successBg, successIconChar, successText, successDeltaClass, successCardClass;
+                if (successRate >= 85) {
+                    successColor = 'var(--color-excellent)';
+                    successBg = 'var(--excellent-icon-bg)';
+                    successIconChar = '▲';
+                    successText = 'ممتاز';
+                    successDeltaClass = 'kpi-delta up';
+                    successCardClass = 'kpi-card excellent';
+                } else if (successRate >= 70) {
+                    successColor = 'var(--color-blue)';
+                    successBg = 'var(--blue-icon-bg)';
+                    successIconChar = '▲';
+                    successText = 'جيد جداً';
+                    successDeltaClass = 'kpi-delta up';
+                    successCardClass = 'kpi-card telemetry';
+                } else {
+                    successColor = 'var(--color-poor)';
+                    successBg = 'var(--poor-icon-bg)';
+                    successIconChar = '⚠';
+                    successText = 'بحاجة للتحسين';
+                    successDeltaClass = 'kpi-delta down';
+                    successCardClass = 'kpi-card poor';
+                }
+                
+                if (successCard) {
+                    successCard.className = successCardClass;
+                }
+                if (successIcon) {
+                    successIcon.innerText = successIconChar;
+                    successIcon.style.color = successColor;
+                    successIcon.style.backgroundColor = successBg;
+                }
+                if (successDesc) {
+                    successDesc.innerText = successText;
+                    successDesc.className = successDeltaClass;
+                    successDesc.style.color = successColor;
+                }
+                if (bulletSuccess) {
+                    bulletSuccess.style.width = `${successRate}%`;
+                    bulletSuccess.style.backgroundColor = successColor;
+                }
+                globalSuccessColor = successColor;
 
                 // Magistrate Score Card
                 let totalScore = 0, scoreCount = 0;
@@ -1364,11 +1608,19 @@
                     });
                 }
                 const avgScore = scoreCount > 0 ? (totalScore / scoreCount) * 100 : 92.4;
+                const scoreColor = avgScore >= 85 ? 'var(--color-excellent)' : 'var(--color-blue)';
+                
                 document.getElementById('val-system-score').innerText = avgScore.toFixed(1);
-                document.getElementById('percent-system-score').innerText = `${avgScore.toFixed(1)}%`;
-                document.getElementById('bullet-system-score').style.width = `${avgScore}%`;
-                document.getElementById('val-system-score-desc').innerText = avgScore >= 85 ? 'مستقر' : 'تراجع بالأداء';
-                document.getElementById('val-system-score-desc').style.color = avgScore >= 85 ? 'var(--color-excellent)' : 'var(--color-poor)';
+                
+                const bulletScore = document.getElementById('bullet-system-score');
+                if (bulletScore) {
+                    bulletScore.style.width = `${avgScore}%`;
+                    bulletScore.style.backgroundColor = scoreColor;
+                }
+                
+                document.getElementById('val-system-score-desc').innerText = avgScore >= 85 ? 'أداء ممتاز' : 'جيد جداً';
+                document.getElementById('val-system-score-desc').style.color = scoreColor;
+                globalScoreColor = scoreColor;
             }
         }
 
@@ -1448,10 +1700,10 @@
             });
             const successTrend = successPoints.slice(-15);
 
-            drawSVG('sparkline-system-m2e', m2ePoints, 'var(--color-blue)', false);
-            drawSVG('sparkline-system-ttft', ttftPoints, 'var(--color-excellent)', false);
-            drawSVG('sparkline-system-success', successTrend, 'var(--color-excellent)', true);
-            drawSVG('sparkline-system-score', scorePoints, 'var(--color-blue)', true);
+            drawSVG('sparkline-system-m2e', m2ePoints, globalM2eColor, false);
+            drawSVG('sparkline-system-ttft', ttftPoints, globalTtftColor, false);
+            drawSVG('sparkline-system-success', successTrend, globalSuccessColor, true);
+            drawSVG('sparkline-system-score', scorePoints, globalScoreColor, true);
         }
 
         function drawTrendSpline(trend) {
@@ -1563,15 +1815,19 @@
             container.innerHTML = '';
 
             const verdicts = telemetryStats ? telemetryStats.verdicts || {} : {};
-            const total = Object.values(verdicts).reduce((a, b) => a + b, 0);
+            let total = 0;
+            Object.keys(verdicts).forEach(k => {
+                if (k !== 'USER_ABANDONMENT') {
+                    total += verdicts[k];
+                }
+            });
 
             const verdictConfigs = [
                 { key: 'SUCCESS', label: 'نجاح الاتصال والهدف (SUCCESS)', color: 'var(--color-excellent)' },
                 { key: 'FACTUAL_DIVERGENCE', label: 'انحراف أو خطأ معرفي (FACTUAL_DIVERGENCE)', color: 'var(--color-poor)' },
                 { key: 'INTEGRATION_LATENCY_DRAG', label: 'بطء الأنظمة الخارجية (LATENCY_DRAG)', color: 'var(--color-poor)' },
                 { key: 'LLM_COMPUTE_WASTAGE', label: 'بطء توليد المساعد الذكي (COMPUTE_WASTAGE)', color: 'var(--color-poor)' },
-                { key: 'ACOUSTIC_VAD_CONFLICT', label: 'تداخل أو مقاطعة صوتية (VAD_CONFLICT)', color: 'var(--color-blue)' },
-                { key: 'USER_ABANDONMENT', label: 'إغلاق مبكر للمكالمة (USER_ABANDONMENT)', color: 'var(--color-acceptable)' }
+                { key: 'ACOUSTIC_VAD_CONFLICT', label: 'تداخل أو مقاطعة صوتية (VAD_CONFLICT)', color: 'var(--color-blue)' }
             ];
 
             verdictConfigs.forEach(cfg => {
@@ -1839,6 +2095,73 @@
                 drawVerdictDistribution(kpiDataGlobal.telemetryStats);
             }
         });
+
+        // Info Modal control functions
+        function showInfoModal(cardType) {
+            const modal = document.getElementById('info-modal');
+            const titleEl = document.getElementById('info-modal-title');
+            const textEl = document.getElementById('info-modal-text');
+            if (!modal || !titleEl || !textEl) return;
+
+            let title = '';
+            let text = '';
+
+            switch(cardType) {
+                case 'm2e':
+                    title = 'متوسط زمن الاستجابة (M2E)';
+                    text = 'يقيس متوسط التأخير الإجمالي في المحادثة. ويمثل الوقت المستغرق منذ انتهاء المتصل من الكلام وحتى بدء المساعد الذكي في الرد بصوته. كلما قل هذا الزمن (يفضل أقل من 600 مللي ثانية)، أصبحت المحادثة أسرع وأكثر طبيعية وتماثل الحوار البشري.';
+                    break;
+                case 'ttft':
+                    title = 'سرعة الاستجابة الأولى (TTFT)';
+                    text = 'يمثل "وقت التفكير" للمساعد الذكي. ويقيس الوقت المستغرق منذ استلام المساعد لمدخلات المتصل وحتى توليد الكلمة الأولى من الإجابة. هذا المؤشر حيوي لمراقبة سرعة معالجة نموذج الذكاء الاصطناعي (LLM) المستخدم.';
+                    break;
+                case 'success':
+                    title = 'معدل النجاح للمحكمة';
+                    text = 'يمثل النسبة المئوية للمكالمات التي تمت بنجاح كامل. يقوم قاضٍ آلي يعمل بالذكاء الاصطناعي بمراجعة نص كل مكالمة للتأكد من التزام المساعد بالتعليمات وتلبية طلب المتصل دون أخطاء أو معلومات غير صحيحة. تم استبعاد حالات إغلاق الخط المبكر من قبل المتصل ليركز المؤشر فقط على جودة الأداء التقني للمساعد.';
+                    break;
+                case 'score':
+                    title = 'مؤشر تقييم القاضي';
+                    text = 'هو التقييم العام لجودة المحادثة (من 100%) الذي يمنحه القاضي الآلي للمكالمات الأخيرة. يقيس مدى طبيعية ودقة ولباقة المساعد الذكي في مساعدته للمتصل. يعتبر التقييم ممتازاً (باللون الأخضر) إذا كان 85% فأكثر، وجيداً جداً (باللون الأزرق) إذا كان أقل من 85%.';
+                    break;
+            }
+
+            titleEl.innerText = title;
+            textEl.innerText = text;
+            modal.style.display = 'flex';
+            // Force a reflow for transition
+            modal.offsetHeight;
+            modal.classList.add('active');
+        }
+
+        function closeInfoModal() {
+            const modal = document.getElementById('info-modal');
+            if (!modal) return;
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        }
+
+        // Close modal when clicking outside the content area
+        window.addEventListener('click', (e) => {
+            const modal = document.getElementById('info-modal');
+            if (e.target === modal) {
+                closeInfoModal();
+            }
+        });
     </script>
+
+    <!-- Info Modal HTML -->
+    <div id="info-modal" class="info-modal-overlay" style="display: none;">
+        <div class="info-modal-content">
+            <div class="info-modal-header">
+                <h3 id="info-modal-title">شرح مؤشر الأداء</h3>
+                <button onclick="closeInfoModal()" class="info-modal-close-btn">&times;</button>
+            </div>
+            <div class="info-modal-body">
+                <p id="info-modal-text"></p>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

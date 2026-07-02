@@ -1055,7 +1055,7 @@
                 <!-- Live Chat Scroll Area -->
                 <div id="chat-messages" class="chat-messages">
                     <div class="message-wrapper agent">
-                        <div class="message agent">مرحباً بك! اضغط على زر "بدء محادثة صوتية" بالأسفل لبدء التحدث الصوتي.</div>
+                        <div class="message agent">مرحباً بكم! اضغط على زر "بدء محادثة صوتية" بالأسفل لبدء التحدث الصوتي.</div>
                     </div>
                 </div>
 
@@ -1253,6 +1253,14 @@
                 commentContainer.style.display = 'flex';
                 // Wait briefly for display flex to register before focus
                 setTimeout(() => input.focus(), 50);
+            } else if (kpiValue === 50) {
+                // Slide down text box for Acceptable (50%)
+                prompt.innerText = "يسعدني أن الخدمة كانت مقبولة! كيف يمكننا تحسينها لتصبح ممتازة بالتحديد؟";
+                input.value = "";
+                toast.classList.add('expanded');
+                commentContainer.style.display = 'flex';
+                // Wait briefly for display flex to register before focus
+                setTimeout(() => input.focus(), 50);
             } else if (kpiValue === 0) {
                 // Slide down text box for Bad (0%)
                 prompt.innerText = "يؤسفني ذلك! ما الذي أزعجك بالتحديد؟ رأيك سيساعدني في تطويري";
@@ -1262,7 +1270,7 @@
                 // Wait briefly for display flex to register before focus
                 setTimeout(() => input.focus(), 50);
             } else {
-                // For Okay (50%), show success directly and slide away
+                // Show success directly and slide away (fallback)
                 successMsg.style.display = 'inline-block';
                 setTimeout(() => {
                     hideFeedbackToast();

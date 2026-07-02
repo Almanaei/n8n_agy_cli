@@ -187,6 +187,73 @@
         .tray-transition {
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
+
+        /* Info Modal Styling */
+        .info-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .info-modal-overlay.active {
+            opacity: 1;
+        }
+        .info-modal-content {
+            background-color: var(--surface-primary, #1c1c1e);
+            border: 1px solid var(--border-color, rgba(255,255,255,0.1));
+            border-radius: 12px;
+            width: 90%;
+            max-width: 450px;
+            padding: 24px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        .info-modal-overlay.active .info-modal-content {
+            transform: scale(1);
+        }
+        .info-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.1));
+            padding-bottom: 12px;
+        }
+        .info-modal-header h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary, #ffffff);
+            margin: 0;
+        }
+        .info-modal-close-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary, #8e8e93);
+            font-size: 1.5rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: 4px;
+            transition: color 0.2s ease;
+        }
+        .info-modal-close-btn:hover {
+            color: var(--text-primary, #ffffff);
+        }
+        .info-modal-body p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-secondary, #8e8e93);
+            margin: 0;
+        }
     </style>
 </head>
 <body class="h-full overflow-hidden">
@@ -270,12 +337,12 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                         
                         <!-- KPI 1: Sentiment Success Rate -->
-                        <div class="glass-card spring-scale-brand p-5 flex flex-col gap-3 cursor-pointer relative overflow-hidden">
+                        <div class="glass-card spring-scale-brand p-5 flex flex-col gap-3 cursor-pointer relative overflow-hidden" id="card-secondary-success-wrapper" onclick="showInfoModal('success')">
                             <!-- Top glow line -->
-                            <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-brand to-transparent"></div>
+                            <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-brand to-transparent" id="card-secondary-success-glow"></div>
                             <div class="flex justify-between items-center">
                                 <span class="text-xs font-semibold text-text-secondary tracking-wider">معدل نجاح المكالمات</span>
-                                <span class="text-lg bg-brand/10 text-brand w-8 h-8 rounded-lg flex items-center justify-center">🎯</span>
+                                <span class="text-lg bg-brand/10 text-brand w-8 h-8 rounded-lg flex items-center justify-center" id="card-secondary-success-icon">🎯</span>
                             </div>
                             <div class="flex items-baseline gap-2">
                                 <span class="text-3xl font-mono font-bold" id="kpi-success-rate">0.0</span>
@@ -290,12 +357,11 @@
                         </div>
 
                         <!-- KPI 2: Average TTFT Delay -->
-                        <div class="glass-card spring-scale-success p-5 flex flex-col gap-3 cursor-pointer relative overflow-hidden">
+                        <div class="glass-card spring-scale-success p-5 flex flex-col gap-3 cursor-pointer relative overflow-hidden" onclick="showInfoModal('ttft')">
                             <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-status-success to-transparent"></div>
                             <div class="flex justify-between items-center">
                                 <div class="flex flex-col">
                                     <span class="text-xs font-semibold text-text-secondary tracking-wider">سرعة الاستجابة الأولى (TTFT)</span>
-                                    <span class="text-[10px] text-text-secondary mt-0.5" id="kpi-ttft-target">المستهدف: --ms</span>
                                 </div>
                                 <span class="text-lg bg-status-success/10 text-status-success w-8 h-8 rounded-lg flex items-center justify-center">⏱️</span>
                             </div>
@@ -312,7 +378,7 @@
                         </div>
 
                         <!-- KPI 3: Average M2E Latency -->
-                        <div class="glass-card spring-scale-info p-5 flex flex-col gap-3 cursor-pointer relative overflow-hidden">
+                        <div class="glass-card spring-scale-info p-5 flex flex-col gap-3 cursor-pointer relative overflow-hidden" onclick="showInfoModal('m2e')">
                             <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-status-info to-transparent"></div>
                             <div class="flex justify-between items-center">
                                 <span class="text-xs font-semibold text-text-secondary tracking-wider">زمن الاستجابة للنهاية (M2E)</span>
@@ -331,11 +397,11 @@
                         </div>
 
                         <!-- KPI 4: Adversarial Score -->
-                        <div class="glass-card spring-scale-warning p-5 flex flex-col gap-3 cursor-pointer relative overflow-hidden">
-                            <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-status-warning to-transparent"></div>
+                        <div class="glass-card spring-scale-warning p-5 flex flex-col gap-3 cursor-pointer relative overflow-hidden" id="card-secondary-score-wrapper" onclick="showInfoModal('score')">
+                            <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-status-warning to-transparent" id="card-secondary-score-glow"></div>
                             <div class="flex justify-between items-center">
                                 <span class="text-xs font-semibold text-text-secondary tracking-wider">تقييم قاضي المحكمة</span>
-                                <span class="text-lg bg-status-warning/10 text-status-warning w-8 h-8 rounded-lg flex items-center justify-center">⚖️</span>
+                                <span class="text-lg bg-status-warning/10 text-status-warning w-8 h-8 rounded-lg flex items-center justify-center" id="card-secondary-score-icon">⚖️</span>
                             </div>
                             <div class="flex items-baseline gap-2">
                                 <span class="text-3xl font-mono font-bold" id="kpi-magistrate-score">0.0</span>
@@ -561,6 +627,10 @@
     <script>
         let apiData = null;
         let activeTab = 'system';
+        let globalM2eColorHex = '#3B82F6';
+        let globalTtftColorHex = '#10B981';
+        let globalSuccessColorHex = '#8251EE';
+        let globalScoreColorHex = '#F59E0B';
 
         // Formats time strings legibly
         function cleanTimeFormat(rawTimestamp) {
@@ -651,24 +721,72 @@
             const stats = data.stats || {};
             const telemetry = data.telemetryStats || {};
 
-            // Success Rate Card (System)
-            const totalVerdicts = Object.values(telemetry.verdicts || {}).reduce((a, b) => a + b, 0);
-            const successVerdicts = (telemetry.verdicts || {})['SUCCESS'] || 0;
+            // Success Rate Card (System - excluding USER_ABANDONMENT)
+            const verdictsObj = telemetry.verdicts || {};
+            let totalVerdicts = 0;
+            Object.keys(verdictsObj).forEach(k => {
+                if (k !== 'USER_ABANDONMENT') {
+                    totalVerdicts += verdictsObj[k];
+                }
+            });
+            const successVerdicts = verdictsObj['SUCCESS'] || 0;
             const successRate = totalVerdicts > 0 ? (successVerdicts / totalVerdicts) * 100 : 100.0;
             
+            let successColorHex = '#10B981';
+            let successColorClass = 'bg-status-success';
+            let successScaleClass = 'spring-scale-success';
+            let successGlowClass = 'via-status-success';
+            let successIconClass = 'bg-status-success/10 text-status-success';
+
+            if (successRate >= 85) {
+                successColorHex = '#10B981';
+                successColorClass = 'bg-status-success';
+                successScaleClass = 'spring-scale-success';
+                successGlowClass = 'via-status-success';
+                successIconClass = 'bg-status-success/10 text-status-success';
+            } else if (successRate >= 70) {
+                successColorHex = '#3B82F6';
+                successColorClass = 'bg-status-info';
+                successScaleClass = 'spring-scale-info';
+                successGlowClass = 'via-status-info';
+                successIconClass = 'bg-status-info/10 text-status-info';
+            } else {
+                successColorHex = '#F59E0B';
+                successColorClass = 'bg-status-warning';
+                successScaleClass = 'spring-scale-warning';
+                successGlowClass = 'via-status-warning';
+                successIconClass = 'bg-status-warning/10 text-status-warning';
+            }
+
             document.getElementById('kpi-success-rate').innerText = successRate.toFixed(1);
-            document.getElementById('bar-success-rate').style.width = `${successRate}%`;
+            const barSuccess = document.getElementById('bar-success-rate');
+            if (barSuccess) {
+                barSuccess.className = `h-full rounded-full transition-all duration-1000 ${successColorClass}`;
+                barSuccess.style.width = `${successRate}%`;
+            }
+
+            // Dynamic card classes for success
+            const successWrapper = document.getElementById('card-secondary-success-wrapper');
+            if (successWrapper) {
+                successWrapper.className = `glass-card ${successScaleClass} p-5 flex flex-col gap-3 cursor-pointer relative overflow-hidden`;
+            }
+            const successGlow = document.getElementById('card-secondary-success-glow');
+            if (successGlow) {
+                successGlow.className = `absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent ${successGlowClass} to-transparent`;
+            }
+            const successIcon = document.getElementById('card-secondary-success-icon');
+            if (successIcon) {
+                successIcon.className = `text-lg ${successIconClass} w-8 h-8 rounded-lg flex items-center justify-center`;
+            }
+
+            globalSuccessColorHex = successColorHex;
 
             // TTFT Card
             const defaultTtftMs = (data.config && data.config.defaultTtftMs) ? data.config.defaultTtftMs : 663;
-            const targetLabelEl = document.getElementById('kpi-ttft-target');
-            if (targetLabelEl) {
-                targetLabelEl.innerText = `المستهدف: < ${defaultTtftMs}ms`;
-            }
 
             const excellentThreshold = defaultTtftMs;
             const acceptableThreshold = Math.round(defaultTtftMs * 1.2);
-            const poorThreshold = Math.round(defaultTtftMs * 1.5);
+            const poorThreshold = 2000;
 
             const hasTtft = telemetry.avgTtft > 0;
             document.getElementById('kpi-ttft').innerText = hasTtft ? telemetry.avgTtft : "N/A";
@@ -692,11 +810,41 @@
                 barTtft.style.width = `${ttftPercent}%`;
             }
 
+            let ttftColorHex = '#10B981';
+            if (ttftColorClass === 'bg-status-info') ttftColorHex = '#3B82F6';
+            else if (ttftColorClass === 'bg-status-warning') ttftColorHex = '#F59E0B';
+            else if (ttftColorClass === 'bg-status-error') ttftColorHex = '#EF4444';
+            globalTtftColorHex = ttftColorHex;
+
             // M2E Card
             const hasM2e = telemetry.avgM2e > 0;
             document.getElementById('kpi-m2e').innerText = hasM2e ? telemetry.avgM2e : "N/A";
-            const m2ePercent = hasM2e ? Math.max(0, Math.min(100, Math.round((telemetry.avgM2e / 800) * 100))) : 0;
-            document.getElementById('bar-m2e').style.width = `${m2ePercent}%`;
+            
+            let m2eColorClass = 'bg-status-info';
+            if (hasM2e) {
+                if (telemetry.avgM2e < 600) {
+                    m2eColorClass = 'bg-status-success';
+                } else if (telemetry.avgM2e < 1200) {
+                    m2eColorClass = 'bg-status-info';
+                } else if (telemetry.avgM2e < 2000) {
+                    m2eColorClass = 'bg-status-warning';
+                } else {
+                    m2eColorClass = 'bg-status-error';
+                }
+            }
+            const barM2e = document.getElementById('bar-m2e');
+            if (barM2e) {
+                barM2e.className = `h-full rounded-full transition-all duration-1000 ${m2eColorClass}`;
+                const m2ePercent = hasM2e ? Math.max(0, Math.min(100, Math.round((telemetry.avgM2e / 2000) * 100))) : 0;
+                barM2e.style.width = `${m2ePercent}%`;
+            }
+
+            let m2eColorHex = '#3B82F6';
+            if (m2eColorClass === 'bg-status-success') m2eColorHex = '#10B981';
+            else if (m2eColorClass === 'bg-status-info') m2eColorHex = '#3B82F6';
+            else if (m2eColorClass === 'bg-status-warning') m2eColorHex = '#F59E0B';
+            else if (m2eColorClass === 'bg-status-error') m2eColorHex = '#EF4444';
+            globalM2eColorHex = m2eColorHex;
 
             // Magistrate Score Card
             let scoreCount = 0, scoreSum = 0;
@@ -707,8 +855,49 @@
                 }
             });
             const magistrateScore = scoreCount > 0 ? (scoreSum / scoreCount) * 100 : 92.4;
+            
+            let scoreColorHex = '#10B981';
+            let scoreColorClass = 'bg-status-success';
+            let scoreScaleClass = 'spring-scale-success';
+            let scoreGlowClass = 'via-status-success';
+            let scoreIconClass = 'bg-status-success/10 text-status-success';
+
+            if (magistrateScore >= 85) {
+                scoreColorHex = '#10B981';
+                scoreColorClass = 'bg-status-success';
+                scoreScaleClass = 'spring-scale-success';
+                scoreGlowClass = 'via-status-success';
+                scoreIconClass = 'bg-status-success/10 text-status-success';
+            } else {
+                scoreColorHex = '#3B82F6';
+                scoreColorClass = 'bg-status-info';
+                scoreScaleClass = 'spring-scale-info';
+                scoreGlowClass = 'via-status-info';
+                scoreIconClass = 'bg-status-info/10 text-status-info';
+            }
+
             document.getElementById('kpi-magistrate-score').innerText = magistrateScore.toFixed(1);
-            document.getElementById('bar-magistrate').style.width = `${magistrateScore}%`;
+            const barMagistrate = document.getElementById('bar-magistrate');
+            if (barMagistrate) {
+                barMagistrate.className = `h-full rounded-full transition-all duration-1000 ${scoreColorClass}`;
+                barMagistrate.style.width = `${magistrateScore}%`;
+            }
+
+            // Dynamic card classes for score
+            const scoreWrapper = document.getElementById('card-secondary-score-wrapper');
+            if (scoreWrapper) {
+                scoreWrapper.className = `glass-card ${scoreScaleClass} p-5 flex flex-col gap-3 cursor-pointer relative overflow-hidden`;
+            }
+            const scoreGlow = document.getElementById('card-secondary-score-glow');
+            if (scoreGlow) {
+                scoreGlow.className = `absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent ${scoreGlowClass} to-transparent`;
+            }
+            const scoreIcon = document.getElementById('card-secondary-score-icon');
+            if (scoreIcon) {
+                scoreIcon.className = `text-lg ${scoreIconClass} w-8 h-8 rounded-lg flex items-center justify-center`;
+            }
+
+            globalScoreColorHex = scoreColorHex;
 
             // User KPIs
             document.getElementById('kpi-excellent').innerText = stats.excellentRate.toFixed(1);
@@ -728,7 +917,12 @@
             chartRows.innerHTML = '';
 
             const verdicts = telemetry ? telemetry.verdicts || {} : {};
-            const total = Object.values(verdicts).reduce((a, b) => a + b, 0);
+            let total = 0;
+            Object.keys(verdicts).forEach(k => {
+                if (k !== 'USER_ABANDONMENT') {
+                    total += verdicts[k];
+                }
+            });
 
             const configs = [
                 { key: 'SUCCESS', name: 'مكالمات ناجحة (SUCCESS)', color: '#10B981' },
@@ -1182,10 +1376,10 @@
             });
             const successTrend = successPoints.slice(-15);
 
-            drawSVG('sparkline-system-success', successTrend, '#8251EE');
-            drawSVG('sparkline-system-ttft', ttftPoints, '#10B981');
-            drawSVG('sparkline-system-m2e', m2ePoints, '#3B82F6');
-            drawSVG('sparkline-system-score', scorePoints, '#F59E0B');
+            drawSVG('sparkline-system-success', successTrend, globalSuccessColorHex);
+            drawSVG('sparkline-system-ttft', ttftPoints, globalTtftColorHex);
+            drawSVG('sparkline-system-m2e', m2ePoints, globalM2eColorHex);
+            drawSVG('sparkline-system-score', scorePoints, globalScoreColorHex);
         }
 
         // Initialize and setup polling
@@ -1199,6 +1393,71 @@
                 drawSparklines(apiData.recentCalls);
             }
         });
+        // Info Modal control functions
+        function showInfoModal(cardType) {
+            const modal = document.getElementById('info-modal');
+            const titleEl = document.getElementById('info-modal-title');
+            const textEl = document.getElementById('info-modal-text');
+            if (!modal || !titleEl || !textEl) return;
+
+            let title = '';
+            let text = '';
+
+            switch(cardType) {
+                case 'm2e':
+                    title = 'متوسط زمن الاستجابة (M2E)';
+                    text = 'يقيس متوسط التأخير الإجمالي في المحادثة. ويمثل الوقت المستغرق منذ انتهاء المتصل من الكلام وحتى بدء المساعد الذكي في الرد بصوته. كلما قل هذا الزمن (يفضل أقل من 600 مللي ثانية), أصبحت المحادثة أسرع وأكثر طبيعية وتماثل الحوار البشري.';
+                    break;
+                case 'ttft':
+                    title = 'سرعة الاستجابة الأولى (TTFT)';
+                    text = 'يمثل "وقت التفكير" للمساعد الذكي. ويقيس الوقت المستغرق منذ استلام المساعد لمدخلات المتصل وحتى توليد الكلمة الأولى من الإجابة. هذا المؤشر حيوي لمراقبة سرعة معالجة نموذج الذكاء الاصطناعي (LLM) المستخدم.';
+                    break;
+                case 'success':
+                    title = 'معدل النجاح للمحكمة';
+                    text = 'يمثل النسبة المئوية للمكالمات التي تمت بنجاح كامل. يقوم قاضٍ آلي يعمل بالذكاء الاصطناعي بمراجعة نص كل مكالمة للتأكد من التزام المساعد بالتعليمات وتلبية طلب المتصل دون أخطاء أو معلومات غير صحيحة. تم استبعاد حالات إغلاق الخط المبكر من قبل المتصل ليركز المؤشر فقط على جودة الأداء التقني للمساعد.';
+                    break;
+                case 'score':
+                    title = 'مؤشر تقييم القاضي';
+                    text = 'هو التقييم العام لجودة المحادثة (من 100%) الذي يمنحه القاضي الآلي للمكالمات الأخيرة. يقيس مدى طبيعية ودقة ولباقة المساعد الذكي في مساعدته للمتصل. يعتبر التقييم ممتازاً (باللون الأخضر) إذا كان 85% فأكثر, وجيداً جداً (باللون الأزرق) إذا كان أقل من 85%.';
+                    break;
+            }
+
+            titleEl.innerText = title;
+            textEl.innerText = text;
+            modal.style.display = 'flex';
+            modal.offsetHeight;
+            modal.classList.add('active');
+        }
+
+        function closeInfoModal() {
+            const modal = document.getElementById('info-modal');
+            if (!modal) return;
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        }
+
+        // Close modal when clicking outside the content area
+        window.addEventListener('click', (e) => {
+            const modal = document.getElementById('info-modal');
+            if (e.target === modal) {
+                closeInfoModal();
+            }
+        });
     </script>
+
+    <!-- Info Modal HTML -->
+    <div id="info-modal" class="info-modal-overlay" style="display: none;">
+        <div class="info-modal-content text-right" style="direction: rtl;">
+            <div class="info-modal-header flex justify-between items-center">
+                <h3 id="info-modal-title" class="text-lg font-bold text-white">شرح مؤشر الأداء</h3>
+                <button onclick="closeInfoModal()" class="info-modal-close-btn text-2xl text-text-secondary hover:text-white">&times;</button>
+            </div>
+            <div class="info-modal-body mt-4">
+                <p id="info-modal-text" class="text-sm text-text-secondary leading-relaxed"></p>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

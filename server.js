@@ -394,7 +394,11 @@ const server = http.createServer(async (req, res) => {
             
             if (!n8nRes.ok) {
               const errText = await n8nRes.text();
-              console.error(`[Background Task] n8n webhook returned ${n8nRes.status}: ${errText}`);
+              if (n8nRes.status === 404) {
+                console.log(`[Background Task] n8n feedback webhook is optional in the active workflow (returned 404). Formatting sheet directly.`);
+              } else {
+                console.error(`[Background Task] n8n webhook returned ${n8nRes.status}: ${errText}`);
+              }
             }
           } catch (n8nError) {
             console.error("[Background Task] Error forwarding feedback to n8n:", n8nError);
@@ -533,23 +537,6 @@ erra6BzpXyWJxdylk4cdvD0=
         if (!item || !item.conversation_id) return;
         if (item.conversation_id.startsWith("standalone_")) return;
         telemetryMap[item.conversation_id] = item;
-        
-        const stats = item.stats || {};
-        if (stats.avg_m2e_ms) {
-          totalM2e += stats.avg_m2e_ms;
-          countM2e++;
-        }
-        if (stats.avg_ttft_ms) {
-          totalTtft += stats.avg_ttft_ms;
-          countTtft++;
-        }
-        if (stats.p95_m2e_ms > maxP95) {
-          maxP95 = stats.p95_m2e_ms;
-        }
-        const v = item.root_cause_verdict;
-        if (v in verdictCounts) {
-          verdictCounts[v]++;
-        }
       });
 
       for (let i = 1; i < rows.length; i++) {
@@ -595,6 +582,27 @@ erra6BzpXyWJxdylk4cdvD0=
         else if (kpiVal === 50) agentMap[agent].acceptable++;
         else if (kpiVal === 0) agentMap[agent].poor++;
 
+        // Accumulate telemetry statistics only for active sheet rows
+        const telemetryItem = telemetryMap[conversationId];
+        if (telemetryItem) {
+          const stats = telemetryItem.stats || {};
+          if (stats.avg_m2e_ms) {
+            totalM2e += stats.avg_m2e_ms;
+            countM2e++;
+          }
+          if (stats.avg_ttft_ms) {
+            totalTtft += stats.avg_ttft_ms;
+            countTtft++;
+          }
+          if (stats.p95_m2e_ms > maxP95) {
+            maxP95 = stats.p95_m2e_ms;
+          }
+          const v = telemetryItem.root_cause_verdict;
+          if (v in verdictCounts) {
+            verdictCounts[v]++;
+          }
+        }
+
         parsedRows.push({
           timestamp,
           clientName,
@@ -604,7 +612,7 @@ erra6BzpXyWJxdylk4cdvD0=
           status,
           kpi,
           comment,
-          telemetry: telemetryMap[conversationId] || null
+          telemetry: telemetryItem || null
         });
 
         if (timestamp) {
