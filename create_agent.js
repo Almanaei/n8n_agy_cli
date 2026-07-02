@@ -89,7 +89,7 @@ const agentConfig = {
           }
         ]
       },
-      first_message: "مرحبا بكم في مركز خدمات الدفاع المدني الذكي. يرجى تزويدي بالإسم ورقم الهاتف للبدء / Welcome to the Civil Defense services. Please provide your name and phone number to begin.",
+      first_message: "مرحبا بكم في مركز خدمات الدفاع المدني الذكي. يرجى تزويدي بالإسم ورقم الهاتف للبدء\nWelcome to the Civil Defense services. Please provide your name and phone number to begin.",
       language: "ar"
     },
     turn: {

@@ -103,7 +103,7 @@ async function patchElevenLabs(baseUrl) {
             }
           ]
         },
-        first_message: "مرحبا بكم في مركز خدمات الإدارة العامة للدفاع المدني .. يرجى تزويدي بالإسم ورقم الهاتف"
+        first_message: "مرحبا بكم في مركز خدمات الدفاع المدني الذكي. يرجى تزويدي بالإسم ورقم الهاتف للبدء\nWelcome to the Civil Defense services. Please provide your name and phone number to begin."
       },
       turn: {
         turn_timeout: 15
