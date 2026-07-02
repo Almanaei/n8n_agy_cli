@@ -2087,6 +2087,12 @@
         fetchKpiData();
         setInterval(fetchKpiData, 10000);
 
+        // Switch to user tab if requested via query param
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('tab') === 'user') {
+            switchTab('user');
+        }
+
         // Adjust SVG viewports on window resize to ensure fluid layouts
         window.addEventListener('resize', () => {
             if (kpiDataGlobal) {
