@@ -15,7 +15,7 @@ if hasattr(sys.stderr, 'reconfigure'):
 # Load dotenv from workspace root
 load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 
-ELEVENLABS_API_KEY = "896c43093392d23879dc8d578e7840b4a0b27af2ecf38803e985386b494c427c"
+ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "896c43093392d23879dc8d578e7840b4a0b27af2ecf38803e985386b494c427c")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4o-mini")

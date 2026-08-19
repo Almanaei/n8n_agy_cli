@@ -41,7 +41,7 @@ function startProcess(name, command, args, colorCode) {
 }
 
 // 1. Start n8n Server (Green - 32)
-startProcess('n8n', 'npx', ['n8n', 'start'], '32');
+startProcess('n8n', 'npx', ['-y', 'n8n', 'start'], '32');
 
 // 2. Start Express Web Server (Blue - 34)
 startProcess('Express Server', 'node', ['server.js'], '34');

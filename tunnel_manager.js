@@ -1,7 +1,7 @@
 const localtunnel = require('localtunnel');
-const apiKey = "896c43093392d23879dc8d578e7840b4a0b27af2ecf38803e985386b494c427c";
-const agentId = "agent_1601kv6ytcwwfh1sfk46qqhrrq3j";
-const webhookId = "b78ba4ce83d64a8ca92dafb87447b48b";
+const apiKey = process.env.ELEVENLABS_API_KEY || "896c43093392d23879dc8d578e7840b4a0b27af2ecf38803e985386b494c427c";
+const agentId = process.env.ELEVENLABS_AGENT_ID || "agent_1601kv6ytcwwfh1sfk46qqhrrq3j";
+const webhookId = process.env.ELEVENLABS_WEBHOOK_ID || "b78ba4ce83d64a8ca92dafb87447b48b";
 
 const systemPrompt = `You are a professional customer service assistant representing the General Directorate of Civil Defense in the Kingdom of Bahrain (الإدارة العامة للدفاع المدني في مملكة البحرين).
 

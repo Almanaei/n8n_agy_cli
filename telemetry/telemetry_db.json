@@ -1671,5 +1671,121 @@
     "accusation": "الوكيل يتهم العميل بتقديم معلومات غير دقيقة حول رقم هاتف مركز خدمة العملاء",
     "defense": "المدافع يبرر أن هناك خلل في فهم العميل للاستجابة الصحيحة التي قدمها الوكيل",
     "adjudication": "حكم القاضي يؤكد أن هناك انحرافًا عن الحقائق فيما يخص رقم هاتف مركز خدمة العملاء، حيث لم يتم تقديم رقم هاتف صحيح من قبل الوكيل"
+  },
+  {
+    "conversation_id": "conv_8201kwhxfb52erxswp4n08arnh4m",
+    "timestamp": 1783012991.0302966,
+    "stats": {
+      "avg_m2e_ms": 995.2,
+      "avg_ttft_ms": 775.7,
+      "p95_m2e_ms": 1506.0,
+      "interrupted_count": 9,
+      "total_turns": 43,
+      "has_audio": true
+    },
+    "score": 0.9,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "لم يتم الكشف عن أي انتهاكات للقواعد أو الانحرافات عن المعرفة الأساسية",
+    "defense": "تم الرد على جميع استفسارات المستخدم بشكل دقيق ومطابق للمعلومات المتاحة في قاعدة المعرفة، مع احترام القيود الصوتية والديناميكية للتحديث",
+    "adjudication": "تمت المحادثة بنجاح مع استجابات سريعة ومدروسة، وتم تزويد المستخدم بجميع المعلومات المطلوبة بشكل واضح ومفيد، وتم الحفاظ على الشخصية المطلوبة لمركز خدمات الإدارة العامة للدفاع المدني"
+  },
+  {
+    "conversation_id": "conv_2101kwj2q772f59ard1a9mgaf7ae",
+    "timestamp": 1783018392.3841581,
+    "stats": {
+      "avg_m2e_ms": 762.5,
+      "avg_ttft_ms": 660.7,
+      "p95_m2e_ms": 1025.3,
+      "interrupted_count": 3,
+      "total_turns": 19,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "FACTUAL_DIVERGENCE",
+    "accusation": "الوكيل يتهم الوكيل بتقديم معلومات خاطئة حول الرسوم والخدمات",
+    "defense": "المدافع يبرر أن هناك بعض الاختلافات في المعلومات بسبب تحديثات الخدمات، ولكن الجهد كان لتقديم معلومات دقيقة",
+    "adjudication": "حكمت المحكمة بأن هناك بعض الانحرافات عن الحقائق فيما يتعلق بالرسوم والخدمات، وينبغي على الوكيل تحسين دقة المعلومات المقدمة إلى المستخدمين"
+  },
+  {
+    "conversation_id": "conv_7101kwhxfb52erxswp4n08arnh4n",
+    "timestamp": 1783037029.0442395,
+    "stats": {
+      "avg_m2e_ms": 0.0,
+      "avg_ttft_ms": 0.0,
+      "p95_m2e_ms": 0.0,
+      "interrupted_count": 0,
+      "total_turns": 0
+    },
+    "score": 0.0,
+    "root_cause_verdict": "NOT_FOUND",
+    "accusation": "Conversation ID not found on ElevenLabs. It might be a test or mock record.",
+    "defense": "N/A",
+    "adjudication": "This conversation could not be evaluated because it does not exist in ElevenLabs history."
+  },
+  {
+    "conversation_id": "conv_6101kwhxfb52erxswp4n08arnh4o",
+    "timestamp": 1783037032.872701,
+    "stats": {
+      "avg_m2e_ms": 0.0,
+      "avg_ttft_ms": 0.0,
+      "p95_m2e_ms": 0.0,
+      "interrupted_count": 0,
+      "total_turns": 0
+    },
+    "score": 0.0,
+    "root_cause_verdict": "NOT_FOUND",
+    "accusation": "Conversation ID not found on ElevenLabs. It might be a test or mock record.",
+    "defense": "N/A",
+    "adjudication": "This conversation could not be evaluated because it does not exist in ElevenLabs history."
+  },
+  {
+    "conversation_id": "conv_5101kwhxfb52erxswp4n08arnh4p",
+    "timestamp": 1783037039.7970867,
+    "stats": {
+      "avg_m2e_ms": 0.0,
+      "avg_ttft_ms": 0.0,
+      "p95_m2e_ms": 0.0,
+      "interrupted_count": 0,
+      "total_turns": 0
+    },
+    "score": 0.0,
+    "root_cause_verdict": "NOT_FOUND",
+    "accusation": "Conversation ID not found on ElevenLabs. It might be a test or mock record.",
+    "defense": "N/A",
+    "adjudication": "This conversation could not be evaluated because it does not exist in ElevenLabs history."
+  },
+  {
+    "conversation_id": "conv_2401m0e4hdezf7gsv5t1j6derhf7",
+    "timestamp": 1787181047.3513207,
+    "stats": {
+      "avg_m2e_ms": 749.7,
+      "avg_ttft_ms": 786.1,
+      "p95_m2e_ms": 956.6,
+      "interrupted_count": 1,
+      "total_turns": 15,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "The agent provided accurate information regarding the service fees and maintained the Bahrain Civil Defense persona throughout the conversation.",
+    "defense": "The agent's responses were brief and relevant, adhering to the voice constraints, and there were no significant latency issues.",
+    "adjudication": "The conversation was handled well, with the agent providing correct information about the service fees and maintaining a professional tone. However, there were some unnecessary pauses that could have been avoided, which slightly affected the overall fluidity of the interaction."
+  },
+  {
+    "conversation_id": "conv_3201m0e4r4kye7gr7k5eghpy76mp",
+    "timestamp": 1787181292.4383333,
+    "stats": {
+      "avg_m2e_ms": 814.3,
+      "avg_ttft_ms": 625.1,
+      "p95_m2e_ms": 1074.4,
+      "interrupted_count": 1,
+      "total_turns": 23,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "The agent provided accurate information about services but had some latency issues and unnecessary follow-up questions.",
+    "defense": "The agent maintained the Bahrain Civil Defense persona and provided relevant information, but there were instances of unexcused latency and interruptions.",
+    "adjudication": "The conversation was mostly successful, with the agent providing accurate information about services. However, there were some unnecessary follow-up questions and a slight delay in responses that affected the overall experience."
   }
 ]

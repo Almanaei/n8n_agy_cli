@@ -35,8 +35,8 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 
-const apiKey = "896c43093392d23879dc8d578e7840b4a0b27af2ecf38803e985386b494c427c";
-const agentId = "agent_1601kv6ytcwwfh1sfk46qqhrrq3j";
+const apiKey = process.env.ELEVENLABS_API_KEY || "896c43093392d23879dc8d578e7840b4a0b27af2ecf38803e985386b494c427c";
+const agentId = process.env.ELEVENLABS_AGENT_ID || "agent_1601kv6ytcwwfh1sfk46qqhrrq3j";
 
 function generateGoogleAccessToken(clientEmail, privateKey, scopes) {
   const header = {

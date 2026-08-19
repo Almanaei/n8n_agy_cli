@@ -1,7 +1,11 @@
 const fs = require('fs');
 
+try {
+  require('dotenv').config();
+} catch (e) {}
+
 async function run() {
-  const apiKey = "896c43093392d23879dc8d578e7840b4a0b27af2ecf38803e985386b494c427c";
+  const apiKey = process.env.ELEVENLABS_API_KEY || "896c43093392d23879dc8d578e7840b4a0b27af2ecf38803e985386b494c427c";
   const conversationId = "conv_6301kvmpaagffs5se53vm0sfdzrv";
   const url = `https://api.elevenlabs.io/v1/convai/conversations/${conversationId}`;
 

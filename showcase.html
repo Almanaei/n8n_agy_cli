@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ملف تعريفي: نظام المساعد الصوتي والتحكم الذكي للدفاع المدني</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #030508;
+            color: #f5f5f7;
+            padding: 40px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(22, 22, 23, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 45px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 30px;
+            margin-bottom: 40px;
+        }
+
+        .logo-placeholder {
+            font-size: 55px;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            color: #ffffff;
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #86868b;
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        h2 {
+            color: #0071e3;
+            font-size: 22px;
+            margin-top: 35px;
+            margin-bottom: 15px;
+            border-right: 4px solid #0071e3;
+            padding-right: 12px;
+            font-weight: 700;
+        }
+
+        p {
+            color: #86868b;
+            margin-bottom: 15px;
+            font-size: 15px;
+            text-align: justify;
+        }
+
+        ul {
+            margin-right: 25px;
+            margin-bottom: 20px;
+            color: #86868b;
+        }
+
+        li {
+            margin-bottom: 8px;
+            font-size: 14.5px;
+        }
+
+        .highlight {
+            color: #ff453a;
+            font-weight: 600;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .feature-card h3 {
+            color: #ffffff;
+            font-size: 16px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .screenshot-container {
+            margin-top: 35px;
+            margin-bottom: 35px;
+            background: rgba(255, 255, 255, 0.015);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 25px;
+        }
+
+        .screenshot-title {
+            color: #ffffff;
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 8px;
+        }
+
+        .screenshot-desc {
+            color: #86868b;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .screenshot-img-wrapper {
+            text-align: center;
+        }
+
+        .screenshot-img-mobile {
+            max-width: 320px;
+            width: 100%;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            margin-bottom: 15px;
+        }
+
+        .screenshot-img-desktop {
+            width: 100%;
+            max-width: 900px;
+            border-radius: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            margin-bottom: 15px;
+        }
+
+        .footer {
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 25px;
+            margin-top: 45px;
+            color: #86868b;
+            font-size: 13px;
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+
+        @media print {
+            body {
+                background-color: #ffffff;
+                color: #000000;
+                padding: 10px;
+            }
+            .container {
+                background: none;
+                border: none;
+                box-shadow: none;
+                padding: 0;
+            }
+            h1, h2, h3, .screenshot-title {
+                color: #000000 !important;
+            }
+            p, li, .subtitle, .screenshot-desc, .footer {
+                color: #333333 !important;
+            }
+            .feature-card, .screenshot-container {
+                background: #f6f8fa;
+                border: 1px solid #d0d7de;
+            }
+            .screenshot-img-mobile, .screenshot-img-desktop {
+                border: 1px solid #d0d7de;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-placeholder">🚒📱</div>
+            <h1>نظام المساعد الصوتي والتحكم الذكي المتكامل</h1>
+            <div class="subtitle">استعراض شامل حقيقي لخطوات تجربة العميل ونظام متابعة مؤشرات الأداء (KPI) للذكاء الاصطناعي</div>
+        </div>
+
+        <h2>1. نبذة عن النظام (Brief)</h2>
+        <p>
+            يمثل هذا النظام <span class="highlight">الجيل الجديد من حلول خدمة العملاء المؤتمتة بالذكاء الاصطناعي الصوتي</span>. يقوم النظام باستقبال المكالمات الصوتية للمستخدمين والتحدث معهم باللغة العربية بطلاقة وسلاسة تحاكي البشر، وتحديداً لخدمة عملاء <span class="highlight">الإدارة العامة للدفاع المدني بمملكة البحرين</span>. 
+        </p>
+        <p>
+            لا يقتصر دور النظام على المحادثة الصوتية فحسب، بل يمتد ليكون خط إنتاج مؤتمت بالكامل (Automation Pipeline). فبمجرد انتهاء المحادثة أو إدخال البيانات، يقوم النظام فوراً بتحديث قواعد البيانات (Google Sheets)، وإرسال بريد إلكتروني رسمي يحتوي على تفاصيل ونصوص المحادثة، وإرسال إشعار فوري عبر تطبيق الـ WhatsApp للمستخدم لتأكيد الطلب أو الخدمة.
+        </p>
+
+        <h2>2. هيكلية وبنية النظام (System Architecture)</h2>
+        <p>
+            يعتمد النظام على بنية برمجية متكاملة وسريعة الاستجابة مكونة من عدة طبقات:
+        </p>
+        <ul>
+            <li><strong>واجهة الاتصال الصوتي (ElevenLabs ConvAI):</strong> محرك الذكاء الاصطناعي الصوتي المتقدم الذي يفهم الصوت البشري ويحلله باللغة العربية الفصحى واللهجة البحرينية، ويقوم بإدارة الحوار والرد الفوري.</li>
+            <li><strong>بوابة الخادم المحلي (App Server - Express):</strong> خادم مبني بلغة Node.js يقوم بالتحقق الآمن وتوليد روابط التوثيق وجلب التذاكر الصوتية المشفرة.</li>
+            <li><strong>نفق الاتصال التلقائي (Cloudflared Tunnel):</strong> مدير متكامل يقوم بإنشاء قنوات ربط عامة آمنة وتحديث الإعدادات والأدوات (Tools) داخل حساب ElevenLabs تلقائياً عند البدء لضمان تدفق البيانات دون انقطاع.</li>
+            <li><strong>محرك أتمتة العمليات (n8n Pipeline):</strong> العقل المدبر لربط البيانات وتوليد التقارير. يستقبل بيانات المكالمات، يفرزها، ينظف أرقام الهواتف، ثم يوزعها على قنوات التواصل الفورية كـ SMTP و Twilio.</li>
+        </ul>
+
+        <div class="page-break"></div>
+
+        <h2>3. الميزات الرئيسية للنظام (Key Features)</h2>
+        <div class="grid-2">
+            <div class="feature-card">
+                <h3>🗣️ محادثة صوتية طبيعية بالكامل</h3>
+                <p>استجابة ذكية باللغة العربية مع دعم قواعد تنسيق للأرقام الهاتفية والقصيرة لضمان قراءتها وعرضها بشكل صحيح للعميل.</p>
+            </div>
+            <div class="feature-card">
+                <h3>📋 جمع وتدقيق البيانات فورياً</h3>
+                <p>يقوم المساعد بطلب اسم المتصل ورقم هاتفه للتحقق منهما، واستدعاء أداة حفظ العملاء تلقائياً لتسجيل بياناتهم قبل الانتقال لأي خدمة.</p>
+            </div>
+            <div class="feature-card">
+                <h3>🔗 إشعارات آلية متعددة القنوات</h3>
+                <p>إرسال فوري لنسخة نصية كاملة من الحوار إلى البريد الإلكتروني للمستخدم، مع إرسال ملخص المحادثة عبر الـ WhatsApp فور انتهاء المكالمة.</p>
+            </div>
+            <div class="feature-card">
+                <h3>📊 لوحة تحكم وتحليلات متقدمة</h3>
+                <p>تتبع مباشر لزمن الاستجابة (Latency)، وإجراءات فحص الجودة والتأكد من نجاح أو فشل المكالمات والمبررات الفنية لأي خلل.</p>
+            </div>
+        </div>
+
+        <div class="page-break"></div>
+
+        <h2>4. لقطات حقيقية من المحادثة التفاعلية (Real Conversation Flow)</h2>
+
+        <!-- Step 1 -->
+        <div class="screenshot-container">
+            <div class="screenshot-title">الخطوة 1: بدء الاتصال والترحيب التلقائي (Greeting & Connection)</div>
+            <p class="screenshot-desc">بمجرد الضغط على زر التحدث، يتم إنشاء اتصال آمن وتوليد تذكرة ElevenLabs بالخلفية. يرحب المساعد بالمتصل ويطلب منه الاسم ورقم الهاتف لبدء المعاملة.</p>
+            <div class="screenshot-img-wrapper">
+                <img class="screenshot-img-mobile" src="step1_greeting.png" alt="Step 1 Screen">
+            </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="screenshot-container">
+            <div class="screenshot-title">الخطوة 2: التحقق التلقائي وجمع بيانات العميل (Data Collection)</div>
+            <p class="screenshot-desc">ينطق العميل بياناته أو يكتبها، فيقوم المساعد بالتقاطها واستدعاء أداة حفظ العملاء بالخلفية لتنزيلها بجدول البيانات.</p>
+            <div class="screenshot-img-wrapper">
+                <img class="screenshot-img-mobile" src="step2_data_collection.png" alt="Step 2 Screen">
+            </div>
+        </div>
+
+        <div class="page-break"></div>
+
+        <!-- Step 3 -->
+        <div class="screenshot-container">
+            <div class="screenshot-title">الخطوة 3: الاستعلام وتنسيق الأرقام الجديد (Service Inquiry & Number Format)</div>
+            <p class="screenshot-desc">عندما يسأل المتصل عن هاتف مركز خدمة العملاء، يقوم الوكيل بكتابة الرقم 17461100 مجرداً بدون أي شرطات أو علامات اقتباس، مع وضعه على سطر منفرد مستقل يسبقه سطر فارغ ويليه سطر فارغ لتسهيل العرض والنسخ.</p>
+            <div class="screenshot-img-wrapper">
+                <img class="screenshot-img-mobile" src="step3_service_inquiry.png" alt="Step 3 Screen">
+            </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="screenshot-container">
+            <div class="screenshot-title">الخطوة 4: طلب نسخة من المحادثة (Email Request)</div>
+            <p class="screenshot-desc">عندما يطلب العميل نسخة مكتوبة، يوجهه الوكيل لكتابتها في الحقل النصي بالأسفل لتفادي التلعثم الصوتي في نطق أحرف البريد الإلكتروني.</p>
+            <div class="screenshot-img-wrapper">
+                <img class="screenshot-img-mobile" src="step4_email_request.png" alt="Step 4 Screen">
+            </div>
+        </div>
+
+        <div class="page-break"></div>
+
+        <!-- Step 5 -->
+        <div class="screenshot-container">
+            <div class="screenshot-title">الخطوة 5: إدخال البريد الإلكتروني بنجاح (Email Submission)</div>
+            <p class="screenshot-desc">يكتب العميل البريد الإلكتروني بصيغة آمنة، فيقوم النظام بتأكيد الحفظ وربطه بسجل المكالمة فورياً تمهيداً لتوليد وإرسال ملف التقرير.</p>
+            <div class="screenshot-img-wrapper">
+                <img class="screenshot-img-mobile" src="step5_email_input.png" alt="Step 5 Screen">
+            </div>
+        </div>
+
+        <div class="page-break"></div>
+
+        <h2>5. لقطات حقيقية من لوحات الإحصاء ومؤشرات الأداء (Real Dashboards & KPIs)</h2>
+
+        <!-- Step 6 (System KPI Dashboard) -->
+        <div class="screenshot-container">
+            <div class="screenshot-title">أولاً: لوحة أداء النظام الأساسية (System KPIs Dashboard)</div>
+            <p class="screenshot-desc">لقطة شاشة كاملة لصفحة dashboard.html الرئيسية وتعرض متوسط زمن الاستجابة (TTFT)، وتوزيع سرعات الاتصال، وحساب التكاليف ومعدلات نجاح خط الإنتاج التلقائي n8n.</p>
+            <div class="screenshot-img-wrapper">
+                <img class="screenshot-img-desktop" src="step6_system_kpi.png" alt="System KPI Screen">
+            </div>
+        </div>
+
+        <div class="page-break"></div>
+
+        <!-- Step 7 (User KPI Dashboard) -->
+        <div class="screenshot-container">
+            <div class="screenshot-title">ثانياً: لوحة أداء المستخدمين وتأكيد الحوار (User KPIs Dashboard)</div>
+            <p class="screenshot-desc">لقطة شاشة حقيقية لعلامة التبويب الثانية بالدردشة وتعرض تفاصيل تقييم العملاء (100%، 50%، 0% مؤشر KPI) والتعليقات المكتوبة والتقارير المأخوذة مباشرة من أداء المستند الذكي.</p>
+            <div class="screenshot-img-wrapper">
+                <img class="screenshot-img-desktop" src="step7_user_kpi.png" alt="User KPI Screen">
+            </div>
+        </div>
+
+        <div class="page-break"></div>
+
+        <!-- Step 8 (AI Analytics Dashboard) -->
+        <div class="screenshot-container">
+            <div class="screenshot-title">ثالثاً: لوحة تحليلات الذكاء الاصطناعي المتقدمة (AI Analytics Dashboard)</div>
+            <p class="screenshot-desc">لقطة شاشة حقيقية لصفحة dashboardsecondary.html وتعرض توزيع الفحص والتقييم لجلسات ElevenLabs ومقاييس زمن استجابة المحادثة ونسب التحليلات المتقدمة للقرارات والعمليات بالخلفية.</p>
+            <div class="screenshot-img-wrapper">
+                <img class="screenshot-img-desktop" src="step8_dashboard_secondary.png" alt="AI Analytics Screen">
+            </div>
+        </div>
+
+        <h2>6. الخلاصة والقيمة المضافة (Conclusion)</h2>
+        <p>
+            يقدم هذا النظام للجهات الخدمية وحكومات المستقبل أداة فائقة الفعالية لتقليص الضغط على مراكز الاتصال البشرية بنسبة تتجاوز <span class="highlight">70%</span>، مع الحفاظ على رضا العملاء من خلال الاستجابة الفورية على مدار الساعة وطوال أيام الأسبوع، مع حفظ البيانات وتوزيع المهام في ثوانٍ معدودة.
+        </p>
+
+        <div class="footer">
+            جميع الحقوق محفوظة © 2026 - نظام المساعد الصوتي والتحكم الذكي للدفاع المدني بمملكة البحرين
+        </div>
+    </div>
+</body>
+</html>
