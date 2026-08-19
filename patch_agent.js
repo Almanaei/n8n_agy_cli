@@ -1,4 +1,8 @@
-const apiKey = "896c43093392d23879dc8d578e7840b4a0b27af2ecf38803e985386b494c427c";
+try {
+  require('dotenv').config();
+} catch (e) {}
+
+const apiKey = process.env.ELEVENLABS_API_KEY || "896c43093392d23879dc8d578e7840b4a0b27af2ecf38803e985386b494c427c";
 const agentId = "agent_1601kv6ytcwwfh1sfk46qqhrrq3j";
 const url = `https://api.elevenlabs.io/v1/convai/agents/${agentId}`;
 
@@ -10,6 +14,7 @@ CRITICAL LANGUAGE LOCK (MUST OBEY):
 - If the user starts the conversation in English, or answers in English (e.g. providing their name and phone number in English), you MUST speak and respond ONLY in English. Do NOT switch back to Arabic under any circumstances (such as after calling a tool or when confirming saved info) unless the user explicitly changes the language to Arabic.
 - If the user starts the conversation in Arabic, respond ONLY in Arabic.
 - Do not mix languages within a single response.
+- You must speak all letters, numbers, and phone numbers in the user's active language. If the conversation is in English, speak numbers and spell letters strictly in English (e.g. read digits as "one seven four..." and spell words as "A B C..."). If the conversation is in Arabic, speak numbers strictly in Arabic. Never speak numbers in Arabic when responding to an English-speaking user.
 
 CRITICAL NUMBER FORMATTING RULE (MUST OBEY):
 - When the AI agent receives or reads a question from the user that must be answered with a mobile/phone number (such as the Civil Defense service center phone number or any other phone/mobile numbers), the number format MUST be as follows:
@@ -55,7 +60,9 @@ CONVERSATIONAL RULES & GUARDRAILS:
      * Arabic: "تم حفظ بريدك الإلكتروني بنجاح، وسنقوم بإرسال نسخة من المحادثة فور انتهاء المكالمة."
      * English: "Your email address has been saved successfully. We will send a copy of the transcript as soon as the call ends."
 5. Silence & Turn-Taking:
-   - If the user stops talking, do NOT repeatedly prompt them. Simply wait patiently and silently for them to continue speaking or typing.`;
+   - If the user stops talking, do NOT repeatedly prompt them. Simply wait patiently and silently for them to continue speaking or typing.
+6. Call Termination (Auto-Hangup):
+   - If the user says goodbye, bye, or مع السلامة, or indicates they want to end the conversation, you MUST politely bid them farewell and call the 'end_call' built-in system tool immediately to disconnect the call. Do not wait for the user to end it.`;
 
 const patchConfig = {
   conversation_config: {
@@ -99,6 +106,9 @@ const patchConfig = {
           }
         ]
       },
+      built_in_tools: {
+        end_call: {}
+      },
       first_message: "مرحبا بكم في مركز خدمات الدفاع المدني الذكي. يرجى تزويدي بالإسم ورقم الهاتف للبدء\nWelcome to the Civil Defense services. Please provide your name and phone number to begin."
     },
     turn: {
@@ -109,6 +119,16 @@ const patchConfig = {
     tts: {
       text_normalisation_type: "elevenlabs",
       optimize_streaming_latency: 4
+    },
+    language_presets: {
+      en: {
+        overrides: {
+          agent: {
+            language: "en",
+            first_message: "Welcome to the Civil Defense services. Please provide your name and phone number to begin."
+          }
+        }
+      }
     }
   }
 };
