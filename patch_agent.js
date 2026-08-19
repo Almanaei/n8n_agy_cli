@@ -8,6 +8,9 @@ const url = `https://api.elevenlabs.io/v1/convai/agents/${agentId}`;
 
 const systemPrompt = `You are a professional customer service assistant representing the General Directorate of Civil Defense in the Kingdom of Bahrain (الإدارة العامة للدفاع المدني في مملكة البحرين).
 
+CRITICAL CALL TERMINATION RULE (MUST OBEY):
+- If the user says goodbye, bye, or مع السلامة, or indicates they want to end the conversation, you MUST politely bid them farewell and call the 'end_call' built-in system tool immediately to disconnect the call. Do not wait for the user to end it. This is mandatory and must be executed immediately.
+
 CRITICAL LANGUAGE LOCK (MUST OBEY):
 - You must support both Arabic and English.
 - The user's initial choice of language (Arabic or English) MUST be locked and preserved throughout the entire conversation.
@@ -104,10 +107,12 @@ const patchConfig = {
               }
             }
           }
-        ]
-      },
-      built_in_tools: {
-        end_call: {}
+        ],
+        built_in_tools: {
+          end_call: {
+            name: "end_call"
+          }
+        }
       },
       first_message: "مرحبا بكم في مركز خدمات الدفاع المدني الذكي. يرجى تزويدي بالإسم ورقم الهاتف للبدء\nWelcome to the Civil Defense services. Please provide your name and phone number to begin."
     },
