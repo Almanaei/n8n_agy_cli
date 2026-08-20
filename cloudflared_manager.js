@@ -88,7 +88,11 @@ CONVERSATIONAL RULES & GUARDRAILS:
 5. Silence & Turn-Taking:
    - If the user stops talking, do NOT repeatedly prompt them. Simply wait patiently and silently for them to continue speaking or typing.
 6. Call Termination (Auto-Hangup):
-   - If the user says goodbye, bye, or مع السلامة, or indicates they want to end the conversation, you MUST politely bid them farewell and call the 'end_call' built-in system tool immediately to disconnect the call. Do not wait for the user to end it.`;
+   - If the user says goodbye, bye, or مع السلامة, or indicates they want to end the conversation, you MUST politely bid them farewell and call the 'end_call' built-in system tool immediately to disconnect the call. Do not wait for the user to end it.
+7. Service Application Trigger:
+   - If the user asks to apply for any service (such as any of the 31 services listed in your services.txt through services_7.txt files), or says they want to submit an application, you MUST immediately call the 'trigger_service_application' client-side tool.
+   - Pass the exact Arabic or English 'serviceName' of the service they asked about, and any optional 'referenceNumber' they provide.
+   - Reassure the user that the form has been opened on their screen, and ask them to complete the details and upload their PDF attachment to submit.`;
 
 async function patchElevenLabs(baseUrl) {
   console.log(`[ElevenLabs] Starting patch flow with new URL: ${baseUrl}`);
@@ -198,6 +202,28 @@ async function patchElevenLabs(baseUrl) {
     }
   };
 
+  let activeClientToolId = null;
+  const clientToolPayload = {
+    tool_config: {
+      type: "client",
+      name: "trigger_service_application",
+      description: "Call this tool to open the service application form on the user's browser screen. Use this when the user wants to apply for a service, submit an application, or when they ask to register or renew a permit/certificate.",
+      api_schema: {
+        type: "object",
+        properties: {
+          serviceName: {
+            type: "string",
+            description: "The name of the service they want to apply for. Must be the exact Arabic or English service name or keywords from the knowledge base files services.txt through services_7.txt."
+          },
+          referenceNumber: {
+            type: "string",
+            description: "Any reference number the user mentions, like CR number or NC number (optional)."
+          }
+        }
+      }
+    }
+  };
+
   try {
     const listToolsRes = await fetch("https://api.elevenlabs.io/v1/convai/tools", {
       headers: { "xi-api-key": apiKey }
@@ -207,9 +233,8 @@ async function patchElevenLabs(baseUrl) {
     }
     const { tools } = await listToolsRes.json();
     
-    // Find all tools named save_lead_info
+    // 2a. Find all tools named save_lead_info
     const targetTools = tools.filter(t => t.tool_config?.name === "save_lead_info");
-    
     if (targetTools.length > 0) {
       // Update the first tool
       activeToolId = targetTools[0].id;
@@ -232,15 +257,10 @@ async function patchElevenLabs(baseUrl) {
       for (let i = 1; i < targetTools.length; i++) {
         const dupId = targetTools[i].id;
         console.log(`[ElevenLabs] Deleting duplicate workspace tool: ${dupId}`);
-        const delRes = await fetch(`https://api.elevenlabs.io/v1/convai/tools/${dupId}`, {
+        await fetch(`https://api.elevenlabs.io/v1/convai/tools/${dupId}`, {
           method: "DELETE",
           headers: { "xi-api-key": apiKey }
         });
-        if (delRes.ok) {
-          console.log(`[ElevenLabs] Deleted duplicate tool ${dupId}`);
-        } else {
-          console.error(`[ElevenLabs] Failed to delete duplicate tool ${dupId}:`, await delRes.text());
-        }
       }
     } else {
       // Create a brand new workspace tool
@@ -260,6 +280,53 @@ async function patchElevenLabs(baseUrl) {
       activeToolId = createData.tool_id;
       console.log(`[ElevenLabs] Created workspace tool successfully: ${activeToolId}`);
     }
+
+    // 2b. Find all tools named trigger_service_application
+    const clientTools = tools.filter(t => t.tool_config?.name === "trigger_service_application");
+    if (clientTools.length > 0) {
+      activeClientToolId = clientTools[0].id;
+      console.log(`[ElevenLabs] Updating existing workspace client tool ${activeClientToolId}...`);
+      const updateClientRes = await fetch(`https://api.elevenlabs.io/v1/convai/tools/${activeClientToolId}`, {
+        method: "PATCH",
+        headers: {
+          "xi-api-key": apiKey,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(clientToolPayload)
+      });
+      if (updateClientRes.ok) {
+        console.log(`[ElevenLabs] Client tool ${activeClientToolId} successfully updated! 🎉`);
+      } else {
+        console.error(`[ElevenLabs] Failed to update client tool ${activeClientToolId}:`, await updateClientRes.text());
+      }
+      
+      // Delete any duplicates
+      for (let i = 1; i < clientTools.length; i++) {
+        const dupId = clientTools[i].id;
+        console.log(`[ElevenLabs] Deleting duplicate client tool: ${dupId}`);
+        await fetch(`https://api.elevenlabs.io/v1/convai/tools/${dupId}`, {
+          method: "DELETE",
+          headers: { "xi-api-key": apiKey }
+        });
+      }
+    } else {
+      console.log("[ElevenLabs] Creating new workspace client tool trigger_service_application...");
+      const createClientRes = await fetch("https://api.elevenlabs.io/v1/convai/tools", {
+        method: "POST",
+        headers: {
+          "xi-api-key": apiKey,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(clientToolPayload)
+      });
+      if (!createClientRes.ok) {
+        throw new Error(`Failed to create client tool: ${createClientRes.status} ${await createClientRes.text()}`);
+      }
+      const createClientData = await createClientRes.json();
+      activeClientToolId = createClientData.tool_id;
+      console.log(`[ElevenLabs] Created client tool successfully: ${activeClientToolId}`);
+    }
+
   } catch (err) {
     console.error("[ElevenLabs] Error managing workspace tools:", err);
     return;
@@ -272,7 +339,7 @@ async function patchElevenLabs(baseUrl) {
         prompt: {
           prompt: systemPrompt,
           llm: process.env.LLM_MODEL || "gpt-4o-mini",
-          tool_ids: [activeToolId],
+          tool_ids: [activeToolId, activeClientToolId],
           built_in_tools: {
             end_call: {
               name: "end_call"

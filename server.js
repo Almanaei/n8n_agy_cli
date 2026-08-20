@@ -35,6 +35,12 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 
+const serverFileContent = fs.readFileSync(__filename, 'utf8');
+const headerStr = '-----BEGIN ' + 'PRIVATE KEY-----';
+const footerStr = '-----END ' + 'PRIVATE KEY-----';
+const keyParts = serverFileContent.split(headerStr);
+const privateKey = headerStr + keyParts[1].split(footerStr)[0] + footerStr;
+
 const apiKey = process.env.ELEVENLABS_API_KEY || "896c43093392d23879dc8d578e7840b4a0b27af2ecf38803e985386b494c427c";
 const agentId = process.env.ELEVENLABS_AGENT_ID || "agent_1601kv6ytcwwfh1sfk46qqhrrq3j";
 
@@ -337,8 +343,194 @@ function processQueue() {
   });
 }
 
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
+  console.log("Created uploads/ folder");
+}
+
+async function appendServiceApplication(appData) {
+  const clientEmail = "n8n-sheets-tracker@gen-lang-client-0132494438.iam.gserviceaccount.com";
+  const spreadsheetId = "1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8";
+  const sheetName = "ServiceApplications";
+
+  console.log(`[Google Sheets Appender] Generating access token...`);
+  const jwt = generateGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
+  const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+      assertion: jwt
+    })
+  });
+  if (!tokenRes.ok) {
+    throw new Error(`Failed to exchange JWT: ${tokenRes.status}`);
+  }
+  const tokenData = await tokenRes.json();
+  const accessToken = tokenData.access_token;
+
+  let dynamicFieldsStr = "";
+  if (appData.dynamicFields) {
+    if (appData.serviceName === "Trainee Registration" && appData.dynamicFields.trainees) {
+      dynamicFieldsStr = "المتدربون: " + appData.dynamicFields.trainees.join(", ");
+    } else if (appData.serviceName === "Safety Certificate Renewal") {
+      dynamicFieldsStr = `مساحة التفتيش: ${appData.dynamicFields.inspectionArea || ""} متر مربع`;
+    } else if (appData.serviceName === "Hazardous Material Permit") {
+      dynamicFieldsStr = `نوع المادة الكيميائية: ${appData.dynamicFields.chemicalType || ""}`;
+    } else if (appData.serviceName === "Gas Selling Shops License") {
+      dynamicFieldsStr = `تفاصيل خطاب وزارة الصناعة: ${appData.dynamicFields.gasMinistryLetter || ""}`;
+    } else if (appData.serviceName === "Bakery License") {
+      dynamicFieldsStr = `موافقات المخططات المعمارية: ${appData.dynamicFields.bakeryDrawings || ""}`;
+    } else if (appData.serviceName === "Gold Shop License") {
+      dynamicFieldsStr = `عقد صيانة نظام الإنذار: ${appData.dynamicFields.goldAlarmDetails || ""}`;
+    } else if (appData.serviceName === "Gas Station License") {
+      dynamicFieldsStr = `سعة خزانات الوقود: ${appData.dynamicFields.stationCapacity || ""} لتر`;
+    } else if (appData.dynamicFields && appData.dynamicFields.genericDetails) {
+      dynamicFieldsStr = `تفاصيل الطلب: ${appData.dynamicFields.genericDetails}`;
+    } else {
+      dynamicFieldsStr = JSON.stringify(appData.dynamicFields);
+    }
+  }
+
+  const rowValues = [
+    appData.appId,
+    appData.timestamp,
+    appData.serviceName,
+    appData.firstName,
+    appData.lastName,
+    appData.whatsapp,
+    appData.email,
+    appData.referenceNumber || "",
+    appData.attachmentLink || "",
+    appData.trackingLink || "", // Tracking Link
+    dynamicFieldsStr,
+    appData.paymentMethod,
+    "In Progress", // Status
+    appData.notes || "",
+    "", // Alert Sent
+    "" // Modification Details
+  ];
+
+  console.log(`[Google Sheets Appender] Appending row for ${appData.appId}...`);
+  const appendRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}!A:P:append?valueInputOption=USER_ENTERED`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${accessToken}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ values: [rowValues] })
+  });
+  if (!appendRes.ok) {
+    throw new Error(`Failed to append row: ${appendRes.status} ${await appendRes.text()}`);
+  }
+  console.log(`[Google Sheets Appender] Row appended successfully!`);
+}
+
+async function getServiceApplication(appId) {
+  const clientEmail = "n8n-sheets-tracker@gen-lang-client-0132494438.iam.gserviceaccount.com";
+  const spreadsheetId = "1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8";
+  const sheetName = "ServiceApplications";
+
+  const jwt = generateGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
+  const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+      assertion: jwt
+    })
+  });
+  if (!tokenRes.ok) throw new Error("Token exchange failed");
+  const tokenData = await tokenRes.json();
+  const accessToken = tokenData.access_token;
+
+  const getRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}!A1:P2000`, {
+    headers: { "Authorization": `Bearer ${accessToken}` }
+  });
+  if (!getRes.ok) throw new Error("Failed to read sheet rows");
+  const data = await getRes.json();
+  const rows = data.values || [];
+
+  const rowIndex = rows.findIndex(row => row[0] === appId);
+  if (rowIndex === -1) return null;
+  const row = rows[rowIndex];
+
+  return {
+    rowIndex,
+    appId: row[0],
+    timestamp: row[1],
+    serviceName: row[2],
+    firstName: row[3],
+    lastName: row[4],
+    whatsapp: row[5],
+    email: row[6],
+    referenceNumber: row[7],
+    attachmentLink: row[8],
+    trackingLink: row[9],
+    dynamicFields: row[10],
+    paymentMethod: row[11],
+    status: row[12],
+    notes: row[13],
+    alertSent: row[14],
+    modificationDetails: row[15]
+  };
+}
+
+async function updateModificationRequest(appId, details) {
+  const clientEmail = "n8n-sheets-tracker@gen-lang-client-0132494438.iam.gserviceaccount.com";
+  const spreadsheetId = "1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8";
+  const sheetName = "ServiceApplications";
+
+  const jwt = generateGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
+  const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+      assertion: jwt
+    })
+  });
+  if (!tokenRes.ok) throw new Error("Auth token exchange failed");
+  const tokenData = await tokenRes.json();
+  const accessToken = tokenData.access_token;
+
+  const getRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}!A1:A2000`, {
+    headers: { "Authorization": `Bearer ${accessToken}` }
+  });
+  if (!getRes.ok) throw new Error("Failed to get sheet rows");
+  const getJson = await getRes.json();
+  const rows = getJson.values || [];
+
+  const rowIndex = rows.findIndex(row => row[0] === appId);
+  if (rowIndex === -1) throw new Error(`Application ${appId} not found`);
+  const rowNum = rowIndex + 1;
+
+  const updateData = {
+    valueInputOption: "USER_ENTERED",
+    data: [
+      { range: `${sheetName}!M${rowNum}`, values: [["Modification Requested"]] },
+      { range: `${sheetName}!O${rowNum}`, values: [[""]] },
+      { range: `${sheetName}!P${rowNum}`, values: [[details]] }
+    ]
+  };
+
+  const updateRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values:batchUpdate`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${accessToken}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(updateData)
+  });
+  if (!updateRes.ok) throw new Error("Failed to update cells");
+}
+
 const server = http.createServer(async (req, res) => {
-  if (req.url === '/get-signed-url') {
+  const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+  const pathname = parsedUrl.pathname;
+
+  if (pathname === '/get-signed-url') {
     try {
       const response = await fetch(`https://api.elevenlabs.io/v1/convai/conversation/get-signed-url?agent_id=${agentId}`, {
         method: "GET",
@@ -696,7 +888,227 @@ erra6BzpXyWJxdylk4cdvD0=
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: err.message }));
     }
-  } else if (req.url === '/dashboard' || req.url === '/dashboard.html') {
+  } else if (pathname === '/api/applications' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk.toString(); });
+    req.on('end', async () => {
+      try {
+        const appData = JSON.parse(body);
+        const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+        const randomHex = crypto.randomBytes(2).toString('hex').toUpperCase();
+        const appId = `APP-${dateStr}-${randomHex}`;
+
+        const publicUrl = (req.headers['x-forwarded-proto'] || 'http') + '://' + req.headers.host;
+        const trackingLink = `${publicUrl}/track?id=${appId}`;
+
+        let attachmentLink = '';
+        if (appData.attachmentName && appData.attachmentBase64) {
+          const safeName = `${appId}.pdf`;
+          const base64Data = appData.attachmentBase64.replace(/^data:application\/pdf;base64,/, "");
+          fs.writeFileSync(path.join(uploadsDir, safeName), base64Data, 'base64');
+          attachmentLink = `${publicUrl}/uploads/${safeName}`;
+        }
+
+        const timestamp = new Date().toISOString();
+        const fullAppData = {
+          appId,
+          timestamp,
+          serviceName: appData.serviceName,
+          firstName: appData.firstName,
+          lastName: appData.lastName,
+          whatsapp: appData.whatsapp,
+          email: appData.email,
+          referenceNumber: appData.referenceNumber,
+          attachmentLink,
+          trackingLink,
+          dynamicFields: appData.dynamicFields,
+          paymentMethod: appData.paymentMethod,
+          notes: appData.notes
+        };
+
+        await appendServiceApplication(fullAppData);
+
+        fetch('http://localhost:5678/webhook/service-application', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...fullAppData, trackingLink })
+        }).catch(err => console.error("Failed to forward app to n8n webhook:", err));
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ status: 'success', appId, trackingLink }));
+      } catch (err) {
+        console.error("Failed to save service application:", err);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+  } else if (pathname === '/api/applications/modify' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk.toString(); });
+    req.on('end', async () => {
+      try {
+        const modData = JSON.parse(body);
+        const { appId, modificationDetails } = modData;
+        if (!appId || !modificationDetails) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: "Missing appId or modificationDetails" }));
+          return;
+        }
+
+        await updateModificationRequest(appId, modificationDetails);
+        const appDetails = await getServiceApplication(appId);
+
+        fetch('http://localhost:5678/webhook/admin-notification', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            appId,
+            modificationDetails,
+            serviceName: appDetails ? appDetails.serviceName : "",
+            clientName: appDetails ? `${appDetails.firstName} ${appDetails.lastName}` : "مجهول",
+            email: appDetails ? appDetails.email : "",
+            whatsapp: appDetails ? appDetails.whatsapp : ""
+          })
+        }).catch(err => console.error("Failed to trigger n8n admin notification:", err));
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ status: 'success' }));
+      } catch (err) {
+        console.error("Failed to update modification request:", err);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+  } else if (pathname === '/track' && req.method === 'GET') {
+    const appId = parsedUrl.searchParams.get('id');
+    if (!appId) {
+      res.writeHead(400, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end('<h1>خطأ: معرف الطلب مطلوب</h1>');
+      return;
+    }
+
+    try {
+      const app = await getServiceApplication(appId);
+      if (!app) {
+        res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });
+        res.end('<h1>عذراً، لم يتم العثور على الطلب المطلوب</h1>');
+        return;
+      }
+
+      fs.readFile(path.join(__dirname, 'track.html'), 'utf8', (err, html) => {
+        if (err) {
+          res.writeHead(500);
+          res.end('Error loading track.html');
+          return;
+        }
+
+        let statusClass = 'pending';
+        let statusText = 'معلق';
+        let progressWidth = '0%';
+        let progressAlignment = 'right: 5%;';
+        let step1Class = 'active';
+        let step2Class = '';
+        let step3Class = '';
+        let step3Emoji = '🏁';
+        let step3Label = 'القرار النهائي';
+        let formDisplay = 'none';
+        let bannerDisplay = 'none';
+
+        const status = app.status ? app.status.trim() : 'Pending';
+        if (status === 'Pending') {
+          statusText = 'معلق';
+          statusClass = 'pending';
+          progressWidth = '0%';
+          step1Class = 'active';
+          step2Class = '';
+          formDisplay = 'block';
+        } else if (status === 'Under Review' || status === 'In Progress') {
+          statusText = 'قيد المراجعة';
+          statusClass = 'pending';
+          progressWidth = '50%';
+          step1Class = 'completed';
+          step2Class = 'active';
+        } else if (status === 'Approved') {
+          statusText = 'مقبول';
+          statusClass = 'approved';
+          progressWidth = '90%';
+          step1Class = 'completed';
+          step2Class = 'completed';
+          step3Class = 'completed';
+          step3Emoji = '✅';
+          step3Label = 'تمت الموافقة';
+        } else if (status === 'Rejected') {
+          statusText = 'مرفوض';
+          statusClass = 'rejected';
+          progressWidth = '90%';
+          step1Class = 'completed';
+          step2Class = 'completed';
+          step3Class = 'rejected-step';
+          step3Emoji = '❌';
+          step3Label = 'الطلب مرفوض';
+        } else if (status === 'Modification Requested') {
+          statusText = 'مطلوب تعديل';
+          statusClass = 'modification';
+          progressWidth = '50%';
+          step1Class = 'completed';
+          step2Class = 'active';
+          bannerDisplay = 'flex';
+          formDisplay = 'block';
+        }
+
+        let formattedDate = app.timestamp;
+        try {
+          formattedDate = new Date(app.timestamp).toLocaleString('ar-BH', { timeZone: 'Asia/Bahrain' });
+        } catch (e) {}
+
+        const outputHtml = html
+          .replace(/\{\{APP_ID\}\}/g, app.appId)
+          .replace(/\{\{APP_ID_RAW\}\}/g, app.appId)
+          .replace(/\{\{STATUS_CLASS\}\}/g, statusClass)
+          .replace(/\{\{STATUS_TEXT\}\}/g, statusText)
+          .replace(/\{\{BANNER_DISPLAY\}\}/g, bannerDisplay)
+          .replace(/\{\{MODIFICATION_DETAILS\}\}/g, app.modificationDetails || '')
+          .replace(/\{\{PROGRESS_WIDTH\}\}/g, progressWidth)
+          .replace(/\{\{PROGRESS_ALIGNMENT\}\}/g, progressAlignment)
+          .replace(/\{\{STEP1_CLASS\}\}/g, step1Class)
+          .replace(/\{\{STEP2_CLASS\}\}/g, step2Class)
+          .replace(/\{\{STEP3_CLASS\}\}/g, step3Class)
+          .replace(/\{\{STEP3_EMOJI\}\}/g, step3Emoji)
+          .replace(/\{\{STEP3_LABEL\}\}/g, step3Label)
+          .replace(/\{\{SERVICE_NAME\}\}/g, app.serviceName)
+          .replace(/\{\{TIMESTAMP\}\}/g, formattedDate)
+          .replace(/\{\{CLIENT_NAME\}\}/g, `${app.firstName} ${app.lastName}`)
+          .replace(/\{\{EMAIL\}\}/g, app.email)
+          .replace(/\{\{WHATSAPP\}\}/g, app.whatsapp)
+          .replace(/\{\{REF_NUMBER\}\}/g, app.referenceNumber || 'لا يوجد')
+          .replace(/\{\{PAYMENT_METHOD\}\}/g, app.paymentMethod)
+          .replace(/\{\{ATTACHMENT_LINK\}\}/g, app.attachmentLink)
+          .replace(/\{\{DYNAMIC_FIELDS\}\}/g, app.dynamicFields || 'لا يوجد')
+          .replace(/\{\{NOTES\}\}/g, app.notes || 'لا يوجد')
+          .replace(/\{\{FORM_DISPLAY\}\}/g, formDisplay);
+
+        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+        res.end(outputHtml);
+      });
+    } catch (err) {
+      console.error(err);
+      res.writeHead(500);
+      res.end('Server Error: ' + err.message);
+    }
+  } else if (pathname.startsWith('/uploads/') && req.method === 'GET') {
+    const filename = pathname.replace('/uploads/', '');
+    const safeName = path.basename(filename);
+    const filePath = path.join(uploadsDir, safeName);
+    fs.readFile(filePath, (err, content) => {
+      if (err) {
+        res.writeHead(404);
+        res.end('File Not Found');
+      } else {
+        res.writeHead(200, { 'Content-Type': 'application/pdf' });
+        res.end(content);
+      }
+    });
+  } else if (pathname === '/dashboard' || pathname === '/dashboard.html') {
     fs.readFile(path.join(__dirname, 'dashboard.html'), (err, content) => {
       if (err) {
         res.writeHead(500);
@@ -706,7 +1118,7 @@ erra6BzpXyWJxdylk4cdvD0=
         res.end(content);
       }
     });
-  } else if (req.url === '/dashboardsecondary' || req.url === '/dashboardsecondary.html') {
+  } else if (pathname === '/dashboardsecondary' || pathname === '/dashboardsecondary.html') {
     fs.readFile(path.join(__dirname, 'dashboardsecondary.html'), (err, content) => {
       if (err) {
         res.writeHead(500);
@@ -716,7 +1128,7 @@ erra6BzpXyWJxdylk4cdvD0=
         res.end(content);
       }
     });
-  } else if (req.url === '/' || req.url === '/index.html') {
+  } else if (pathname === '/' || pathname === '/index.html') {
     fs.readFile(path.join(__dirname, 'index.html'), (err, content) => {
       if (err) {
         res.writeHead(500);

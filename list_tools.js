@@ -1,4 +1,5 @@
-const apiKey = "896c43093392d23879dc8d578e7840b4a0b27af2ecf38803e985386b494c427c";
+require('dotenv').config();
+const apiKey = process.env.ELEVENLABS_API_KEY;
 
 async function run() {
   const url = "https://api.elevenlabs.io/v1/convai/tools";

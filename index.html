@@ -570,6 +570,102 @@
             box-shadow: 0 6px 20px rgba(255, 69, 58, 0.4);
         }
 
+        .suggestion-chips-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 12px 10px;
+            justify-content: flex-start;
+            width: 100%;
+            animation: slideUpSuggestions 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes slideUpSuggestions {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .apply-now-wrapper {
+            margin: 14px 10px;
+            display: flex;
+            justify-content: flex-start;
+            width: 100%;
+            animation: slideUpSuggestions 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .apply-now-card {
+            background: linear-gradient(135deg, rgba(28, 28, 30, 0.95), rgba(44, 44, 46, 0.95));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(10px);
+            direction: rtl;
+        }
+        .apply-icon {
+            font-size: 1.8rem;
+            background: rgba(10, 132, 255, 0.12);
+            padding: 8px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(10, 132, 255, 0.2);
+            flex-shrink: 0;
+        }
+        .apply-details {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            text-align: right;
+            gap: 2px;
+            min-width: 0; /* Enable text truncation if needed */
+        }
+        .apply-title {
+            color: #0a84ff;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .apply-service-name {
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 600;
+            line-height: 1.4;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .apply-btn {
+            background: #0a84ff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            box-shadow: 0 4px 10px rgba(10, 132, 255, 0.25);
+            flex-shrink: 0;
+        }
+        .apply-btn:hover {
+            background: #0071e3;
+            transform: scale(1.03);
+        }
+        .apply-btn:active {
+            transform: scale(0.97);
+        }
+
         .chat-input-area {
             display: flex;
             gap: 12px;
@@ -983,6 +1079,311 @@
                 text-align: center;
             }
         }
+
+        /* Service Application Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(3, 5, 8, 0.75);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+        .modal-box {
+            background: rgba(22, 22, 23, 0.9);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 32px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.active .modal-box {
+            transform: scale(1);
+        }
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition-apple);
+            font-size: 1.1rem;
+            z-index: 10;
+        }
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        .modal-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #ffffff, #a2a2a7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: right;
+        }
+        .form-step {
+            display: none;
+        }
+        .form-step.active {
+            display: block;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            text-align: right;
+        }
+        .form-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .form-input, .form-select, .form-textarea {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 12px;
+            color: white;
+            font-size: 0.9rem;
+            outline: none;
+            transition: var(--transition-apple);
+            width: 100%;
+            direction: rtl;
+        }
+        .form-select option {
+            background: #1c1c1e;
+            color: white;
+        }
+        .phone-input-container {
+            display: flex;
+            gap: 10px;
+            direction: ltr;
+        }
+        .phone-code-select {
+            width: 140px !important;
+            flex-shrink: 0;
+            text-align: left;
+            direction: ltr;
+        }
+        .phone-number-input {
+            flex-grow: 1;
+            direction: ltr;
+            text-align: left;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
+        }
+        .form-input.invalid, .form-select.invalid {
+            border-color: var(--status-offline);
+            box-shadow: 0 0 0 3px rgba(255, 69, 58, 0.15);
+        }
+        .form-error {
+            color: var(--status-offline);
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 4px;
+            text-align: right;
+        }
+        .dynamic-field-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+        .btn-add-dynamic, .btn-remove-dynamic {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition-apple);
+            font-size: 0.85rem;
+        }
+        .btn-add-dynamic:hover {
+            background: rgba(48, 209, 88, 0.2);
+            border-color: var(--status-online);
+        }
+        .btn-remove-dynamic:hover {
+            background: rgba(255, 69, 58, 0.2);
+            border-color: var(--status-offline);
+        }
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+            border-top: 1px solid var(--glass-border);
+            padding-top: 20px;
+        }
+        .btn-step-prev {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition-apple);
+            font-weight: 600;
+        }
+        .btn-step-prev:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .btn-step-next, .btn-submit-form {
+            background: var(--accent-color);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition-apple);
+            font-weight: 600;
+        }
+        .btn-step-next:hover, .btn-submit-form:hover {
+            background: var(--accent-hover);
+        }
+        .btn-step-next:disabled, .btn-submit-form:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Step indicators */
+        .step-indicators {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 12px;
+            direction: rtl;
+        }
+        .step-indicator {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .step-indicator.active {
+            color: var(--accent-color);
+        }
+        .step-indicator.completed {
+            color: var(--status-online);
+        }
+
+        /* Review summary grid */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: right;
+            direction: rtl;
+        }
+        .summary-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            padding: 6px 0;
+        }
+        .summary-value {
+            color: var(--text-primary);
+            font-size: 0.88rem;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            padding: 6px 0;
+            word-break: break-all;
+        }
+        
+        /* Success modal layout */
+        .success-box {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            padding: 20px 0;
+        }
+        .success-icon {
+            font-size: 3.5rem;
+            color: var(--status-online);
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .success-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+        .success-tracking-link {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--glass-border);
+            padding: 12px;
+            border-radius: 10px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            direction: ltr;
+            margin-top: 10px;
+        }
+        .tracking-link-text {
+            color: var(--accent-color);
+            font-size: 0.85rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-weight: 600;
+        }
+        .btn-copy-link {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: var(--transition-apple);
+        }
+        .btn-copy-link:hover {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -1005,6 +1406,7 @@
             </div>
             <nav class="nav-links">
                 <a href="#" class="active">الرئيسية</a>
+                <a href="javascript:void(0)" onclick="openApplicationModal()">تقديم طلب خدمة</a>
                 <a href="#features">المزايا</a>
                 <a href="#about">الهندسة البرمجية</a>
             </nav>
@@ -1026,6 +1428,9 @@
             <div class="hero-ctas">
                 <button class="btn-primary" onclick="triggerCallFromHero()">
                     🎙️ ابدأ التحدث الصوتي الآن
+                </button>
+                <button class="btn-primary" style="background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); color: white;" onclick="openApplicationModal()">
+                    📝 تقديم طلب إلكتروني
                 </button>
                 <a href="#features" class="btn-secondary">استكشف التقنيات</a>
             </div>
@@ -1080,8 +1485,10 @@
                         </button>
                     </div>
 
+
+
                     <div class="chat-input-area">
-                        <input type="text" id="chat-input" class="chat-input" placeholder="اكتب رسالتك باللغة العربية هنا..." onkeypress="handleKeyPress(event)" disabled>
+                        <input type="text" id="chat-input" class="chat-input" placeholder="اكتب رسالتك باللغة العربية هنا..." onkeypress="handleKeyPress(event)" oninput="const svc = findBestMatchingService(this.value); if (svc) { window.renderApplyNowButton(svc); }" disabled>
                         <button id="send-btn" class="btn-send" onclick="sendMessage()" disabled>إرسال</button>
                     </div>
                 </div>
@@ -1370,6 +1777,22 @@
                 // Start WebRTC session using the signedUrl
                 conversation = await Conversation.startSession({
                     signedUrl: data.signed_url,
+                    clientTools: {
+                        trigger_service_application: async (args) => {
+                            console.log("[Client Tool] trigger_service_application called with arguments:", args);
+                            try {
+                                const serviceName = args?.serviceName || args?.service_name || args?.service || "";
+                                const referenceNumber = args?.referenceNumber || args?.reference_number || args?.ref_number || "";
+                                
+                                console.log("[Client Tool] Resolved parameters - Service:", serviceName, "Reference:", referenceNumber);
+                                openApplicationModal(serviceName, referenceNumber);
+                                return "The form modal has been opened successfully on the user's screen. Ask the user to fill out the remaining details in the modal and submit it.";
+                            } catch (e) {
+                                console.error("[Client Tool] Error opening form:", e);
+                                return "Failed to open form: " + e.message;
+                            }
+                        }
+                    },
                     onConnect: ({ conversationId }) => {
                         // Update UI states to Connected/Online
                         statusBadge.innerText = "متصل بالمايك";
@@ -1387,6 +1810,9 @@
                         
                         chatInput.disabled = false;
                         sendButton.disabled = false;
+
+                        // Enable suggestion chips
+                        window.elevenLabsSessionActive = true;
 
                         // Show visualizer animations
                         bars.forEach(bar => bar.style.display = 'block');
@@ -1406,6 +1832,12 @@
                     },
                     onMessage: (message) => {
                         console.log("Transcript received:", message);
+                        if (message.message) {
+                            const svc = findBestMatchingService(message.message);
+                            if (svc) {
+                                window.renderApplyNowButton(svc);
+                            }
+                        }
                         const sender = message.source === 'user' ? 'user' : 'agent';
                         const eventId = message.event_id;
 
@@ -1485,6 +1917,9 @@
 
             chatInput.disabled = true;
             sendButton.disabled = true;
+
+            // Disable session status
+            window.elevenLabsSessionActive = false;
             
             // Hide visualizer animations
             bars.forEach(bar => bar.style.display = 'none');
@@ -1513,6 +1948,12 @@
             const text = chatInput.value.trim();
             if (!text || !conversation) return;
 
+            // Clear any Apply Now buttons when user sends a message
+            const existingBtn = document.querySelector('.apply-now-wrapper');
+            if (existingBtn) {
+                existingBtn.remove();
+            }
+
             // Append with a pending status for local echo
             const msgEl = appendMessage('user', text);
             msgEl.setAttribute('data-pending', 'true');
@@ -1535,6 +1976,135 @@
             if (event.key === 'Enter') {
                 window.sendMessage();
             }
+        }
+
+        // Keyword Matcher for all 33 Civil Defense Services
+        function findBestMatchingService(text) {
+            if (!text) return null;
+            const cleanText = text.toLowerCase().trim();
+            
+            const serviceKeywords = [
+                { id: "Safety Certificate Renewal", keywords: ["سلامة", "تجديد شهادة السلامة", "استيفاء شروط", "احتياجات الحماية", "الوقاية من الحريق", "سلامه", "حريق"] },
+                { id: "Gas Selling Shops License", keywords: ["محل غاز", "محلات بيع الغاز", "بيع الغاز", "ترخيص الغاز", "سلندر غاز", "سلندرات"] },
+                { id: "Bakery License", keywords: ["مخبز", "مخابز", "ترخيص المخابز", "فرن شعبى", "مخبز آلي", "مخابز شعبية", "فرن"] },
+                { id: "Gold Shop License", keywords: ["ذهب", "محل ذهب", "ورشة ذهب", "ورش الذهب", "مجوهرات", "انذار الذهب"] },
+                { id: "Trainee Registration", keywords: ["تسجيل متدربين", "معاهد التدريب", "مراكز التدريب", "تدريب الدفاع المدني", "تسجيل متدرب", "مركز تدريب"] },
+                { id: "Gas Station License", keywords: ["محطة وقود", "تزويد الوقود", "بترول", "ديزل", "محطة البترول", "محطه وقود"] },
+                { id: "Hazardous Material Permit", keywords: ["مواد خطرة", "مواد كيميائية", "متفجرات", "تخزين مواد", "مادة خطرة", "استيراد مواد"] },
+                
+                // services_2.txt
+                { id: "إصدار شهادة فحص المصانع والفنادق والمجمعات التجارية قيد الإنشاء وتجديدها", keywords: ["فحص المصانع", "فحص الفنادق", "مجمعات تجارية", "قيد الإنشاء", "إنشاء وتجديد", "فحص مصنع", "فندق قيد الإنشاء"] },
+                { id: "إصدار تقرير الحوادث للمنشآت الكبيرة والمصانع والفنادق والمجمعات التجارية وما في حكمها", keywords: ["تقرير الحوادث للمنشآت الكبيرة", "تقرير حادث مصنع", "تقرير حادث فندق", "حادث مجمع تجاري", "تقرير حريق كبير"] },
+                { id: "إصدار تقرير الحوادث للمنشآت الصغيرة والمنازل وما في حكمها", keywords: ["تقرير حادث منزلي", "تقرير حادث بيت", "حادث بسيط", "حريق منزل", "حادث منشأة صغيرة", "حريق بيت"] },
+                { id: "إصدار شهادة الفحص النهائي لتوصيل التيار الكهربائي للمباني الجديدة", keywords: ["تيار كهربائي", "توصيل الكهرباء", "فحص نهائي كهرباء", "توصيل تيار", "كهرباء مبنى جديد", "فحص كهرباء"] },
+                
+                // services_3.txt
+                { id: "إصدار ترخيص خرائط المصانع والمخازن وتجديد الترخيص", keywords: ["خرائط مصانع", "مخازن وتجديد", "مخطط مستودع", "مخطط مصنع", "خريطة مخزن"] },
+                { id: "إصدار ترخيص خرائط المراكز التجارية والمباني العالية", keywords: ["خرائط مراكز تجارية", "مباني عالية", "خرائط مبنى مرتفع", "مخططات أبراج", "خرائط برج"] },
+                { id: "إصدار ترخيص خرائط المجمعات السكنية التي تحتوي على عشر فلل فأكثر", keywords: ["خرائط مجمعات سكنية", "عشر فلل", "مخطط مجمع فلل", "خريطة مجمع سشني"] },
+                { id: "دراسة مخططات دور العبادة والمحاكم والمتاحف", keywords: ["دور العبادة", "مخطط مسجد", "مخططات متاحف", "مخطط محكمة", "مخطط معبد"] },
+                { id: "دراسة الخرائط لمحطات الوقود الجديدة", keywords: ["خرائط محطة وقود", "مخطط محطة وقود جديدة", "مخطط بترول جديد"] },
+                { id: "دراسة المخططات الهندسية الكهربائية", keywords: ["مخططات هندسية كهربائية", "مخطط كهربائي هندسي", "خرائط كهرباء هندسية"] },
+                { id: "دراسة المخططات الميكانيكية", keywords: ["مخططات ميكانيكية", "مخطط ميكانيكي", "خريطة ميكانيك"] },
+                { id: "دراسة الخرائط على تمديدات الغاز والخزانات", keywords: ["تمديدات الغاز والخزانات", "مخطط تمديد غاز", "خريطة خزان غاز"] },
+                
+                // services_4.txt
+                { id: "إصدار شهادة تدريب على أعمال الدفاع المدني لمدة يوم واحد", keywords: ["تدريب يوم واحد", "شهادة تدريب يوم", "دورة يوم"] },
+                { id: "إصدار شهادة تدريب على أعمال الدفاع المدني لمدة  اسبوع", keywords: ["تدريب اسبوع", "دورة أسبوع", "تدريب لمدة أسبوع", "دورة اسبوع"] },
+                { id: "إصدار شهادة تدريب أفراد منشآت ومؤسسات القطاع الخاص على قيادة مركبات الإطفاء الثقيلة لمدة أسبوعين", keywords: ["مركبات الإطفاء الثقيلة", "سياقة سيارة إطفاء", "تدريب قيادة إطفاء", "شاحنة إطفاء ثقيلة"] },
+                { id: "إصدار شهادة تدريب الفرد على أعمال الدفاع المدني لمدة ستة عشر أسبوعًا.", keywords: ["ستة عشر أسبوعا", "تدريب 16 أسبوع", "دورة 16 اسبوع"] },
+                { id: "التدريب على عمليات إخلاء المباني والمنشآت", keywords: ["عمليات إخلاء", "إخلاء مباني", "إخلاء منشآت", "خطة إخلاء", "تدريب اخلاء"] },
+                
+                // services_5.txt
+                { id: "ترخيص المكاتب الهندسية لتصميم أنظمة الحماية والوقاية من الحريق وتجديد الترخيص", keywords: ["ترخيص مكاتب هندسية", "مكتب تصميم أنظمة حماية", "تصميم أنظمة حريق", "مكتب هندسي حريق"] },
+                { id: "ترخيص شركات ومؤسسات صيانة وتثبيت أجهزة ومعدات الحماية والوقاية من الحريق وتجديد الترخيص", keywords: ["شركات صيانة معدات حماية", "تثبيت أجهزة حريق", "صيانة أجهزة حريق", "شركة صيانة طفايات"] },
+                { id: "دراسة الخرائط للمكاتب الفنية والاستشارية للمواد الخطرة والغاز وتجديد الترخيص", keywords: ["خرائط مكاتب استشارية غاز", "مكتب استشاري مواد خطرة", "استشاري مواد خطرة وغاز"] },
+                { id: "مفتش وقاية معتمد", keywords: ["مفتش وقاية معتمد", "مفتش معتمد", "اعتماد مفتش وقاية"] },
+                
+                // services_6.txt
+                { id: "إصدار رخصة بيع وتداول وتخزين أجهزة ومعدات الحماية والوقاية من الحريق وتجديد الرخصة", keywords: ["بيع وتداول وتخزين أجهزة حماية", "رخصة بيع طفايات حريق", "تجارة معدات إطفاء", "محل بيع طفايات"] },
+                { id: "ترخيص مركبات نقل المواد الخطرة وتجديد الترخيص", keywords: ["مركبات نقل مواد خطرة", "ترخيص سيارة نقل كيميائي", "شاحنة نقل غاز", "نقل مواد خطرة سيارة"] },
+                { id: "شراء وتخزين واستيراد الألعاب النارية للمناسبات الوطنية وتجديد الترخيص", keywords: ["ألعاب نارية", "استيراد ألعاب نارية", "ألعاب نارية للمناسبات", "مفرقعات"] },
+                { id: "إصدار ترخيص استيراد مواد خطرة أو كيميائية أو متفجرات وتجديد الترخيص", keywords: ["ترخيص استيراد كيميائي", "استيراد مواد خطرة", "فسح مواد كيميائية", "شحنة مواد خطرة"] },
+                
+                // services_7.txt
+                { id: "طلب ترخيص الخيام للمناسبات العامة والخاصة المؤقتة", keywords: ["ترخيص الخيام", "ترخيص خيمة مناسبات", "خيمة مؤقتة", "خيم عزاء", "خيم أفراح", "ترخيص خيمة"] }
+            ];
+
+            let bestMatch = null;
+            let maxMatches = 0;
+            
+            serviceKeywords.forEach(item => {
+                let matchCount = 0;
+                item.keywords.forEach(kw => {
+                    if (cleanText.includes(kw.toLowerCase())) {
+                        matchCount++;
+                    }
+                });
+                if (cleanText.includes(item.id.toLowerCase())) {
+                    matchCount += 3;
+                }
+                if (matchCount > maxMatches) {
+                    maxMatches = matchCount;
+                    bestMatch = item.id;
+                }
+            });
+            
+            return bestMatch;
+        }
+
+        window.renderApplyNowButton = function(serviceId) {
+            const messagesContainer = document.getElementById('chat-messages');
+            if (!messagesContainer) return;
+            
+            // Avoid creating duplicate cards for the exact same service if one is already showing at the bottom
+            const lastWrapper = messagesContainer.querySelector('.apply-now-wrapper:last-child');
+            if (lastWrapper && lastWrapper.getAttribute('data-service-id') === serviceId) {
+                return;
+            }
+            
+            // Remove any other existing Apply Now card to avoid visual clutter
+            const existingWrappers = messagesContainer.querySelectorAll('.apply-now-wrapper');
+            existingWrappers.forEach(w => w.remove());
+            
+            const serviceItem = servicesList.find(s => s.id === serviceId);
+            if (!serviceItem) return;
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'apply-now-wrapper fade-in';
+            wrapper.setAttribute('data-service-id', serviceId);
+            
+            wrapper.innerHTML = `
+                <div class="apply-now-card">
+                    <span class="apply-icon">📋</span>
+                    <div class="apply-details">
+                        <span class="apply-title">تقديم طلب إلكتروني فوري</span>
+                        <span class="apply-service-name">${serviceItem.name}</span>
+                    </div>
+                    <button class="apply-btn" onclick="openApplicationModal('${serviceId}'); this.closest('.apply-now-wrapper').remove();">قدّم الآن</button>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(wrapper);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        window.useSuggestion = function(text, serviceName) {
+            const chatInput = document.getElementById('chat-input');
+            const status = document.getElementById('status-badge').innerText.trim();
+            
+            if (status === 'غير متصل' || chatInput.disabled) {
+                appendMessage('agent', "⚠️ يرجى بدء المحادثة الصوتية أولاً بالضغط على زر 🎙️ للتمكن من إرسال الاستفسار.");
+                return;
+            }
+            
+            if (serviceName) {
+                console.log("[Suggestion Chip] Selected service:", serviceName);
+                openApplicationModal(serviceName);
+            }
+            
+            chatInput.value = text;
+            window.sendMessage();
         }
 
         function appendMessage(sender, text, eventId) {
@@ -1560,5 +2130,752 @@
         }
     </script>
 
+    <!-- Service Application Form Modal Overlay -->
+    <div id="application-modal" class="modal-overlay" onclick="closeApplicationModalOuter(event)">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeApplicationModal()">&times;</button>
+            
+            <!-- Step Indicators -->
+            <div class="step-indicators">
+                <div id="ind-step-1" class="step-indicator active">📝 تعبئة البيانات</div>
+                <div id="ind-step-2" class="step-indicator">🔍 مراجعة وتأكيد</div>
+                <div id="ind-step-3" class="step-indicator">🎉 تقديم الطلب</div>
+            </div>
+
+            <!-- Form Content -->
+            <form id="service-app-form" onsubmit="event.preventDefault();">
+                <!-- STEP 1: Fill Form -->
+                <div id="form-step-1" class="form-step active">
+                    <h3 class="modal-title">تقديم طلب خدمة الدفاع المدني</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="app-service-name">نوع الخدمة المطلوب التقديم عليها</label>
+                        <select id="app-service-name" class="form-select" onchange="renderDynamicFields()" required>
+                            <option value="" disabled selected>-- اختر الخدمة --</option>
+                        </select>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div class="form-group">
+                            <label class="form-label" for="app-first-name">الاسم الأول</label>
+                            <input type="text" id="app-first-name" class="form-input" placeholder="مثال: علي" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="app-last-name">الاسم الأخير (العائلة)</label>
+                            <input type="text" id="app-last-name" class="form-input" placeholder="مثال: أحمد" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="app-whatsapp">رقم الواتساب</label>
+                        <div class="phone-input-container">
+                            <select id="app-country-code" class="form-select phone-code-select">
+                                <option value="+973" selected>🇧🇭 +973</option>
+                                <option value="+966">🇸🇦 +966</option>
+                                <option value="+971">🇦🇪 +971</option>
+                                <option value="+968">🇴🇲 +968</option>
+                                <option value="+974">🇶🇦 +974</option>
+                                <option value="+965">🇰🇼 +965</option>
+                                <option value="+20">🇪🇬 +20</option>
+                                <option value="+962">🇯🇴 +962</option>
+                                <option value="+961">🇱🇧 +961</option>
+                                <option value="+963">🇸🇾 +963</option>
+                                <option value="+964">🇮🇶 +964</option>
+                                <option value="+967">🇾🇪 +967</option>
+                                <option value="+970">🇵🇸 +970</option>
+                                <option value="+1">🇺🇸 +1</option>
+                                <option value="+44">🇬🇧 +44</option>
+                                <option value="+91">🇮🇳 +91</option>
+                                <option value="+92">🇵🇰 +92</option>
+                            </select>
+                            <input type="tel" id="app-whatsapp" class="form-input phone-number-input" placeholder="39292929" required>
+                        </div>
+                        <div id="whatsapp-error" class="form-error" style="display: none;">يرجى إدخال رقم هاتف صحيح (أرقام فقط).</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="app-email">البريد الإلكتروني</label>
+                        <input type="email" id="app-email" class="form-input" placeholder="مثال: user@domain.com" required>
+                        <div id="email-error" class="form-error" style="display: none;">يرجى إدخال عنوان بريد إلكتروني صحيح.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="app-ref-number">الرقم المرجعي (CR Number / NC Number)</label>
+                        <input type="text" id="app-ref-number" class="form-input" placeholder="رقم السجل التجاري أو الترخيص (اختياري)">
+                    </div>
+
+                    <!-- Dynamic Fields Container -->
+                    <div id="dynamic-fields-container" style="margin-top: 10px;"></div>
+
+                    <div class="form-group" style="margin-top: 10px;">
+                        <label class="form-label" for="app-attachment">المرفقات المطلوبة (نسخة PDF فقط، أقصى حجم 5 ميجابايت)</label>
+                        <input type="file" id="app-attachment" class="form-input" accept="application/pdf" onchange="handleFileSelect(event)" required>
+                        <div id="attachment-error" class="form-error" style="display: none;">الملف المرفوع يجب أن يكون بصيغة PDF فقط وحجمه أقل من 5 ميجابايت.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="app-payment-method">طريقة الدفع المفضلة</label>
+                        <select id="app-payment-method" class="form-select" required>
+                            <option value="Payment Link">رابط دفع إلكتروني (Payment Link)</option>
+                            <option value="In-Person">دفع حضوري (In-Person)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="app-notes">ملاحظات إضافية</label>
+                        <textarea id="app-notes" class="form-textarea" rows="3" placeholder="أدخل أي ملاحظات إضافية ترغب في إرسالها للإدارة..."></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-step-next" onclick="goToStep2()">الانتقال للمراجعة ←</button>
+                    </div>
+                </div>
+
+                <!-- STEP 2: Review and Confirm -->
+                <div id="form-step-2" class="form-step">
+                    <h3 class="modal-title">مراجعة وتأكيد بيانات الطلب</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px; text-align: right;">يرجى مراجعة كافة البيانات المدخلة بعناية والتأكيد قبل إرسال الطلب رسمياً للإدارة.</p>
+                    
+                    <div class="summary-grid" id="summary-grid-el">
+                        <!-- Summary values will be injected dynamically -->
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-step-prev" onclick="goToStep1()">→ تعديل البيانات</button>
+                        <button type="button" class="btn-submit-form" id="btn-submit-app" onclick="submitApplicationForm()">تأكيد وتقديم الطلب الآن ✓</button>
+                    </div>
+                </div>
+
+                <!-- STEP 3: Success -->
+                <div id="form-step-3" class="form-step">
+                    <div class="success-box">
+                        <div class="success-icon">✓</div>
+                        <h3 class="success-title">تم تقديم طلب الخدمة بنجاح!</h3>
+                        <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 8px;">شكراً لك. تم إرسال طلبك وحفظه بنجاح وتوليد رابط تتبع خاص بك.</p>
+                        
+                        <div class="form-group" style="width: 100%; text-align: center; margin-top: 15px;">
+                            <label class="form-label" style="font-weight: 700; color: white;">رقم الطلب الخاص بك:</label>
+                            <span id="success-app-id" style="font-size: 1.4rem; font-weight: 800; color: var(--status-online); letter-spacing: 1px; display: block; margin-top: 4px;">APP-XXXXXXXX-XXXX</span>
+                        </div>
+
+                        <div class="form-group" style="width: 100%; text-align: right; margin-top: 10px;">
+                            <label class="form-label">رابط تتبع حالة الطلب:</label>
+                            <div class="success-tracking-link">
+                                <button type="button" class="btn-copy-link" onclick="copyTrackingLink()">نسخ الرابط</button>
+                                <span class="tracking-link-text" id="success-tracking-url">https://domain.com/track?id=APP-XXX</span>
+                            </div>
+                        </div>
+
+                        <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 8px;">لقد قمنا أيضاً بإرسال رسالة تأكيد تحتوي على رابط التتبع عبر الواتساب والبريد الإلكتروني المدخلين.</p>
+                        
+                        <div class="form-actions" style="width: 100%; justify-content: center;">
+                            <button type="button" class="btn-step-next" style="background: var(--status-online);" onclick="closeApplicationModal()">إغلاق النافذة</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Form Operations JavaScript -->
+    <script>
+        let fileBase64 = '';
+        let fileName = '';
+
+        const servicesList = [
+            { id: "Safety Certificate Renewal", name: "إصدار شهادة استيفاء شروط واحتياجات الحماية والوقاية من الحريق وتجديدها", fee: "50 دينار بحريني فقط" },
+            { id: "Gas Selling Shops License", name: "إصدار ترخيص محلات بيع الغاز، وتجديد الترخيص", fee: "20 دينار بحريني فقط" },
+            { id: "Bakery License", name: "إصدار ترخيص المخابز الشعبية والآلية، وتجديد الترخيص", fee: "10 دينار بحريني فقط" },
+            { id: "Gold Shop License", name: "إصدار ترخيص محلات وورش الذهب، وتجديد الترخيص", fee: "20 دينار بحريني فقط" },
+            { id: "Trainee Registration", name: "إصدار الترخيص لمعاهد ومراكز التدريب على أعمال الدفاع المدني", fee: "200 دينار بحريني فقط" },
+            { id: "Gas Station License", name: "إصدار الترخيص لمحطات تزويد الوقود، وتجديد الترخيص", fee: "مجاناً" },
+            { id: "Hazardous Material Permit", name: "إصدار ترخيص عدم ممانعة لتخزين مواد كيميائية أو المتفجرات، وتجديد الترخيص", fee: "مجاناً" },
+            
+            // services_2.txt
+            { id: "إصدار شهادة فحص المصانع والفنادق والمجمعات التجارية قيد الإنشاء وتجديدها", name: "إصدار شهادة فحص المصانع والفنادق والمجمعات التجارية قيد الإنشاء وتجديدها", fee: "100 دينار بحريني فقط" },
+            { id: "إصدار تقرير الحوادث للمنشآت الكبيرة والمصانع والفنادق والمجمعات التجارية وما في حكمها", name: "إصدار تقرير الحوادث للمنشآت الكبيرة والمصانع والفنادق والمجمعات التجارية وما في حكمها", fee: "50 دينار بحريني فقط" },
+            { id: "إصدار تقرير الحوادث للمنشآت الصغيرة والمنازل وما في حكمها", name: "إصدار تقرير الحوادث للمنشآت الصغيرة والمنازل وما في حكمها", fee: "مجاناً" },
+            { id: "إصدار شهادة الفحص النهائي لتوصيل التيار الكهربائي للمباني الجديدة", name: "إصدار شهادة الفحص النهائي لتوصيل التيار الكهربائي للمباني الجديدة", fee: "30 دينار بحريني فقط" },
+            
+            // services_3.txt
+            { id: "إصدار ترخيص خرائط المصانع والمخازن وتجديد الترخيص", name: "إصدار ترخيص خرائط المصانع والمخازن وتجديد الترخيص", fee: "50 دينار بحريني فقط" },
+            { id: "إصدار ترخيص خرائط المراكز التجارية والمباني العالية", name: "إصدار ترخيص خرائط المراكز التجارية والمباني العالية", fee: "300 دينار بحريني فقط" },
+            { id: "إصدار ترخيص خرائط المجمعات السكنية التي تحتوي على عشر فلل فأكثر", name: "إصدار ترخيص خرائط المجمعات السكنية التي تحتوي على عشر فلل فأكثر", fee: "100 دينار بحريني فقط" },
+            { id: "دراسة مخططات دور العبادة والمحاكم والمتاحف", name: "دراسة مخططات دور العبادة والمحاكم والمتاحف", fee: "مجاناً" },
+            { id: "دراسة الخرائط لمحطات الوقود الجديدة", name: "دراسة الخرائط لمحطات الوقود الجديدة", fee: "مجاناً" },
+            { id: "دراسة المخططات الهندسية الكهربائية", name: "دراسة المخططات الهندسية الكهربائية", fee: "مجاناً" },
+            { id: "دراسة المخططات الميكانيكية", name: "دراسة المخططات الميكانيكية", fee: "مجاناً" },
+            { id: "دراسة الخرائط على تمديدات الغاز والخزانات", name: "دراسة الخرائط على تمديدات الغاز والخزانات", fee: "مجاناً" },
+            
+            // services_4.txt
+            { id: "إصدار شهادة تدريب على أعمال الدفاع المدني لمدة يوم واحد", name: "إصدار شهادة تدريب على أعمال الدفاع المدني لمدة يوم واحد", fee: "40 دينار بحريني" },
+            { id: "إصدار شهادة تدريب على أعمال الدفاع المدني لمدة  اسبوع", name: "إصدار شهادة تدريب على أعمال الدفاع المدني لمدة  اسبوع", fee: "200 دينار بحريني فقط." },
+            { id: "إصدار شهادة تدريب أفراد منشآت ومؤسسات القطاع الخاص على قيادة مركبات الإطفاء الثقيلة لمدة أسبوعين", name: "إصدار شهادة تدريب أفراد منشآت ومؤسسات القطاع الخاص على قيادة مركبات الإطفاء الثقيلة لمدة أسبوعين", fee: "200 دينار بحريني فقط." },
+            { id: "إصدار شهادة تدريب الفرد على أعمال الدفاع المدني لمدة ستة عشر أسبوعًا.", name: "إصدار شهادة تدريب الفرد على أعمال الدفاع المدني لمدة ستة عشر أسبوعًا.", fee: "2000 دينار بحريني فقط." },
+            { id: "التدريب على عمليات إخلاء المباني والمنشآت", name: "التدريب على عمليات إخلاء المباني والمنشآت", fee: "50 دينار بحريني فقط." },
+            
+            // services_5.txt
+            { id: "إصدار الترخيص لمعدات الحريق والسلامة، وتجديد الترخيص", name: "إصدار الترخيص لمعدات الحريق والسلامة، وتجديد الترخيص", fee: "30 دينار بحريني فقط" },
+            { id: "إصدار ترخيص عدم الممانعة لمعدات الحريق والسلامة، وتجديد الترخيص", name: "إصدار ترخيص عدم الممانعة لمعدات الحريق والسلامة، وتجديد الترخيص", fee: "40 دينار بحريني فقط" },
+            { id: "إصدار الترخيص لمصنع محلي لمعدات الإطفاء والوقاية من الحريق، وتجديد الترخيص", name: "إصدار الترخيص لمصنع محلي لمعدات الإطفاء والوقاية من الحريق، وتجديد الترخيص", fee: "مجاناً" },
+            { id: "إصدار الترخيص للمكاتب الفنية ومكاتب صيانة أجهزة الإنذار والإطفاء، وتجديد الترخيص", name: "إصدار الترخيص للمكاتب الفنية ومكاتب صيانة أجهزة الإنذار والإطفاء، وتجديد الترخيص", fee: "100 دينار بحريني فقط" },
+            
+            // services_6.txt
+            { id: "ترخيص بالموافقة على نقل شحنات المواد الخطرة ليوم واحد", name: "ترخيص بالموافقة على نقل شحنات المواد الخطرة ليوم واحد", fee: "50 دينار بحريني فقط" },
+            { id: "إصدار ترخيص الموافقة على سيارات نقل المواد الكيميائية والخطرة، وتجديد الترخيص", name: "إصدار ترخيص الموافقة على سيارات نقل المواد الكيميائية والخطرة، وتجديد الترخيص", fee: "10 دينار بحريني فقط" },
+            
+            // services_7.txt
+            { id: "إصدار ترخيص الموافقة النهائية على تركيب خزانات الديزل والغاز، وتجديد الترخيص", name: "إصدار ترخيص الموافقة النهائية على تركيب خزانات الديزل والغاز، وتجديد الترخيص", fee: "مجاناً" },
+            { id: "إصدار الترخيص للمكاتب الفنية والاستشارية المختصة بالغاز والوقود والمواد الخطرة، وتجديد الترخيص", name: "إصدار الترخيص للمكاتب الفنية والاستشارية المختصة بالغاز والوقود والمواد الخطرة، وتجديد الترخيص", fee: "100 دينار بحريني فقط" },
+            { id: "إصدار شهادة فحص المنشآت الصغيرة، وتجديد الشهادة", name: "إصدار شهادة فحص المنشآت الصغيرة، وتجديد الشهادة", fee: "30 دينار بحريني فقط" }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const selectEl = document.getElementById('app-service-name');
+            if (selectEl) {
+                selectEl.innerHTML = '<option value="" disabled selected>-- اختر الخدمة --</option>';
+                servicesList.forEach(s => {
+                    const opt = document.createElement('option');
+                    opt.value = s.id;
+                    opt.textContent = s.id === s.name ? s.name : `${s.name} (${s.id})`;
+                    selectEl.appendChild(opt);
+                });
+            }
+
+            const countrySelect = document.getElementById('app-country-code');
+            if (countrySelect) {
+                countrySelect.innerHTML = '';
+                const countries = [
+                    { code: "+973", name: "البحرين", flag: "🇧🇭" },
+                    { code: "+966", name: "السعودية", flag: "🇸🇦" },
+                    { code: "+971", name: "الإمارات", flag: "🇦🇪" },
+                    { code: "+965", name: "الكويت", flag: "🇰🇼" },
+                    { code: "+974", name: "قطر", flag: "🇶🇦" },
+                    { code: "+968", name: "عمان", flag: "🇴🇲" },
+                    { code: "+20", name: "مصر", flag: "🇪🇬" },
+                    { code: "+962", name: "الأردن", flag: "🇯🇴" },
+                    { code: "+961", name: "لبنان", flag: "🇱🇧" },
+                    { code: "+963", name: "سوريا", flag: "🇸🇾" },
+                    { code: "+964", name: "العراق", flag: "🇮🇶" },
+                    { code: "+967", name: "اليمن", flag: "🇾🇪" },
+                    { code: "+970", name: "فلسطين", flag: "🇵🇸" },
+                    { code: "+218", name: "ليبيا", flag: "🇱🇾" },
+                    { code: "+216", name: "تونس", flag: "🇹🇳" },
+                    { code: "+212", name: "المغرب", flag: "🇲🇦" },
+                    { code: "+213", name: "الجزائر", flag: "🇩🇿" },
+                    { code: "+249", name: "السودان", flag: "🇸🇩" },
+                    { code: "+252", name: "الصومال", flag: "🇸🇴" },
+                    { code: "+222", name: "موريتانيا", flag: "🇲🇷" },
+                    { code: "+253", name: "جيبوتي", flag: "🇩🇯" },
+                    { code: "+269", name: "جزر القمر", flag: "🇰🇲" },
+                    { code: "+1", name: "الولايات المتحدة", flag: "🇺🇸" },
+                    { code: "+44", name: "المملكة المتحدة", flag: "🇬🇧" },
+                    { code: "+1", name: "كندا", flag: "🇨🇦" },
+                    { code: "+61", name: "أستراليا", flag: "🇦🇺" },
+                    { code: "+91", name: "الهند", flag: "🇮🇳" },
+                    { code: "+92", name: "باكستان", flag: "🇵🇰" },
+                    { code: "+880", name: "بنجلاديش", flag: "🇧🇩" },
+                    { code: "+86", name: "الصين", flag: "🇨🇳" },
+                    { code: "+81", name: "اليابان", flag: "🇯🇵" },
+                    { code: "+82", name: "كوريا الجنوبية", flag: "🇰🇷" },
+                    { code: "+63", name: "الفلبين", flag: "🇵🇭" },
+                    { code: "+62", name: "إندونيسيا", flag: "🇮🇩" },
+                    { code: "+60", name: "ماليزيا", flag: "🇲🇾" },
+                    { code: "+65", name: "سنغافورة", flag: "🇸🇬" },
+                    { code: "+66", name: "تايلاند", flag: "🇹🇭" },
+                    { code: "+84", name: "فيتنام", flag: "🇻🇳" },
+                    { code: "+94", name: "سريلانكا", flag: "🇱🇰" },
+                    { code: "+977", name: "نيبال", flag: "🇳🇵" },
+                    { code: "+33", name: "فرنسا", flag: "🇫🇷" },
+                    { code: "+49", name: "ألمانيا", flag: "🇩🇪" },
+                    { code: "+39", name: "إيطاليا", flag: "🇮🇹" },
+                    { code: "+34", name: "إسبانيا", flag: "🇪🇸" },
+                    { code: "+31", name: "هولندا", flag: "🇳🇱" },
+                    { code: "+32", name: "بلجيكا", flag: "🇧🇪" },
+                    { code: "+41", name: "سويسرا", flag: "🇨🇭" },
+                    { code: "+46", name: "السويد", flag: "🇸🇪" },
+                    { code: "+47", name: "النرويج", flag: "🇳🇴" },
+                    { code: "+45", name: "الدنمارك", flag: "🇩🇰" },
+                    { code: "+353", name: "أيرلندا", flag: "🇮🇪" },
+                    { code: "+7", name: "روسيا", flag: "🇷🇺" },
+                    { code: "+90", name: "تركيا", flag: "🇹🇷" },
+                    { code: "+98", name: "إيران", flag: "🇮🇷" },
+                    { code: "+93", name: "أفغانستان", flag: "🇦🇫" },
+                    { code: "+27", name: "جنوب أفريقيا", flag: "🇿🇦" },
+                    { code: "+234", name: "نيجيريا", flag: "🇳🇬" },
+                    { code: "+254", name: "كينيا", flag: "🇰🇪" },
+                    { code: "+255", name: "تنزانيا", flag: "🇹🇿" },
+                    { code: "+55", name: "البرازيل", flag: "🇧🇷" },
+                    { code: "+52", name: "المكسيك", flag: "🇲🇽" },
+                    { code: "+64", name: "نيوزيلندا", flag: "🇳🇿" },
+                    { code: "+380", name: "أوكرانيا", flag: "🇺🇦" },
+                    { code: "+48", name: "بولندا", flag: "🇵🇱" }
+                ];
+                countries.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.code;
+                    opt.textContent = `${c.flag} ${c.code} (${c.name})`;
+                    if (c.code === "+973") {
+                        opt.selected = true;
+                    }
+                    countrySelect.appendChild(opt);
+                });
+            }
+        });
+
+        window.openApplicationModal = function(serviceName, referenceNumber) {
+            console.log("[openApplicationModal] called with serviceName:", serviceName, "referenceNumber:", referenceNumber);
+            const modal = document.getElementById('application-modal');
+            modal.classList.add('active');
+            
+            // Go to step 1
+            goToStep1();
+            
+            if (serviceName) {
+                const serviceSelect = document.getElementById('app-service-name');
+                if (serviceSelect) {
+                    // 1. Try setting option directly by s.id value match
+                    serviceSelect.value = serviceName;
+                    
+                    // 2. If it did not register, fallback to fuzzy loop matching
+                    if (serviceSelect.value !== serviceName) {
+                        const cleanInput = serviceName.toLowerCase().replace(/\s+/g, ' ').trim();
+                        for (let i = 0; i < serviceSelect.options.length; i++) {
+                            const optVal = serviceSelect.options[i].value.toLowerCase().replace(/\s+/g, ' ').trim();
+                            const optText = serviceSelect.options[i].text.toLowerCase().replace(/\s+/g, ' ').trim();
+                            
+                            if (optVal === cleanInput || optText.includes(cleanInput) || cleanInput.includes(optVal)) {
+                                serviceSelect.selectedIndex = i;
+                                serviceSelect.value = serviceSelect.options[i].value;
+                                break;
+                            }
+                        }
+                    }
+                }
+                renderDynamicFields();
+            } else {
+                console.log("[openApplicationModal] No serviceName provided. Dropdown remains unconfigured.");
+            }
+            if (referenceNumber) {
+                document.getElementById('app-ref-number').value = referenceNumber;
+            }
+        }
+
+        function closeApplicationModal() {
+            const modal = document.getElementById('application-modal');
+            modal.classList.remove('active');
+            document.getElementById('service-app-form').reset();
+            document.getElementById('dynamic-fields-container').innerHTML = '';
+            fileBase64 = '';
+            fileName = '';
+            const inputs = document.querySelectorAll('.form-input, .form-select');
+            inputs.forEach(i => i.classList.remove('invalid'));
+            document.getElementById('whatsapp-error').style.display = 'none';
+            document.getElementById('email-error').style.display = 'none';
+            document.getElementById('attachment-error').style.display = 'none';
+        }
+
+        function closeApplicationModalOuter(e) {
+            if (e.target.id === 'application-modal') {
+                closeApplicationModal();
+            }
+        }
+
+        function renderDynamicFields() {
+            const service = document.getElementById('app-service-name').value;
+            const container = document.getElementById('dynamic-fields-container');
+            container.innerHTML = '';
+
+            if (service === 'Trainee Registration') {
+                container.innerHTML = `
+                    <div class="form-group">
+                        <label class="form-label">أسماء المتدربين</label>
+                        <div id="trainee-list-container">
+                            <div class="dynamic-field-row">
+                                <input type="text" class="form-input trainee-name-input" placeholder="اسم المتدرب الأول" required>
+                                <button type="button" class="btn-add-dynamic" onclick="addTraineeRow()">+</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (service === 'Safety Certificate Renewal') {
+                container.innerHTML = `
+                    <div class="form-group">
+                        <label class="form-label" for="app-inspection-area">مساحة المنشأة الإجمالية الخاضعة للتفتيش (بالمتر المربع)</label>
+                        <input type="number" id="app-inspection-area" class="form-input" min="1" placeholder="مثال: 150" required>
+                    </div>
+                `;
+            } else if (service === 'Hazardous Material Permit') {
+                container.innerHTML = `
+                    <div class="form-group">
+                        <label class="form-label" for="app-chemical-type">نوع المادة الكيميائية المراد تخزينها أو استخدامها</label>
+                        <select id="app-chemical-type" class="form-select" required>
+                            <option value="" disabled selected>-- اختر النوع --</option>
+                            <option value="Flammable Liquids">سوائل قابلة للاشتعال (Flammable Liquids)</option>
+                            <option value="Compressed Gases">غازات مضغوطة (Compressed Gases)</option>
+                            <option value="Toxic Chemicals">مواد سامة (Toxic Chemicals)</option>
+                            <option value="Corrosive Materials">مواد أكالة (Corrosive Materials)</option>
+                        </select>
+                    </div>
+                `;
+            } else if (service === 'Gold Shop License') {
+                container.innerHTML = `
+                    <div class="form-group">
+                        <label class="form-label" for="app-gold-alarm-details">تفاصيل عقد صيانة نظام الإنذار والإطفاء</label>
+                        <input type="text" id="app-gold-alarm-details" class="form-input" placeholder="مثال: عقد صيانة صالحة، شركة السلامة" required>
+                    </div>
+                `;
+            } else if (service === 'Gas Selling Shops License') {
+                container.innerHTML = `
+                    <div class="form-group">
+                        <label class="form-label" for="app-gas-ministry-letter">تفاصيل خطاب وزارة الصناعة والتجارة والسياحة</label>
+                        <input type="text" id="app-gas-ministry-letter" class="form-input" placeholder="مثال: رسالة رقم 10234 بتاريخ 2026/05/12" required>
+                    </div>
+                `;
+            } else if (service === 'Bakery License') {
+                container.innerHTML = `
+                    <div class="form-group">
+                        <label class="form-label" for="app-bakery-drawings">أرقام موافقات المخططات المعمارية والكهربائية</label>
+                        <input type="text" id="app-bakery-drawings" class="form-input" placeholder="مثال: موافقة رقم MC-90234" required>
+                    </div>
+                `;
+            } else if (service === 'Gas Station License') {
+                container.innerHTML = `
+                    <div class="form-group">
+                        <label class="form-label" for="app-station-capacity">إجمالي سعة خزانات الوقود (باللتر)</label>
+                        <input type="number" id="app-station-capacity" class="form-input" min="1" placeholder="مثال: 50000" required>
+                    </div>
+                `;
+            } else if (service) {
+                container.innerHTML = `
+                    <div class="form-group">
+                        <label class="form-label" for="app-generic-details">تفاصيل إضافية للطلب (اختياري)</label>
+                        <input type="text" id="app-generic-details" class="form-input" placeholder="يرجى كتابة أي تفاصيل إضافية للخدمة...">
+                    </div>
+                `;
+            }
+        }
+
+        function addTraineeRow() {
+            const container = document.getElementById('trainee-list-container');
+            const row = document.createElement('div');
+            row.className = 'dynamic-field-row';
+            row.innerHTML = `
+                <input type="text" class="form-input trainee-name-input" placeholder="اسم متدرب إضافي" required>
+                <button type="button" class="btn-remove-dynamic" onclick="this.parentElement.remove()">-</button>
+            `;
+            container.appendChild(row);
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            const errorEl = document.getElementById('attachment-error');
+            errorEl.style.display = 'none';
+
+            if (!file) {
+                fileBase64 = '';
+                fileName = '';
+                return;
+            }
+
+            if (file.type !== 'application/pdf') {
+                errorEl.style.display = 'block';
+                errorEl.innerText = "الملف المرفوع يجب أن يكون بصيغة PDF فقط.";
+                e.target.value = '';
+                fileBase64 = '';
+                fileName = '';
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                errorEl.style.display = 'block';
+                errorEl.innerText = "حجم الملف كبير جداً. الحد الأقصى المسموح به هو 5 ميجابايت.";
+                e.target.value = '';
+                fileBase64 = '';
+                fileName = '';
+                return;
+            }
+
+            fileName = file.name;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                fileBase64 = evt.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function goToStep1() {
+            document.getElementById('form-step-1').classList.add('active');
+            document.getElementById('form-step-2').classList.remove('active');
+            document.getElementById('form-step-3').classList.remove('active');
+            document.getElementById('ind-step-1').className = 'step-indicator active';
+            document.getElementById('ind-step-2').className = 'step-indicator';
+            document.getElementById('ind-step-3').className = 'step-indicator';
+        }
+
+        function goToStep2() {
+            let isValid = true;
+            const serviceSelect = document.getElementById('app-service-name');
+            const firstNameInput = document.getElementById('app-first-name');
+            const lastNameInput = document.getElementById('app-last-name');
+            const whatsappInput = document.getElementById('app-whatsapp');
+            const emailInput = document.getElementById('app-email');
+            const attachmentInput = document.getElementById('app-attachment');
+
+            const fields = [serviceSelect, firstNameInput, lastNameInput, whatsappInput, emailInput, attachmentInput];
+            fields.forEach(f => f.classList.remove('invalid'));
+
+            if (!serviceSelect.value) { serviceSelect.classList.add('invalid'); isValid = false; }
+            if (!firstNameInput.value.trim()) { firstNameInput.classList.add('invalid'); isValid = false; }
+            if (!lastNameInput.value.trim()) { lastNameInput.classList.add('invalid'); isValid = false; }
+
+            const countryCodeSelect = document.getElementById('app-country-code');
+            const whatsappRegex = /^\+[1-9]\d{7,14}$/;
+            const phoneVal = whatsappInput.value.trim().replace(/\s+/g, '');
+            const fullPhoneVal = (countryCodeSelect ? countryCodeSelect.value : '') + phoneVal;
+            const whatsappError = document.getElementById('whatsapp-error');
+            whatsappError.style.display = 'none';
+            if (!whatsappRegex.test(fullPhoneVal)) {
+                whatsappInput.classList.add('invalid');
+                whatsappError.style.display = 'block';
+                isValid = false;
+            }
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const emailError = document.getElementById('email-error');
+            emailError.style.display = 'none';
+            if (!emailRegex.test(emailInput.value.trim())) {
+                emailInput.classList.add('invalid');
+                emailError.style.display = 'block';
+                isValid = false;
+            }
+
+            const attachmentError = document.getElementById('attachment-error');
+            attachmentError.style.display = 'none';
+            if (!fileBase64) {
+                attachmentInput.classList.add('invalid');
+                attachmentError.style.display = 'block';
+                attachmentError.innerText = "يرجى رفع ملف المرفق (PDF) المطلوب للخدمة.";
+                isValid = false;
+            }
+
+            const service = serviceSelect.value;
+            if (service === 'Trainee Registration') {
+                const traineeInputs = document.querySelectorAll('.trainee-name-input');
+                traineeInputs.forEach(input => {
+                    input.classList.remove('invalid');
+                    if (!input.value.trim()) {
+                        input.classList.add('invalid');
+                        isValid = false;
+                    }
+                });
+            } else if (service === 'Safety Certificate Renewal') {
+                const areaInput = document.getElementById('app-inspection-area');
+                if (areaInput) {
+                    areaInput.classList.remove('invalid');
+                    if (!areaInput.value || parseInt(areaInput.value, 10) <= 0) {
+                        areaInput.classList.add('invalid');
+                        isValid = false;
+                    }
+                }
+            } else if (service === 'Hazardous Material Permit') {
+                const chemicalSelect = document.getElementById('app-chemical-type');
+                if (chemicalSelect) {
+                    chemicalSelect.classList.remove('invalid');
+                    if (!chemicalSelect.value) {
+                        chemicalSelect.classList.add('invalid');
+                        isValid = false;
+                    }
+                }
+            } else if (service === 'Gold Shop License') {
+                const alarmInput = document.getElementById('app-gold-alarm-details');
+                if (alarmInput) {
+                    alarmInput.classList.remove('invalid');
+                    if (!alarmInput.value.trim()) {
+                        alarmInput.classList.add('invalid');
+                        isValid = false;
+                    }
+                }
+            } else if (service === 'Gas Selling Shops License') {
+                const gasLetterInput = document.getElementById('app-gas-ministry-letter');
+                if (gasLetterInput) {
+                    gasLetterInput.classList.remove('invalid');
+                    if (!gasLetterInput.value.trim()) {
+                        gasLetterInput.classList.add('invalid');
+                        isValid = false;
+                    }
+                }
+            } else if (service === 'Bakery License') {
+                const bakeryDrawingsInput = document.getElementById('app-bakery-drawings');
+                if (bakeryDrawingsInput) {
+                    bakeryDrawingsInput.classList.remove('invalid');
+                    if (!bakeryDrawingsInput.value.trim()) {
+                        bakeryDrawingsInput.classList.add('invalid');
+                        isValid = false;
+                    }
+                }
+            } else if (service === 'Gas Station License') {
+                const capacityInput = document.getElementById('app-station-capacity');
+                if (capacityInput) {
+                    capacityInput.classList.remove('invalid');
+                    if (!capacityInput.value || parseInt(capacityInput.value, 10) <= 0) {
+                        capacityInput.classList.add('invalid');
+                        isValid = false;
+                    }
+                }
+            }
+
+            if (!isValid) return;
+
+            const summaryGrid = document.getElementById('summary-grid-el');
+            let dynamicSummary = '';
+            if (service === 'Trainee Registration') {
+                const traineeNames = Array.from(document.querySelectorAll('.trainee-name-input')).map(i => i.value.trim());
+                dynamicSummary = `أسماء المتدربين: ${traineeNames.join(', ')}`;
+            } else if (service === 'Safety Certificate Renewal') {
+                const area = document.getElementById('app-inspection-area').value;
+                dynamicSummary = `المساحة الخاضعة للتفتيش: ${area} متر مربع`;
+            } else if (service === 'Hazardous Material Permit') {
+                const chemical = document.getElementById('app-chemical-type').value;
+                dynamicSummary = `نوع المادة الكيميائية: ${chemical}`;
+            } else if (service === 'Gas Selling Shops License') {
+                const gasLetter = document.getElementById('app-gas-ministry-letter').value.trim();
+                dynamicSummary = `تفاصيل خطاب وزارة الصناعة: ${gasLetter}`;
+            } else if (service === 'Bakery License') {
+                const bakeryDrawings = document.getElementById('app-bakery-drawings').value.trim();
+                dynamicSummary = `موافقات المخططات المعمارية: ${bakeryDrawings}`;
+            } else if (service === 'Gold Shop License') {
+                const alarm = document.getElementById('app-gold-alarm-details').value.trim();
+                dynamicSummary = `عقد صيانة نظام الإنذار: ${alarm}`;
+            } else if (service === 'Gas Station License') {
+                const capacity = document.getElementById('app-station-capacity').value;
+                dynamicSummary = `سعة خزانات الوقود: ${capacity} لتر`;
+            } else {
+                const genericInput = document.getElementById('app-generic-details');
+                if (genericInput) {
+                    dynamicSummary = `تفاصيل إضافية: ${genericInput.value.trim() || 'لا يوجد'}`;
+                }
+            }
+
+            let serviceText = serviceSelect.options[serviceSelect.selectedIndex].text;
+            summaryGrid.innerHTML = `
+                <div class="summary-label">نوع الخدمة</div>
+                <div class="summary-value">${serviceText}</div>
+                <div class="summary-label">الاسم الكامل</div>
+                <div class="summary-value">${firstNameInput.value.trim()} ${lastNameInput.value.trim()}</div>
+                <div class="summary-label">رقم الواتساب</div>
+                <div class="summary-value">${(document.getElementById('app-country-code') ? document.getElementById('app-country-code').value : '') + whatsappInput.value.trim()}</div>
+                <div class="summary-label">البريد الإلكتروني</div>
+                <div class="summary-value">${emailInput.value.trim()}</div>
+                <div class="summary-label">الرقم المرجعي</div>
+                <div class="summary-value">${document.getElementById('app-ref-number').value.trim() || 'لا يوجد'}</div>
+                <div class="summary-label">بيانات الخدمة الإضافية</div>
+                <div class="summary-value">${dynamicSummary || 'لا يوجد'}</div>
+                <div class="summary-label">اسم الملف المرفق</div>
+                <div class="summary-value">📄 ${fileName}</div>
+                <div class="summary-label">طريقة الدفع</div>
+                <div class="summary-value">${document.getElementById('app-payment-method').value}</div>
+                <div class="summary-label">ملاحظات</div>
+                <div class="summary-value">${document.getElementById('app-notes').value.trim() || 'لا يوجد'}</div>
+            `;
+
+            document.getElementById('form-step-1').classList.remove('active');
+            document.getElementById('form-step-2').classList.add('active');
+            document.getElementById('ind-step-1').className = 'step-indicator completed';
+            document.getElementById('ind-step-2').className = 'step-indicator active';
+        }
+
+        async function submitApplicationForm() {
+            const submitBtn = document.getElementById('btn-submit-app');
+            submitBtn.disabled = true;
+            submitBtn.innerText = "جاري إرسال الطلب وحفظ البيانات...";
+
+            const serviceName = document.getElementById('app-service-name').value;
+            const firstName = document.getElementById('app-first-name').value.trim();
+            const lastName = document.getElementById('app-last-name').value.trim();
+            const countryCodeSelect = document.getElementById('app-country-code');
+            const countryCode = countryCodeSelect ? countryCodeSelect.value : '';
+            const whatsapp = countryCode + document.getElementById('app-whatsapp').value.trim().replace(/\s+/g, '');
+            const email = document.getElementById('app-email').value.trim();
+            const referenceNumber = document.getElementById('app-ref-number').value.trim();
+            const paymentMethod = document.getElementById('app-payment-method').value;
+            const notes = document.getElementById('app-notes').value.trim();
+
+            let dynamicFields = {};
+            if (serviceName === 'Trainee Registration') {
+                dynamicFields.trainees = Array.from(document.querySelectorAll('.trainee-name-input')).map(i => i.value.trim());
+            } else if (serviceName === 'Safety Certificate Renewal') {
+                dynamicFields.inspectionArea = parseInt(document.getElementById('app-inspection-area').value, 10);
+            } else if (serviceName === 'Hazardous Material Permit') {
+                dynamicFields.chemicalType = document.getElementById('app-chemical-type').value;
+            } else if (serviceName === 'Gas Selling Shops License') {
+                dynamicFields.gasMinistryLetter = document.getElementById('app-gas-ministry-letter').value.trim();
+            } else if (serviceName === 'Bakery License') {
+                dynamicFields.bakeryDrawings = document.getElementById('app-bakery-drawings').value.trim();
+            } else if (serviceName === 'Gold Shop License') {
+                dynamicFields.goldAlarmDetails = document.getElementById('app-gold-alarm-details').value.trim();
+            } else if (serviceName === 'Gas Station License') {
+                dynamicFields.stationCapacity = parseInt(document.getElementById('app-station-capacity').value, 10);
+            } else {
+                const genericInput = document.getElementById('app-generic-details');
+                if (genericInput) {
+                    dynamicFields.genericDetails = genericInput.value.trim();
+                }
+            }
+
+            const payload = {
+                serviceName,
+                firstName,
+                lastName,
+                whatsapp,
+                email,
+                referenceNumber,
+                attachmentName: fileName,
+                attachmentBase64: fileBase64,
+                dynamicFields,
+                paymentMethod,
+                notes
+            };
+
+            try {
+                const response = await fetch('/api/applications', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    const resData = await response.json();
+                    document.getElementById('success-app-id').innerText = resData.appId;
+                    document.getElementById('success-tracking-url').innerText = resData.trackingLink;
+                    
+                    document.getElementById('form-step-2').classList.remove('active');
+                    document.getElementById('form-step-3').classList.add('active');
+                    
+                    document.getElementById('ind-step-2').className = 'step-indicator completed';
+                    document.getElementById('ind-step-3').className = 'step-indicator completed';
+                } else {
+                    const text = await response.text();
+                    alert("فشل إرسال الطلب: " + text);
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = "تأكيد وتقديم الطلب الآن ✓";
+                }
+            } catch (err) {
+                console.error(err);
+                alert("خطأ في الاتصال بالخادم أثناء إرسال الطلب.");
+                submitBtn.disabled = false;
+                submitBtn.innerText = "تأكيد وتقديم الطلب الآن ✓";
+            }
+        }
+
+        function copyTrackingLink() {
+            const urlText = document.getElementById('success-tracking-url').innerText;
+            navigator.clipboard.writeText(urlText).then(() => {
+                alert("تم نسخ رابط تتبع الطلب إلى الحافظة!");
+            }).catch(err => {
+                console.error("Copy failed:", err);
+            });
+        }
+    </script>
 </body>
 </html>

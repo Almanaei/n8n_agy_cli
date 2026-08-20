@@ -1,9 +1,16 @@
+const fs = require('fs');
+const path = require('path');
+
+// Load environment variables from .env
 try {
-  require('dotenv').config();
-} catch (e) {}
+  const dotenv = require('dotenv');
+  dotenv.config({ path: path.join(__dirname, '.env') });
+} catch (e) {
+  console.error("Error loading .env file:", e);
+}
 
 const apiKey = process.env.ELEVENLABS_API_KEY || "896c43093392d23879dc8d578e7840b4a0b27af2ecf38803e985386b494c427c";
-const agentId = "agent_1601kv6ytcwwfh1sfk46qqhrrq3j";
+const agentId = process.env.ELEVENLABS_AGENT_ID || "agent_1601kv6ytcwwfh1sfk46qqhrrq3j";
 const url = `https://api.elevenlabs.io/v1/convai/agents/${agentId}`;
 
 const systemPrompt = `You are a professional customer service assistant representing the General Directorate of Civil Defense in the Kingdom of Bahrain (الإدارة العامة للدفاع المدني في مملكة البحرين).
@@ -65,82 +72,74 @@ CONVERSATIONAL RULES & GUARDRAILS:
 5. Silence & Turn-Taking:
    - If the user stops talking, do NOT repeatedly prompt them. Simply wait patiently and silently for them to continue speaking or typing.
 6. Call Termination (Auto-Hangup):
-   - If the user says goodbye, bye, or مع السلامة, or indicates they want to end the conversation, you MUST politely bid them farewell and call the 'end_call' built-in system tool immediately to disconnect the call. Do not wait for the user to end it.`;
+   - If the user says goodbye, bye, or مع السلامة, or indicates they want to end the conversation, you MUST politely bid them farewell and call the 'end_call' built-in system tool immediately to disconnect the call. Do not wait for the user to end it.
+7. Service Application Trigger:
+   - If the user asks to apply for any service (such as any of the 31 services listed in your services.txt through services_7.txt files), or says they want to submit an application, you MUST immediately call the 'trigger_service_application' client-side tool.
+   - Pass the exact Arabic or English 'serviceName' of the service they asked about, and any optional 'referenceNumber' they provide.
+   - Reassure the user that the form has been opened on their screen, and ask them to complete the details and upload their PDF attachment to submit.`;
 
-const patchConfig = {
-  conversation_config: {
-    agent: {
-      prompt: {
-        prompt: systemPrompt,
-        tools: [
-          {
-            type: "webhook",
-            name: "save_lead_info",
-            description: "Call this tool to save the client's name, phone number, and optional email. This must be done BEFORE providing service details, or when they request an email transcript.",
-            api_schema: {
-              url: "https://bhdefense-n8n-tunnel.loca.lt/webhook/leads",
-              method: "POST",
-              request_headers: {
-                "Content-Type": "application/json"
-              },
-              request_body_schema: {
-                type: "object",
-                required: ["conversationId"],
-                properties: {
-                  clientName: {
-                    type: "string",
-                    description: "The client's full name."
-                  },
-                  phoneNumber: {
-                    type: "string",
-                    description: "The client's phone number."
-                  },
-                  clientEmail: {
-                    type: "string",
-                    description: "The client's email address (optional, only if requested by user)."
-                  },
-                  conversationId: {
-                    type: "string",
-                    dynamic_variable: "system__conversation_id"
-                  }
-                }
+async function patchAgent() {
+  console.log("Fetching active workspace tools from ElevenLabs...");
+  try {
+    const listToolsRes = await fetch("https://api.elevenlabs.io/v1/convai/tools", {
+      headers: { "xi-api-key": apiKey }
+    });
+    if (!listToolsRes.ok) {
+      throw new Error(`Failed to list tools: ${listToolsRes.status}`);
+    }
+    const { tools } = await listToolsRes.json();
+    
+    // Find active save_lead_info and trigger_service_application IDs
+    const saveLeadTool = tools.find(t => t.tool_config?.name === "save_lead_info");
+    const triggerAppTool = tools.find(t => t.tool_config?.name === "trigger_service_application");
+    
+    const toolIds = [];
+    if (saveLeadTool) {
+      toolIds.push(saveLeadTool.id);
+      console.log(`Found save_lead_info ID: ${saveLeadTool.id}`);
+    }
+    if (triggerAppTool) {
+      toolIds.push(triggerAppTool.id);
+      console.log(`Found trigger_service_application ID: ${triggerAppTool.id}`);
+    }
+
+    const patchConfig = {
+      conversation_config: {
+        agent: {
+          prompt: {
+            prompt: systemPrompt,
+            tool_ids: toolIds,
+            built_in_tools: {
+              end_call: {
+                name: "end_call"
+              }
+            }
+          },
+          first_message: "مرحبا بكم في مركز خدمات الدفاع المدني الذكي. يرجى تزويدي بالإسم ورقم الهاتف للبدء\nWelcome to the Civil Defense services. Please provide your name and phone number to begin."
+        },
+        turn: {
+          turn_timeout: 2,
+          silence_end_call_timeout: 30,
+          turn_eagerness: "eager"
+        },
+        tts: {
+          text_normalisation_type: "elevenlabs",
+          optimize_streaming_latency: 4
+        },
+        language_presets: {
+          en: {
+            overrides: {
+              agent: {
+                language: "en",
+                first_message: "Welcome to the Civil Defense services. Please provide your name and phone number to begin."
               }
             }
           }
-        ],
-        built_in_tools: {
-          end_call: {
-            name: "end_call"
-          }
-        }
-      },
-      first_message: "مرحبا بكم في مركز خدمات الدفاع المدني الذكي. يرجى تزويدي بالإسم ورقم الهاتف للبدء\nWelcome to the Civil Defense services. Please provide your name and phone number to begin."
-    },
-    turn: {
-      turn_timeout: 2,
-      silence_end_call_timeout: 30,
-      turn_eagerness: "eager"
-    },
-    tts: {
-      text_normalisation_type: "elevenlabs",
-      optimize_streaming_latency: 4
-    },
-    language_presets: {
-      en: {
-        overrides: {
-          agent: {
-            language: "en",
-            first_message: "Welcome to the Civil Defense services. Please provide your name and phone number to begin."
-          }
         }
       }
-    }
-  }
-};
+    };
 
-async function patchAgent() {
-  console.log("Updating ElevenLabs Conversational Voice Agent prompt rules...");
-  try {
+    console.log("Updating agent with prompt and workspace tool associations...");
     const response = await fetch(url, {
       method: "PATCH",
       headers: {
@@ -152,7 +151,7 @@ async function patchAgent() {
 
     const result = await response.json();
     if (response.ok) {
-      console.log("Agent successfully updated with text-input email rules! 🎉");
+      console.log("Agent successfully updated! 🎉");
     } else {
       console.error("Failed to update agent:", result);
     }
