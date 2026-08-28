@@ -1,0 +1,737 @@
+[
+  {
+    "id": "fire_safety_compliance_certificate",
+    "file": "services.txt",
+    "name": "إصدار شهادة استيفاء شروط واحتياجات الحماية والوقاية من الحريق وتجديدها",
+    "name_en": "Issuance and Renewal of Fire Protection and Safety Requirements Certificate",
+    "canonical_key": "Fire Safety Compliance Certificate",
+    "fee": "50 دينار بحريني فقط",
+    "fee_en": "50 BHD only",
+    "keywords_ar": [
+      "شهادة استيفاء الشروط",
+      "وقاية من الحريق",
+      "سلامة المباني",
+      "تجديد شهادة الحريق",
+      "الحماية والوقاية",
+      "شهادة الدفاع المدني",
+      "فحص أنظمة الإطفاء"
+    ],
+    "keywords_en": [
+      "fire safety certificate",
+      "fire prevention compliance",
+      "building safety certificate",
+      "fire protection renewal",
+      "civil defense certificate",
+      "fire inspection report"
+    ]
+  },
+  {
+    "id": "gas_sales_shop_license",
+    "file": "services.txt",
+    "name": "إصدار ترخيص محلات بيع الغاز، وتجديد الترخيص",
+    "name_en": "Issuance and Renewal of Gas Sales Shop License",
+    "canonical_key": "Gas Sales Shop License",
+    "fee": "20 دينار بحريني فقط",
+    "fee_en": "20 BHD only",
+    "keywords_ar": [
+      "ترخيص محل غاز",
+      "محلات بيع الغاز",
+      "تجديد ترخيص الغاز",
+      "أسطوانات الغاز",
+      "سجلات الغاز",
+      "سلامة محلات الغاز"
+    ],
+    "keywords_en": [
+      "gas sales shop license",
+      "gas store permit",
+      "gas shop renewal",
+      "LPG sales permit",
+      "gas cylinder shop"
+    ]
+  },
+  {
+    "id": "bakery_license",
+    "file": "services.txt",
+    "name": "إصدار ترخيص المخابز الشعبية والآلية، وتجديد الترخيص",
+    "name_en": "Issuance and Renewal of License for Traditional and Automated Bakeries",
+    "canonical_key": "Traditional and Automated Bakery License",
+    "fee": "10 دينار بحريني فقط",
+    "fee_en": "10 BHD only",
+    "keywords_ar": [
+      "ترخيص مخبز",
+      "مخابز شعبية",
+      "مخابز آلية",
+      "تجديد ترخيص مخبز",
+      "ترخيص أفران",
+      "سلامة المخابز"
+    ],
+    "keywords_en": [
+      "bakery license",
+      "traditional bakery permit",
+      "automated bakery license",
+      "bakery safety permit",
+      "bakery renewal"
+    ]
+  },
+  {
+    "id": "gold_shops_workshops_license",
+    "file": "services.txt",
+    "name": "إصدار ترخيص محلات وورش الذهب، وتجديد الترخيص",
+    "name_en": "Issuance and Renewal of License for Gold Shops and Workshops",
+    "canonical_key": "Gold Shops and Workshops License",
+    "fee": "20 دينار بحريني فقط",
+    "fee_en": "20 BHD only",
+    "keywords_ar": [
+      "ترخيص محل ذهب",
+      "ورش الذهب",
+      "تجديد ترخيص ورشة ذهب",
+      "مجوهرات",
+      "إنذار وإطفاء ورش الذهب",
+      "سلامة محلات الذهب"
+    ],
+    "keywords_en": [
+      "gold shop license",
+      "jewelry workshop permit",
+      "gold workshop renewal",
+      "goldsmith store permit",
+      "jewelry shop safety"
+    ]
+  },
+  {
+    "id": "civil_defense_training_center_license",
+    "file": "services.txt",
+    "name": "إصدار الترخيص لمعاهد ومراكز التدريب على أعمال الدفاع المدني",
+    "name_en": "Issuance of License for Civil Defense Training Institutes and Centers",
+    "canonical_key": "Civil Defense Training Institutes and Centers License",
+    "fee": "200 دينار بحريني فقط",
+    "fee_en": "200 BHD only",
+    "keywords_ar": [
+      "ترخيص مركز تدريب",
+      "معاهد الدفاع المدني",
+      "تدريب السلامة",
+      "تأهيل مراكز التدريب",
+      "مراكز تدريب الدفاع المدني"
+    ],
+    "keywords_en": [
+      "civil defense training institute license",
+      "training center permit",
+      "safety training institute",
+      "civil defense academy license"
+    ]
+  },
+  {
+    "id": "fuel_gas_station_license",
+    "file": "services.txt",
+    "name": "إصدار الترخيص لمحطات تزويد الوقود، وتجديد الترخيص",
+    "name_en": "Issuance and Renewal of License for Fuel Stations",
+    "canonical_key": "Fuel Station License",
+    "fee": "مجاناً",
+    "fee_en": "Free of charge",
+    "keywords_ar": [
+      "ترخيص محطة وقود",
+      "محطات البترول",
+      "تجديد ترخيص محطة بنزين",
+      "محطات تزويد الوقود",
+      "سلامة محطات الوقود"
+    ],
+    "keywords_en": [
+      "fuel station license",
+      "petrol station permit",
+      "gas station licensing",
+      "fuel station renewal",
+      "gasoline station safety"
+    ]
+  },
+  {
+    "id": "under_construction_facilities_inspection_certificate",
+    "file": "services_2.txt",
+    "name": "إصدار شهادة فحص المصانع والفنادق والمجمعات التجارية قيد الإنشاء وتجديدها",
+    "name_en": "Issuance and Renewal of Inspection Certificate for Factories, Hotels, and Commercial Complexes Under Construction",
+    "canonical_key": "Inspection Certificate for Facilities Under Construction",
+    "fee": "100 دينار بحريني فقط",
+    "fee_en": "100 BHD only",
+    "keywords_ar": [
+      "فحص منشآت قيد الإنشاء",
+      "فحص مصانع",
+      "فحص فنادق",
+      "فحص مجمعات تجارية",
+      "شهادة فحص إنشائي"
+    ],
+    "keywords_en": [
+      "construction inspection certificate",
+      "factories inspection under construction",
+      "hotel construction safety permit",
+      "commercial complex inspection"
+    ]
+  },
+  {
+    "id": "incident_report_large_facilities",
+    "file": "services_2.txt",
+    "name": "إصدار تقرير الحوادث للمنشآت الكبيرة والمصانع والفنادق والمجمعات التجارية وما في حكمها",
+    "name_en": "Issuance of Incident Report for Large Facilities, Factories, Hotels, and Commercial Complexes",
+    "canonical_key": "Incident Report for Large Facilities",
+    "fee": "50 دينار بحريني فقط",
+    "fee_en": "50 BHD only",
+    "keywords_ar": [
+      "تقرير حوادث منشآت كبيرة",
+      "تقرير حريق مصانع",
+      "تقرير حادث فندق",
+      "تقرير حادث مجمع تجاري",
+      "تقرير إثبات واقعة دفاع مدني"
+    ],
+    "keywords_en": [
+      "large facility incident report",
+      "factory fire report",
+      "hotel incident report",
+      "commercial complex fire investigation report"
+    ]
+  },
+  {
+    "id": "incident_report_small_facilities_homes",
+    "file": "services_2.txt",
+    "name": "إصدار تقرير الحوادث للمنشآت الصغيرة والمنازل وما في حكمها",
+    "name_en": "Issuance of Incident Report for Small Facilities and Residential Houses",
+    "canonical_key": "Incident Report for Small Facilities and Homes",
+    "fee": "مجاناً",
+    "fee_en": "Free of charge",
+    "keywords_ar": [
+      "تقرير حوادث المنازل",
+      "تقرير حريق منزل",
+      "تقرير منشآت صغيرة",
+      "تقرير حادث حريق سكني"
+    ],
+    "keywords_en": [
+      "residential incident report",
+      "home fire accident report",
+      "small facility incident report",
+      "house fire report"
+    ]
+  },
+  {
+    "id": "final_inspection_certificate_electrical_connection",
+    "file": "services_2.txt",
+    "name": "إصدار شهادة الفحص النهائي لتوصيل التيار الكهربائي للمباني الجديدة",
+    "name_en": "Issuance of Final Inspection Certificate for Electrical Connection to New Buildings",
+    "canonical_key": "Final Inspection Certificate for Electrical Connection",
+    "fee": "30 دينار بحريني فقط",
+    "fee_en": "30 BHD only",
+    "keywords_ar": [
+      "فحص توصيل الكهرباء",
+      "شهادة الكهرباء للمباني الجديدة",
+      "فحص نهائي كهرباء",
+      "توصيل التيار الكهربائي"
+    ],
+    "keywords_en": [
+      "final electrical inspection certificate",
+      "power connection clearance",
+      "new building electricity connection",
+      "electrical safety clearance"
+    ]
+  },
+  {
+    "id": "factory_warehouse_plans_license",
+    "file": "services_3.txt",
+    "name": "إصدار ترخيص خرائط المصانع والمخازن وتجديد الترخيص",
+    "name_en": "Issuance and Renewal of Permit for Factory and Warehouse Plans",
+    "canonical_key": "Factory and Warehouse Plans Permit",
+    "fee": "50 دينار بحريني فقط",
+    "fee_en": "50 BHD only",
+    "keywords_ar": [
+      "ترخيص خرائط مصانع",
+      "مخططات مستودعات",
+      "اعتماد خرائط مخازن",
+      "تجديد ترخيص خرائط المصانع"
+    ],
+    "keywords_en": [
+      "factory plans permit",
+      "warehouse layout approval",
+      "factory map license renewal",
+      "industrial building plan permit"
+    ]
+  },
+  {
+    "id": "commercial_centers_highrise_plans_license",
+    "file": "services_3.txt",
+    "name": "إصدار ترخيص خرائط المراكز التجارية والمباني العالية",
+    "name_en": "Issuance of Permit for Commercial Center and High-Rise Building Plans",
+    "canonical_key": "Commercial Centers and High-Rise Building Plans Permit",
+    "fee": "300 دينار بحريني فقط",
+    "fee_en": "300 BHD only",
+    "keywords_ar": [
+      "خرائط المباني العالية",
+      "مخططات المراكز التجارية",
+      "ترخيص ناطحات سحاب",
+      "مخططات أبراج"
+    ],
+    "keywords_en": [
+      "high rise building plans permit",
+      "commercial center map approval",
+      "skyscraper building plan license",
+      "shopping mall plan review"
+    ]
+  },
+  {
+    "id": "residential_compounds_plans_license",
+    "file": "services_3.txt",
+    "name": "إصدار ترخيص خرائط المجمعات السكنية التي تحتوي على عشر فلل فأكثر",
+    "name_en": "Issuance of Permit for Residential Compound Plans (10 Villas or More)",
+    "canonical_key": "Residential Compound Plans Permit (10+ Villas)",
+    "fee": "100 دينار بحريني فقط",
+    "fee_en": "100 BHD only",
+    "keywords_ar": [
+      "خرائط مجمعات سكنية",
+      "مخططات عشر فلل",
+      "ترخيص فلل سكنية",
+      "مجمع فلل"
+    ],
+    "keywords_en": [
+      "residential compound plan permit",
+      "housing compound plan approval",
+      "10 villa compound license",
+      "residential complex plan review"
+    ]
+  },
+  {
+    "id": "public_worship_courts_museums_plans_review",
+    "file": "services_3.txt",
+    "name": "دراسة مخططات دور العبادة والمحاكم والمتاحف",
+    "name_en": "Review of Engineering Plans for Places of Worship, Courts, and Museums",
+    "canonical_key": "Places of Worship, Courts, and Museums Engineering Plans Review",
+    "fee": "مجاناً",
+    "fee_en": "Free of charge",
+    "keywords_ar": [
+      "مخططات مساجد",
+      "دراسة خرائط دور العبادة",
+      "مخططات محاكم",
+      "مخططات متاحف",
+      "مباني حكومية ودينية"
+    ],
+    "keywords_en": [
+      "worship place plan review",
+      "mosque plan study",
+      "court building plan approval",
+      "museum plan review",
+      "public building plan evaluation"
+    ]
+  },
+  {
+    "id": "new_fuel_stations_plans_review",
+    "file": "services_3.txt",
+    "name": "دراسة الخرائط لمحطات الوقود الجديدة",
+    "name_en": "Review of Building Plans for New Fuel Stations",
+    "canonical_key": "New Fuel Station Building Plans Review",
+    "fee": "مجاناً",
+    "fee_en": "Free of charge",
+    "keywords_ar": [
+      "دراسة خرائط محطات الوقود",
+      "مخططات محطة بنزين جديدة",
+      "اعتماد خرائط الوقود",
+      "سلامة مخططات محطات البترول"
+    ],
+    "keywords_en": [
+      "new fuel station plan review",
+      "gas station design approval",
+      "petrol station layout review",
+      "fuel station safety plan study"
+    ]
+  },
+  {
+    "id": "electrical_engineering_plans_review",
+    "file": "services_3.txt",
+    "name": "دراسة المخططات الهندسية الكهربائية",
+    "name_en": "Review of Electrical Engineering Plans",
+    "canonical_key": "Electrical Engineering Plans Review",
+    "fee": "مجاناً",
+    "fee_en": "Free of charge",
+    "keywords_ar": [
+      "مخططات كهربائية",
+      "دراسة الخرائط الكهربائية",
+      "اعتماد المخططات الكهربائية",
+      "سلامة التوصيلات الكهربائية"
+    ],
+    "keywords_en": [
+      "electrical plan review",
+      "electrical engineering blueprints",
+      "electrical system approval",
+      "building electrical design review"
+    ]
+  },
+  {
+    "id": "mechanical_engineering_plans_review",
+    "file": "services_3.txt",
+    "name": "دراسة المخططات الميكانيكية",
+    "name_en": "Review of Mechanical Engineering Plans",
+    "canonical_key": "Mechanical Engineering Plans Review",
+    "fee": "مجاناً",
+    "fee_en": "Free of charge",
+    "keywords_ar": [
+      "مخططات ميكانيكية",
+      "دراسة الخرائط الميكانيكية",
+      "أنظمة التكييف والتهوية",
+      "اعتماد المخططات الميكانيكية"
+    ],
+    "keywords_en": [
+      "mechanical plan review",
+      "HVAC plan approval",
+      "mechanical engineering blueprints",
+      "building mechanical design review"
+    ]
+  },
+  {
+    "id": "gas_piping_tanks_plans_review",
+    "file": "services_3.txt",
+    "name": "دراسة الخرائط على تمديدات الغاز والخزانات",
+    "name_en": "Review of Gas Piping and Storage Tank Plans",
+    "canonical_key": "Gas Piping and Tank Installation Plans Review",
+    "fee": "مجاناً",
+    "fee_en": "Free of charge",
+    "keywords_ar": [
+      "تمديدات الغاز",
+      "خزانات الغاز",
+      "دراسة خرائط الغاز",
+      "اعتماد مخططات غاز",
+      "شبكات الغاز المركزية"
+    ],
+    "keywords_en": [
+      "gas piping plan review",
+      "gas tank installation approval",
+      "LPG network plan study",
+      "gas storage design review"
+    ]
+  },
+  {
+    "id": "civil_defense_training_certificate_1day",
+    "file": "services_4.txt",
+    "name": "إصدار شهادة تدريب على أعمال الدفاع المدني لمدة يوم واحد",
+    "name_en": "Issuance of Civil Defense Training Certificate (1 Day Duration)",
+    "canonical_key": "1-Day Civil Defense Training Certificate",
+    "fee": "40 دينار بحريني",
+    "fee_en": "40 BHD",
+    "keywords_ar": [
+      "تدريب يوم واحد",
+      "دورة دفاع مدني يوم",
+      "شهادة تدريب يومية",
+      "تدريب إطفاء قصير"
+    ],
+    "keywords_en": [
+      "1 day civil defense training",
+      "one day safety course certificate",
+      "1-day fire training",
+      "short civil defense course"
+    ]
+  },
+  {
+    "id": "civil_defense_training_certificate_1week",
+    "file": "services_4.txt",
+    "name": "إصدار شهادة تدريب على أعمال الدفاع المدني لمدة  اسبوع",
+    "name_en": "Issuance of Civil Defense Training Certificate (1 Week Duration)",
+    "canonical_key": "1-Week Civil Defense Training Certificate",
+    "fee": "200 دينار بحريني فقط.",
+    "fee_en": "200 BHD only.",
+    "keywords_ar": [
+      "تدريب أسبوع",
+      "دورة دفاع مدني أسبوع",
+      "شهادة تدريب أسبوعية",
+      "برنامج تدريب السلامة أسبوع"
+    ],
+    "keywords_en": [
+      "1 week civil defense training",
+      "one week fire safety course",
+      "weekly civil defense certificate",
+      "firefighter course 1 week"
+    ]
+  },
+  {
+    "id": "heavy_fire_vehicle_driving_training_certificate_2weeks",
+    "file": "services_4.txt",
+    "name": "إصدار شهادة تدريب أفراد منشآت ومؤسسات القطاع الخاص على قيادة مركبات الإطفاء الثقيلة لمدة أسبوعين",
+    "name_en": "Issuance of Training Certificate for Private Sector Personnel on Driving Heavy Firefighting Vehicles (2 Weeks Duration)",
+    "canonical_key": "Heavy Firefighting Vehicle Driving Training Certificate (2 Weeks)",
+    "fee": "200 دينار بحريني فقط.",
+    "fee_en": "200 BHD only.",
+    "keywords_ar": [
+      "قيادة مركبات الإطفاء الثقيلة",
+      "تدريب شاحنات إطفاء",
+      "تدريب القطاع الخاص إطفاء",
+      "سياقة سيارات دفاع مدني"
+    ],
+    "keywords_en": [
+      "heavy fire engine driving training",
+      "fire truck driver course",
+      "private sector firefighting vehicle certificate",
+      "2-week fire truck driving"
+    ]
+  },
+  {
+    "id": "civil_defense_comprehensive_training_certificate_16weeks",
+    "file": "services_4.txt",
+    "name": "إصدار شهادة تدريب الفرد على أعمال الدفاع المدني لمدة ستة عشر أسبوعًا.",
+    "name_en": "Issuance of Individual Civil Defense Training Certificate (16 Weeks Duration)",
+    "canonical_key": "16-Week Comprehensive Civil Defense Training Certificate",
+    "fee": "2000 دينار بحريني فقط.",
+    "fee_en": "2000 BHD only.",
+    "keywords_ar": [
+      "تدريب 16 أسبوع",
+      "دورة دفاع مدني شاملة",
+      "دورة إطفاء متقدمة",
+      "شهادة 16 أسبوع دفاع مدني"
+    ],
+    "keywords_en": [
+      "16 week civil defense training",
+      "comprehensive fire course",
+      "16-week professional firefighter certificate",
+      "long term safety training"
+    ]
+  },
+  {
+    "id": "building_evacuation_drills_training",
+    "file": "services_4.txt",
+    "name": "التدريب على عمليات إخلاء المباني والمنشآت",
+    "name_en": "Training on Building and Facility Evacuation Operations",
+    "canonical_key": "Building and Facility Evacuation Operations Training",
+    "fee": "50 دينار بحريني فقط.",
+    "fee_en": "50 BHD only.",
+    "keywords_ar": [
+      "تدريب إخلاء",
+      "عمليات الإخلاء",
+      "إخلاء المباني",
+      "تمارين طوارئ إخلاء",
+      "خطة الإخلاء من الحريق"
+    ],
+    "keywords_en": [
+      "building evacuation training",
+      "fire evacuation drill",
+      "emergency evacuation exercise",
+      "facility evacuation procedures"
+    ]
+  },
+  {
+    "id": "fire_safety_equipment_license",
+    "file": "services_5.txt",
+    "name": "إصدار الترخيص لمعدات الحريق والسلامة، وتجديد الترخيص",
+    "name_en": "Issuance and Renewal of License for Fire Safety Equipment",
+    "canonical_key": "Fire Safety Equipment Licensing and Renewal",
+    "fee": "30 دينار بحريني فقط",
+    "fee_en": "30 BHD only",
+    "keywords_ar": [
+      "ترخيص معدات الحريق",
+      "أجهزة السلامة",
+      "تفتيش معدات الإطفاء",
+      "تجديد ترخيص أجهزة الحريق"
+    ],
+    "keywords_en": [
+      "fire safety equipment license",
+      "fire protection gear permit",
+      "fire extinguishers approval",
+      "fire equipment license renewal"
+    ]
+  },
+  {
+    "id": "noc_fire_safety_equipment_license",
+    "file": "services_5.txt",
+    "name": "إصدار ترخيص عدم الممانعة لمعدات الحريق والسلامة، وتجديد الترخيص",
+    "name_en": "Issuance and Renewal of No-Objection Certificate (NOC) for Fire and Safety Equipment",
+    "canonical_key": "Fire and Safety Equipment No-Objection Certificate (NOC)",
+    "fee": "40 دينار بحريني فقط",
+    "fee_en": "40 BHD only",
+    "keywords_ar": [
+      "عدم ممانعة معدات الحريق",
+      "شهادة لا مانع معدات السلامة",
+      "تجديد عدم الممانعة للإطفاء",
+      "استيراد معدات حريق"
+    ],
+    "keywords_en": [
+      "no objection certificate fire equipment",
+      "fire safety equipment NOC",
+      "fire gear import permit",
+      "NOC renewal fire safety"
+    ]
+  },
+  {
+    "id": "local_fire_equipment_factory_license",
+    "file": "services_5.txt",
+    "name": "إصدار الترخيص لمصنع محلي لمعدات الإطفاء والوقاية من الحريق، وتجديد الترخيص",
+    "name_en": "Issuance and Renewal of License for Local Fire Equipment and Protection Factory",
+    "canonical_key": "Local Firefighting Equipment Factory License",
+    "fee": "مجاناً",
+    "fee_en": "Free of charge",
+    "keywords_ar": [
+      "مصنع معدات إطفاء",
+      "ترخيص مصنع محلي لعدات الحريق",
+      "تصنيع أدوات السلامة",
+      "تجديد ترخيص مصنع الإطفاء"
+    ],
+    "keywords_en": [
+      "local fire equipment factory license",
+      "fire protection manufacturing permit",
+      "fire extinguisher factory approval"
+    ]
+  },
+  {
+    "id": "fire_alarm_maintenance_technical_offices_license",
+    "file": "services_5.txt",
+    "name": "إصدار الترخيص للمكاتب الفنية ومكاتب صيانة أجهزة الإنذار والإطفاء، وتجديد الترخيص",
+    "name_en": "Issuance and Renewal of License for Technical Offices and Fire Alarm and Extinguishing Maintenance Firms",
+    "canonical_key": "Fire Alarm and Extinguishing System Maintenance Offices Licensing",
+    "fee": "100 دينار بحريني فقط",
+    "fee_en": "100 BHD only",
+    "keywords_ar": [
+      "مكاتب صيانة أجهزة الإنذار",
+      "مكاتب صيانة الإطفاء",
+      "ترخيص مكتب فني دفاع مدني",
+      "تجديد ترخيص صيانة أجهزة الحريق"
+    ],
+    "keywords_en": [
+      "fire alarm maintenance company license",
+      "fire protection technical office permit",
+      "alarm system maintenance firm license"
+    ]
+  },
+  {
+    "id": "noc_chemical_explosive_storage_license",
+    "file": "services_6.txt",
+    "name": "إصدار ترخيص عدم ممانعة لتخزين مواد كيميائية أو المتفجرات، وتجديد الترخيص",
+    "name_en": "Issuance and Renewal of No-Objection Certificate (NOC) for Chemical or Explosive Storage",
+    "canonical_key": "Chemical or Explosive Storage No-Objection Certificate (NOC)",
+    "fee": "مجاناً",
+    "fee_en": "Free of charge",
+    "keywords_ar": [
+      "تخزين المواد الكيميائية",
+      "تخزين المتفجرات",
+      "عدم ممانعة المواد الخطرة",
+      "ترخيص مستودع مواد كيميائية"
+    ],
+    "keywords_en": [
+      "chemical storage NOC",
+      "explosives storage permit",
+      "hazardous materials storage approval",
+      "chemical warehouse safety license"
+    ]
+  },
+  {
+    "id": "one_day_hazardous_materials_transport_permit",
+    "file": "services_6.txt",
+    "name": "ترخيص بالموافقة على نقل شحنات المواد الخطرة ليوم واحد",
+    "name_en": "Issuance of One-Day Approval Permit for Transporting Hazardous Material Shipments",
+    "canonical_key": "One-Day Hazardous Material Transport Permit",
+    "fee": "50 دينار بحريني فقط",
+    "fee_en": "50 BHD only",
+    "keywords_ar": [
+      "نقل المواد الخطرة ليوم واحد",
+      "تصريح نقل شحنات خطرة",
+      "ترخيص مواد خطرة يومي",
+      "شحنة مواد كيميائية مؤقتة"
+    ],
+    "keywords_en": [
+      "1 day hazardous transport permit",
+      "hazardous cargo transport permit",
+      "single day dangerous goods permit",
+      "one-day chemical transport approval"
+    ]
+  },
+  {
+    "id": "hazardous_chemical_transport_vehicles_license",
+    "file": "services_6.txt",
+    "name": "إصدار ترخيص الموافقة على سيارات نقل المواد الكيميائية والخطرة، وتجديد الترخيص",
+    "name_en": "Issuance and Renewal of Approval License for Chemical and Hazardous Material Transport Vehicles",
+    "canonical_key": "Chemical and Hazardous Material Transport Vehicle Approval",
+    "fee": "10 دينار بحريني فقط",
+    "fee_en": "10 BHD only",
+    "keywords_ar": [
+      "شاحنات المواد الكيميائية",
+      "مركبات نقل المواد الخطرة",
+      "ترخيص صهريج مواد خطرة",
+      "تجديد ترخيص سيارات المواد الكيميائية"
+    ],
+    "keywords_en": [
+      "chemical transport vehicle license",
+      "hazardous material truck permit",
+      "dangerous goods vehicle inspection",
+      "chemical tanker license"
+    ]
+  },
+  {
+    "id": "diesel_gas_tanks_installation_approval_license",
+    "file": "services_7.txt",
+    "name": "إصدار ترخيص الموافقة النهائية على تركيب خزانات الديزل والغاز، وتجديد الترخيص",
+    "name_en": "Issuance and Renewal of Final Approval License for Diesel and Gas Tank Installation",
+    "canonical_key": "Final Approval for Diesel and Gas Tank Installation",
+    "fee": "مجاناً",
+    "fee_en": "Free of charge",
+    "keywords_ar": [
+      "تركيب خزانات الديزل",
+      "خزانات الغاز",
+      "موافقة نهائية خزانات الديزل والغاز",
+      "تجديد ترخيص خزانات الوقود"
+    ],
+    "keywords_en": [
+      "diesel tank installation approval",
+      "gas tank installation permit",
+      "fuel tank safety clearance",
+      "diesel storage approval"
+    ]
+  },
+  {
+    "id": "gas_fuel_hazmat_consulting_offices_license",
+    "file": "services_7.txt",
+    "name": "إصدار الترخيص للمكاتب الفنية والاستشارية المختصة بالغاز والوقود والمواد الخطرة، وتجديد الترخيص",
+    "name_en": "Issuance and Renewal of License for Technical and Consultancy Offices Specialized in Gas, Fuel, and Hazardous Materials",
+    "canonical_key": "Gas, Fuel, and Hazmat Technical and Consultancy Offices Licensing",
+    "fee": "100 دينار بحريني فقط",
+    "fee_en": "100 BHD only",
+    "keywords_ar": [
+      "استشارات الغاز والوقود",
+      "مكاتب المواد الخطرة الفنية",
+      "ترخيص مكتب استشاري غاز",
+      "تجديد ترخيص مكاتب الوقود والمواد الخطرة"
+    ],
+    "keywords_en": [
+      "gas and fuel consultancy license",
+      "hazmat technical office permit",
+      "fuel engineering consultancy approval",
+      "hazardous materials expert firm"
+    ]
+  },
+  {
+    "id": "fuel_stations_licensing_sec7",
+    "file": "services_7.txt",
+    "name": "إصدار الترخيص لمحطات تزويد الوقود، وتجديد الترخيص",
+    "name_en": "Issuance and Renewal of License for Fuel Supply Stations",
+    "canonical_key": "Fuel Supply Stations Licensing and Renewal",
+    "fee": "مجاناً",
+    "fee_en": "Free of charge",
+    "keywords_ar": [
+      "ترخيص محطات تزويد الوقود",
+      "محطة وقود خدمات 7",
+      "تجديد ترخيص محطات الوقود",
+      "محطات المحروقات"
+    ],
+    "keywords_en": [
+      "fuel supply station license",
+      "petrol filling station permit",
+      "gas station license sec7",
+      "fueling station renewal"
+    ]
+  },
+  {
+    "id": "small_facilities_inspection_certificate",
+    "file": "services_7.txt",
+    "name": "إصدار شهادة فحص المنشآت الصغيرة، وتجديد الشهادة",
+    "name_en": "Issuance and Renewal of Inspection Certificate for Small Facilities",
+    "canonical_key": "Small Facilities Inspection Certificate Issuance and Renewal",
+    "fee": "30 دينار بحريني فقط",
+    "fee_en": "30 BHD only",
+    "keywords_ar": [
+      "فحص المنشآت الصغيرة",
+      "شهادة سلامة المحلات الصغيرة",
+      "تجديد شهادة فحص المنشآت",
+      "تفقد المحلات التجارية الصغيرة"
+    ],
+    "keywords_en": [
+      "small facility inspection certificate",
+      "small business safety permit",
+      "small establishment inspection",
+      "small enterprise fire check"
+    ]
+  }
+]

@@ -10,16 +10,29 @@ __pycache__/
 
 # Local data, logs, and cache
 *.log
+*.sqlite
+*.sqlite-journal
 .agent/
 .agents/
 agent_info.json
+elevenlabs_*.json
 deref_exec.json
-execution_235.json
+execution_*.json
+inspect_*.py
+query_db.*
+check_row.js
+check_n8n_executions.js
 raw_transcript.json
 recent_details_output.txt
 sheets_outputs.txt
 standalone/telemetry_db.json
-
+scratch/
+uploads/
+backups/
+database.sqlite
+*.pdf
+*.png
+*.txt
 
 # Executables
 cloudflared.exe

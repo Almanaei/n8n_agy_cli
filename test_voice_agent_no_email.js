@@ -39,7 +39,7 @@ async function run() {
     setTimeout(() => {
       switch (step) {
         case 0:
-          sendUserMessage("اسمي سالم أحمد ورقم هاتفي هو 39485760.");
+          sendUserMessage("اسمي سالم أحمد ورقم هاتفي هو 17461100.");
           step++;
           break;
         case 1:

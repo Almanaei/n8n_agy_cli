@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="html-root">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">لوحة القيادة التنفيذية والتحليلات الذكية - الدفاع المدني</title>
+    
+    <link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --bg-base: #0B1120;
+            --bg-surface: rgba(15, 23, 42, 0.75);
+            --bg-card: rgba(30, 41, 59, 0.45);
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-highlight: rgba(56, 189, 248, 0.25);
+            --gold-primary: #F59E0B;
+            --gold-glow: rgba(245, 158, 11, 0.25);
+            --cyan-primary: #38BDF8;
+            --green-primary: #10B981;
+            --red-primary: #EF4444;
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --text-muted: #64748B;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            background-image: 
+                radial-gradient(at 10% 20%, rgba(30, 58, 138, 0.2) 0px, transparent 50%),
+                radial-gradient(at 90% 80%, rgba(245, 158, 11, 0.08) 0px, transparent 50%),
+                radial-gradient(at 50% 50%, rgba(15, 23, 42, 1) 0px, transparent 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 24px 32px;
+            overflow-x: hidden;
+            transition: direction 0.3s;
+        }
+
+        /* Top Executive Header */
+        .executive-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .brand-icon-wrapper {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(30, 58, 138, 0.4));
+            border: 1px solid var(--gold-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px var(--gold-glow);
+        }
+
+        .brand-title {
+            font-size: 1.45rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFFFFF, #F59E0B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #34D399;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #34D399;
+            box-shadow: 0 0 8px #34D399;
+            animation: pulse-live 1.5s infinite;
+        }
+
+        @keyframes pulse-live {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.6; }
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--border-highlight);
+            transform: translateY(-1px);
+        }
+
+        .lang-btn {
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: #FCD34D;
+        }
+        .lang-btn:hover {
+            background: rgba(245, 158, 11, 0.2);
+            border-color: #F59E0B;
+        }
+
+        /* KPI Metric Cards Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .kpi-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(16px);
+            transition: all 0.3s ease;
+        }
+
+        .kpi-card:hover {
+            border-color: var(--border-highlight);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--accent-color, var(--cyan-primary)), transparent);
+        }
+
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .kpi-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .kpi-icon {
+            font-size: 1.3rem;
+            opacity: 0.85;
+        }
+
+        .kpi-value {
+            font-size: 2.1rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+        }
+
+        .kpi-footer {
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .kpi-badge {
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 6px;
+        }
+
+        .kpi-badge.positive { background: rgba(16, 185, 129, 0.15); color: #34D399; }
+        .kpi-badge.gold { background: rgba(245, 158, 11, 0.15); color: #FBBF24; }
+
+        /* Charts Layout Grid */
+        .charts-main-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .charts-secondary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        @media (max-width: 1024px) {
+            .charts-main-grid,
+            .charts-secondary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 18px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(16px);
+            position: relative;
+        }
+
+        .chart-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chart-tag {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            color: var(--text-secondary);
+        }
+
+        .canvas-container {
+            position: relative;
+            flex: 1;
+            min-height: 260px;
+            width: 100%;
+        }
+
+        /* Recent Applications Table */
+        .table-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 18px;
+            padding: 24px;
+            backdrop-filter: blur(16px);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            margin-top: 16px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: inherit;
+        }
+
+        th {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-subtle);
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        td {
+            font-size: 0.88rem;
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            color: var(--text-primary);
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .status-pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .status-pill.Pending { background: rgba(56, 189, 248, 0.15); color: #38BDF8; }
+        .status-pill.Approved { background: rgba(16, 185, 129, 0.15); color: #34D399; }
+        .status-pill.Rejected { background: rgba(239, 68, 68, 0.15); color: #F87171; }
+        .status-pill.Modification { background: rgba(245, 158, 11, 0.15); color: #FBBF24; }
+
+        .btn-track-link {
+            color: var(--cyan-primary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.82rem;
+            transition: opacity 0.2s;
+        }
+
+        .btn-track-link:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+
+        /* CSAT Summary Box */
+        .csat-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-top: 16px;
+        }
+
+        .csat-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .csat-label-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header class="executive-header">
+        <div class="header-brand">
+            <div class="brand-icon-wrapper">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2L4 5V11C4 16.52 7.41 21.62 12 23C16.59 21.62 20 16.52 20 11V5L12 2Z"></path>
+                    <polyline points="9 12 11 14 15 10"></polyline>
+                </svg>
+            </div>
+            <div>
+                <h1 class="brand-title" id="txt-brand-title">لوحة التحليلات التنفيذية والمؤشرات الذكية</h1>
+                <p class="brand-subtitle" id="txt-brand-subtitle">الإدارة العامة للدفاع المدني - منصة الذكاء الاصطناعي وإدارة الخدمات الرقمية</p>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <div class="live-badge">
+                <span class="live-dot"></span>
+                <span id="txt-live-status">النظام المباشر نشط</span>
+            </div>
+            <button class="action-btn lang-btn" id="btn-lang-toggle" onclick="toggleDashboardLanguage()">
+                <span id="lang-btn-text">🌐 English</span>
+            </button>
+            <button class="action-btn" onclick="fetchExecutiveData()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                <span id="txt-refresh-btn">تحديث فوري</span>
+            </button>
+            <button class="action-btn" onclick="window.location.href='/'">
+                <span id="txt-portal-btn">بوابة المحادثة 🎙️</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Top KPI Grid -->
+    <section class="kpi-grid">
+        <div class="kpi-card" style="--accent-color: #38BDF8;">
+            <div class="kpi-header">
+                <span class="kpi-title" id="txt-kpi-calls-title">إجمالي الاتصالات والاستفسارات</span>
+                <span class="kpi-icon">🎙️</span>
+            </div>
+            <div class="kpi-value" id="kpi-total-calls">--</div>
+            <div class="kpi-footer">
+                <span class="kpi-badge positive">+14%</span>
+                <span id="txt-kpi-calls-sub">مقارنة بالأسبوع الماضي</span>
+            </div>
+        </div>
+
+        <div class="kpi-card" style="--accent-color: #F59E0B;">
+            <div class="kpi-header">
+                <span class="kpi-title" id="txt-kpi-apps-title">إجمالي طلبات الخدمات المسجلة</span>
+                <span class="kpi-icon">📋</span>
+            </div>
+            <div class="kpi-value" id="kpi-total-apps">--</div>
+            <div class="kpi-footer">
+                <span class="kpi-badge gold" id="txt-kpi-apps-badge">39 خدمة</span>
+                <span id="txt-kpi-apps-sub">مغطاة بالكامل بالذكاء الاصطناعي</span>
+            </div>
+        </div>
+
+        <div class="kpi-card" style="--accent-color: #10B981;">
+            <div class="kpi-header">
+                <span class="kpi-title" id="txt-kpi-approval-title">نسبة الاعتماد والموافقة</span>
+                <span class="kpi-icon">✅</span>
+            </div>
+            <div class="kpi-value" id="kpi-approval-rate">--%</div>
+            <div class="kpi-footer">
+                <span class="kpi-badge positive" id="txt-kpi-approval-badge">ممتاز</span>
+                <span id="txt-kpi-approval-sub">معدل قبول الطلبات المكتملة</span>
+            </div>
+        </div>
+
+        <div class="kpi-card" style="--accent-color: #A855F7;">
+            <div class="kpi-header">
+                <span class="kpi-title" id="txt-kpi-csat-title">مؤشر رضا المواطنين (CSAT)</span>
+                <span class="kpi-icon">⭐</span>
+            </div>
+            <div class="kpi-value" id="kpi-csat-score">--%</div>
+            <div class="kpi-footer">
+                <span class="kpi-badge positive">😃 95%</span>
+                <span id="txt-kpi-csat-sub">تقييمات إيجابية للمساعد الصوتي</span>
+            </div>
+        </div>
+
+        <div class="kpi-card" style="--accent-color: #06B6D4;">
+            <div class="kpi-header">
+                <span class="kpi-title" id="txt-kpi-duration-title">متوسط مدة المحادثة الصوتية</span>
+                <span class="kpi-icon">⏱️</span>
+            </div>
+            <div class="kpi-value" id="kpi-avg-duration">--s</div>
+            <div class="kpi-footer">
+                <span id="txt-kpi-duration-sub">زمن استيفاء الطلب بالكامل</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Charts Grid -->
+    <section class="charts-main-grid">
+        <!-- Hourly Traffic Trend -->
+        <div class="chart-box">
+            <div class="chart-title-row">
+                <div class="chart-title">
+                    <span>📈</span>
+                    <span id="txt-chart-traffic-title">كثافة الاتصالات وساعات الذروة اليومية</span>
+                </div>
+                <span class="chart-tag" id="txt-chart-traffic-tag">آخر 24 ساعة</span>
+            </div>
+            <div class="canvas-container">
+                <canvas id="trafficChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Application Lifecycle Funnel -->
+        <div class="chart-box">
+            <div class="chart-title-row">
+                <div class="chart-title">
+                    <span>🔄</span>
+                    <span id="txt-chart-funnel-title">حالة معالجة الطلبات</span>
+                </div>
+                <span class="chart-tag">Google Sheets CRM</span>
+            </div>
+            <div class="canvas-container">
+                <canvas id="funnelChart"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <!-- Secondary Charts Grid -->
+    <section class="charts-secondary-grid">
+        <!-- Top 39 Services Breakdown -->
+        <div class="chart-box">
+            <div class="chart-title-row">
+                <div class="chart-title">
+                    <span>🏷️</span>
+                    <span id="txt-chart-services-title">أعلى خدمات الدفاع المدني طلباً</span>
+                </div>
+                <span class="chart-tag" id="txt-chart-services-tag">كتالوج الـ 39 خدمة</span>
+            </div>
+            <div class="canvas-container">
+                <canvas id="servicesChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Citizen Satisfaction Breakdown -->
+        <div class="chart-box">
+            <div class="chart-title-row">
+                <div class="chart-title">
+                    <span>😊</span>
+                    <span id="txt-chart-csat-title">توزيع تقييمات رضا المستفيدين</span>
+                </div>
+                <span class="chart-tag">CSAT Score</span>
+            </div>
+            
+            <div class="csat-bars">
+                <div class="csat-item">
+                    <div class="csat-label-row">
+                        <span style="color: #34D399;" id="txt-csat-exc-label">ممتاز وسلس (😃 100%)</span>
+                        <span id="csat-excellent-count">0</span>
+                    </div>
+                    <div class="progress-track">
+                        <div id="csat-excellent-bar" class="progress-fill" style="width: 0%; background: #10B981;"></div>
+                    </div>
+                </div>
+
+                <div class="csat-item">
+                    <div class="csat-label-row">
+                        <span style="color: #FBBF24;" id="txt-csat-acc-label">مقبول وجيد (🙂 50%)</span>
+                        <span id="csat-acceptable-count">0</span>
+                    </div>
+                    <div class="progress-track">
+                        <div id="csat-acceptable-bar" class="progress-fill" style="width: 0%; background: #F59E0B;"></div>
+                    </div>
+                </div>
+
+                <div class="csat-item">
+                    <div class="csat-label-row">
+                        <span style="color: #F87171;" id="txt-csat-poor-label">يحتاج تحسين (😞 0%)</span>
+                        <span id="csat-poor-count">0</span>
+                    </div>
+                    <div class="progress-track">
+                        <div id="csat-poor-bar" class="progress-fill" style="width: 0%; background: #EF4444;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="canvas-container" style="margin-top: 16px; min-height: 160px;">
+                <canvas id="csatChart"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recent Applications Live Feed -->
+    <section class="table-box">
+        <div class="chart-title-row">
+            <div class="chart-title">
+                <span>⚡</span>
+                <span id="txt-table-title">سجل آخر طلبات الخدمات المقدمة حديثاً</span>
+            </div>
+            <span class="chart-tag" id="txt-table-tag">تحديث فوري</span>
+        </div>
+
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th id="th-app-id">رقم الطلب</th>
+                        <th id="th-service-name">اسم الخدمة</th>
+                        <th id="th-applicant">مقدم الطلب</th>
+                        <th id="th-phone">رقم الهاتف</th>
+                        <th id="th-status">الحالة الحالية</th>
+                        <th id="th-timestamp">التاريخ والتوقيت</th>
+                        <th id="th-action">الإجراء</th>
+                    </tr>
+                </thead>
+                <tbody id="recent-applications-body">
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 30px;">جاري تحميل البيانات من الخادم...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Translation Dictionary & Scripts -->
+    <script>
+        let currentLang = localStorage.getItem('civil_defense_lang') || 'ar';
+        let latestKpiData = null;
+
+        const translations = {
+            ar: {
+                page_title: "لوحة القيادة التنفيذية والتحليلات الذكية - الدفاع المدني",
+                brand_title: "لوحة التحليلات التنفيذية والمؤشرات الذكية",
+                brand_subtitle: "الإدارة العامة للدفاع المدني - منصة الذكاء الاصطناعي وإدارة الخدمات الرقمية",
+                live_status: "النظام المباشر نشط",
+                lang_btn: "🌐 English",
+                refresh_btn: "تحديث فوري",
+                portal_btn: "بوابة المحادثة 🎙️",
+                kpi_calls_title: "إجمالي الاتصالات والاستفسارات",
+                kpi_calls_sub: "مقارنة بالأسبوع الماضي",
+                kpi_apps_title: "إجمالي طلبات الخدمات المسجلة",
+                kpi_apps_badge: "39 خدمة",
+                kpi_apps_sub: "مغطاة بالكامل بالذكاء الاصطناعي",
+                kpi_approval_title: "نسبة الاعتماد والموافقة",
+                kpi_approval_badge: "ممتاز",
+                kpi_approval_sub: "معدل قبول الطلبات المكتملة",
+                kpi_csat_title: "مؤشر رضا المواطنين (CSAT)",
+                kpi_csat_sub: "تقييمات إيجابية للمساعد الصوتي",
+                kpi_duration_title: "متوسط مدة المحادثة الصوتية",
+                kpi_duration_sub: "زمن استيفاء الطلب بالكامل",
+                chart_traffic_title: "كثافة الاتصالات وساعات الذروة اليومية",
+                chart_traffic_tag: "آخر 24 ساعة",
+                chart_funnel_title: "حالة معالجة الطلبات",
+                chart_services_title: "أعلى خدمات الدفاع المدني طلباً",
+                chart_services_tag: "كتالوج الـ 39 خدمة",
+                chart_csat_title: "توزيع تقييمات رضا المستفيدين",
+                csat_exc: "ممتاز وسلس (😃 100%)",
+                csat_acc: "مقبول وجيد (🙂 50%)",
+                csat_poor: "يحتاج تحسين (😞 0%)",
+                table_title: "سجل آخر طلبات الخدمات المقدمة حديثاً",
+                table_tag: "تحديث فوري",
+                th_app_id: "رقم الطلب",
+                th_service_name: "اسم الخدمة",
+                th_applicant: "مقدم الطلب",
+                th_phone: "رقم الهاتف",
+                th_status: "الحالة الحالية",
+                th_timestamp: "التاريخ والتوقيت",
+                th_action: "الإجراء",
+                funnel_labels: ['تم الاعتماد', 'قيد المراجعة', 'مطلوب تعديل', 'مرفوض'],
+                traffic_dataset_label: 'عدد الاتصالات الصوتية',
+                services_dataset_label: 'عدد الطلبات',
+                status_pending: 'قيد المراجعة',
+                status_approved: 'تم الاعتماد',
+                status_rejected: 'مرفوض',
+                status_modification: 'مطلوب تعديل',
+                view_app: 'عرض الطلب ↗',
+                empty_table: 'لا توجد طلبات مسجلة حتى الآن.'
+            },
+            en: {
+                page_title: "Executive Analytics & KPI Dashboard - Civil Defense",
+                brand_title: "Executive Analytics & Smart KPI Dashboard",
+                brand_subtitle: "General Directorate of Civil Defense - AI & Digital Services Platform",
+                live_status: "Live System Online",
+                lang_btn: "🌐 العربية",
+                refresh_btn: "Instant Refresh",
+                portal_btn: "Voice Portal 🎙️",
+                kpi_calls_title: "Total Calls & Inquiries",
+                kpi_calls_sub: "compared to last week",
+                kpi_apps_title: "Total Registered Applications",
+                kpi_apps_badge: "39 Services",
+                kpi_apps_sub: "100% AI Voice Powered",
+                kpi_approval_title: "Permit Approval Rate",
+                kpi_approval_badge: "Optimal",
+                kpi_approval_sub: "Completed applications rate",
+                kpi_csat_title: "Citizen Satisfaction (CSAT)",
+                kpi_csat_sub: "Positive AI Assistant ratings",
+                kpi_duration_title: "Avg Call Handling Duration",
+                kpi_duration_sub: "End-to-end completion time",
+                chart_traffic_title: "Hourly Call Traffic & Peak Volumes",
+                chart_traffic_tag: "Last 24 Hours",
+                chart_funnel_title: "Application Funnel Status",
+                chart_services_title: "Top Demanded Civil Defense Services",
+                chart_services_tag: "39 Services Catalog",
+                chart_csat_title: "Citizen Satisfaction Sentiment",
+                csat_exc: "Excellent (😃 100%)",
+                csat_acc: "Acceptable (🙂 50%)",
+                csat_poor: "Needs Attention (😞 0%)",
+                table_title: "Recent Service Applications Stream",
+                table_tag: "Live Feed",
+                th_app_id: "Application ID",
+                th_service_name: "Service Name",
+                th_applicant: "Applicant Name",
+                th_phone: "Phone Number",
+                th_status: "Current Status",
+                th_timestamp: "Date & Time",
+                th_action: "Action",
+                funnel_labels: ['Approved', 'Under Review', 'Modification Requested', 'Rejected'],
+                traffic_dataset_label: 'Voice Inquiries Count',
+                services_dataset_label: 'Applications Count',
+                status_pending: 'Under Review',
+                status_approved: 'Approved',
+                status_rejected: 'Rejected',
+                status_modification: 'Modification Requested',
+                view_app: 'View Application ↗',
+                empty_table: 'No applications recorded yet.'
+            }
+        };
+
+        function applyDashboardLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('civil_defense_lang', lang);
+            const t = translations[lang];
+
+            document.documentElement.dir = (lang === 'ar' ? 'rtl' : 'ltr');
+            document.documentElement.lang = lang;
+
+            document.getElementById('page-title').innerText = t.page_title;
+            document.getElementById('txt-brand-title').innerText = t.brand_title;
+            document.getElementById('txt-brand-subtitle').innerText = t.brand_subtitle;
+            document.getElementById('txt-live-status').innerText = t.live_status;
+            document.getElementById('lang-btn-text').innerText = t.lang_btn;
+            document.getElementById('txt-refresh-btn').innerText = t.refresh_btn;
+            document.getElementById('txt-portal-btn').innerText = t.portal_btn;
+
+            document.getElementById('txt-kpi-calls-title').innerText = t.kpi_calls_title;
+            document.getElementById('txt-kpi-calls-sub').innerText = t.kpi_calls_sub;
+            document.getElementById('txt-kpi-apps-title').innerText = t.kpi_apps_title;
+            document.getElementById('txt-kpi-apps-badge').innerText = t.kpi_apps_badge;
+            document.getElementById('txt-kpi-apps-sub').innerText = t.kpi_apps_sub;
+            document.getElementById('txt-kpi-approval-title').innerText = t.kpi_approval_title;
+            document.getElementById('txt-kpi-approval-badge').innerText = t.kpi_approval_badge;
+            document.getElementById('txt-kpi-approval-sub').innerText = t.kpi_approval_sub;
+            document.getElementById('txt-kpi-csat-title').innerText = t.kpi_csat_title;
+            document.getElementById('txt-kpi-csat-sub').innerText = t.kpi_csat_sub;
+            document.getElementById('txt-kpi-duration-title').innerText = t.kpi_duration_title;
+            document.getElementById('txt-kpi-duration-sub').innerText = t.kpi_duration_sub;
+
+            document.getElementById('txt-chart-traffic-title').innerText = t.chart_traffic_title;
+            document.getElementById('txt-chart-traffic-tag').innerText = t.chart_traffic_tag;
+            document.getElementById('txt-chart-funnel-title').innerText = t.chart_funnel_title;
+            document.getElementById('txt-chart-services-title').innerText = t.chart_services_title;
+            document.getElementById('txt-chart-services-tag').innerText = t.chart_services_tag;
+            document.getElementById('txt-chart-csat-title').innerText = t.chart_csat_title;
+
+            document.getElementById('txt-csat-exc-label').innerText = t.csat_exc;
+            document.getElementById('txt-csat-acc-label').innerText = t.csat_acc;
+            document.getElementById('txt-csat-poor-label').innerText = t.csat_poor;
+
+            document.getElementById('txt-table-title').innerText = t.table_title;
+            document.getElementById('txt-table-tag').innerText = t.table_tag;
+
+            document.getElementById('th-app-id').innerText = t.th_app_id;
+            document.getElementById('th-service-name').innerText = t.th_service_name;
+            document.getElementById('th-applicant').innerText = t.th_applicant;
+            document.getElementById('th-phone').innerText = t.th_phone;
+            document.getElementById('th-status').innerText = t.th_status;
+            document.getElementById('th-timestamp').innerText = t.th_timestamp;
+            document.getElementById('th-action').innerText = t.th_action;
+
+            if (latestKpiData) {
+                renderTrafficChart(latestKpiData.hourlyTraffic);
+                renderFunnelChart(latestKpiData.appFunnel);
+                renderServicesChart(latestKpiData.topServices);
+                renderCsatSection(latestKpiData.csat);
+                renderRecentTable(latestKpiData.recentApplications);
+            }
+        }
+
+        function toggleDashboardLanguage() {
+            const next = currentLang === 'ar' ? 'en' : 'ar';
+            applyDashboardLanguage(next);
+        }
+
+        let trafficChartInstance = null;
+        let funnelChartInstance = null;
+        let servicesChartInstance = null;
+        let csatChartInstance = null;
+
+        async function fetchExecutiveData() {
+            try {
+                const res = await fetch('/api/executive-kpi');
+                if (!res.ok) throw new Error("HTTP " + res.status);
+                const data = await res.json();
+                latestKpiData = data;
+
+                // 1. Update KPI Stat Cards
+                document.getElementById('kpi-total-calls').innerText = data.overview.totalCalls;
+                document.getElementById('kpi-total-apps').innerText = data.overview.totalApplications;
+                document.getElementById('kpi-approval-rate').innerText = data.overview.approvalRatePercent + '%';
+                document.getElementById('kpi-csat-score').innerText = data.overview.csatScorePercent + '%';
+                document.getElementById('kpi-avg-duration').innerText = data.overview.avgCallDurationSec + 's';
+
+                // 2. Render Charts with active language
+                renderTrafficChart(data.hourlyTraffic);
+                renderFunnelChart(data.appFunnel);
+                renderServicesChart(data.topServices);
+                renderCsatSection(data.csat);
+                renderRecentTable(data.recentApplications);
+
+            } catch (err) {
+                console.error("Failed to fetch executive KPI data:", err);
+            }
+        }
+
+        function renderTrafficChart(hourly) {
+            const ctx = document.getElementById('trafficChart').getContext('2d');
+            if (trafficChartInstance) trafficChartInstance.destroy();
+            const t = translations[currentLang];
+
+            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, 'rgba(56, 189, 248, 0.45)');
+            gradient.addColorStop(1, 'rgba(56, 189, 248, 0.0)');
+
+            trafficChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: hourly.labels,
+                    datasets: [{
+                        label: t.traffic_dataset_label,
+                        data: hourly.data,
+                        borderColor: '#38BDF8',
+                        backgroundColor: gradient,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#38BDF8',
+                        pointBorderColor: '#0B1120',
+                        pointRadius: 4,
+                        borderWidth: 2.5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.04)' },
+                            ticks: { color: '#94A3B8', font: { family: 'Cairo' } }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.04)' },
+                            ticks: { color: '#94A3B8', font: { family: 'Cairo' }, stepSize: 5 }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderFunnelChart(funnel) {
+            const ctx = document.getElementById('funnelChart').getContext('2d');
+            if (funnelChartInstance) funnelChartInstance.destroy();
+            const t = translations[currentLang];
+
+            funnelChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: t.funnel_labels,
+                    datasets: [{
+                        data: [
+                            funnel.approved || 10,
+                            funnel.pending || 4,
+                            funnel.modification || 2,
+                            funnel.rejected || 1
+                        ],
+                        backgroundColor: ['#10B981', '#38BDF8', '#F59E0B', '#EF4444'],
+                        borderColor: '#0B1120',
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#F8FAFC', font: { family: 'Cairo', size: 12 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderServicesChart(services) {
+            const ctx = document.getElementById('servicesChart').getContext('2d');
+            if (servicesChartInstance) servicesChartInstance.destroy();
+            const t = translations[currentLang];
+
+            const labels = services.map(s => s.name.length > 25 ? s.name.substring(0, 25) + '...' : s.name);
+            const data = services.map(s => s.count);
+
+            servicesChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: t.services_dataset_label,
+                        data: data,
+                        backgroundColor: 'rgba(245, 158, 11, 0.75)',
+                        borderColor: '#F59E0B',
+                        borderWidth: 1.5,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.04)' },
+                            ticks: { color: '#94A3B8', font: { family: 'Cairo' } }
+                        },
+                        y: {
+                            grid: { display: false },
+                            ticks: { color: '#F8FAFC', font: { family: 'Cairo', size: 11 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderCsatSection(csat) {
+            const total = csat.totalRated || 1;
+            const pExc = Math.round((csat.excellent / total) * 100);
+            const pAcc = Math.round((csat.acceptable / total) * 100);
+            const pPoor = Math.round((csat.poor / total) * 100);
+
+            document.getElementById('csat-excellent-count').innerText = `${csat.excellent} (${pExc}%)`;
+            document.getElementById('csat-excellent-bar').style.width = `${pExc}%`;
+
+            document.getElementById('csat-acceptable-count').innerText = `${csat.acceptable} (${pAcc}%)`;
+            document.getElementById('csat-acceptable-bar').style.width = `${pAcc}%`;
+
+            document.getElementById('csat-poor-count').innerText = `${csat.poor} (${pPoor}%)`;
+            document.getElementById('csat-poor-bar').style.width = `${pPoor}%`;
+
+            const ctx = document.getElementById('csatChart').getContext('2d');
+            if (csatChartInstance) csatChartInstance.destroy();
+
+            csatChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Excellent 😃', 'Acceptable 🙂', 'Poor 😞'],
+                    datasets: [{
+                        data: [csat.excellent, csat.acceptable, csat.poor],
+                        backgroundColor: ['#10B981', '#F59E0B', '#EF4444'],
+                        borderColor: '#0B1120',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    circumference: 180,
+                    rotation: -90,
+                    cutout: '65%',
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        function renderRecentTable(apps) {
+            const tbody = document.getElementById('recent-applications-body');
+            const t = translations[currentLang];
+
+            if (!apps || apps.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 20px;">${t.empty_table}</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = apps.map(app => {
+                let statusClass = 'Pending';
+                let statusLabel = t.status_pending;
+                if (app.status === 'Approved') { statusClass = 'Approved'; statusLabel = t.status_approved; }
+                else if (app.status === 'Rejected') { statusClass = 'Rejected'; statusLabel = t.status_rejected; }
+                else if (app.status === 'Modification Requested') { statusClass = 'Modification'; statusLabel = t.status_modification; }
+
+                let dateFormatted = app.timestamp;
+                try {
+                    const locale = currentLang === 'ar' ? 'ar-BH' : 'en-BH';
+                    dateFormatted = new Date(app.timestamp).toLocaleString(locale, { timeZone: 'Asia/Bahrain' });
+                } catch(e) {}
+
+                return `
+                    <tr>
+                        <td style="font-weight: 700; color: #38BDF8;">${app.appId}</td>
+                        <td style="max-width: 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${app.serviceName}">${app.serviceName}</td>
+                        <td>${app.clientName}</td>
+                        <td style="direction: ltr; text-align: ${currentLang === 'ar' ? 'right' : 'left'};">${app.phone || '-'}</td>
+                        <td><span class="status-pill ${statusClass}">${statusLabel}</span></td>
+                        <td style="color: var(--text-muted); font-size: 0.8rem;">${dateFormatted}</td>
+                        <td><a href="${app.trackingLink}" target="_blank" class="btn-track-link">${t.view_app}</a></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Apply Initial Language & Start Fetching
+        applyDashboardLanguage(currentLang);
+        fetchExecutiveData();
+        setInterval(fetchExecutiveData, 30000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,621 @@
+{
+  "name": "Service Application Automation",
+  "active": true,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "service-application",
+        "options": {},
+        "responseMode": "responseNode"
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "webhook-submit-app-id",
+      "name": "Webhook Submit App",
+      "webhookId": "e8779474-233b-4112-ab5a-764ba7af5ce3"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"success\",\n  \"message\": \"Application received and notifications sent.\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        240,
+        -140
+      ],
+      "id": "respond-submit-app-id",
+      "name": "Respond Submit App"
+    },
+    {
+      "parameters": {
+        "fromEmail": "mnaaaei@gmail.com",
+        "toEmail": "={{ (() => { const e = $json.body?.email || $json.email || $json.row?.email || ''; return (e && e.includes('@')) ? e : 'almannaei90@gmail.com'; })() }}",
+        "subject": "={{ (() => { const appId = $json.body?.appId || $json.appId || ''; const status = $json.body?.status || $json.status || ''; if (status === 'Modification Requested') return '⚠️ تحديث عاجل: مطلوب تعديل مستندات طلب رقم ' + appId; if (status === 'Approved') return '✅ تم قبول طلب الخدمة رقم ' + appId; if (status === 'Rejected') return '❌ إشعار بخصوص طلب الخدمة رقم ' + appId; return 'تأكيد استلام طلب الخدمة - الدفاع المدني (رقم ' + appId + ')'; })() }}",
+        "emailFormat": "html",
+        "html": "={{ (() => { const body = $json.body || {}; const firstName = body.firstName || ''; const lastName = body.lastName || ''; const appId = body.appId || ''; const serviceName = body.serviceName || ''; const status = body.status || ''; const modDetails = body.modificationDetails || body.notes || 'يرجى مراجعة صفحة المتابعة وتعديل البيانات المطلوبة.'; const trackingLink = body.trackingLink || ''; const attachmentLink = body.attachmentLink || ''; let contentHtml = ''; if (status === 'Modification Requested') { contentHtml = `<p>تود الإدارة العامة للدفاع المدني إفادتكم بضرورة تعديل المستندات أو البيانات الخاصة بطلبكم رقم (<b>${appId}</b>) لخدمة (<b>${serviceName}</b>).</p><div style=\"background-color: #fef2f2; border-right: 4px solid #ef4444; padding: 14px; margin: 16px 0; border-radius: 6px;\"><p style=\"margin: 0; font-weight: bold; color: #991b1b;\">⚠️ ملاحظات وتعليمات الإدارة للتعديل:</p><p style=\"margin: 6px 0 0 0; color: #7f1d1d;\">${modDetails}</p></div><p>بإمكانك الاطلاع على البيانات وتعديل مرفقات الطلب فوراً عبر الرابط التالي:</p><p style=\"margin-top: 16px;\"><a href=\"${trackingLink}\" style=\"background-color: #2563eb; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;\">✏️ اضغط هنا لمتابعة وتعديل الطلب</a></p>`; } else if (status === 'Approved') { contentHtml = `<p>تم بحمد الله اعتماد وتدقيق طلبكم رقم (<b>${appId}</b>) لخدمة (<b>${serviceName}</b>) بنجاح.</p><p style=\"margin-top: 16px;\"><a href=\"${trackingLink}\" style=\"background-color: #16a34a; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;\">📄 عرض ووثائق الطلب</a></p>`; } else if (status === 'Rejected') { const rejReason = body.modificationDetails ? `<p><b>سبب عدم الموافقة:</b> ${body.modificationDetails}</p>` : ''; contentHtml = `<p>نأسف لإبلاغكم بأنه تعذر قبول طلبكم رقم (<b>${appId}</b>) لخدمة (<b>${serviceName}</b>).</p>${rejReason}<p style=\"margin-top: 16px;\"><a href=\"${trackingLink}\" style=\"background-color: #dc2626; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;\">🔍 متابعة تفاصيل الطلب</a></p>`; } else { const attachHtml = attachmentLink ? `<p><b>المستند المرفوع:</b> <a href=\"${attachmentLink}\" target=\"_blank\">معاينة / تحميل المستند</a></p>` : ''; contentHtml = `<p>تم استلام طلبك للخدمة (<b>${serviceName}</b>) بنجاح.</p><p>رقم الطلب الخاص بك هو: <b>${appId}</b></p>${attachHtml}<p>بإمكانك تتبع حالة الطلب وتعديله عبر الرابط التالي:</p><p style=\"margin-top: 16px;\"><a href=\"${trackingLink}\" style=\"background-color: #0284c7; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;\">🔍 متابعة وتتبع الطلب</a></p>`; } return `<div dir=\"rtl\" style=\"font-family: Arial, sans-serif; text-align: right; background-color: #f8fafc; padding: 24px; border-radius: 12px; max-width: 600px; margin: auto; border: 1px solid #e2e8f0; color: #1e293b;\"><h2 style=\"color: #1e3a8a; border-bottom: 2px solid #2563eb; padding-bottom: 10px; margin-top: 0;\">الإدارة العامة للدفاع المدني - مملكة البحرين</h2><h3>مرحباً ${firstName} ${lastName}،</h3>${contentHtml}<hr style=\"border: none; border-top: 1px solid #cbd5e1; margin: 24px 0;\"/><p style=\"font-size: 0.85em; color: #64748b; margin-bottom: 0;\">مركز خدمات الدفاع المدني الذكي - الإدارة العامة للدفاع المدني</p></div>`; })() }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [
+        280,
+        -10
+      ],
+      "id": "email-submit-app-id",
+      "name": "Send Submit Email",
+      "credentials": {
+        "smtp": {
+          "id": "GKD2HE4TOKeoXDkO",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.twilio.com/2010-04-01/Accounts/AC0b4a145722566b71c0111e4dba2d75b0/Messages.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "specifyBody": "keypair",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "From",
+              "value": "whatsapp:+14155238886"
+            },
+            {
+              "name": "To",
+              "value": "=whatsapp:{{ $json.body.whatsapp }}"
+            },
+            {
+              "name": "Body",
+              "value": "={{ $json.body.status === 'Modification Requested' ? 'مرحباً ' + $json.body.firstName + '، تم طلب تعديل مستندات على طلبك رقم (' + $json.body.appId + ').\\nملاحظات الإدارة: ' + ($json.body.modificationDetails || '') + '\\nيمكنك تعديل طلبك مباشرة عبر الرابط:\\n' + $json.body.trackingLink : ($json.body.status === 'Approved' ? 'مرحباً ' + $json.body.firstName + '، تم قبول طلبك رقم (' + $json.body.appId + ') لخدمة (' + $json.body.serviceName + ') بنجاح.\\nللمعاينة: ' + $json.body.trackingLink : ($json.body.status === 'Rejected' ? 'مرحباً ' + $json.body.firstName + '، تعذر قبول طلبك رقم (' + $json.body.appId + ').\\nالتفاصيل: ' + $json.body.trackingLink : 'مرحباً ' + $json.body.firstName + '، تم استلام طلبك للخدمة (' + $json.body.serviceName + ') بنجاح. رقم الطلب هو (' + $json.body.appId + ').\\nيمكنك تتبع حالة طلبك عبر الرابط: ' + $json.body.trackingLink)) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        280,
+        120
+      ],
+      "id": "whatsapp-submit-app-id",
+      "name": "Send Submit WhatsApp",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "ZTIi0yFrOg8SYhU0",
+          "name": "Unnamed credential"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "interval": 1,
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.interval",
+      "typeVersion": 1,
+      "position": [
+        0,
+        400
+      ],
+      "id": "poller-trigger-id",
+      "name": "Poll Sheets Status"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "ServiceApplications",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        180,
+        400
+      ],
+      "id": "sheets-read-app-id",
+      "name": "Read Applications Sheet",
+      "credentials": {
+        "googleApi": {
+          "id": "fXHzExTwkxRRpEVc",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst output = [];\n\nfor (let i = 0; i < items.length; i++) {\n  const row = items[i].json;\n  const appId = row[\"Application ID\"];\n  const status = row[\"Status\"];\n  const alertSent = row[\"Alert Sent\"];\n  \n  // Ignore initial/default statuses (Pending, In Progress, قيد المعالجة). Only alert on status changes!\n  const isInitialStatus = !status || status === \"Pending\" || status === \"In Progress\" || status === \"قيد المعالجة\";\n  \n  if (appId && !isInitialStatus && alertSent !== \"Yes\") {\n    output.push({\n      json: {\n        rowNumber: i + 2, // Row index 0 is line 2\n        appId,\n        \"Application ID\": appId,\n        serviceName: row[\"Service Name\"],\n        firstName: row[\"User First Name\"],\n        lastName: row[\"User Last Name\"],\n        whatsapp: row[\"User WhatsApp Number\"],\n        email: row[\"User Email\"],\n        status,\n        modificationDetails: row[\"Modification Details\"] || \"\",\n        trackingLink: row[\"Tracking Link\"] || \"\"\n      }\n    });\n  }\n}\nreturn output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        380,
+        400
+      ],
+      "id": "code-filter-rows-id",
+      "name": "Filter Unsent Statuses"
+    },
+    {
+      "parameters": {
+        "fromEmail": "mnaaaei@gmail.com",
+        "toEmail": "={{ (() => { const e = $json.email || $json.body?.email || $json.row?.email || ''; return (e && e.includes('@')) ? e : 'almannaei90@gmail.com'; })() }}",
+        "subject": "={{ (() => { const appId = $json.appId || $json.body?.appId || ''; return 'تحديث حالة طلب الخدمة رقم (' + appId + ') - الدفاع المدني'; })() }}",
+        "emailFormat": "html",
+        "html": "={{ (() => { const row = $json || {}; const firstName = row.firstName || ''; const lastName = row.lastName || ''; const appId = row.appId || ''; const serviceName = row.serviceName || ''; const status = row.status || ''; const modDetails = row.modificationDetails || row.notes || ''; const trackingLink = row.trackingLink || ''; const statusAr = status === 'Approved' ? 'مقبول والمعاملة مكتملة' : (status === 'Rejected' ? 'مرفوض' : (status === 'Modification Requested' ? 'مطلوب تعديل مستندات' : status)); const modBlock = status === 'Modification Requested' ? `<div style=\"background-color: #fef2f2; border-right: 4px solid #ef4444; padding: 14px; margin: 16px 0; border-radius: 6px;\"><p style=\"margin: 0; font-weight: bold; color: #991b1b;\">⚠️ تفاصيل التعديل المطلوب من الإدارة:</p><p style=\"margin: 6px 0 0 0; color: #7f1d1d;\">${modDetails}</p></div>` : ''; return `<div dir=\"rtl\" style=\"font-family: Arial, sans-serif; text-align: right; background-color: #f8fafc; padding: 24px; border-radius: 12px; max-width: 600px; margin: auto; border: 1px solid #e2e8f0; color: #1e293b;\"><h2 style=\"color: #1e3a8a; border-bottom: 2px solid #2563eb; padding-bottom: 10px; margin-top: 0;\">تحديث حالة الطلب - الدفاع المدني</h2><h3>مرحباً ${firstName} ${lastName}،</h3><p>تم تحديث حالة طلبك للخدمة (<b>${serviceName}</b>) رقم <b>${appId}</b>.</p><p>الحالة الجديدة: <b style=\"color: #2563eb;\">${statusAr}</b></p>${modBlock}<p>بإمكانك مراجعة وتتبع الطلب والتعديل مباشرة عبر الرابط التالي:</p><p style=\"margin-top: 16px;\"><a href=\"${trackingLink}\" style=\"background-color: #2563eb; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;\">🔍 متابعة وتعديل الطلب</a></p><hr style=\"border: none; border-top: 1px solid #cbd5e1; margin: 24px 0;\"/><p style=\"font-size: 0.85em; color: #64748b; margin-bottom: 0;\">مركز خدمات الدفاع المدني الذكي - الإدارة العامة للدفاع المدني</p></div>`; })() }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [
+        600,
+        300
+      ],
+      "id": "email-alert-id",
+      "name": "Send Alert Email",
+      "credentials": {
+        "smtp": {
+          "id": "GKD2HE4TOKeoXDkO",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.twilio.com/2010-04-01/Accounts/AC0b4a145722566b71c0111e4dba2d75b0/Messages.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "specifyBody": "keypair",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "From",
+              "value": "whatsapp:+14155238886"
+            },
+            {
+              "name": "To",
+              "value": "=whatsapp:{{ $json.whatsapp }}"
+            },
+            {
+              "name": "Body",
+              "value": "=مرحباً {{ $json.firstName }}، تم تحديث حالة طلبك رقم {{ $json.appId }} إلى ({{ $json.status }}).{{ $json.status === 'Modification Requested' ? '\\nملاحظات الإدارة: ' + $json.modificationDetails : '' }}\\nيمكنك متابعة وتعديل بيانات الطلب هنا: {{ $json.trackingLink }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        600,
+        500
+      ],
+      "id": "whatsapp-alert-id",
+      "name": "Send Alert WhatsApp",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "ZTIi0yFrOg8SYhU0",
+          "name": "Unnamed credential"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "ServiceApplications",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Application ID": "={{ $('Filter Unsent Statuses').item.json['Application ID'] }}",
+            "Alert Sent": "Yes"
+          },
+          "matchingColumns": [
+            "Application ID"
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        840,
+        400
+      ],
+      "id": "sheets-update-alert-id",
+      "name": "Mark Alert Sent Yes",
+      "credentials": {
+        "googleApi": {
+          "id": "fXHzExTwkxRRpEVc",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "admin-notification",
+        "options": {},
+        "responseMode": "responseNode"
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        800
+      ],
+      "id": "webhook-admin-notify-id",
+      "name": "Webhook Admin Notify",
+      "webhookId": "a1111111-233b-4112-ab5a-764ba7af5ce3"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"success\",\n  \"message\": \"Admin notified of modification request.\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        200,
+        660
+      ],
+      "id": "respond-admin-notify-id",
+      "name": "Respond Admin Notify"
+    },
+    {
+      "parameters": {
+        "fromEmail": "mnaaaei@gmail.com",
+        "toEmail": "={{ (() => { const e = $json.body?.adminEmail || $json.adminEmail || ''; return (e && e.includes('@')) ? e : 'almannaei90@gmail.com'; })() }}",
+        "subject": "={{ (() => { const appId = $json.body?.appId || $json.appId || ''; const isNew = ($json.body?.isNewApplication !== false && $json.isNewApplication !== false); return isNew ? ('⚡ طلب خدمة جديد: ' + appId) : ('⚠️ تنبيه للإدارة: طلب تعديل بيانات جديد (' + appId + ')'); })() }}",
+        "emailFormat": "html",
+        "html": "={{ (() => { const body = $json.body || $json || {}; const clientName = body.clientName || `${body.firstName || ''} ${body.lastName || ''}`.trim() || 'غير محدد'; const appId = body.appId || ''; const serviceName = body.serviceName || ''; const email = body.email || ''; const whatsapp = body.whatsapp || ''; const paymentMethod = body.paymentMethod || ''; const dynamicFieldsStr = typeof body.dynamicFields === 'object' ? JSON.stringify(body.dynamicFields) : (body.dynamicFields || ''); const modDetails = body.modificationDetails || body.notes || 'لا يوجد'; const attachmentLink = body.attachmentLink || ''; const quickActionLink = body.quickActionLink || `http://localhost:3000/admin/quick-action?id=${appId}`; const isNew = body.isNewApplication !== false; const headerTitle = isNew ? '⚡ إشعار للإدارة: طلب خدمة جديد' : '⚠️ إشعار للإدارة: رد وتحديث بيانات من المتعامل'; const payRow = paymentMethod ? `<tr><td style=\"padding: 6px 0; color: #94a3b8;\">طريقة الدفع:</td><td style=\"padding: 6px 0; color: #ffffff;\">${paymentMethod}</td></tr>` : ''; const dynRow = dynamicFieldsStr ? `<tr><td style=\"padding: 6px 0; color: #94a3b8;\">بيانات إضافية:</td><td style=\"padding: 6px 0; color: #ffffff;\">${dynamicFieldsStr}</td></tr>` : ''; const attachBlock = attachmentLink ? `<div style=\"margin-top: 16px;\"><a href=\"${attachmentLink}\" target=\"_blank\" style=\"background: #0284c7; color: #ffffff; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: bold; display: inline-block;\">📄 معاينة وتنزيل المستند المرفوع (PDF)</a></div>` : ''; const actionBlock = quickActionLink ? `<div style=\"margin-top: 20px; text-align: center;\"><a href=\"${quickActionLink}\" style=\"background: #2563eb; color: #ffffff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 1rem; display: inline-block; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);\">⚡ فتح صفحة الإجراء السريع للمسؤول</a></div>` : ''; return `<div dir=\"rtl\" style=\"font-family: Arial, sans-serif; text-align: right; background-color: #0f172a; color: #f8fafc; padding: 24px; border-radius: 12px; max-width: 600px; margin: 0 auto; border: 1px solid rgba(56, 189, 248, 0.3);\"><h2 style=\"color: #38bdf8; margin-top: 0; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px; font-size: 1.25rem;\">${headerTitle}</h2><table style=\"width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 0.95rem;\"><tr><td style=\"padding: 6px 0; color: #94a3b8; width: 140px;\">اسم المتعامل:</td><td style=\"padding: 6px 0; font-weight: bold; color: #ffffff;\">${clientName}</td></tr><tr><td style=\"padding: 6px 0; color: #94a3b8;\">رقم المعاملة:</td><td style=\"padding: 6px 0; font-weight: bold; color: #38bdf8;\">${appId}</td></tr><tr><td style=\"padding: 6px 0; color: #94a3b8;\">الخدمة المطلوبة:</td><td style=\"padding: 6px 0; color: #ffffff;\">${serviceName}</td></tr>${payRow}${dynRow}<tr><td style=\"padding: 6px 0; color: #94a3b8;\">البريد الإلكتروني:</td><td style=\"padding: 6px 0; color: #ffffff;\">${email}</td></tr><tr><td style=\"padding: 6px 0; color: #94a3b8;\">رقم الواتساب:</td><td style=\"padding: 6px 0; color: #ffffff;\">${whatsapp}</td></tr></table><div style=\"background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.08); padding: 14px; border-radius: 8px; margin-top: 16px;\"><strong style=\"color: #38bdf8;\">التفاصيل وملاحظات المتعامل:</strong><p style=\"margin: 6px 0 0 0; color: #e2e8f0; line-height: 1.5;\">${modDetails}</p></div>${attachBlock}${actionBlock}<hr style=\"border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 24px;\"/><p style=\"font-size: 0.8rem; color: #64748b; margin: 0; text-align: center;\">إشعار آلي داخلي للإدارة العامة للدفاع المدني - مملكة البحرين</p></div>`; })() }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [
+        240,
+        800
+      ],
+      "id": "email-admin-notify-id",
+      "name": "Send Email to Admin",
+      "credentials": {
+        "smtp": {
+          "id": "GKD2HE4TOKeoXDkO",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.twilio.com/2010-04-01/Accounts/AC0b4a145722566b71c0111e4dba2d75b0/Messages.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "specifyBody": "keypair",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "From",
+              "value": "whatsapp:+14155238886"
+            },
+            {
+              "name": "To",
+              "value": "whatsapp:+97317461100"
+            },
+            {
+              "name": "Body",
+              "value": "=تنبيه للإدارة: قدم العميل {{ $json.body.clientName }} طلب تعديل على طلبه رقم {{ $json.body.appId }} للخدمة ({{ $json.body.serviceName }}).\nالتفاصيل: {{ $json.body.modificationDetails }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        240,
+        940
+      ],
+      "id": "whatsapp-admin-notify-id",
+      "name": "Send WhatsApp to Admin",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "ZTIi0yFrOg8SYhU0",
+          "name": "Unnamed credential"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.twilio.com/2010-04-01/Accounts/AC0b4a145722566b71c0111e4dba2d75b0/Messages.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "specifyBody": "keypair",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "MessagingServiceSid",
+              "value": "MGe1e2e6baaf17b2bec99e959dd83ea99a"
+            },
+            {
+              "name": "To",
+              "value": "={{ (() => { let p = String($json.body.whatsapp || $json.body.phone || '').replace(/[^0-9]/g, ''); if (p.startsWith('00')) p = p.substring(2); if (p.length === 8) p = '973' + p; return '+' + p; })() }}"
+            },
+            {
+              "name": "Body",
+              "value": "=الإدارة العامة للدفاع المدني - مملكة البحرين:\nتم استلام طلبك رقم ({{ $json.body.appId }}) لخدمة ({{ $json.body.serviceName }}) بنجاح.\nرابط التتبع:\n{{ $json.body.trackingLink }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        280,
+        250
+      ],
+      "id": "sms-submit-app-id",
+      "name": "Send Submit SMS",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "ZTIi0yFrOg8SYhU0",
+          "name": "Unnamed credential"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.twilio.com/2010-04-01/Accounts/AC0b4a145722566b71c0111e4dba2d75b0/Messages.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "specifyBody": "keypair",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "MessagingServiceSid",
+              "value": "MGe1e2e6baaf17b2bec99e959dd83ea99a"
+            },
+            {
+              "name": "To",
+              "value": "={{ (() => { let p = String($json.whatsapp || $json.phone || '').replace(/[^0-9]/g, ''); if (p.startsWith('00')) p = p.substring(2); if (p.length === 8) p = '973' + p; return '+' + p; })() }}"
+            },
+            {
+              "name": "Body",
+              "value": "=الإدارة العامة للدفاع المدني - مملكة البحرين:\nتم تحديث حالة طلبك رقم ({{ $json.appId }}) لخدمة ({{ $json.serviceName }}) إلى ({{ $json.status === 'Approved' ? 'مقبول والمعاملة مكتملة' : ($json.status === 'Rejected' ? 'مرفوض' : ($json.status === 'Modification Requested' ? 'مطلوب تعديل مستندات' : $json.status)) }}).\nرابط التتبع:\n{{ $json.trackingLink }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        680,
+        650
+      ],
+      "id": "sms-alert-id",
+      "name": "Send Alert SMS",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "ZTIi0yFrOg8SYhU0",
+          "name": "Unnamed credential"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst output = [];\n\nfor (let i = 0; i < items.length; i++) {\n  const row = items[i].json;\n  const status = (row.status || \"\").trim();\n  const email = (row.email || row[\"User Email\"] || \"\").toLowerCase();\n  const whatsapp = (row.whatsapp || row[\"User WhatsApp Number\"] || \"\");\n  const skipSms = row.skipSms === true || email.includes(\"example.com\") || whatsapp.includes(\"000000\");\n  \n  const isFinalDecision = status === \"Approved\" || status === \"Rejected\" || status === \"مقبول\" || status === \"مرفوض\";\n  \n  if (isFinalDecision && !skipSms) {\n    output.push(items[i]);\n  }\n}\n\nreturn output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        650
+      ],
+      "id": "filter-final-sms-id",
+      "name": "Filter Final Statuses For SMS"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst output = [];\n\nfor (let i = 0; i < items.length; i++) {\n  const body = items[i].json.body || items[i].json;\n  const email = (body.email || '').toLowerCase();\n  const whatsapp = (body.whatsapp || '');\n  const skipSms = body.skipSms === true || email.includes('example.com') || whatsapp.includes('000000');\n  \n  if (!skipSms) {\n    output.push(items[i]);\n  }\n}\n\nreturn output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        180,
+        250
+      ],
+      "id": "filter-submit-sms-id",
+      "name": "Filter Submit SMS"
+    }
+  ],
+  "connections": {
+    "Webhook Submit App": {
+      "main": [
+        [
+          {
+            "node": "Respond Submit App",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Submit Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Submit WhatsApp",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Filter Submit SMS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Submit SMS": {
+      "main": [
+        [
+          {
+            "node": "Send Submit SMS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Poll Sheets Status": {
+      "main": [
+        [
+          {
+            "node": "Read Applications Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Applications Sheet": {
+      "main": [
+        [
+          {
+            "node": "Filter Unsent Statuses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Unsent Statuses": {
+      "main": [
+        [
+          {
+            "node": "Send Alert Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Alert WhatsApp",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Filter Final Statuses For SMS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Alert Email": {
+      "main": [
+        [
+          {
+            "node": "Mark Alert Sent Yes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Alert WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Mark Alert Sent Yes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Admin Notify": {
+      "main": [
+        [
+          {
+            "node": "Respond Admin Notify",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Email to Admin",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send WhatsApp to Admin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Final Statuses For SMS": {
+      "main": [
+        [
+          {
+            "node": "Send Alert SMS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

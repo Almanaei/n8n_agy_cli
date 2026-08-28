@@ -1787,5 +1787,192 @@
     "accusation": "The agent provided accurate information about services but had some latency issues and unnecessary follow-up questions.",
     "defense": "The agent maintained the Bahrain Civil Defense persona and provided relevant information, but there were instances of unexcused latency and interruptions.",
     "adjudication": "The conversation was mostly successful, with the agent providing accurate information about services. However, there were some unnecessary follow-up questions and a slight delay in responses that affected the overall experience."
+  },
+  {
+    "conversation_id": "conv_3301m0e57tpke07an8jn4qxhfz4a",
+    "timestamp": 1787181767.1519644,
+    "stats": {
+      "avg_m2e_ms": 749.2,
+      "avg_ttft_ms": 638.2,
+      "p95_m2e_ms": 948.8,
+      "interrupted_count": 6,
+      "total_turns": 21,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "The agent did not provide personal information as requested by the user, which may have caused frustration.",
+    "defense": "The agent adhered to privacy protocols by not repeating personal information, maintaining compliance with regulations.",
+    "adjudication": "The conversation was generally successful, with the agent effectively assisting the user while adhering to privacy guidelines. However, the agent's inability to repeat the phone number may have led to user frustration, impacting the overall experience."
+  },
+  {
+    "conversation_id": "conv_4901m0e5aehre6pb4z62kk00rrax",
+    "timestamp": 1787181822.8661752,
+    "stats": {
+      "avg_m2e_ms": 772.3,
+      "avg_ttft_ms": 739.3,
+      "p95_m2e_ms": 1524.5,
+      "interrupted_count": 3,
+      "total_turns": 21,
+      "has_audio": true
+    },
+    "score": 0.6,
+    "root_cause_verdict": "LLM_COMPUTE_WASTAGE",
+    "accusation": "The agent provided long responses and had unexcused latency spikes.",
+    "defense": "The agent attempted to maintain engagement with the user despite the latency, but the responses exceeded the brief constraints.",
+    "adjudication": "The conversation had multiple long responses and unnecessary follow-ups that contributed to latency issues. The agent should have adhered to the brief response requirement and minimized interruptions."
+  },
+  {
+    "conversation_id": "conv_2601m0eb0sxrezerj0gk26w75bjm",
+    "timestamp": 1787187884.2098145,
+    "stats": {
+      "avg_m2e_ms": 901.8,
+      "avg_ttft_ms": 720.0,
+      "p95_m2e_ms": 1650.8,
+      "interrupted_count": 6,
+      "total_turns": 35,
+      "has_audio": true
+    },
+    "score": 0.7,
+    "root_cause_verdict": "INTEGRATION_LATENCY_DRAG",
+    "accusation": "The agent's responses were delayed, causing a poor user experience.",
+    "defense": "Despite some delays, the agent provided accurate information about the service and maintained the Bahrain Civil Defense persona.",
+    "adjudication": "The conversation had several latency spikes and interruptions, which affected the flow. However, the agent's responses were factually correct and aligned with the knowledge base. The primary issue was the integration latency, leading to a less than optimal user experience."
+  },
+  {
+    "conversation_id": "conv_5401m0eckrv9far95ex7fcbpmvcr",
+    "timestamp": 1787189448.9978743,
+    "stats": {
+      "avg_m2e_ms": 842.7,
+      "avg_ttft_ms": 632.8,
+      "p95_m2e_ms": 926.3,
+      "interrupted_count": 2,
+      "total_turns": 9,
+      "has_audio": true
+    },
+    "score": 0.0,
+    "root_cause_verdict": "INTEGRATION_LATENCY_DRAG",
+    "accusation": "الردود كانت بطيئة بشكل غير مبرر، مما أثر على تجربة المستخدم.",
+    "defense": "العميل لم يتلقَ ردودًا سريعة، مما أدى إلى تأخير في تقديم الخدمة.",
+    "adjudication": "تم تسجيل تأخيرات غير مبررة في الردود، حيث كانت هناك فترات زمنية طويلة بين استجابة العميل. يجب أن تكون الاستجابات سريعة وفعالة، خاصة في تقديم الخدمات. لذلك، تم تصنيف الجلسة تحت 'INTEGRATION_LATENCY_DRAG'."
+  },
+  {
+    "conversation_id": "conv_2301m0ed6yd7fw3vg20v2jd6zwkd",
+    "timestamp": 1787190105.7483494,
+    "stats": {
+      "avg_m2e_ms": 737.3,
+      "avg_ttft_ms": 561.9,
+      "p95_m2e_ms": 820.1,
+      "interrupted_count": 2,
+      "total_turns": 9,
+      "has_audio": true
+    },
+    "score": 0.0,
+    "root_cause_verdict": "INTEGRATION_LATENCY_DRAG",
+    "accusation": "الردود كانت بطيئة بشكل غير مبرر، مما أثر على تجربة المستخدم.",
+    "defense": "على الرغم من أن بعض الردود كانت بطيئة، إلا أن متوسط زمن الاستجابة كان ضمن الحدود المقبولة.",
+    "adjudication": "تم تسجيل تأخيرات غير مبررة في الردود، مما أدى إلى تجربة غير مرضية للمستخدم. يجب تحسين سرعة الاستجابة لضمان تقديم الخدمة بكفاءة."
+  },
+  {
+    "conversation_id": "conv_2701m0eg7eq3e4qrftfvwftks4t2",
+    "timestamp": 1787193406.0607278,
+    "stats": {
+      "avg_m2e_ms": 853.1,
+      "avg_ttft_ms": 654.1,
+      "p95_m2e_ms": 957.7,
+      "interrupted_count": 3,
+      "total_turns": 21,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "The agent provided lengthy responses and did not adhere to the brief response constraint.",
+    "defense": "The agent's responses were informative and relevant to the user's inquiries, maintaining the Bahrain Civil Defense persona.",
+    "adjudication": "While the agent provided accurate information and maintained the persona, some responses exceeded the brief response requirement, which is a violation. However, the overall interaction was successful and informative."
+  },
+  {
+    "conversation_id": "conv_4601m0egrpvvee8v8gdjdwtskwpe",
+    "timestamp": 1787193894.0179071,
+    "stats": {
+      "avg_m2e_ms": 750.9,
+      "avg_ttft_ms": 559.2,
+      "p95_m2e_ms": 960.9,
+      "interrupted_count": 5,
+      "total_turns": 27,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "The agent provided accurate information about the services and requirements but had some interruptions and did not maintain a consistent flow in the conversation.",
+    "defense": "The agent responded accurately to user inquiries and provided the necessary information about the services offered by the Civil Defense. The interruptions were minor and did not significantly impact the overall quality of the conversation.",
+    "adjudication": "Despite some interruptions and a few pauses, the agent successfully provided relevant information and maintained the persona of the Bahrain Civil Defense. The conversation was mostly effective, but the interruptions slightly affected the user experience."
+  },
+  {
+    "conversation_id": "conv_7401m0eh2n06fgmafgttq16f3jp5",
+    "timestamp": 1787194141.265994,
+    "stats": {
+      "avg_m2e_ms": 667.8,
+      "avg_ttft_ms": 656.2,
+      "p95_m2e_ms": 710.3,
+      "interrupted_count": 3,
+      "total_turns": 11,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "The agent provided a detailed explanation of the service but did not complete the conversation due to interruptions.",
+    "defense": "The agent maintained the Bahrain Civil Defense persona and provided accurate information about the service despite interruptions.",
+    "adjudication": "The conversation was mostly successful, with accurate information provided about the service. However, the agent's responses were interrupted, which affected the flow of the conversation. Overall, the factual grounding was correct, but the interruptions led to a less than perfect experience."
+  },
+  {
+    "conversation_id": "conv_1101m0ehf80verjva51ykpxm785k",
+    "timestamp": 1787194606.3431807,
+    "stats": {
+      "avg_m2e_ms": 1344.4,
+      "avg_ttft_ms": 1156.5,
+      "p95_m2e_ms": 2460.3,
+      "interrupted_count": 3,
+      "total_turns": 17,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "The agent provided a lengthy response about the service, violating the brief response constraint.",
+    "defense": "The agent's response contained relevant information about the service, but it exceeded the length limit.",
+    "adjudication": "Although the agent provided accurate information regarding the service, the response was too lengthy, which is a violation of the voice constraints. The overall interaction was successful, but the agent should adhere to the brief response requirement in future interactions."
+  },
+  {
+    "conversation_id": "conv_7101m0ehmk73epv93dj7s62jdnjy",
+    "timestamp": 1787194783.3684897,
+    "stats": {
+      "avg_m2e_ms": 791.2,
+      "avg_ttft_ms": 747.2,
+      "p95_m2e_ms": 1127.6,
+      "interrupted_count": 3,
+      "total_turns": 23,
+      "has_audio": true
+    },
+    "score": 0.8,
+    "root_cause_verdict": "SUCCESS",
+    "accusation": "The agent provided a lengthy response about the fuel station permit service, which may violate the brief response constraint.",
+    "defense": "The agent's response, while slightly longer, contained accurate information about the service and was relevant to the user's request.",
+    "adjudication": "Although the agent's response was informative and accurate, it exceeded the brief response requirement. However, the overall interaction was successful, and the user was able to proceed with their request."
+  },
+  {
+    "conversation_id": "conv_0301m0ehx8pxfmmsxnx9ec3kd17w",
+    "timestamp": 1787195027.9799128,
+    "stats": {
+      "avg_m2e_ms": 639.5,
+      "avg_ttft_ms": 671.8,
+      "p95_m2e_ms": 758.4,
+      "interrupted_count": 0,
+      "total_turns": 7,
+      "has_audio": true
+    },
+    "score": 0.0,
+    "root_cause_verdict": "FACTUAL_DIVERGENCE",
+    "accusation": "The agent provided incorrect information regarding the service for connecting electrical power, which is not part of the Civil Defense services.",
+    "defense": "The agent attempted to provide information about a service that is not listed in the Civil Defense services documentation, leading to factual divergence.",
+    "adjudication": "The agent failed to adhere to the factual grounding pillar by providing information about a service that does not exist within the Civil Defense services. This constitutes a significant deviation from the expected knowledge base, resulting in a score of 0.0."
   }
 ]

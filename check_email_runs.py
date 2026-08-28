@@ -64,7 +64,7 @@ for row in rows:
             
         has_relevant_nodes = False
         for node_name, runs in run_data.items():
-            if node_name in ["Send Transcript Email", "ElevenLabs Post-Call Webhook", "Lookup Lead Email", "Email Exists?", "Format WhatsApp Payload", "Send WhatsApp Summary (Twilio)"]:
+            if node_name in ["Send Submit Email", "Send Alert Email", "Send Transcript Email", "ElevenLabs Post-Call Webhook", "Lookup Lead Email", "Email Exists?", "Format WhatsApp Payload", "Send WhatsApp Summary (Twilio)"]:
                 has_relevant_nodes = True
                 
         if not has_relevant_nodes:

@@ -265,6 +265,14 @@
             color: var(--text-primary);
         }
 
+        .step-sublabel {
+            font-size: 0.72rem;
+            color: #94a3b8;
+            margin-top: -4px;
+            font-weight: 400;
+            text-align: center;
+        }
+
         /* Details Grid */
         .details-grid {
             display: grid;
@@ -394,6 +402,98 @@
             gap: 6px;
         }
 
+        /* Edit Form Classes */
+        .edit-form-box {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            border-top: 1px solid var(--glass-border);
+            padding-top: 24px;
+            margin-top: 24px;
+        }
+
+        .edit-form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            text-align: right;
+        }
+
+        .form-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .form-input, .form-select {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 12px 14px;
+            color: white;
+            font-size: 0.9rem;
+            outline: none;
+            transition: var(--transition-apple);
+        }
+
+        .form-input:focus, .form-select:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
+        }
+
+        .invalid {
+            border-color: var(--status-offline) !important;
+            box-shadow: 0 0 0 3px rgba(255, 69, 58, 0.15) !important;
+        }
+
+        .phone-input-container {
+            display: flex;
+            gap: 8px;
+            direction: ltr;
+        }
+
+        .phone-code-select {
+            width: 130px;
+            flex-shrink: 0;
+            background-color: #1c1c1e;
+        }
+
+        .phone-number-input {
+            flex-grow: 1;
+        }
+
+        .btn-add-dynamic {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-apple);
+        }
+
+        .btn-add-dynamic:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .dynamic-field-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
         /* Footer */
         .main-footer {
             margin-top: auto;
@@ -401,8 +501,43 @@
             background: rgba(3, 5, 8, 0.9);
             padding: 24px;
             text-align: center;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
+        }
+
+        /* Floating Live WhatsApp Support Button */
+        .floating-whatsapp-btn {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            z-index: 1000;
+            background: #25D366;
+            color: #ffffff !important;
+            padding: 12px 20px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            text-decoration: none !important;
+            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .floating-whatsapp-btn:hover {
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.6);
+            color: #ffffff !important;
+        }
+
+        @media (max-width: 480px) {
+            .floating-whatsapp-btn {
+                bottom: 16px;
+                left: 16px;
+                padding: 10px 16px;
+                font-size: 0.85rem;
+            }
         }
     </style>
 </head>
@@ -412,10 +547,13 @@
     <header class="navbar">
         <div class="navbar-container">
             <div class="logo">
-                <span class="logo-text">مركز خدمات الدفاع المدني الذكي</span>
+                <span class="logo-text" id="track-txt-logo">مركز خدمات الدفاع المدني الذكي</span>
             </div>
-            <nav class="nav-links">
-                <a href="/">العودة للرئيسية</a>
+            <nav class="nav-links" style="display: flex; align-items: center; gap: 14px;">
+                <button type="button" class="status-badge" id="track-btn-lang" onclick="toggleTrackLanguage()" style="background: rgba(245, 158, 11, 0.15); border: 1px solid #F59E0B; color: #FBBF24; cursor: pointer; padding: 6px 14px; border-radius: 16px; font-weight: 700; font-size: 0.82rem; transition: all 0.2s;">
+                    <span id="track-lang-text">🌐 English</span>
+                </button>
+                <a href="/" id="track-txt-home">العودة للرئيسية</a>
             </nav>
         </div>
     </header>
@@ -424,9 +562,14 @@
     <main class="main-container">
         <div class="card">
             <!-- Header Row -->
-            <div class="card-header">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
                 <span class="app-id-title">{{APP_ID}}</span>
-                <span class="status-badge {{STATUS_CLASS}}" id="status-badge-val">{{STATUS_TEXT}}</span>
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <a href="/receipt?id={{APP_ID_RAW}}" target="_blank" class="status-badge" style="background: rgba(245, 158, 11, 0.15); border: 1px solid #F59E0B; color: #FBBF24; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; padding: 6px 14px; border-radius: 20px; transition: all 0.2s;">
+                        <span>📄 تحميل الشهادة / الإيصال الرسمي (PDF)</span>
+                    </a>
+                    <span class="status-badge {{STATUS_CLASS}}" id="status-badge-val">{{STATUS_TEXT}}</span>
+                </div>
             </div>
 
             <!-- Conditional modification request feedback banner -->
@@ -435,67 +578,98 @@
                 <span class="mod-banner-desc" id="mod-details-val">{{MODIFICATION_DETAILS}}</span>
             </div>
 
-            <!-- Steps Progress Timeline -->
+            <!-- Steps Progress Timeline (4-Step Sub-Milestones) -->
             <div class="timeline" id="timeline-el">
                 <div class="timeline-progress" style="width: {{PROGRESS_WIDTH}}; {{PROGRESS_ALIGNMENT}}"></div>
                 
                 <div class="timeline-step {{STEP1_CLASS}}">
-                    <span class="step-circle">📝</span>
-                    <span class="step-label">تقديم الطلب</span>
+                    <span class="step-circle">📩</span>
+                    <span class="step-label" id="step1-lbl">1. استلام الطلب</span>
+                    <span class="step-sublabel" id="step1-sub">تم الإرسال والتحقق</span>
                 </div>
                 
                 <div class="timeline-step {{STEP2_CLASS}}">
-                    <span class="step-circle">🔍</span>
-                    <span class="step-label">قيد المراجعة</span>
+                    <span class="step-circle">📐</span>
+                    <span class="step-label" id="step2-lbl">2. فحص المستندات</span>
+                    <span class="step-sublabel" id="step2-sub">مراجعة الأوراق</span>
+                </div>
+
+                <div class="timeline-step {{STEP3_CLASS}}">
+                    <span class="step-circle">📑</span>
+                    <span class="step-label" id="step3-lbl">3. الإعتماد</span>
+                    <span class="step-sublabel" id="step3-sub">المراجعة والتدقيق</span>
                 </div>
                 
-                <div class="timeline-step {{STEP3_CLASS}}">
-                    <span class="step-circle">{{STEP3_EMOJI}}</span>
-                    <span class="step-label">{{STEP3_LABEL}}</span>
+                <div class="timeline-step {{STEP4_CLASS}}">
+                    <span class="step-circle">{{STEP4_EMOJI}}</span>
+                    <span class="step-label" id="step4-lbl">{{STEP4_LABEL}}</span>
+                    <span class="step-sublabel" id="step4-sub">اعتماد النتيجة</span>
                 </div>
             </div>
 
             <!-- Core Details Grid -->
             <div class="details-grid">
                 <div class="detail-item">
-                    <span class="detail-label">نوع الخدمة</span>
+                    <span class="detail-label" id="lbl-service-type">نوع الخدمة</span>
                     <span class="detail-value">{{SERVICE_NAME}}</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">تاريخ التقديم</span>
+                    <span class="detail-label" id="lbl-submission-date">تاريخ التقديم</span>
                     <span class="detail-value">{{TIMESTAMP}}</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">الاسم الكامل</span>
+                    <span class="detail-label" id="lbl-client-name">الاسم الكامل</span>
                     <span class="detail-value">{{CLIENT_NAME}}</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">البريد الإلكتروني</span>
+                    <span class="detail-label" id="lbl-email">البريد الإلكتروني</span>
                     <span class="detail-value">{{EMAIL}}</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">رقم الواتساب</span>
+                    <span class="detail-label" id="lbl-whatsapp">رقم الهاتف</span>
                     <span class="detail-value">{{WHATSAPP}}</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">الرقم المرجعي</span>
+                    <span class="detail-label" id="lbl-ref-number">الرقم المرجعي</span>
                     <span class="detail-value">{{REF_NUMBER}}</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">طريقة الدفع</span>
+                    <span class="detail-label" id="lbl-payment-method">طريقة الدفع</span>
                     <span class="detail-value">{{PAYMENT_METHOD}}</span>
                 </div>
-                <div class="detail-item">
-                    <span class="detail-label">المرفقات</span>
-                    <span class="detail-value"><a href="{{ATTACHMENT_LINK}}" target="_blank">📄 تحميل المرفق المرفوع (PDF)</a></span>
+                <div class="detail-item" style="grid-column: span 2;">
+                    <span class="detail-label" id="lbl-attachments">📄 المرفقات وسجل أرشفة المستندات (Document Audit History Log)</span>
+                    <div id="doc-history-container" style="margin-top: 8px;">
+                        <span class="detail-value"><a href="{{ATTACHMENT_LINK}}" target="_blank" id="lbl-view-attachment">📄 تحميل المرفق المرفوع (PDF)</a></span>
+                    </div>
                 </div>
                 <div class="detail-item" style="grid-column: span 2;">
-                    <span class="detail-label">حقول الخدمة الإضافية</span>
+                    <span class="detail-label" id="lbl-dynamic-fields">حقول الخدمة الإضافية</span>
                     <span class="detail-value" style="font-weight: normal; color: var(--text-secondary);">{{DYNAMIC_FIELDS}}</span>
                 </div>
                 <div class="detail-item" style="grid-column: span 2;">
-                    <span class="detail-label">ملاحظات إضافية</span>
+                    <span class="detail-label" id="lbl-notes">ملاحظات إضافية</span>
                     <span class="detail-value" style="font-weight: normal; color: var(--text-secondary);">{{NOTES}}</span>
+                </div>
+            </div>
+
+            <!-- Document Version History Container -->
+            <div style="margin-top: 24px; background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px;">
+                <h3 style="color: #38bdf8; font-size: 1.1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <span>📂</span> <span id="lbl-doc-history-title">سجل نسخ المستندات والمخططات المرفقة</span>
+                </h3>
+                <div id="doc-history-container">
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">لا يوجد تغييرات أو نسخ سابقة على المستندات المرفقة.</p>
+                </div>
+            </div>
+
+            <!-- AI Voice Interaction History Container -->
+            <div style="margin-top: 24px; background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px;">
+                <h3 style="color: #38bdf8; font-size: 1.1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <span>🎙️</span> سجل التواصل والتفاعلات مع المساعد الصوتي الذكي (AI Call History)
+                </h3>
+                <div id="call-history-container">
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">لم يتم تسجيل مكالمات صوتية بعد لهذه المعاملة.</p>
                 </div>
             </div>
 
@@ -508,6 +682,79 @@
                     <span class="success-overlay" id="success-msg">✓ تم إرسال طلب التعديل بنجاح وسيتم إشعار الإدارة فوراً.</span>
                 </div>
             </div>
+
+            <!-- Full Form Edit Box (Only for Pending status) -->
+            <div class="edit-form-box" id="edit-form-box-el" style="display: {{EDIT_FORM_DISPLAY}};">
+                <span class="mod-form-title">📝 تعديل بيانات الطلب بالكامل:</span>
+                <form id="edit-service-app-form" onsubmit="event.preventDefault();">
+                    <div class="edit-form-grid" style="margin-top: 12px;">
+                        <div class="form-group">
+                            <label class="form-label" for="edit-first-name">الاسم الأول</label>
+                            <input type="text" id="edit-first-name" class="form-input" value="{{FIRST_NAME_RAW}}" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="edit-last-name">الاسم الأخير (العائلة)</label>
+                            <input type="text" id="edit-last-name" class="form-input" value="{{LAST_NAME_RAW}}" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="edit-email">البريد الإلكتروني</label>
+                            <input type="email" id="edit-email" class="form-input" value="{{EMAIL_RAW}}" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">رقم الهاتف للواتساب</label>
+                            <div class="phone-input-container">
+                                <select id="edit-country-code" class="form-select phone-code-select" required>
+                                    <!-- Populated dynamically -->
+                                </select>
+                                <input type="tel" id="edit-whatsapp" class="form-input phone-number-input" placeholder="39XXXXXX" required>
+                            </div>
+                            <span id="edit-whatsapp-error" style="color: var(--status-offline); font-size: 0.8rem; display: none; text-align: right;">يرجى إدخال رقم هاتف صحيح.</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="edit-service-name">نوع الخدمة المطلوب التقديم عليها</label>
+                            <select id="edit-service-name" class="form-select" onchange="renderEditDynamicFields()" required>
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="edit-ref-number">الرقم المرجعي (إن وجد)</label>
+                            <input type="text" id="edit-ref-number" class="form-input" value="{{REF_NUMBER_RAW}}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="edit-payment-method">طريقة الدفع</label>
+                            <select id="edit-payment-method" class="form-select" required>
+                                <option value="BenefitPay" {{BENEFIT_SELECTED}}>بوابة بنفت بي (BenefitPay)</option>
+                                <option value="CreditCard" {{CREDIT_SELECTED}}>بطاقة الائتمان (Credit Card)</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label class="form-label" for="edit-notes">ملاحظاتك أو الرد على الإدارة (إختياري)</label>
+                            <textarea id="edit-notes" class="form-input" style="min-height: 70px; resize: vertical;" placeholder="اكتب ملاحظاتك أو توضيحاتك للإدارة هنا...">{{NOTES_RAW}}</textarea>
+                        </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label class="form-label" for="edit-attachment">المستند المرفق (PDF) - رفع مستند جديد أو معدل</label>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 6px;">
+                                المستند الحالي المرفوع: <a href="{{ATTACHMENT_LINK}}" target="_blank" style="color: var(--accent-color); font-weight: 600; text-decoration: underline;">📄 معاينة / تحميل المستند الحالي</a>
+                            </div>
+                            <input type="file" id="edit-attachment" class="form-input" accept="application/pdf">
+                            <span id="edit-attachment-error" style="color: var(--status-offline); font-size: 0.8rem; display: none; text-align: right; margin-top: 4px;">يرجى إرفاق مستند بصيغة PDF فقط (أقصى حجم 5MB).</span>
+                            <span id="edit-attachment-selected" style="color: var(--status-online); font-size: 0.85rem; display: none; text-align: right; margin-top: 4px;">✓ تم اختيار ملف جديد وجاهز للإرسال عند الحفظ.</span>
+                        </div>
+                    </div>
+                    <!-- Dynamic Fields Container for the selected service -->
+                    <div id="edit-dynamic-fields-container" style="margin-top: 16px;"></div>
+                    
+                    <!-- Alert of previous dynamic fields value if any -->
+                    <div id="edit-dynamic-fields-help" style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 8px; text-align: right;">
+                        البيانات الإضافية الحالية: <span style="color: white; font-weight: 600;">{{DYNAMIC_FIELDS}}</span>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 16px; margin-top: 24px; direction: rtl;">
+                        <button type="button" id="submit-edit-btn" class="btn-submit-mod" onclick="submitFullEdit()">حفظ وتحديث الطلب</button>
+                        <span class="success-overlay" id="edit-success-msg">✓ تم تحديث بيانات طلبك بالكامل بنجاح وجاري إعادة تحميل الصفحة.</span>
+                    </div>
+                </form>
+            </div>
         </div>
     </main>
 
@@ -517,6 +764,489 @@
     </footer>
 
     <script>
+        const servicesList = [
+            { id: "safety_certificate_renewal", legacyId: "Safety Certificate Renewal", nameEn: "Safety Certificate Renewal", nameAr: "إصدار شهادة استيفاء شروط واحتياجات الحماية والوقاية من الحريق وتجديدها", name: "إصدار شهادة استيفاء شروط واحتياجات الحماية والوقاية من الحريق وتجديدها" },
+            { id: "gas_selling_shops_license", legacyId: "Gas Selling Shops License", nameEn: "Gas Selling Shops License", nameAr: "إصدار ترخيص محلات بيع الغاز، وتجديد الترخيص", name: "إصدار ترخيص محلات بيع الغاز، وتجديد الترخيص" },
+            { id: "bakery_license", legacyId: "Bakery License", nameEn: "Bakery License", nameAr: "إصدار ترخيص المخابز الشعبية والآلية، وتجديد الترخيص", name: "إصدار ترخيص المخابز الشعبية والآلية، وتجديد الترخيص" },
+            { id: "gold_shop_license", legacyId: "Gold Shop License", nameEn: "Gold Shop License", nameAr: "إصدار ترخيص محلات وورش الذهب، وتجديد الترخيص", name: "إصدار ترخيص محلات وورش الذهب، وتجديد الترخيص" },
+            { id: "trainee_registration", legacyId: "Trainee Registration", nameEn: "Civil Defense Training Centers License", nameAr: "إصدار الترخيص لمعاهد ومراكز التدريب على أعمال الدفاع المدني", name: "إصدار الترخيص لمعاهد ومراكز التدريب على أعمال الدفاع المدني" },
+            { id: "gas_station_license", legacyId: "Gas Station License", nameEn: "Gas Station License", nameAr: "إصدار الترخيص لمحطات تزويد الوقود، وتجديد الترخيص", name: "إصدار الترخيص لمحطات تزويد الوقود، وتجديد الترخيص" },
+            { id: "hazardous_material_permit", legacyId: "Hazardous Material Permit", nameEn: "Hazardous Material Permit", nameAr: "إصدار ترخيص عدم ممانعة لتخزين مواد كيميائية أو المتفجرات، وتجديد الترخيص", name: "إصدار ترخيص عدم ممانعة لتخزين مواد كيميائية أو المتفجرات، وتجديد الترخيص" },
+            { id: "factories_hotels_malls_inspection_certificate", legacyId: "إصدار شهادة فحص المصانع والفنادق والمجمعات التجارية قيد الإنشاء وتجديدها", nameEn: "Inspection Certificate for Factories, Hotels, & Malls under Construction", nameAr: "إصدار شهادة فحص المصانع والفنادق والمجمعات التجارية قيد الإنشاء وتجديدها", name: "إصدار شهادة فحص المصانع والفنادق والمجمعات التجارية قيد الإنشاء وتجديدها" },
+            { id: "incident_report_large_facilities", legacyId: "إصدار تقرير الحوادث للمنشآت الكبيرة والمصانع والفنادق والمجمعات التجارية وما في حكمها", nameEn: "Incident Report for Large Facilities, Factories, & Malls", nameAr: "إصدار تقرير الحوادث للمنشآت الكبيرة والمصانع والفنادق والمجمعات التجارية وما في حكمها", name: "إصدار تقرير الحوادث للمنشآت الكبيرة والمصانع والفنادق والمجمعات التجارية وما في حكمها" },
+            { id: "incident_report_small_facilities_homes", legacyId: "إصدار تقرير الحوادث للمنشآت الصغيرة والمنازل وما في حكمها", nameEn: "Incident Report for Small Facilities & Homes", nameAr: "إصدار تقرير الحوادث للمنشآت الصغيرة والمنازل وما في حكمها", name: "إصدار تقرير الحوادث للمنشآت الصغيرة والمنازل وما في حكمها" },
+            { id: "electrical_connection_final_inspection", legacyId: "إصدار شهادة الفحص النهائي لتوصيل التيار الكهربائي للمباني الجديدة", nameEn: "Final Inspection Certificate for Electrical Connection", nameAr: "إصدار شهادة الفحص النهائي لتوصيل التيار الكهربائي للمباني الجديدة", name: "إصدار شهادة الفحص النهائي لتوصيل التيار الكهربائي للمباني الجديدة" },
+            { id: "factory_warehouse_maps_license", legacyId: "إصدار ترخيص خرائط المصانع والمخازن وتجديد الترخيص", nameEn: "Factory & Warehouse Maps License", nameAr: "إصدار ترخيص خرائط المصانع والمخازن وتجديد الترخيص", name: "إصدار ترخيص خرائط المصانع والمخازن وتجديد الترخيص" },
+            { id: "commercial_centers_high_rise_maps_license", legacyId: "إصدار ترخيص خرائط المراكز التجارية والمباني العالية", nameEn: "Commercial Centers & High-Rise Buildings Maps License", nameAr: "إصدار ترخيص خرائط المراكز التجارية والمباني العالية", name: "إصدار ترخيص خرائط المراكز التجارية والمباني العالية" },
+            { id: "residential_complexes_maps_license", legacyId: "إصدار ترخيص خرائط المجمعات السكنية التي تحتوي على عشر فلل فأكثر", nameEn: "Residential Complexes Maps License (10+ Villas)", nameAr: "إصدار ترخيص خرائط المجمعات السكنية التي تحتوي على عشر فلل فأكثر", name: "إصدار ترخيص خرائط المجمعات السكنية التي تحتوي على عشر فلل فأكثر" },
+            { id: "worship_courts_museums_maps_review", legacyId: "دراسة مخططات دور العبادة والمحاكم والمتاحف", nameEn: "Review of Maps for Places of Worship, Courts, & Museums", nameAr: "دراسة مخططات دور العبادة والمحاكم والمتاحف", name: "دراسة مخططات دور العبادة والمحاكم والمتاحف" },
+            { id: "new_gas_stations_maps_review", legacyId: "دراسة الخرائط لمحطات الوقود الجديدة", nameEn: "Review of Maps for New Fuel Stations", nameAr: "دراسة الخرائط لمحطات الوقود الجديدة", name: "دراسة الخرائط لمحطات الوقود الجديدة" },
+            { id: "electrical_engineering_plans_review", legacyId: "دراسة المخططات الهندسية الكهربائية", nameEn: "Review of Electrical Engineering Plans", nameAr: "دراسة المخططات الهندسية الكهربائية", name: "دراسة المخططات الهندسية الكهربائية" },
+            { id: "mechanical_engineering_plans_review", legacyId: "دراسة المخططات الميكانيكية", nameEn: "Review of Mechanical Engineering Plans", nameAr: "دراسة المخططات الميكانيكية", name: "دراسة المخططات الميكانيكية" },
+            { id: "gas_piping_tanks_maps_review", legacyId: "دراسة الخرائط على تمديدات الغاز والخزانات", nameEn: "Review of Maps for Gas Extension Lines & Tanks", nameAr: "دراسة الخرائط على تمديدات الغاز والخزانات", name: "دراسة الخرائط على تمديدات الغاز والخزانات" },
+            { id: "trainee_registration_1day", legacyId: "إصدار شهادة تدريب على أعمال الدفاع المدني لمدة يوم واحد", nameEn: "Civil Defense Training Certificate (1 Day)", nameAr: "إصدار شهادة تدريب على أعمال الدفاع المدني لمدة يوم واحد", name: "إصدار شهادة تدريب على أعمال الدفاع المدني لمدة يوم واحد" },
+            { id: "trainee_registration_1week", legacyId: "إصدار شهادة تدريب على أعمال الدفاع المدني لمدة  اسبوع", nameEn: "Civil Defense Training Certificate (1 Week)", nameAr: "إصدار شهادة تدريب على أعمال الدفاع المدني لمدة  اسبوع", name: "إصدار شهادة تدريب على أعمال الدفاع المدني لمدة  اسبوع" },
+            { id: "heavy_fire_vehicle_driving_training", legacyId: "إصدار شهادة تدريب أفراد منشآت ومؤسسات القطاع الخاص على قيادة مركبات الإطفاء الثقيلة لمدة أسبوعين", nameEn: "Heavy Firefighting Vehicle Driving Training Certificate (2 Weeks)", nameAr: "إصدار شهادة تدريب أفراد منشآت ومؤسسات القطاع الخاص على قيادة مركبات الإطفاء الثقيلة لمدة أسبوعين", name: "إصدار شهادة تدريب أفراد منشآت ومؤسسات القطاع الخاص على قيادة مركبات الإطفاء الثقيلة لمدة أسبوعين" },
+            { id: "trainee_registration_16weeks", legacyId: "إصدار شهادة تدريب الفرد على أعمال الدفاع المدني لمدة ستة عشر أسبوعًا.", nameEn: "Civil Defense Individual Training Certificate (16 Weeks)", nameAr: "إصدار شهادة تدريب الفرد على أعمال الدفاع المدني لمدة ستة عشر أسبوعًا.", name: "إصدار شهادة تدريب الفرد على أعمال الدفاع المدني لمدة ستة عشر أسبوعًا." },
+            { id: "building_evacuation_training", legacyId: "التدريب على عمليات إخلاء المباني والمنشآت", nameEn: "Building & Facility Evacuation Operations Training", nameAr: "التدريب على عمليات إخلاء المباني والمنشآت", name: "التدريب على عمليات إخلاء المباني والمنشآت" },
+            { id: "fire_safety_equipment_license", legacyId: "إصدار الترخيص لمعدات الحريق والسلامة، وتجديد الترخيص", nameEn: "Fire Safety & Protection Equipment License", nameAr: "إصدار الترخيص لمعدات الحريق والسلامة، وتجديد الترخيص", name: "إصدار الترخيص لمعدات الحريق والسلامة، وتجديد الترخيص" },
+            { id: "fire_safety_equipment_noc", legacyId: "إصدار ترخيص عدم الممانعة لمعدات الحريق والسلامة، وتجديد الترخيص", nameEn: "No-Objection Certificate (NOC) for Fire Safety Equipment", nameAr: "إصدار ترخيص عدم الممانعة لمعدات الحريق والسلامة، وتجديد الترخيص", name: "إصدار ترخيص عدم الممانعة لمعدات الحريق والسلامة، وتجديد الترخيص" },
+            { id: "local_fire_equipment_factory_license", legacyId: "إصدار الترخيص لمصنع محلي لمعدات الإطفاء والوقاية من الحريق، وتجديد الترخيص", nameEn: "License for Local Firefighting Equipment Factory", nameAr: "إصدار الترخيص لمصنع محلي لمعدات الإطفاء والوقاية من الحريق، وتجديد الترخيص", name: "إصدار الترخيص لمصنع محلي لمعدات الإطفاء والوقاية من الحريق، وتجديد الترخيص" },
+            { id: "alarm_firefighting_maintenance_offices_license", legacyId: "إصدار الترخيص للمكاتب الفنية ومكاتب صيانة أجهزة الإنذار والإطفاء، وتجديد الترخيص", nameEn: "License for Alarm & Firefighting Maintenance Offices", nameAr: "إصدار الترخيص للمكاتب الفنية ومكاتب صيانة أجهزة الإنذار والإطفاء، وتجديد الترخيص", name: "إصدار الترخيص للمكاتب الفنية ومكاتب صيانة أجهزة الإنذار والإطفاء، وتجديد الترخيص" },
+            { id: "hazardous_materials_1day_transport", legacyId: "ترخيص بالموافقة على نقل شحنات المواد الخطرة ليوم واحد", nameEn: "One-Day Permit for Transporting Hazardous Material Shipments", nameAr: "ترخيص بالموافقة على نقل شحنات المواد الخطرة ليوم واحد", name: "ترخيص بالموافقة على نقل شحنات المواد الخطرة ليوم واحد" },
+            { id: "chemical_hazmat_transport_vehicles_license", legacyId: "إصدار ترخيص الموافقة على سيارات نقل المواد الكيميائية والخطرة، وتجديد الترخيص", nameEn: "Approval License for Chemical & Hazardous Transport Vehicles", nameAr: "إصدار ترخيص الموافقة على سيارات نقل المواد الكيميائية والخطرة، وتجديد الترخيص", name: "إصدار ترخيص الموافقة على سيارات نقل المواد الكيميائية والخطرة، وتجديد الترخيص" },
+            { id: "diesel_gas_tanks_installation_license", legacyId: "إصدار ترخيص الموافقة النهائية على تركيب خزانات الديزل والغاز، وتجديد الترخيص", nameEn: "Final Approval License for Installing Diesel & Gas Tanks", nameAr: "إصدار ترخيص الموافقة النهائية على تركيب خزانات الديزل والغاز، وتجديد الترخيص", name: "إصدار ترخيص الموافقة النهائية على تركيب خزانات الديزل والغاز، وتجديد الترخيص" },
+            { id: "consulting_offices_gas_fuel_hazmat_license", legacyId: "إصدار الترخيص للمكاتب الفنية والاستشارية المختصة بالغاز والوقود والمواد الخطرة، وتجديد الترخيص", nameEn: "License for Technical & Consulting Offices (Gas, Fuel, & Hazmat)", nameAr: "إصدار الترخيص للمكاتب الفنية والاستشارية المختصة بالغاز والوقود والمواد الخطرة، وتجديد الترخيص", name: "إصدار الترخيص للمكاتب الفنية والاستشارية المختصة بالغاز والوقود والمواد الخطرة، وتجديد الترخيص" },
+            { id: "engineering_offices_fire_protection_license", legacyId: "ترخيص المكاتب الهندسية لتصميم أنظمة الحماية والوقاية من الحريق وتجديد الترخيص", nameEn: "License for Engineering Offices Designing Fire Protection Systems", nameAr: "ترخيص المكاتب الهندسية لتصميم أنظمة الحماية والوقاية من الحريق وتجديد الترخيص", name: "ترخيص المكاتب الهندسية لتصميم أنظمة الحماية والوقاية من الحريق وتجديد الترخيص" },
+            { id: "small_facilities_inspection_certificate", legacyId: "إصدار شهادة فحص المنشآت الصغيرة، وتجديد الشهادة", nameEn: "Small Facilities Inspection Certificate Renewal", nameAr: "إصدار شهادة فحص المنشآت الصغيرة، وتجديد الشهادة", name: "إصدار شهادة فحص المنشآت الصغيرة، وتجديد الشهادة" }
+        ];
+
+        const countries = [
+            { code: "+973", name: "البحرين", flag: "🇧🇭" },
+            { code: "+966", name: "السعودية", flag: "🇸🇦" },
+            { code: "+971", name: "الإمارات", flag: "🇦🇪" },
+            { code: "+965", name: "الكويت", flag: "🇰🇼" },
+            { code: "+974", name: "قطر", flag: "🇶🇦" },
+            { code: "+968", name: "عمان", flag: "🇴🇲" },
+            { code: "+20", name: "مصر", flag: "🇪🇬" },
+            { code: "+962", name: "الأردن", flag: "🇯🇴" },
+            { code: "+961", name: "لبنان", flag: "🇱🇧" },
+            { code: "+963", name: "سوريا", flag: "🇸🇾" },
+            { code: "+964", name: "العراق", flag: "🇮🇶" },
+            { code: "+967", name: "اليمن", flag: "🇾🇪" },
+            { code: "+970", name: "فلسطين", flag: "🇵🇸" },
+            { code: "+212", name: "المغرب", flag: "🇲🇦" },
+            { code: "+216", name: "تونس", flag: "🇹🇳" },
+            { code: "+213", name: "الجزائر", flag: "🇩🇿" },
+            { code: "+218", name: "ليبيا", flag: "🇱🇾" },
+            { code: "+249", name: "السودان", flag: "🇸🇩" },
+            { code: "+251", name: "إثيوبيا", flag: "🇪🇹" },
+            { code: "+252", name: "الصومال", flag: "🇸🇴" },
+            { code: "+253", name: "جيبوتي", flag: "🇩🇯" },
+            { code: "+222", name: "موريتانيا", flag: "🇲🇷" },
+            { code: "+1", name: "الولايات المتحدة", flag: "🇺🇸" },
+            { code: "+44", name: "المملكة المتحدة", flag: "🇬🇧" },
+            { code: "+91", name: "الهند", flag: "🇮🇳" },
+            { code: "+92", name: "باكستان", flag: "🇵🇰" },
+            { code: "+880", name: "بنغلاديش", flag: "🇧🇩" },
+            { code: "+63", name: "الفلبين", flag: "🇵🇭" },
+            { code: "+90", name: "تركيا", flag: "🇹🇷" }
+        ];
+
+        let editFileBase64 = '';
+        let editFileName = '';
+        const rawDynamicFieldsStr = "{{DYNAMIC_FIELDS_RAW}}";
+        let parsedDynamicObj = {};
+        try {
+            if (rawDynamicFieldsStr && (rawDynamicFieldsStr.startsWith('{') || rawDynamicFieldsStr.startsWith('['))) {
+                parsedDynamicObj = JSON.parse(rawDynamicFieldsStr);
+            }
+        } catch (e) {
+            parsedDynamicObj = {};
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function extractDynamicVal(key, regex) {
+            if (parsedDynamicObj && parsedDynamicObj[key] !== undefined && parsedDynamicObj[key] !== null) {
+                return String(parsedDynamicObj[key]);
+            }
+            if (typeof rawDynamicFieldsStr === 'string' && regex) {
+                const m = rawDynamicFieldsStr.match(regex);
+                if (m && m[1]) return m[1].trim();
+            }
+            return '';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Populate country dropdown in edit form
+            const countrySelect = document.getElementById('edit-country-code');
+            if (countrySelect) {
+                countrySelect.innerHTML = '';
+                countries.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.code;
+                    opt.textContent = `${c.flag} ${c.code} (${c.name})`;
+                    countrySelect.appendChild(opt);
+                });
+            }
+
+            // Extract country code and whatsapp number
+            const rawWhatsapp = "{{WHATSAPP_RAW}}";
+            const phoneSelect = document.getElementById('edit-country-code');
+            const phoneInput = document.getElementById('edit-whatsapp');
+            if (phoneSelect && phoneInput && rawWhatsapp) {
+                let codeMatched = false;
+                for (const c of countries) {
+                    if (rawWhatsapp.startsWith(c.code)) {
+                        phoneSelect.value = c.code;
+                        phoneInput.value = rawWhatsapp.substring(c.code.length);
+                        codeMatched = true;
+                        break;
+                    }
+                }
+                if (!codeMatched) {
+                    phoneSelect.value = "+973";
+                    phoneInput.value = rawWhatsapp.replace(/^\+973/, "");
+                }
+            }
+
+            // Populate services dropdown in edit form
+            const serviceSelect = document.getElementById('edit-service-name');
+            if (serviceSelect) {
+                serviceSelect.innerHTML = '<option value="" disabled>-- اختر الخدمة --</option>';
+                servicesList.forEach(s => {
+                    const opt = document.createElement('option');
+                    opt.value = s.id;
+                    opt.textContent = s.id === s.name ? s.name : `${s.nameAr || s.name} (${s.nameEn || s.id})`;
+                    const currentServiceRaw = "{{SERVICE_NAME_RAW}}".toLowerCase().trim();
+                    const isMatch = s.id.toLowerCase() === currentServiceRaw || 
+                                    (s.legacyId && s.legacyId.toLowerCase() === currentServiceRaw) || 
+                                    (s.nameAr && s.nameAr.toLowerCase() === currentServiceRaw) || 
+                                    (s.nameEn && s.nameEn.toLowerCase() === currentServiceRaw) ||
+                                    (s.name && s.name.toLowerCase() === currentServiceRaw);
+                    if (isMatch) {
+                        opt.selected = true;
+                    }
+                    serviceSelect.appendChild(opt);
+                });
+            }
+
+            // Initialize dynamic fields with existing original values
+            renderEditDynamicFields();
+
+            // Set up file upload listener
+            const fileInput = document.getElementById('edit-attachment');
+            if (fileInput) {
+                fileInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    const errorEl = document.getElementById('edit-attachment-error');
+                    const successEl = document.getElementById('edit-attachment-selected');
+                    if (errorEl) errorEl.style.display = 'none';
+                    if (successEl) successEl.style.display = 'none';
+
+                    if (file) {
+                        if (file.type !== 'application/pdf') {
+                            if (errorEl) {
+                                errorEl.textContent = 'يرجى إرفاق مستند بصيغة PDF فقط.';
+                                errorEl.style.display = 'block';
+                            }
+                            fileInput.value = '';
+                            editFileBase64 = '';
+                            editFileName = '';
+                            return;
+                        }
+                        if (file.size > 5 * 1024 * 1024) {
+                            if (errorEl) {
+                                errorEl.textContent = 'حجم الملف يجب أن لا يتجاوز 5 ميجابايت.';
+                                errorEl.style.display = 'block';
+                            }
+                            fileInput.value = '';
+                            editFileBase64 = '';
+                            editFileName = '';
+                            return;
+                        }
+
+                        const reader = new FileReader();
+                        reader.onload = function(evt) {
+                            editFileBase64 = evt.target.result;
+                            editFileName = file.name;
+                            if (successEl) {
+                                successEl.textContent = `✓ تم اختيار (${file.name}) وسيتم رفعه وتحديثه عند الضغط على حفظ وتحديث الطلب.`;
+                                successEl.style.display = 'block';
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+        });
+
+        function renderEditDynamicFields() {
+            const serviceSelect = document.getElementById('edit-service-name');
+            if (!serviceSelect) return;
+            const service = serviceSelect.value;
+            const container = document.getElementById('edit-dynamic-fields-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const isTraineeService = ['trainee_registration', 'trainee_registration_1day', 'trainee_registration_1week', 'heavy_fire_vehicle_driving_training', 'trainee_registration_16weeks', 'Trainee Registration'].includes(service);
+            const isSafetyService = ['safety_certificate_renewal', 'Safety Certificate Renewal'].includes(service);
+            const isHazmatService = ['hazardous_material_permit', 'Hazardous Material Permit'].includes(service);
+            const isGoldService = ['gold_shop_license', 'Gold Shop License'].includes(service);
+            const isGasShopService = ['gas_selling_shops_license', 'Gas Selling Shops License'].includes(service);
+            const isBakeryService = ['bakery_license', 'Bakery License'].includes(service);
+            const isGasStationService = ['gas_station_license', 'Gas Station License'].includes(service);
+
+            if (isTraineeService) {
+                let existingNames = [];
+                if (Array.isArray(parsedDynamicObj.trainees)) {
+                    existingNames = parsedDynamicObj.trainees;
+                } else {
+                    const match = rawDynamicFieldsStr.match(/(?:أسماء المتدربين|المتدربين|Trainees|trainees)[:\s]+([^\]]+)/i);
+                    if (match && match[1]) {
+                        existingNames = match[1].split(/[,،\n]+/).map(s => s.trim()).filter(Boolean);
+                    } else if (rawDynamicFieldsStr && rawDynamicFieldsStr !== 'لا يوجد' && !rawDynamicFieldsStr.startsWith('{')) {
+                        existingNames = rawDynamicFieldsStr.replace(/[\[\]]/g, '').split(/[,،\n]+/).map(s => s.trim()).filter(Boolean);
+                    }
+                }
+                if (existingNames.length === 0) existingNames = [''];
+
+                let rowsHtml = '';
+                existingNames.forEach((name, idx) => {
+                    const isFirst = idx === 0;
+                    const btn = isFirst 
+                        ? `<button type="button" class="btn-add-dynamic" onclick="addEditTraineeRow()">+</button>`
+                        : `<button type="button" class="btn-add-dynamic" style="background: rgba(255, 69, 58, 0.1); border-color: rgba(255, 69, 58, 0.2);" onclick="this.parentElement.remove()">-</button>`;
+                    rowsHtml += `
+                        <div class="dynamic-field-row" style="margin-bottom: 8px;">
+                            <input type="text" class="form-input edit-trainee-name-input" value="${escapeHtml(name)}" placeholder="اسم المتدرب" required>
+                            ${btn}
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = `
+                    <div class="form-group">
+                        <label class="form-label">أسماء المتدربين</label>
+                        <div id="edit-trainee-list-container">
+                            ${rowsHtml}
+                        </div>
+                    </div>
+                `;
+            } else if (isSafetyService) {
+                const area = extractDynamicVal('inspectionArea', /(?:المساحة|مساحة المنشأة|area)[:\s]+(\d+)/i) || extractDynamicVal('area', /(\d+)/);
+                container.innerHTML = `
+                    <div class="form-group">
+                        <label class="form-label" for="edit-inspection-area">مساحة المنشأة الإجمالية الخاضعة للتفتيش (بالمتر المربع)</label>
+                        <input type="number" id="edit-inspection-area" class="form-input" min="1" value="${escapeHtml(area)}" placeholder="مثال: 150" required>
+                    </div>
+                `;
+            } else if (isHazmatService) {
+                const chemical = extractDynamicVal('chemicalType', /(?:نوع المادة|المادة الكيميائية|chemical)[:\s]+([^\]]+)/i);
+                container.innerHTML = `
+                    <div class="form-group">
+                        <label class="form-label" for="edit-chemical-type">نوع المادة الكيميائية المراد تخزينها أو استخدامها</label>
+                        <select id="edit-chemical-type" class="form-select" required>
+                            <option value="" disabled ${!chemical ? 'selected' : ''}>-- اختر النوع --</option>
+                            <option value="Flammable Liquids" ${chemical.includes('Flammable') || chemical.includes('قابلة للاشتعال') ? 'selected' : ''}>سوائل قابلة للاشتعال (Flammable Liquids)</option>
+                            <option value="Compressed Gases" ${chemical.includes('Gases') || chemical.includes('مضغوطة') ? 'selected' : ''}>غازات مضغوطة (Compressed Gases)</option>
+                            <option value="Toxic Chemicals" ${chemical.includes('Toxic') || chemical.includes('سامة') ? 'selected' : ''}>مواد سامة (Toxic Chemicals)</option>
+                            <option value="Corrosive Materials" ${chemical.includes('Corrosive') || chemical.includes('أكالة') ? 'selected' : ''}>مواد أكالة (Corrosive Materials)</option>
+                        </select>
+                    </div>
+                `;
+            } else if (isGoldService) {
+                let alarm = extractDynamicVal('goldAlarmDetails', /(?:عقد صيانة|نظام الإنذار|alarm)[:\s]+([^\]]+)/i);
+                if (!alarm && rawDynamicFieldsStr && rawDynamicFieldsStr !== 'لا يوجد' && !rawDynamicFieldsStr.startsWith('{')) {
+                    alarm = rawDynamicFieldsStr.replace(/[\[\]]/g, '').trim();
+                }
+                container.innerHTML = `
+                    <div class="form-group">
+                        <label class="form-label" for="edit-gold-alarm-details">تفاصيل عقد صيانة نظام الإنذار والإطفاء</label>
+                        <input type="text" id="edit-gold-alarm-details" class="form-input" value="${escapeHtml(alarm)}" placeholder="مثال: عقد صيانة سارٍ مع شركة معتمدة" required>
+                    </div>
+                `;
+            } else if (isGasShopService) {
+                let gasLetter = extractDynamicVal('gasMinistryLetter', /(?:خطاب وزارة الصناعة|وزارة الصناعة|gas letter)[:\s]+([^\]]+)/i);
+                if (!gasLetter && rawDynamicFieldsStr && rawDynamicFieldsStr !== 'لا يوجد' && !rawDynamicFieldsStr.startsWith('{')) {
+                    gasLetter = rawDynamicFieldsStr.replace(/[\[\]]/g, '').trim();
+                }
+                container.innerHTML = `
+                    <div class="form-group">
+                        <label class="form-label" for="edit-gas-ministry-letter">تفاصيل خطاب وزارة الصناعة والتجارة والسياحة</label>
+                        <input type="text" id="edit-gas-ministry-letter" class="form-input" value="${escapeHtml(gasLetter)}" placeholder="مثال: رسالة رقم 10234 بتاريخ 2026/05/12" required>
+                    </div>
+                `;
+            } else if (isBakeryService) {
+                let drawings = extractDynamicVal('bakeryDrawings', /(?:موافقات المخططات|المخططات المعمارية|drawings)[:\s]+([^\]]+)/i);
+                if (!drawings && rawDynamicFieldsStr && rawDynamicFieldsStr !== 'لا يوجد' && !rawDynamicFieldsStr.startsWith('{')) {
+                    drawings = rawDynamicFieldsStr.replace(/[\[\]]/g, '').trim();
+                }
+                container.innerHTML = `
+                    <div class="form-group">
+                        <label class="form-label" for="edit-bakery-drawings">أرقام موافقات المخططات المعمارية والكهربائية</label>
+                        <input type="text" id="edit-bakery-drawings" class="form-input" value="${escapeHtml(drawings)}" placeholder="مثال: موافقة رقم MC-90234" required>
+                    </div>
+                `;
+            } else if (isGasStationService) {
+                const capacity = extractDynamicVal('stationCapacity', /(?:سعة خزانات الوقود|سعة الخزانات|capacity)[:\s]+(\d+)/i) || extractDynamicVal('capacity', /(\d+)/);
+                container.innerHTML = `
+                    <div class="form-group">
+                        <label class="form-label" for="edit-station-capacity">إجمالي سعة خزانات الوقود (باللتر)</label>
+                        <input type="number" id="edit-station-capacity" class="form-input" min="1" value="${escapeHtml(capacity)}" placeholder="مثال: 50000" required>
+                    </div>
+                `;
+            } else {
+                let generic = extractDynamicVal('genericDetails', /(?:تفاصيل إضافية|بيانات الخدمة|تفاصيل)[:\s]+([^\]]+)/i);
+                if (!generic && rawDynamicFieldsStr && rawDynamicFieldsStr !== 'لا يوجد' && !rawDynamicFieldsStr.startsWith('{')) {
+                    generic = rawDynamicFieldsStr.replace(/[\[\]]/g, '').trim();
+                }
+                if (generic) {
+                    container.innerHTML = `
+                        <div class="form-group">
+                            <label class="form-label" for="edit-generic-details">البيانات الإضافية للخدمة</label>
+                            <input type="text" id="edit-generic-details" class="form-input" value="${escapeHtml(generic)}" placeholder="أدخل أي بيانات إضافية للخدمة">
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        function addEditTraineeRow() {
+            const container = document.getElementById('edit-trainee-list-container');
+            const row = document.createElement('div');
+            row.className = 'dynamic-field-row';
+            row.style.marginBottom = '8px';
+            row.innerHTML = `
+                <input type="text" class="form-input edit-trainee-name-input" placeholder="اسم المتدرب الإضافي" required>
+                <button type="button" class="btn-add-dynamic" style="background: rgba(255, 69, 58, 0.1); border-color: rgba(255, 69, 58, 0.2);" onclick="this.parentElement.remove()">-</button>
+            `;
+            container.appendChild(row);
+        }
+
+        async function submitFullEdit() {
+            const firstName = document.getElementById('edit-first-name').value.trim();
+            const lastName = document.getElementById('edit-last-name').value.trim();
+            const email = document.getElementById('edit-email').value.trim();
+            const countryCodeSelect = document.getElementById('edit-country-code');
+            const countryCode = countryCodeSelect ? countryCodeSelect.value : '+973';
+            const localPhone = document.getElementById('edit-whatsapp').value.trim();
+            const serviceName = document.getElementById('edit-service-name').value;
+            const refNumberInput = document.getElementById('edit-ref-number');
+            const refNumber = refNumberInput ? refNumberInput.value.trim() : '';
+            const paymentMethod = document.getElementById('edit-payment-method').value;
+            const editNotesEl = document.getElementById('edit-notes') || document.getElementById('mod-textarea');
+            const notes = editNotesEl ? editNotesEl.value.trim() : '';
+
+            const emailInput = document.getElementById('edit-email');
+            const whatsappError = document.getElementById('edit-whatsapp-error');
+            whatsappError.style.display = 'none';
+
+            let isValid = true;
+
+            if (!firstName) { document.getElementById('edit-first-name').classList.add('invalid'); isValid = false; }
+            else { document.getElementById('edit-first-name').classList.remove('invalid'); }
+
+            if (!lastName) { document.getElementById('edit-last-name').classList.add('invalid'); isValid = false; }
+            else { document.getElementById('edit-last-name').classList.remove('invalid'); }
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!email || !emailRegex.test(email)) {
+                emailInput.classList.add('invalid');
+                isValid = false;
+            } else {
+                emailInput.classList.remove('invalid');
+            }
+
+            const phoneRegex = /^[0-9]{6,15}$/;
+            if (!localPhone || !phoneRegex.test(localPhone)) {
+                document.getElementById('edit-whatsapp').classList.add('invalid');
+                whatsappError.style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('edit-whatsapp').classList.remove('invalid');
+            }
+
+            if (!serviceName) { document.getElementById('edit-service-name').classList.add('invalid'); isValid = false; }
+            else { document.getElementById('edit-service-name').classList.remove('invalid'); }
+
+            if (!isValid) return;
+
+            let dynamicFieldsStr = '';
+            const isTraineeService = ['trainee_registration', 'trainee_registration_1day', 'trainee_registration_1week', 'heavy_fire_vehicle_driving_training', 'trainee_registration_16weeks', 'Trainee Registration'].includes(serviceName);
+            const isSafetyService = ['safety_certificate_renewal', 'Safety Certificate Renewal'].includes(serviceName);
+            const isHazmatService = ['hazardous_material_permit', 'Hazardous Material Permit'].includes(serviceName);
+            const isGoldService = ['gold_shop_license', 'Gold Shop License'].includes(serviceName);
+            const isGasShopService = ['gas_selling_shops_license', 'Gas Selling Shops License'].includes(serviceName);
+            const isBakeryService = ['bakery_license', 'Bakery License'].includes(serviceName);
+            const isGasStationService = ['gas_station_license', 'Gas Station License'].includes(serviceName);
+
+            if (isTraineeService) {
+                const inputs = document.querySelectorAll('.edit-trainee-name-input');
+                const names = Array.from(inputs).map(i => i.value.trim()).filter(Boolean);
+                dynamicFieldsStr = `[أسماء المتدربين: ${names.join('، ')}]`;
+            } else if (isSafetyService) {
+                const val = document.getElementById('edit-inspection-area')?.value;
+                dynamicFieldsStr = val ? `[مساحة المنشأة: ${val} متر مربع]` : '';
+            } else if (isHazmatService) {
+                const val = document.getElementById('edit-chemical-type')?.value;
+                dynamicFieldsStr = val ? `[نوع المادة الكيميائية: ${val}]` : '';
+            } else if (isGoldService) {
+                const val = document.getElementById('edit-gold-alarm-details')?.value.trim();
+                dynamicFieldsStr = val ? `[تفاصيل عقد صيانة نظام الإنذار والإطفاء: ${val}]` : '';
+            } else if (isGasShopService) {
+                const val = document.getElementById('edit-gas-ministry-letter')?.value.trim();
+                dynamicFieldsStr = val ? `[تفاصيل خطاب وزارة الصناعة والتجارة: ${val}]` : '';
+            } else if (isBakeryService) {
+                const val = document.getElementById('edit-bakery-drawings')?.value.trim();
+                dynamicFieldsStr = val ? `[موافقات المخططات المعمارية والكهربائية: ${val}]` : '';
+            } else if (isGasStationService) {
+                const val = document.getElementById('edit-station-capacity')?.value;
+                dynamicFieldsStr = val ? `[إجمالي سعة خزانات الوقود: ${val} لتر]` : '';
+            } else {
+                const genericInput = document.getElementById('edit-generic-details');
+                if (genericInput && genericInput.value.trim()) {
+                    dynamicFieldsStr = `[بيانات إضافية: ${genericInput.value.trim()}]`;
+                } else if (rawDynamicFieldsStr && rawDynamicFieldsStr !== 'لا يوجد') {
+                    dynamicFieldsStr = rawDynamicFieldsStr;
+                }
+            }
+
+            const btn = document.getElementById('submit-edit-btn');
+            const success = document.getElementById('edit-success-msg');
+            btn.disabled = true;
+
+            const payload = {
+                appId: '{{APP_ID_RAW}}',
+                firstName,
+                lastName,
+                email,
+                whatsapp: countryCode + localPhone,
+                serviceName,
+                referenceNumber: refNumber,
+                paymentMethod,
+                notes,
+                dynamicFields: dynamicFieldsStr
+            };
+
+            if (editFileBase64) {
+                payload.attachmentName = editFileName;
+                payload.attachmentBase64 = editFileBase64;
+            }
+
+            try {
+                const res = await fetch('/api/applications/modify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    success.style.display = 'inline-flex';
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    const data = await res.json();
+                    alert("فشل تحديث الطلب: " + (data.error || "خطأ غير معروف"));
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                console.error(err);
+                alert("خطأ في الاتصال بالخادم.");
+                btn.disabled = false;
+            }
+        }
+
         async function submitModification() {
             const textarea = document.getElementById('mod-textarea');
             const details = textarea.value.trim();
@@ -556,6 +1286,192 @@
                 btn.disabled = false;
             }
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                const rawAuditHistory = {{DOCUMENT_AUDIT_HISTORY_JSON}};
+                const docContainer = document.getElementById('doc-history-container');
+                if (docContainer && Array.isArray(rawAuditHistory) && rawAuditHistory.length > 0) {
+                    let html = '<div style="display: flex; flex-direction: column; gap: 10px;">';
+                    rawAuditHistory.forEach((item, index) => {
+                        const isLatest = index === rawAuditHistory.length - 1;
+                        const badgeColor = isLatest ? '#10b981' : '#64748b';
+                        const badgeBg = isLatest ? 'rgba(16, 185, 129, 0.15)' : 'rgba(100, 116, 139, 0.15)';
+                        const borderStyle = isLatest ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid rgba(100, 116, 139, 0.2)';
+                        
+                        html += `
+                            <div style="background: rgba(15, 23, 42, 0.6); border: ${borderStyle}; border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <span style="font-size: 1.2rem;">📄</span>
+                                    <div style="display: flex; flex-direction: column; gap: 2px;">
+                                        <span style="font-weight: 700; color: #ffffff; font-size: 0.9rem;">${item.fileName || 'المستند المرفوع'}</span>
+                                        <span style="font-size: 0.8rem; color: #94a3b8;">${item.label || 'إصدار مستند'} • تم الرفع: ${item.uploadedAt || ''}</span>
+                                    </div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <span style="background: ${badgeBg}; color: ${badgeColor}; border: 1px solid ${badgeColor}; padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">${isLatest ? '🟢 الإصدار الحالي المعتمد' : '⚪ نسخة أرشفة سابقاً'}</span>
+                                    <a href="${item.fileUrl}" target="_blank" style="background: #2563eb; color: #ffffff; padding: 6px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; text-decoration: none;">معاينة / تحميل</a>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                    docContainer.innerHTML = html;
+                }
+            } catch (e) {
+                console.error("Error rendering document audit log:", e);
+            }
+
+            try {
+                const rawCallHistory = {{CALL_SUMMARY_HISTORY_JSON}};
+                const callContainer = document.getElementById('call-history-container');
+                if (callContainer && Array.isArray(rawCallHistory) && rawCallHistory.length > 0) {
+                    let html = '<div style="display: flex; flex-direction: column; gap: 12px;">';
+                    rawCallHistory.forEach((item, index) => {
+                        html += `
+                            <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px; flex-wrap: wrap;">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <span style="font-size: 1.1rem;">🎧</span>
+                                        <span style="font-weight: 700; color: #ffffff; font-size: 0.95rem;">${item.agentName || 'المساعد الصوتي الذكي'}</span>
+                                        <span style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid #38bdf8; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: 700;">مكالمة مكتملة</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 10px; font-size: 0.82rem; color: #94a3b8;">
+                                        <span>📅 ${item.date || ''}</span>
+                                        <span>⏱️ ${item.duration || '1m 30s'}</span>
+                                    </div>
+                                </div>
+                                <div style="color: #e2e8f0; font-size: 0.9rem; line-height: 1.6; direction: rtl; padding-top: 4px;">
+                                    <strong style="color: #38bdf8;">ملخص التفاعل الصوتي:</strong> ${item.summaryAr || item.summaryEn || ''}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                    callContainer.innerHTML = html;
+                }
+            } catch (e) {
+                console.error("Error rendering call summary history:", e);
+            }
+
+            // Apply saved language preference
+            const savedLang = localStorage.getItem('civil_defense_lang') || 'ar';
+            applyTrackLanguage(savedLang);
+        });
+
+        const trackTranslations = {
+            ar: {
+                logo: "مركز خدمات الدفاع المدني الذكي",
+                home: "العودة للرئيسية",
+                lang_btn: "🌐 English",
+                download_cert: "📄 تحميل الشهادة / الإيصال الرسمي (PDF)",
+                step1_lbl: "1. استلام الطلب",
+                step1_sub: "تم الإرسال والتحقق",
+                step2_lbl: "2. فحص المستندات",
+                step2_sub: "مراجعة الأوراق",
+                step3_lbl: "3. الإعتماد",
+                step3_sub: "المراجعة والتدقيق",
+                step4_lbl: "4. القرار النهائي",
+                step4_sub: "اعتماد النتيجة",
+                service_type: "نوع الخدمة",
+                submission_date: "تاريخ التقديم",
+                client_name: "الاسم الكامل",
+                email: "البريد الإلكتروني",
+                whatsapp: "رقم الهاتف",
+                ref_number: "الرقم المرجعي / السجل",
+                payment_method: "طريقة الدفع",
+                attachments: "📄 المرفقات وسجل أرشفة المستندات (Document Audit History Log)",
+                view_attachment: "📄 تحميل المرفق المرفوع (PDF)",
+                dynamic_fields: "حقول الخدمة الإضافية",
+                notes: "ملاحظات إضافية",
+                doc_history_title: "سجل نسخ المستندات والمخططات المرفقة",
+                call_history_title: "سجل التواصل والتفاعلات مع المساعد الصوتي الذكي (AI Call History)",
+                support_btn: "الدعم الفني المباشر"
+            },
+            en: {
+                logo: "Civil Defense Smart Services Center",
+                home: "Back to Home",
+                lang_btn: "🌐 العربية",
+                download_cert: "📄 Download Official Certificate / Receipt (PDF)",
+                step1_lbl: "1. Application Received",
+                step1_sub: "Submitted & Verified",
+                step2_lbl: "2. Document Review",
+                step2_sub: "Technical Inspection",
+                step3_lbl: "3. Verification",
+                step3_sub: "Directorate Auditing",
+                step4_lbl: "4. Final Decision",
+                step4_sub: "Outcome Endorsement",
+                service_type: "Service Type",
+                submission_date: "Submission Date",
+                client_name: "Full Name",
+                email: "Email Address",
+                whatsapp: "Phone Number",
+                ref_number: "CR / Reference No.",
+                payment_method: "Payment Method",
+                attachments: "📄 Uploaded Documents & Audit Log",
+                view_attachment: "📄 Download Attached Document (PDF)",
+                dynamic_fields: "Technical Service Specifications",
+                notes: "Additional Notes",
+                doc_history_title: "Document & Blueprint Version History",
+                call_history_title: "AI Voice Interaction & Call History",
+                support_btn: "Live WhatsApp Support"
+            }
+        };
+
+        function applyTrackLanguage(lang) {
+            localStorage.setItem('civil_defense_lang', lang);
+            const t = trackTranslations[lang];
+            if (!t) return;
+
+            document.documentElement.dir = (lang === 'ar' ? 'rtl' : 'ltr');
+            document.documentElement.lang = lang;
+
+            const safeSet = (id, text) => {
+                const el = document.getElementById(id);
+                if (el) el.innerText = text;
+            };
+
+            safeSet('track-txt-logo', t.logo);
+            safeSet('track-txt-home', t.home);
+            safeSet('track-lang-text', t.lang_btn);
+            safeSet('step1-lbl', t.step1_lbl);
+            safeSet('step1-sub', t.step1_sub);
+            safeSet('step2-lbl', t.step2_lbl);
+            safeSet('step2-sub', t.step2_sub);
+            safeSet('step3-lbl', t.step3_lbl);
+            safeSet('step3-sub', t.step3_sub);
+            safeSet('lbl-service-type', t.service_type);
+            safeSet('lbl-submission-date', t.submission_date);
+            safeSet('lbl-client-name', t.client_name);
+            safeSet('lbl-email', t.email);
+            safeSet('lbl-whatsapp', t.whatsapp);
+            safeSet('lbl-ref-number', t.ref_number);
+            safeSet('lbl-payment-method', t.payment_method);
+            safeSet('lbl-attachments', t.attachments);
+            safeSet('lbl-view-attachment', t.view_attachment);
+            safeSet('lbl-dynamic-fields', t.dynamic_fields);
+            safeSet('lbl-notes', t.notes);
+            safeSet('lbl-doc-history-title', t.doc_history_title);
+            safeSet('lbl-call-history-title', t.call_history_title);
+            safeSet('track-support-text', t.support_btn);
+        }
+
+        function toggleTrackLanguage() {
+            const current = localStorage.getItem('civil_defense_lang') || 'ar';
+            const next = current === 'ar' ? 'en' : 'ar';
+            applyTrackLanguage(next);
+        }
     </script>
+
+    <!-- Floating Live WhatsApp Support Quick-Button -->
+    <a href="https://wa.me/{{SUPPORT_WHATSAPP_NUMBER}}?text={{ENCODED_WHATSAPP_MSG}}" 
+       target="_blank" 
+       rel="noopener noreferrer"
+       class="floating-whatsapp-btn" 
+       title="تواصل مع الدعم الفني عبر الواتساب">
+        <span style="font-size: 1.3rem;">💬</span>
+        <span id="track-support-text">الدعم الفني المباشر</span>
+    </a>
 </body>
 </html>
+

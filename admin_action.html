@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوابة الإجراء السريع للإدارة - الدفاع المدني للبحرين</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-input: #0f172a;
+            --border-color: #334155;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --text-main: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-amber: #f59e0b;
+            --accent-amber-bg: rgba(245, 158, 11, 0.1);
+            --accent-amber-border: rgba(245, 158, 11, 0.3);
+            --accent-green: #10b981;
+            --accent-green-bg: rgba(16, 185, 129, 0.1);
+            --accent-green-border: rgba(16, 185, 129, 0.3);
+            --accent-red: #ef4444;
+            --accent-red-bg: rgba(239, 68, 68, 0.1);
+            --accent-red-border: rgba(239, 68, 68, 0.3);
+            --accent-purple: #8b5cf6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 20px 24px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-title-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--primary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .header-text h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .header-text p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .badge-app-id {
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #f1f5f9;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .info-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .info-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        /* Preset Reasons Grid */
+        .presets-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #cbd5e1;
+            margin-bottom: 12px;
+        }
+
+        .preset-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .preset-card {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .preset-card:hover {
+            border-color: var(--primary);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .preset-card.selected {
+            border-color: var(--accent-amber);
+            background: var(--accent-amber-bg);
+        }
+
+        .preset-card input[type="radio"] {
+            margin-top: 4px;
+            accent-color: var(--accent-amber);
+            width: 18px;
+            height: 18px;
+        }
+
+        .preset-text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .preset-name {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #ffffff;
+        }
+
+        .preset-desc {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .textarea-reason {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px;
+            color: #ffffff;
+            font-size: 0.95rem;
+            min-height: 90px;
+            resize: vertical;
+            margin-bottom: 20px;
+            outline: none;
+        }
+
+        .textarea-reason:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Action Buttons */
+        .actions-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .btn-action {
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-request-mod {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
+        .btn-request-mod:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
+        }
+
+        .btn-approve {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-approve:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-reject {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-reject:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .alert-success {
+            display: none;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #34d399;
+            padding: 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            margin-top: 16px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Banner -->
+        <div class="header">
+            <div class="header-title-group">
+                <div class="header-icon">⚡</div>
+                <div class="header-text">
+                    <h1>بوابة الإجراء السريع للإدارة (Quick Action Portal)</h1>
+                    <p>مركز خدمات الدفاع المدني الذكي - مملكة البحرين</p>
+                </div>
+            </div>
+            <div class="badge-app-id" id="app-id-badge">{{APP_ID}}</div>
+        </div>
+
+        <!-- Application Summary Card -->
+        <div class="card">
+            <div class="card-title">
+                <span>📋 تفاصيل الطلب المقدم</span>
+                <span class="status-badge" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa;">{{STATUS}}</span>
+            </div>
+            <div class="grid-2">
+                <div class="info-group">
+                    <span class="info-label">اسم الخدمة</span>
+                    <span class="info-value">{{SERVICE_NAME}}</span>
+                </div>
+                <div class="info-group">
+                    <span class="info-label">اسم مقدم الطلب</span>
+                    <span class="info-value">{{APPLICANT_NAME}}</span>
+                </div>
+                <div class="info-group">
+                    <span class="info-label">رقم الهاتف (الواتساب)</span>
+                    <span class="info-value" dir="ltr" style="text-align: right;">{{WHATSAPP}}</span>
+                </div>
+                <div class="info-group">
+                    <span class="info-label">البريد الإلكتروني</span>
+                    <span class="info-value">{{EMAIL}}</span>
+                </div>
+                <div class="info-group" style="grid-column: span 2;">
+                    <span class="info-label">المستندات وسجل الأرشيف (Document Audit History Log)</span>
+                    <div id="admin-doc-history-container" style="margin-top: 6px;">
+                        <span class="info-value">
+                            <a href="{{ATTACHMENT_LINK}}" target="_blank" style="color: #60a5fa; text-decoration: underline;">📄 معاينة المستند المرفق (PDF)</a>
+                        </span>
+                    </div>
+                </div>
+                <div class="info-group">
+                    <span class="info-label">تاريخ التقديم</span>
+                    <span class="info-value">{{TIMESTAMP}}</span>
+                </div>
+                <div class="info-group" style="grid-column: span 2;">
+                    <span class="info-label">ملاحظات/رد المستخدم (إن وجد)</span>
+                    <span class="info-value" style="color: #cbd5e1; font-weight: normal;">{{USER_RESPONSE}}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Action Form Card -->
+        <div class="card">
+            <div class="card-title">
+                <span>⚡ اتخاذ إجراء فوري على الطلب</span>
+            </div>
+
+            <div class="presets-title">اختر سبباً جاهزاً لطلب التعديل (أو اكتب سبباً خاصاً):</div>
+            
+            <div class="preset-options">
+                <label class="preset-card" onclick="selectPreset('يرجى إرفاق صورة واضحة من بطاقة الهوية / الجواز لصاحب الطلب أو المفوض.')">
+                    <input type="radio" name="preset-reason" value="id">
+                    <div class="preset-text">
+                        <span class="preset-name">💳 1- إثبات هوية</span>
+                        <span class="preset-desc">يرجى إرفاق صورة واضحة من بطاقة الهوية / الجواز لصاحب الطلب أو المفوض.</span>
+                    </div>
+                </label>
+
+                <label class="preset-card" onclick="selectPreset('يرجى تزويدنا بالمستندات والمعلومات الناقصة لاستكمال إجراءات الطلب.')">
+                    <input type="radio" name="preset-reason" value="missing_docs">
+                    <div class="preset-text">
+                        <span class="preset-name">📑 2- نقص في المستندات أو المعلومات</span>
+                        <span class="preset-desc">يرجى تزويدنا بالمستندات والمعلومات الناقصة لاستكمال إجراءات الطلب.</span>
+                    </div>
+                </label>
+
+                <label class="preset-card" onclick="selectPreset('يرجى التواصل مع قسم خدمات الدفاع المدني عبر الهاتف لمتابعة واستكمال بيانات الطلب.')">
+                    <input type="radio" name="preset-reason" value="phone">
+                    <div class="preset-text">
+                        <span class="preset-name">📞 3- للتواصل عبر الهاتف</span>
+                        <span class="preset-desc">يرجى التواصل مع قسم خدمات الدفاع المدني أو التواجد للرد على اتصال الموظف المختص.</span>
+                    </div>
+                </label>
+
+                <label class="preset-card" onclick="selectPreset('')">
+                    <input type="radio" name="preset-reason" value="other">
+                    <div class="preset-text">
+                        <span class="preset-name">✍️ 4- سبب آخر</span>
+                        <span class="preset-desc">اكتب سبباً مخصصاً في المربع أدناه غير مدرج في القائمة أعلاه.</span>
+                    </div>
+                </label>
+            </div>
+
+            <div class="presets-title">نص السبب أو الملاحظات الموجهة للمستخدم:</div>
+            <textarea id="action-reason-textarea" class="textarea-reason" placeholder="اكتب تفاصيل التعديل أو سبب القرار هنا...">{{EXISTING_ADMIN_NOTE}}</textarea>
+
+            <!-- Actions Bar -->
+            <div class="actions-bar">
+                <button class="btn-action btn-request-mod" onclick="executeAdminAction('request_modification')">
+                    <span>⚠️ طلب تعديل من العميل</span>
+                </button>
+
+                <button class="btn-action btn-approve" onclick="executeAdminAction('approve')">
+                    <span>✅ اعتماد الطلب (مقبول)</span>
+                </button>
+
+                <button class="btn-action btn-reject" onclick="executeAdminAction('reject')">
+                    <span>❌ رفض الطلب (مرفوض)</span>
+                </button>
+            </div>
+
+            <div id="alert-success-msg" class="alert-success">
+                ✓ تم تنفيذ الإجراء بنجاح وتحديث شيت جوجل وإشعار صاحب الطلب!
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function selectPreset(text) {
+            const textarea = document.getElementById('action-reason-textarea');
+            textarea.value = text;
+            if (!text) {
+                textarea.focus();
+                textarea.placeholder = "اكتب السبب المخصص هنا بكل وضوح...";
+            }
+            document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+        }
+
+        async function executeAdminAction(actionType) {
+            const reason = document.getElementById('action-reason-textarea').value.trim();
+            if (actionType === 'request_modification' && !reason) {
+                alert("يرجى اختيار أو كتابة سبب طلب التعديل أولاً.");
+                return;
+            }
+
+            const alertMsg = document.getElementById('alert-success-msg');
+            alertMsg.style.display = 'none';
+
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const adminKey = urlParams.get('key') || '';
+                const res = await fetch('/api/admin/action?key=' + encodeURIComponent(adminKey), {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'x-admin-key': adminKey
+                    },
+                    body: JSON.stringify({
+                        appId: '{{APP_ID}}',
+                        action: actionType,
+                        reason: reason
+                    })
+                });
+
+                if (res.ok) {
+                    alertMsg.style.display = 'block';
+                    alertMsg.textContent = "✓ تم تنفيذ الإجراء (" + actionType + ") بنجاح! تم تحديث شيت جوجل وإشعار العميل.";
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2500);
+                } else {
+                    const data = await res.json();
+                    alert("فشل تنفيذ الإجراء: " + (data.error || "خطأ غير معروف"));
+                }
+            } catch (err) {
+                console.error(err);
+                alert("خطأ في الاتصال بالخادم.");
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                const rawAuditHistory = {{DOCUMENT_AUDIT_HISTORY_JSON}};
+                const container = document.getElementById('admin-doc-history-container');
+                if (container && Array.isArray(rawAuditHistory) && rawAuditHistory.length > 0) {
+                    let html = '<div style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">';
+                    rawAuditHistory.forEach((item, index) => {
+                        const isLatest = index === rawAuditHistory.length - 1;
+                        const badgeBg = isLatest ? '#059669' : '#475569';
+                        html += `
+                            <div style="background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span>📄</span>
+                                    <span style="color: #e2e8f0; font-size: 0.88rem; font-weight: bold;">${item.fileName || 'مستند'}</span>
+                                    <span style="color: #94a3b8; font-size: 0.78rem;">(${item.uploadedAt || ''})</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="background: ${badgeBg}; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem;">${isLatest ? '🟢 النسخة الحالية' : '⚪ نسخة سابقة'}</span>
+                                    <a href="${item.fileUrl}" target="_blank" style="color: #38bdf8; font-weight: bold; font-size: 0.85rem; text-decoration: underline;">معاينة</a>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                    container.innerHTML = html;
+                }
+            } catch (e) {}
+        });
+    </script>
+</body>
+</html>

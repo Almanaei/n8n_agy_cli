@@ -4,12 +4,30 @@
   "private": true,
   "scripts": {
     "start": "node server.js",
+    "pm2:start": "pm2 start ecosystem.config.js",
+    "pm2:stop": "pm2 stop ecosystem.config.js",
+    "pm2:restart": "pm2 restart ecosystem.config.js",
+    "pm2:status": "pm2 status",
+    "pm2:logs": "pm2 logs",
+    "backup": "node scripts/backup_manager.js",
+    "backup:verify": "node scripts/restore_manager.js",
+    "health": "node scripts/health_monitor.js",
+    "health:watch": "node scripts/health_monitor.js --watch",
     "standalone": "python -m uvicorn standalone.main:app --host 0.0.0.0 --port 8000",
     "dev": "node start_all.js"
   },
   "dependencies": {
     "dotenv": "^17.4.2",
     "localtunnel": "^2.0.2",
+    "nodemailer": "^9.0.6",
     "ws": "^8.21.0"
+  },
+  "devDependencies": {
+    "arabic-persian-reshaper": "^1.0.1",
+    "archiver": "^8.0.0",
+    "pdfkit": "^0.20.1",
+    "pm2": "^7.0.4",
+    "qrcode": "^1.5.4",
+    "sharp": "^0.35.4"
   }
 }

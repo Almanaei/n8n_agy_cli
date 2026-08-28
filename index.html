@@ -2,8 +2,21 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>مركز خدمات الدفاع المدني الذكي - مملكة البحرين</title>
+    
+    <!-- PWA & Mobile Web App Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0F172A">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="الدفاع المدني">
+    <link rel="apple-touch-icon" href="/icons/icon-180.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png">
+    <link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
+    
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
         // Safely patch WebSocket.prototype.send to prevent console flooding
@@ -148,7 +161,6 @@
             color: var(--text-primary);
         }
 
-        /* Status indicator in navbar */
         .nav-status {
             display: flex;
             align-items: center;
@@ -159,6 +171,27 @@
             border-radius: 20px;
             font-size: 0.8rem;
             font-weight: 600;
+        }
+
+        .pwa-install-pill {
+            display: none;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, rgba(0, 113, 227, 0.2), rgba(56, 189, 248, 0.25));
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            color: #38bdf8;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-apple);
+            backdrop-filter: blur(10px);
+        }
+        .pwa-install-pill:hover {
+            background: linear-gradient(135deg, rgba(0, 113, 227, 0.35), rgba(56, 189, 248, 0.4));
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.25);
         }
 
         .status-dot {
@@ -484,40 +517,31 @@
 
         .visualizer-wrapper {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 32px;
+            gap: 6px;
+            width: 100%;
+            min-height: 56px;
         }
 
-        .visualizer {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            height: 100%;
+        .waveform-canvas {
+            width: 100%;
+            max-width: 440px;
+            height: 42px;
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(8px);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .bar {
-            width: 3px;
-            height: 8px;
-            background-color: var(--status-online);
-            border-radius: 3px;
-            animation: bounce 0.8s ease-in-out infinite alternate;
-            display: none;
-            box-shadow: 0 0 6px var(--status-online);
-        }
-
-        .bar:nth-child(1) { animation-delay: 0.1s; }
-        .bar:nth-child(2) { animation-delay: 0.25s; }
-        .bar:nth-child(3) { animation-delay: 0.4s; }
-        .bar:nth-child(4) { animation-delay: 0.55s; }
-        .bar:nth-child(5) { animation-delay: 0.7s; }
-        .bar:nth-child(6) { animation-delay: 0.55s; }
-        .bar:nth-child(7) { animation-delay: 0.4s; }
-        .bar:nth-child(8) { animation-delay: 0.25s; }
-
-        @keyframes bounce {
-            from { height: 4px; }
-            to { height: 32px; }
+        .visualizer-status-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            letter-spacing: 0.2px;
+            transition: color 0.3s ease;
         }
 
         .controls-row {
@@ -1101,12 +1125,15 @@
             display: flex;
             opacity: 1;
         }
+        .modal-box, .modal-box * {
+            box-sizing: border-box;
+        }
         .modal-box {
-            background: rgba(22, 22, 23, 0.9);
+            background: rgba(22, 22, 23, 0.95);
             border: 1px solid var(--glass-border);
             border-radius: 24px;
             width: 100%;
-            max-width: 600px;
+            max-width: 620px;
             max-height: 85vh;
             overflow-y: auto;
             padding: 32px;
@@ -1150,9 +1177,11 @@
         }
         .form-step {
             display: none;
+            width: 100%;
         }
         .form-step.active {
             display: block;
+            width: 100%;
         }
         .form-group {
             margin-bottom: 20px;
@@ -1160,6 +1189,8 @@
             flex-direction: column;
             gap: 8px;
             text-align: right;
+            width: 100%;
+            max-width: 100%;
         }
         .form-label {
             font-size: 0.9rem;
@@ -1167,20 +1198,159 @@
             color: var(--text-primary);
         }
         .form-input, .form-select, .form-textarea {
+            box-sizing: border-box;
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--glass-border);
             border-radius: 10px;
-            padding: 12px;
+            padding: 12px 14px;
             color: white;
             font-size: 0.9rem;
             outline: none;
             transition: var(--transition-apple);
             width: 100%;
+            max-width: 100%;
             direction: rtl;
+        }
+        .form-select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.7)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: left 12px center;
+            background-size: 16px;
+            padding-left: 36px;
+            padding-right: 14px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            cursor: pointer;
         }
         .form-select option {
             background: #1c1c1e;
             color: white;
+            padding: 10px;
+            direction: rtl;
+        }
+
+        /* Custom Dark Glassmorphic Searchable Select Component */
+        .custom-dropdown-container {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+        }
+        .custom-dropdown-trigger {
+            box-sizing: border-box;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 12px 14px;
+            color: white;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            width: 100%;
+            max-width: 100%;
+            transition: var(--transition-apple);
+            user-select: none;
+            direction: rtl;
+        }
+        .custom-dropdown-trigger:hover, .custom-dropdown-trigger.active {
+            border-color: var(--accent-color);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
+        }
+        .custom-dropdown-trigger-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-left: 8px;
+            flex-grow: 1;
+            text-align: right;
+        }
+        .custom-dropdown-arrow {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.6);
+            transition: transform 0.2s ease;
+            flex-shrink: 0;
+        }
+        .custom-dropdown-trigger.active .custom-dropdown-arrow {
+            transform: rotate(180deg);
+        }
+        .custom-dropdown-menu {
+            display: none;
+            position: absolute;
+            top: calc(100% + 6px);
+            right: 0;
+            left: 0;
+            width: 100%;
+            max-width: 100%;
+            background: #1c1c1e;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 14px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
+            z-index: 2000;
+            overflow: hidden;
+            direction: rtl;
+        }
+        .custom-dropdown-menu.show {
+            display: block;
+            animation: fadeIn 0.15s ease;
+        }
+        .custom-dropdown-search-box {
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(0, 0, 0, 0.4);
+        }
+        .custom-dropdown-search-input {
+            width: 100%;
+            box-sizing: border-box;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: white;
+            font-size: 0.85rem;
+            outline: none;
+            direction: rtl;
+        }
+        .custom-dropdown-search-input:focus {
+            border-color: var(--accent-color);
+        }
+        .custom-dropdown-list {
+            max-height: 240px;
+            overflow-y: auto;
+            padding: 6px;
+        }
+        .custom-dropdown-item {
+            padding: 10px 12px;
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background 0.15s ease;
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .custom-dropdown-item-ar {
+            font-weight: 600;
+            color: #ffffff;
+        }
+        .custom-dropdown-item-en {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.55);
+            direction: ltr;
+            text-align: right;
+        }
+        .custom-dropdown-item:hover, .custom-dropdown-item.selected {
+            background: rgba(0, 113, 227, 0.35);
+        }
+        .custom-dropdown-item.selected .custom-dropdown-item-ar {
+            color: #38bdf8;
         }
         .phone-input-container {
             display: flex;
@@ -1410,9 +1580,18 @@
                 <a href="#features">المزايا</a>
                 <a href="#about">الهندسة البرمجية</a>
             </nav>
-            <div class="nav-status">
-                <span class="status-dot offline" id="nav-status-dot"></span>
-                <span class="status-text" id="nav-status-text">غير متصل</span>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <button id="main-lang-btn" class="pwa-install-pill" onclick="togglePortalLanguage()" title="تبديل اللغة / Switch Language" style="border-color: rgba(245, 158, 11, 0.4); color: #FCD34D;">
+                    <span id="main-lang-text">🌐 English</span>
+                </button>
+                <button id="pwa-install-btn" class="pwa-install-pill" onclick="installPWA()" title="تثبيت التطبيق على جهازك">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    <span id="txt-pwa-btn">تثبيت التطبيق</span>
+                </button>
+                <div class="nav-status">
+                    <span class="status-dot offline" id="nav-status-dot"></span>
+                    <span class="status-text" id="nav-status-text">غير متصل</span>
+                </div>
             </div>
         </div>
     </header>
@@ -1467,16 +1646,8 @@
                 <!-- Footer Console Controls -->
                 <div class="console-footer">
                     <div class="visualizer-wrapper">
-                        <div id="visualizer" class="visualizer">
-                            <div class="bar"></div>
-                            <div class="bar"></div>
-                            <div class="bar"></div>
-                            <div class="bar"></div>
-                            <div class="bar"></div>
-                            <div class="bar"></div>
-                            <div class="bar"></div>
-                            <div class="bar"></div>
-                        </div>
+                        <canvas id="waveform-canvas" class="waveform-canvas" height="42"></canvas>
+                        <div id="visualizer-status-label" class="visualizer-status-label">المساعد الذكي جاهز للاستماع</div>
                     </div>
 
                     <div class="controls-row">
@@ -1488,7 +1659,7 @@
 
 
                     <div class="chat-input-area">
-                        <input type="text" id="chat-input" class="chat-input" placeholder="اكتب رسالتك باللغة العربية هنا..." onkeypress="handleKeyPress(event)" oninput="const svc = findBestMatchingService(this.value); if (svc) { window.renderApplyNowButton(svc); }" disabled>
+                        <input type="text" id="chat-input" class="chat-input" placeholder="اكتب رسالتك باللغة العربية هنا..." onkeypress="handleKeyPress(event)" disabled>
                         <button id="send-btn" class="btn-send" onclick="sendMessage()" disabled>إرسال</button>
                     </div>
                 </div>
@@ -1563,15 +1734,15 @@
     <!-- Feedback Pill Component -->
     <div id="feedback-toast" class="feedback-toast">
         <div id="feedback-options" class="feedback-options">
-            <button class="feedback-emoji-btn" onclick="submitFeedback(0)">
+            <button type="button" class="feedback-emoji-btn" onclick="submitFeedback(0)" title="سيء">
                 <span class="emoji">😞</span>
                 <span class="label">سيء</span>
             </button>
-            <button class="feedback-emoji-btn" onclick="submitFeedback(50)">
+            <button type="button" class="feedback-emoji-btn" onclick="submitFeedback(50)" title="مقبول">
                 <span class="emoji">🙂</span>
                 <span class="label">مقبول</span>
             </button>
-            <button class="feedback-emoji-btn" onclick="submitFeedback(100)">
+            <button type="button" class="feedback-emoji-btn" onclick="submitFeedback(100)" title="ممتاز">
                 <span class="emoji">😀</span>
                 <span class="label">ممتاز</span>
             </button>
@@ -1580,7 +1751,7 @@
             <p id="feedback-comment-prompt" class="feedback-comment-prompt"></p>
             <div class="feedback-comment-input-row">
                 <input type="text" id="feedback-comment-input" placeholder="اكتب تعليقك هنا..." onkeydown="if(event.key === 'Enter') submitComment()" />
-                <button id="feedback-comment-submit" onclick="submitComment()">إرسال</button>
+                <button type="button" id="feedback-comment-submit" onclick="submitComment()">إرسال</button>
             </div>
         </div>
         <span id="feedback-success" class="feedback-success-msg">✓</span>
@@ -1596,34 +1767,57 @@
         let lastKpiValue = null;
 
         function showFeedbackToast(convId) {
-            activeConversationId = convId;
+            if (convId) activeConversationId = convId;
+            if (!activeConversationId) {
+                if (conversation && typeof conversation.getId === 'function') {
+                    try { activeConversationId = conversation.getId(); } catch(e) {}
+                }
+                if (!activeConversationId) {
+                    activeConversationId = window.lastConversationId || ('conv_web_' + Date.now());
+                }
+            }
+            window.lastConversationId = activeConversationId;
+            
             const toast = document.getElementById('feedback-toast');
             const options = document.getElementById('feedback-options');
             const commentContainer = document.getElementById('feedback-comment-container');
             const successMsg = document.getElementById('feedback-success');
             
+            if (!toast) return;
+
             // Reset state
             toast.classList.remove('expanded');
-            successMsg.style.display = 'none';
-            options.style.display = 'flex';
-            commentContainer.style.display = 'none';
+            if (successMsg) successMsg.style.display = 'none';
+            if (options) options.style.display = 'flex';
+            if (commentContainer) commentContainer.style.display = 'none';
             lastKpiValue = null;
             
             toast.classList.add('show');
         }
+        window.showFeedbackToast = showFeedbackToast;
 
         function hideFeedbackToast() {
             const toast = document.getElementById('feedback-toast');
-            toast.classList.remove('show');
+            if (toast) toast.classList.remove('show');
         }
+        window.hideFeedbackToast = hideFeedbackToast;
 
         window.submitFeedback = function(kpiValue) {
-            if (!activeConversationId) {
-                console.warn("No active conversation ID to submit feedback for.");
-                return;
+            if (conversation && typeof conversation.getId === 'function') {
+                try {
+                    const realId = conversation.getId();
+                    if (realId && typeof realId === 'string' && realId.startsWith('conv_')) {
+                        activeConversationId = realId;
+                    }
+                } catch (e) {}
             }
+            if (!activeConversationId) {
+                activeConversationId = window.lastConversationId || ('conv_web_' + Date.now());
+            }
+            window.lastConversationId = activeConversationId;
             
             lastKpiValue = kpiValue;
+            console.log(`[Rating Feedback] Submitting ${kpiValue}% for conversation: ${activeConversationId}`);
             
             // Instantly submit the quantitative vote to the server in the background
             fetch('/submit-feedback', {
@@ -1649,45 +1843,48 @@
             const input = document.getElementById('feedback-comment-input');
             const successMsg = document.getElementById('feedback-success');
 
+            if (!toast) return;
+
             // Hide initial emoji options instantly
-            options.style.display = 'none';
+            if (options) options.style.display = 'none';
 
             if (kpiValue === 100) {
                 // Slide down text box for Good (100%)
-                prompt.innerText = "لقد أسعدني رأيك!، ما الذي اعجبك بالتحديد؟ رأيك سيساعدني في تطويري؟";
-                input.value = "";
+                if (prompt) prompt.innerText = "لقد أسعدنا تقييمك! ما الذي أعجبك بالتحديد في الخدمة؟";
+                if (input) input.value = "";
                 toast.classList.add('expanded');
-                commentContainer.style.display = 'flex';
-                // Wait briefly for display flex to register before focus
-                setTimeout(() => input.focus(), 50);
+                if (commentContainer) commentContainer.style.display = 'flex';
+                setTimeout(() => { if (input) input.focus(); }, 100);
             } else if (kpiValue === 50) {
                 // Slide down text box for Acceptable (50%)
-                prompt.innerText = "يسعدني أن الخدمة كانت مقبولة! كيف يمكننا تحسينها لتصبح ممتازة بالتحديد؟";
-                input.value = "";
+                if (prompt) prompt.innerText = "يسعدنا أن الخدمة كانت مقبولة! كيف يمكننا تحسينها لتصبح ممتازة؟";
+                if (input) input.value = "";
                 toast.classList.add('expanded');
-                commentContainer.style.display = 'flex';
-                // Wait briefly for display flex to register before focus
-                setTimeout(() => input.focus(), 50);
+                if (commentContainer) commentContainer.style.display = 'flex';
+                setTimeout(() => { if (input) input.focus(); }, 100);
             } else if (kpiValue === 0) {
                 // Slide down text box for Bad (0%)
-                prompt.innerText = "يؤسفني ذلك! ما الذي أزعجك بالتحديد؟ رأيك سيساعدني في تطويري";
-                input.value = "";
+                if (prompt) prompt.innerText = "يؤسفنا ذلك! ما الذي أزعجك بالتحديد؟ رأيك سيساعدنا في التطوير.";
+                if (input) input.value = "";
                 toast.classList.add('expanded');
-                commentContainer.style.display = 'flex';
-                // Wait briefly for display flex to register before focus
-                setTimeout(() => input.focus(), 50);
+                if (commentContainer) commentContainer.style.display = 'flex';
+                setTimeout(() => { if (input) input.focus(); }, 100);
             } else {
                 // Show success directly and slide away (fallback)
-                successMsg.style.display = 'inline-block';
+                if (successMsg) successMsg.style.display = 'inline-block';
                 setTimeout(() => {
                     hideFeedbackToast();
                 }, 1500);
             }
-        }
+        };
 
         window.submitComment = function() {
+            if (!activeConversationId) {
+                activeConversationId = window.lastConversationId || ('conv_web_' + Date.now());
+            }
+
             const input = document.getElementById('feedback-comment-input');
-            const commentText = input.value.trim();
+            const commentText = input ? input.value.trim() : '';
             const commentContainer = document.getElementById('feedback-comment-container');
             const successMsg = document.getElementById('feedback-success');
             const toast = document.getElementById('feedback-toast');
@@ -1711,26 +1908,188 @@
                 });
             }
 
-            // Show success, hide input, shrink toast and slide away instantly
-            commentContainer.style.display = 'none';
-            toast.classList.remove('expanded');
-            successMsg.style.display = 'inline-block';
+            // Show success, hide input, shrink toast and slide away
+            if (commentContainer) commentContainer.style.display = 'none';
+            if (toast) toast.classList.remove('expanded');
+            if (successMsg) successMsg.style.display = 'inline-block';
 
             setTimeout(() => {
                 hideFeedbackToast();
             }, 1500);
-        }
+        };
         const messagesContainer = document.getElementById('chat-messages');
         const chatInput = document.getElementById('chat-input');
         const sendButton = document.getElementById('send-btn');
         const callButton = document.getElementById('call-btn');
         const statusBadge = document.getElementById('status-badge');
-        const bars = document.querySelectorAll('.bar');
         
         // Custom interactive visual elements for landing page state sync
         const navStatusDot = document.getElementById('nav-status-dot');
         const navStatusText = document.getElementById('nav-status-text');
         const statusDot = document.getElementById('status-dot');
+
+        // =========================================================================
+        // Real-Time Audio Frequency Waveform Visualizer Engine
+        // =========================================================================
+        class RealtimeAudioWaveform {
+            constructor(canvasId, statusLabelId) {
+                this.canvas = document.getElementById(canvasId);
+                this.statusLabel = document.getElementById(statusLabelId);
+                this.ctx = this.canvas ? this.canvas.getContext('2d') : null;
+                this.animId = null;
+                this.analyser = null;
+                this.dataArray = null;
+                this.activeMode = 'idle'; // 'speaking' | 'listening' | 'connecting' | 'idle'
+                this.volume = 0;
+                this.phase = 0;
+                this.barCount = 36;
+            }
+
+            initMicrophone(stream, audioCtx) {
+                if (!audioCtx || !stream) return;
+                try {
+                    this.analyser = audioCtx.createAnalyser();
+                    this.analyser.fftSize = 64;
+                    this.analyser.smoothingTimeConstant = 0.8;
+                    this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+                    const source = audioCtx.createMediaStreamSource(stream);
+                    source.connect(this.analyser);
+                    console.log("[Waveform] AnalyserNode connected to microphone stream.");
+                } catch (e) {
+                    console.warn("[Waveform] Error connecting AnalyserNode:", e);
+                }
+            }
+
+            setMode(mode) {
+                this.activeMode = mode; // 'speaking' | 'listening' | 'connecting' | 'idle'
+                if (this.statusLabel) {
+                    if (mode === 'speaking') {
+                        this.statusLabel.innerText = "المساعد الذكي يتحدث الآن...";
+                        this.statusLabel.style.color = "#F59E0B";
+                    } else if (mode === 'listening') {
+                        this.statusLabel.innerText = "المساعد يستمع إليك... تفضل بالتحدث";
+                        this.statusLabel.style.color = "#30D158";
+                    } else if (mode === 'connecting') {
+                        this.statusLabel.innerText = "جاري تهيئة الصوت والاتصال...";
+                        this.statusLabel.style.color = "#38BDF8";
+                    } else {
+                        this.statusLabel.innerText = "المساعد الذكي جاهز للاستماع";
+                        this.statusLabel.style.color = "var(--text-secondary)";
+                    }
+                }
+            }
+
+            start() {
+                if (!this.canvas || !this.ctx) return;
+                this.resize();
+                this.setMode('listening');
+                if (!this.animId) {
+                    this.draw();
+                }
+            }
+
+            stop() {
+                if (this.animId) {
+                    cancelAnimationFrame(this.animId);
+                    this.animId = null;
+                }
+                this.setMode('idle');
+                if (this.ctx && this.canvas) {
+                    const rect = this.canvas.getBoundingClientRect();
+                    this.ctx.clearRect(0, 0, rect.width, rect.height);
+                }
+            }
+
+            resize() {
+                if (!this.canvas) return;
+                const rect = this.canvas.getBoundingClientRect();
+                const dpr = window.devicePixelRatio || 1;
+                this.canvas.width = rect.width * dpr;
+                this.canvas.height = 42 * dpr;
+                this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            }
+
+            draw() {
+                if (!this.canvas || !this.ctx) return;
+                const rect = this.canvas.getBoundingClientRect();
+                const width = rect.width;
+                const height = rect.height;
+                const ctx = this.ctx;
+
+                ctx.clearRect(0, 0, width, height);
+
+                // 1. Calculate target volume amplitude based on speaker
+                let targetVol = 0.08;
+                if (this.activeMode === 'speaking') {
+                    targetVol = 0.45 + 0.3 * Math.sin(Date.now() * 0.009) * Math.cos(Date.now() * 0.004);
+                } else if (this.activeMode === 'listening' && this.analyser && this.dataArray) {
+                    this.analyser.getByteFrequencyData(this.dataArray);
+                    let sum = 0;
+                    for (let i = 0; i < this.dataArray.length; i++) {
+                        sum += this.dataArray[i];
+                    }
+                    const avg = sum / this.dataArray.length / 255;
+                    targetVol = Math.max(0.08, avg * 1.8);
+                } else if (this.activeMode === 'listening') {
+                    targetVol = 0.14 + 0.06 * Math.sin(Date.now() * 0.004);
+                }
+
+                // Smooth volume interpolation
+                this.volume += (targetVol - this.volume) * 0.22;
+                this.phase += 0.06 + this.volume * 0.12;
+
+                const centerY = height / 2;
+                const barWidth = 3.5;
+                const gap = Math.max(2, (width - (this.barCount * barWidth)) / (this.barCount + 1));
+
+                // 2. Dynamic Gradient Palette
+                const grad = ctx.createLinearGradient(0, 0, width, 0);
+                if (this.activeMode === 'speaking') {
+                    grad.addColorStop(0, '#F59E0B');
+                    grad.addColorStop(0.5, '#38BDF8');
+                    grad.addColorStop(1, '#F59E0B');
+                    ctx.shadowColor = 'rgba(245, 158, 11, 0.45)';
+                } else if (this.activeMode === 'listening') {
+                    grad.addColorStop(0, '#30D158');
+                    grad.addColorStop(0.5, '#38BDF8');
+                    grad.addColorStop(1, '#30D158');
+                    ctx.shadowColor = 'rgba(48, 209, 88, 0.45)';
+                } else {
+                    grad.addColorStop(0, 'rgba(56, 189, 248, 0.35)');
+                    grad.addColorStop(1, 'rgba(56, 189, 248, 0.35)');
+                    ctx.shadowColor = 'transparent';
+                }
+
+                ctx.fillStyle = grad;
+                ctx.shadowBlur = this.volume > 0.18 ? 8 : 0;
+
+                // 3. Draw responsive spectrum capsules
+                for (let i = 0; i < this.barCount; i++) {
+                    const x = gap + i * (barWidth + gap);
+                    const normalizedX = (i / this.barCount) * Math.PI;
+                    const wave1 = Math.sin(normalizedX * 2 + this.phase);
+                    const wave2 = Math.cos(normalizedX * 3 - this.phase * 1.3);
+                    const harmonic = Math.abs(wave1 * 0.6 + wave2 * 0.4);
+
+                    const minH = 4;
+                    const maxH = height * 0.82;
+                    const h = Math.min(maxH, Math.max(minH, harmonic * maxH * (this.volume * 1.8 + 0.15)));
+                    const y = centerY - h / 2;
+                    const radius = barWidth / 2;
+
+                    ctx.beginPath();
+                    ctx.roundRect(x, y, barWidth, h, radius);
+                    ctx.fill();
+                }
+
+                this.animId = requestAnimationFrame(() => this.draw());
+            }
+        }
+
+        const waveformVisualizer = new RealtimeAudioWaveform('waveform-canvas', 'visualizer-status-label');
+        window.addEventListener('resize', () => waveformVisualizer.resize());
+
+        // Note: window.renderApplyNowButton is defined after window.servicesList at line 2805
 
         window.triggerCallFromHero = function() {
             callButton.click();
@@ -1755,24 +2114,62 @@
             if (navStatusDot) { navStatusDot.className = 'status-dot connecting'; }
             if (navStatusText) { navStatusText.innerText = "جاري الاتصال..."; }
             
+            waveformVisualizer.setMode('connecting');
             callButton.disabled = true;
 
             try {
+                // AudioContext Unlock for iOS Safari & Mobile Browsers
+                try {
+                    const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+                    if (AudioCtxClass) {
+                        if (!window.globalAudioCtx) {
+                            window.globalAudioCtx = new AudioCtxClass();
+                        }
+                        if (window.globalAudioCtx.state === 'suspended') {
+                            await window.globalAudioCtx.resume();
+                            console.log("[WebRTC Audio] AudioContext resumed for iOS Safari/Mobile.");
+                        }
+                    }
+                } catch (audioErr) {
+                    console.warn("[WebRTC Audio] AudioContext resume note:", audioErr);
+                }
+
                 // Request microphone access with echo cancellation and noise suppression
-                await navigator.mediaDevices.getUserMedia({ 
+                const micStream = await navigator.mediaDevices.getUserMedia({ 
                     audio: {
                         echoCancellation: true,
                         noiseSuppression: true,
-                        autoGainControl: true
+                        autoGainControl: true,
+                        channelCount: 1
                     }
                 });
 
-                // Fetch signed URL from backend proxy to keep credentials secure
-                const signedUrlResponse = await fetch('/get-signed-url');
+                if (window.globalAudioCtx) {
+                    waveformVisualizer.initMicrophone(micStream, window.globalAudioCtx);
+                }
+
+                // Fetch signed URL with pre-lookup parameters if available
+                const savedPhone = localStorage.getItem('civil_defense_applicant_phone') || '';
+                const savedAppId = localStorage.getItem('civil_defense_applicant_appid') || (new URLSearchParams(window.location.search)).get('id') || '';
+
+                let getUrl = '/get-signed-url';
+                const params = new URLSearchParams();
+                if (savedPhone) params.append('phone', savedPhone);
+                if (savedAppId) params.append('appId', savedAppId);
+                if (params.toString()) getUrl += '?' + params.toString();
+
+                const signedUrlResponse = await fetch(getUrl);
                 if (!signedUrlResponse.ok) {
+                    if (signedUrlResponse.status === 429) {
+                        throw new Error("HTTP 429: Rate limit exceeded");
+                    }
                     throw new Error("Failed to retrieve signed URL");
                 }
                 const data = await signedUrlResponse.json();
+
+                if (data.pre_lookup && data.pre_lookup.found) {
+                    console.log("[Pre-Lookup] Recognized returning applicant:", data.pre_lookup.clientName, data.pre_lookup.appId);
+                }
 
                 // Start WebRTC session using the signedUrl
                 conversation = await Conversation.startSession({
@@ -1780,42 +2177,181 @@
                     clientTools: {
                         trigger_service_application: async (args) => {
                             console.log("[Client Tool] trigger_service_application called with arguments:", args);
+                            let resolvedServiceId = null;
                             try {
-                                const serviceName = args?.serviceName || args?.service_name || args?.service || "";
+                                // Extract serviceName from any possible property key ElevenLabs might send
+                                let serviceName = args?.serviceName || args?.service_name || args?.service || args?.name || args?.service_type || args?.type || args?.query || args?.title || args?.value || args?.input || args?.serviceId || args?.service_id || args?.text || "";
+                                
+                                if (typeof serviceName === 'object') {
+                                    serviceName = JSON.stringify(serviceName);
+                                }
+                                
+                                if (typeof args === 'string' && !serviceName) {
+                                    serviceName = args;
+                                }
+
+                                if (!serviceName && args && typeof args === 'object') {
+                                    const strVals = Object.values(args).filter(v => typeof v === 'string' && v.trim()).join(' ');
+                                    if (strVals) serviceName = strVals;
+                                }
+                                
                                 const referenceNumber = args?.referenceNumber || args?.reference_number || args?.ref_number || "";
                                 
                                 console.log("[Client Tool] Resolved parameters - Service:", serviceName, "Reference:", referenceNumber);
-                                openApplicationModal(serviceName, referenceNumber);
-                                return "The form modal has been opened successfully on the user's screen. Ask the user to fill out the remaining details in the modal and submit it.";
+                                
+                                // 1. Try dynamic match using tool argument serviceName
+                                if (serviceName) {
+                                    resolvedServiceId = findBestMatchingService(serviceName);
+                                    if (!resolvedServiceId) {
+                                        const match = servicesList.find(s => s.id.toLowerCase() === serviceName.toLowerCase() || (s.nameAr && s.nameAr.toLowerCase() === serviceName.toLowerCase()) || (s.nameEn && s.nameEn.toLowerCase() === serviceName.toLowerCase()));
+                                        if (match) resolvedServiceId = match.id;
+                                    }
+                                }
+
+                                // 2. Try dynamic match using caller's last spoken transcript text
+                                if (!resolvedServiceId && window.lastUserMessageText) {
+                                    resolvedServiceId = findBestMatchingService(window.lastUserMessageText);
+                                }
+
+                                // 3. Try dynamic match using DOM user chat bubbles
+                                if (!resolvedServiceId) {
+                                    const userBubbles = Array.from(document.querySelectorAll('.message-bubble.user, [data-sender="user"]'));
+                                    for (let i = userBubbles.length - 1; i >= 0; i--) {
+                                        const userText = userBubbles[i].innerText || userBubbles[i].textContent || "";
+                                        const matched = findBestMatchingService(userText);
+                                        if (matched) {
+                                            resolvedServiceId = matched;
+                                            console.log("[Client Tool] Dynamically resolved service from user chat transcript:", resolvedServiceId);
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                // 4. Safe Phrase Boosters: Match context tokens across input & user transcript
+                                if (!resolvedServiceId) {
+                                    const combined = ((serviceName || '') + ' ' + (window.lastUserMessageText || '')).toLowerCase();
+                                    const normalizeAr = (str) => str ? str.toLowerCase()
+                                        .replace(/[أإآ]/g, 'ا')
+                                        .replace(/ة/g, 'ه')
+                                        .replace(/ى/g, 'ي')
+                                        .replace(/[^\u0621-\u064Aa-zA-Z0-9\s]/g, ' ')
+                                        .replace(/\s+/g, ' ').trim() : '';
+                                    const normCombined = normalizeAr(combined);
+
+                                    const isBakery = normCombined.includes('مخبز') || normCombined.includes('مخابز') || normCombined.includes('فرن') || normCombined.includes('افران') || normCombined.includes('أفران') || normCombined.includes('خبز') || normCombined.includes('bakery') || normCombined.includes('bakeries');
+                                    const isGasStation = normCombined.includes('محطة وقود') || normCombined.includes('محطات وقود') || normCombined.includes('تزويد الوقود') || normCombined.includes('gas station') || normCombined.includes('fuel station');
+                                    const isGasShop = normCombined.includes('محل غاز') || normCombined.includes('محلات غاز') || normCombined.includes('بيع الغاز') || normCombined.includes('سلندر') || normCombined.includes('سلندرات') || normCombined.includes('gas shop') || normCombined.includes('gas cylinder');
+                                    const isGold = normCombined.includes('محل ذهب') || normCombined.includes('محلات الذهب') || normCombined.includes('ورش الذهب') || normCombined.includes('ورشة ذهب') || normCombined.includes('gold shop') || normCombined.includes('gold workshop');
+                                    const isTrainee = normCombined.includes('تسجيل متدرب') || normCombined.includes('تسجيل متدربين') || normCombined.includes('مراكز التدريب') || normCombined.includes('معاهد التدريب') || normCombined.includes('ترخيص معاهد') || normCombined.includes('trainee registration') || normCombined.includes('training institutes');
+                                    const isInspection = normCombined.includes('شهادة فحص') || normCombined.includes('تقرير فحص') || normCombined.includes('فحص المنشات') || normCombined.includes('فحص المنشآت') || normCombined.includes('طلب تفتيش') || normCombined.includes('inspection certificate');
+
+                                    if (isBakery) resolvedServiceId = 'bakery_license';
+                                    else if (isGasStation) resolvedServiceId = 'gas_station_license';
+                                    else if (isGasShop) resolvedServiceId = 'gas_selling_shops_license';
+                                    else if (isGold) resolvedServiceId = 'gold_shop_license';
+                                    else if (isTrainee) resolvedServiceId = 'trainee_registration';
+                                    else if (isInspection) {
+                                        const isLarge = normCombined.includes('مصنع') || normCombined.includes('مصانع') || normCombined.includes('فندق') || normCombined.includes('فنادق') || normCombined.includes('مجمع') || normCombined.includes('مجمعات') || normCombined.includes('كبيره') || normCombined.includes('كبيرة') || normCombined.includes('factory') || normCombined.includes('hotel') || normCombined.includes('mall');
+                                        resolvedServiceId = isLarge ? 'factories_hotels_malls_inspection_certificate' : 'small_facilities_inspection_certificate';
+                                    }
+                                }
+
+                                // 5. Persistent Session Context Fallback: Use active applied service ID in session
+                                if (!resolvedServiceId && (window.lastAppliedServiceId || window.lastResolvedServiceId)) {
+                                    resolvedServiceId = window.lastAppliedServiceId || window.lastResolvedServiceId;
+                                    console.log("[Client Tool] Resolved service from active session context (lastAppliedServiceId):", resolvedServiceId);
+                                }
+
+                                if (!resolvedServiceId) {
+                                    console.warn("[Client Tool] Could not resolve service ID for request:", serviceName, window.lastUserMessageText);
+                                    return "CRITICAL ERROR: The tool failed to find the service. The button WAS NOT SHOWN. You MUST NOT tell the user that the button is visible. Instead, apologize and ask the user to clarify exactly which Civil Defense service they want.";
+                                }
+
+                                window.lastAppliedServiceId = resolvedServiceId;
+                                window.lastResolvedServiceId = resolvedServiceId;
+                                console.log("[Client Tool] Dynamically rendered Apply Now button for resolved service:", resolvedServiceId);
+                                window.renderApplyNowButton(resolvedServiceId, referenceNumber);
+                                return "The 'Apply for Service' button has been displayed on the user's screen below your response message. Inform the user in their active language that the button is now visible on their screen and they can click it whenever they are ready to fill out the form.";
                             } catch (e) {
-                                console.error("[Client Tool] Error opening form:", e);
-                                return "Failed to open form: " + e.message;
+                                console.error("[Client Tool] Error processing trigger_service_application:", e);
+                                return "An error occurred while displaying the apply button. Please ask the user to specify which Civil Defense service they wish to apply for.";
+                            }
+                        },
+                        lookup_application_status: async (args) => {
+                            console.log("[Client Tool] lookup_application_status called with arguments:", args);
+                            try {
+                                const phone = args?.phone || args?.whatsapp || args?.mobile || "";
+                                const appId = args?.appId || args?.app_id || args?.id || "";
+                                const res = await fetch('/api/voice/lookup-application', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ phone, appId })
+                                });
+                                const data = await res.json();
+                                console.log("[Client Tool] lookup_application_status response:", data);
+                                if (data.found) {
+                                    return JSON.stringify(data);
+                                } else {
+                                    return JSON.stringify({ found: false, message: "No active applications found for this caller." });
+                                }
+                            } catch (e) {
+                                console.error("[Client Tool] Error looking up application status:", e);
+                                return JSON.stringify({ found: false, error: e.message });
+                            }
+                        },
+                        send_tracking_link_whatsapp: async (args) => {
+                            console.log("[Client Tool] send_tracking_link_whatsapp called with arguments:", args);
+                            try {
+                                const phone = args?.phone || args?.whatsapp || args?.mobile || "";
+                                const appId = args?.appId || args?.app_id || args?.id || "";
+                                const res = await fetch('/api/voice/send-tracking-link', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ phone, appId })
+                                });
+                                const data = await res.json();
+                                console.log("[Client Tool] send_tracking_link_whatsapp response:", data);
+                                return JSON.stringify(data);
+                            } catch (e) {
+                                console.error("[Client Tool] Error sending tracking link:", e);
+                                return JSON.stringify({ success: false, error: e.message });
                             }
                         }
                     },
-                    onConnect: ({ conversationId }) => {
-                        // Update UI states to Connected/Online
-                        statusBadge.innerText = "متصل بالمايك";
-                        statusBadge.style.background = "rgba(48, 209, 88, 0.12)";
+                    onConnect: () => {
+                        console.log("WebRTC Connected");
+                        try {
+                            if (conversation && typeof conversation.getId === 'function') {
+                                activeConversationId = conversation.getId();
+                            }
+                        } catch (e) {}
+                        if (!activeConversationId) {
+                            activeConversationId = 'conv_' + Date.now();
+                        }
+                        window.lastConversationId = activeConversationId;
+
+                        window.elevenLabsSessionActive = true;
+                        statusBadge.innerText = "متصل مباشر (صوتي)";
+                        statusBadge.style.background = "rgba(48, 209, 88, 0.15)";
                         statusBadge.style.color = "var(--status-online)";
-                        statusBadge.style.borderColor = "rgba(48, 209, 88, 0.2)";
-                        
-                        if (statusDot) { statusDot.className = 'pulse-dot online'; }
+                        statusBadge.style.borderColor = "rgba(48, 209, 88, 0.25)";
+
+                        if (statusDot) { statusDot.className = 'pulse-dot active'; }
                         if (navStatusDot) { navStatusDot.className = 'status-dot online'; }
-                        if (navStatusText) { navStatusText.innerText = "متصل"; }
-                        
+                        if (navStatusText) { navStatusText.innerText = "متصل مباشر"; }
+
                         callButton.innerText = "إنهاء المكالمة";
                         callButton.classList.add('connected');
                         callButton.disabled = false;
-                        
+
                         chatInput.disabled = false;
                         sendButton.disabled = false;
 
                         // Enable suggestion chips
                         window.elevenLabsSessionActive = true;
 
-                        // Show visualizer animations
-                        bars.forEach(bar => bar.style.display = 'block');
+                        // Start dynamic real-time audio waveform visualizer
+                        waveformVisualizer.start();
                         messagesContainer.innerHTML = '';
 
                         // Clear any previous feedback state
@@ -1824,21 +2360,42 @@
                         
                         // Show feedback pill after 8 seconds of active call
                         feedbackTimeout = setTimeout(() => {
-                            showFeedbackToast(conversationId);
+                            showFeedbackToast(activeConversationId);
                         }, 8000);
+                    },
+                    onModeChange: ({ mode }) => {
+                        console.log("[ElevenLabs Mode Change]:", mode);
+                        waveformVisualizer.setMode(mode);
                     },
                     onDisconnect: () => {
                         handleDisconnect();
                     },
                     onMessage: (message) => {
                         console.log("Transcript received:", message);
-                        if (message.message) {
-                            const svc = findBestMatchingService(message.message);
-                            if (svc) {
-                                window.renderApplyNowButton(svc);
-                            }
+                        if (conversation && typeof conversation.getId === 'function') {
+                            try {
+                                const realId = conversation.getId();
+                                if (realId && typeof realId === 'string' && realId.startsWith('conv_')) {
+                                    activeConversationId = realId;
+                                    window.lastConversationId = realId;
+                                }
+                            } catch (e) {}
                         }
                         const sender = message.source === 'user' ? 'user' : 'agent';
+                        if (sender === 'user') {
+                            window.lastUserMessageText = message.message;
+                        } else {
+                            window.lastAgentMessageText = message.message;
+                        }
+
+                        if (message.message && window.findBestMatchingService) {
+                            const matchedCtx = window.findBestMatchingService(message.message);
+                            if (matchedCtx) {
+                                window.activeServiceContext = matchedCtx;
+                                window.lastResolvedServiceId = matchedCtx;
+                                console.log("[Session Context] Active service context updated from transcript:", matchedCtx);
+                            }
+                        }
                         const eventId = message.event_id;
 
                         // Check if a message bubble with this eventId already exists
@@ -1890,6 +2447,20 @@
                 if (navStatusText) { navStatusText.innerText = "خطأ بالاتصال"; }
                 
                 callButton.disabled = false;
+
+                // Mobile & Cross-Browser User Guidance
+                let userFriendlyMsg = "تعذر بدء المكالمة الصوتية مع المساعد الذكي. يرجى المحاولة مجدداً.";
+                if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+                    userFriendlyMsg = "⚠️ إذن الميكروفون محظور:\nيرجى السماح بالوصول إلى الميكروفون من إعدادات المتصفح للتحدث مع المساعد الصوتي.\n\nPlease allow microphone access in your browser settings.";
+                } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
+                    userFriendlyMsg = "⚠️ لم يتم العثور على ميكروفون:\nتأكد من توصيل سماعة أو ميكروفون بجهازك.\n\nNo microphone device found.";
+                } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
+                    userFriendlyMsg = "⚠️ الميكروفون قيد الاستخدام:\nالميكروفون مستخدم حالياً بواسطة تطبيق آخر (مكالمة هاتفية أو تطبيق صوتي). يرجى إغلاقه والمحاولة مجدداً.\n\nMicrophone is being used by another application.";
+                } else if (error.message && error.message.includes('429')) {
+                    userFriendlyMsg = "⚠️ تم تجاوز الحد المسموح:\nيرجى الانتظار دقيقة واحدة قبل محاولة بدء مكالمة جديدة.";
+                }
+
+                alert(userFriendlyMsg);
             }
         }
 
@@ -1921,12 +2492,12 @@
             // Disable session status
             window.elevenLabsSessionActive = false;
             
-            // Hide visualizer animations
-            bars.forEach(bar => bar.style.display = 'none');
+            // Stop and reset audio waveform visualizer
+            waveformVisualizer.stop();
             
             // If feedback has not been shown, show it now upon disconnect
             const toast = document.getElementById('feedback-toast');
-            if (activeConversationId && toast && !toast.classList.contains('show')) {
+            if (toast && !toast.classList.contains('show')) {
                 showFeedbackToast(activeConversationId);
             }
             clearTimeout(feedbackTimeout);
@@ -1948,11 +2519,7 @@
             const text = chatInput.value.trim();
             if (!text || !conversation) return;
 
-            // Clear any Apply Now buttons when user sends a message
-            const existingBtn = document.querySelector('.apply-now-wrapper');
-            if (existingBtn) {
-                existingBtn.remove();
-            }
+            window.lastUserMessageText = text;
 
             // Append with a pending status for local echo
             const msgEl = appendMessage('user', text);
@@ -1978,110 +2545,552 @@
             }
         }
 
-        // Keyword Matcher for all 33 Civil Defense Services
-        function findBestMatchingService(text) {
-            if (!text) return null;
-            const cleanText = text.toLowerCase().trim();
-            
-            const serviceKeywords = [
-                { id: "Safety Certificate Renewal", keywords: ["سلامة", "تجديد شهادة السلامة", "استيفاء شروط", "احتياجات الحماية", "الوقاية من الحريق", "سلامه", "حريق"] },
-                { id: "Gas Selling Shops License", keywords: ["محل غاز", "محلات بيع الغاز", "بيع الغاز", "ترخيص الغاز", "سلندر غاز", "سلندرات"] },
-                { id: "Bakery License", keywords: ["مخبز", "مخابز", "ترخيص المخابز", "فرن شعبى", "مخبز آلي", "مخابز شعبية", "فرن"] },
-                { id: "Gold Shop License", keywords: ["ذهب", "محل ذهب", "ورشة ذهب", "ورش الذهب", "مجوهرات", "انذار الذهب"] },
-                { id: "Trainee Registration", keywords: ["تسجيل متدربين", "معاهد التدريب", "مراكز التدريب", "تدريب الدفاع المدني", "تسجيل متدرب", "مركز تدريب"] },
-                { id: "Gas Station License", keywords: ["محطة وقود", "تزويد الوقود", "بترول", "ديزل", "محطة البترول", "محطه وقود"] },
-                { id: "Hazardous Material Permit", keywords: ["مواد خطرة", "مواد كيميائية", "متفجرات", "تخزين مواد", "مادة خطرة", "استيراد مواد"] },
-                
-                // services_2.txt
-                { id: "إصدار شهادة فحص المصانع والفنادق والمجمعات التجارية قيد الإنشاء وتجديدها", keywords: ["فحص المصانع", "فحص الفنادق", "مجمعات تجارية", "قيد الإنشاء", "إنشاء وتجديد", "فحص مصنع", "فندق قيد الإنشاء"] },
-                { id: "إصدار تقرير الحوادث للمنشآت الكبيرة والمصانع والفنادق والمجمعات التجارية وما في حكمها", keywords: ["تقرير الحوادث للمنشآت الكبيرة", "تقرير حادث مصنع", "تقرير حادث فندق", "حادث مجمع تجاري", "تقرير حريق كبير"] },
-                { id: "إصدار تقرير الحوادث للمنشآت الصغيرة والمنازل وما في حكمها", keywords: ["تقرير حادث منزلي", "تقرير حادث بيت", "حادث بسيط", "حريق منزل", "حادث منشأة صغيرة", "حريق بيت"] },
-                { id: "إصدار شهادة الفحص النهائي لتوصيل التيار الكهربائي للمباني الجديدة", keywords: ["تيار كهربائي", "توصيل الكهرباء", "فحص نهائي كهرباء", "توصيل تيار", "كهرباء مبنى جديد", "فحص كهرباء"] },
-                
-                // services_3.txt
-                { id: "إصدار ترخيص خرائط المصانع والمخازن وتجديد الترخيص", keywords: ["خرائط مصانع", "مخازن وتجديد", "مخطط مستودع", "مخطط مصنع", "خريطة مخزن"] },
-                { id: "إصدار ترخيص خرائط المراكز التجارية والمباني العالية", keywords: ["خرائط مراكز تجارية", "مباني عالية", "خرائط مبنى مرتفع", "مخططات أبراج", "خرائط برج"] },
-                { id: "إصدار ترخيص خرائط المجمعات السكنية التي تحتوي على عشر فلل فأكثر", keywords: ["خرائط مجمعات سكنية", "عشر فلل", "مخطط مجمع فلل", "خريطة مجمع سشني"] },
-                { id: "دراسة مخططات دور العبادة والمحاكم والمتاحف", keywords: ["دور العبادة", "مخطط مسجد", "مخططات متاحف", "مخطط محكمة", "مخطط معبد"] },
-                { id: "دراسة الخرائط لمحطات الوقود الجديدة", keywords: ["خرائط محطة وقود", "مخطط محطة وقود جديدة", "مخطط بترول جديد"] },
-                { id: "دراسة المخططات الهندسية الكهربائية", keywords: ["مخططات هندسية كهربائية", "مخطط كهربائي هندسي", "خرائط كهرباء هندسية"] },
-                { id: "دراسة المخططات الميكانيكية", keywords: ["مخططات ميكانيكية", "مخطط ميكانيكي", "خريطة ميكانيك"] },
-                { id: "دراسة الخرائط على تمديدات الغاز والخزانات", keywords: ["تمديدات الغاز والخزانات", "مخطط تمديد غاز", "خريطة خزان غاز"] },
-                
-                // services_4.txt
-                { id: "إصدار شهادة تدريب على أعمال الدفاع المدني لمدة يوم واحد", keywords: ["تدريب يوم واحد", "شهادة تدريب يوم", "دورة يوم"] },
-                { id: "إصدار شهادة تدريب على أعمال الدفاع المدني لمدة  اسبوع", keywords: ["تدريب اسبوع", "دورة أسبوع", "تدريب لمدة أسبوع", "دورة اسبوع"] },
-                { id: "إصدار شهادة تدريب أفراد منشآت ومؤسسات القطاع الخاص على قيادة مركبات الإطفاء الثقيلة لمدة أسبوعين", keywords: ["مركبات الإطفاء الثقيلة", "سياقة سيارة إطفاء", "تدريب قيادة إطفاء", "شاحنة إطفاء ثقيلة"] },
-                { id: "إصدار شهادة تدريب الفرد على أعمال الدفاع المدني لمدة ستة عشر أسبوعًا.", keywords: ["ستة عشر أسبوعا", "تدريب 16 أسبوع", "دورة 16 اسبوع"] },
-                { id: "التدريب على عمليات إخلاء المباني والمنشآت", keywords: ["عمليات إخلاء", "إخلاء مباني", "إخلاء منشآت", "خطة إخلاء", "تدريب اخلاء"] },
-                
-                // services_5.txt
-                { id: "ترخيص المكاتب الهندسية لتصميم أنظمة الحماية والوقاية من الحريق وتجديد الترخيص", keywords: ["ترخيص مكاتب هندسية", "مكتب تصميم أنظمة حماية", "تصميم أنظمة حريق", "مكتب هندسي حريق"] },
-                { id: "ترخيص شركات ومؤسسات صيانة وتثبيت أجهزة ومعدات الحماية والوقاية من الحريق وتجديد الترخيص", keywords: ["شركات صيانة معدات حماية", "تثبيت أجهزة حريق", "صيانة أجهزة حريق", "شركة صيانة طفايات"] },
-                { id: "دراسة الخرائط للمكاتب الفنية والاستشارية للمواد الخطرة والغاز وتجديد الترخيص", keywords: ["خرائط مكاتب استشارية غاز", "مكتب استشاري مواد خطرة", "استشاري مواد خطرة وغاز"] },
-                { id: "مفتش وقاية معتمد", keywords: ["مفتش وقاية معتمد", "مفتش معتمد", "اعتماد مفتش وقاية"] },
-                
-                // services_6.txt
-                { id: "إصدار رخصة بيع وتداول وتخزين أجهزة ومعدات الحماية والوقاية من الحريق وتجديد الرخصة", keywords: ["بيع وتداول وتخزين أجهزة حماية", "رخصة بيع طفايات حريق", "تجارة معدات إطفاء", "محل بيع طفايات"] },
-                { id: "ترخيص مركبات نقل المواد الخطرة وتجديد الترخيص", keywords: ["مركبات نقل مواد خطرة", "ترخيص سيارة نقل كيميائي", "شاحنة نقل غاز", "نقل مواد خطرة سيارة"] },
-                { id: "شراء وتخزين واستيراد الألعاب النارية للمناسبات الوطنية وتجديد الترخيص", keywords: ["ألعاب نارية", "استيراد ألعاب نارية", "ألعاب نارية للمناسبات", "مفرقعات"] },
-                { id: "إصدار ترخيص استيراد مواد خطرة أو كيميائية أو متفجرات وتجديد الترخيص", keywords: ["ترخيص استيراد كيميائي", "استيراد مواد خطرة", "فسح مواد كيميائية", "شحنة مواد خطرة"] },
-                
-                // services_7.txt
-                { id: "طلب ترخيص الخيام للمناسبات العامة والخاصة المؤقتة", keywords: ["ترخيص الخيام", "ترخيص خيمة مناسبات", "خيمة مؤقتة", "خيم عزاء", "خيم أفراح", "ترخيص خيمة"] }
-            ];
+        // 34 Civil Defense Services Master Data List & Resolution Engine
+        window.servicesList = [
+            {
+                id: "safety_certificate_renewal",
+                legacyId: "Safety Certificate Renewal",
+                nameEn: "Safety Certificate Renewal",
+                nameAr: "إصدار شهادة استيفاء شروط واحتياجات الحماية والوقاية من الحريق وتجديدها",
+                name: "إصدار شهادة استيفاء شروط واحتياجات الحماية والوقاية من الحريق وتجديدها",
+                fee: "50 دينار بحريني فقط",
+                keywordsEn: ["safety certificate", "safety certificate renewal", "fire safety certificate", "fire protection certificate", "fire prevention certificate", "safety compliance"],
+                keywordsAr: ["تجديد شهادة السلامة", "استيفاء شروط", "احتياجات الحماية", "الوقاية من الحريق", "شروط السلامة", "شهادة السلامة", "شهاده السلامه", "شهادة استيفاء"]
+            },
+            {
+                id: "gas_selling_shops_license",
+                legacyId: "Gas Selling Shops License",
+                nameEn: "Gas Selling Shops License",
+                nameAr: "إصدار ترخيص محلات بيع الغاز، وتجديد الترخيص",
+                name: "إصدار ترخيص محلات بيع الغاز، وتجديد الترخيص",
+                fee: "20 دينار بحريني فقط",
+                keywordsEn: ["gas shop", "gas selling shop", "gas shop license", "gas cylinder shop", "gas retail", "propane shop"],
+                keywordsAr: ["محل غاز", "محلات بيع الغاز", "بيع الغاز", "ترخيص الغاز", "سلندر غاز", "سلندرات", "ترخيص محل غاز", "محلات الغاز"]
+            },
+            {
+                id: "bakery_license",
+                legacyId: "Bakery License",
+                nameEn: "Bakery License",
+                nameAr: "إصدار ترخيص المخابز الشعبية والآلية، وتجديد الترخيص",
+                name: "إصدار ترخيص المخابز الشعبية والآلية، وتجديد الترخيص",
+                fee: "10 دينار بحريني فقط",
+                keywordsEn: ["bakery", "bakery license", "bakeries", "traditional bakery", "automated bakery", "bread shop"],
+                keywordsAr: ["مخبز", "مخابز", "ترخيص المخابز", "فرن شعبى", "مخبز آلي", "مخابز شعبية", "فرن", "ترخيص مخبز"]
+            },
+            {
+                id: "gold_shop_license",
+                legacyId: "Gold Shop License",
+                nameEn: "Gold Shop License",
+                nameAr: "إصدار ترخيص محلات وورش الذهب، وتجديد الترخيص",
+                name: "إصدار ترخيص محلات وورش الذهب، وتجديد الترخيص",
+                fee: "20 دينار بحريني فقط",
+                keywordsEn: ["gold shop", "gold shop license", "gold workshop", "jewelry shop", "jewellery", "gold alarm"],
+                keywordsAr: ["ذهب", "محل ذهب", "ورشة ذهب", "ورش الذهب", "مجوهرات", "انذار الذهب", "ترخيص ذهب", "ترخيص محل ذهب"]
+            },
+            {
+                id: "trainee_registration",
+                legacyId: "Trainee Registration",
+                nameEn: "Civil Defense Training Centers License",
+                nameAr: "إصدار الترخيص لمعاهد ومراكز التدريب على أعمال الدفاع المدني",
+                name: "إصدار الترخيص لمعاهد ومراكز التدريب على أعمال الدفاع المدني",
+                fee: "200 دينار بحريني فقط",
+                keywordsEn: ["trainee", "trainee registration", "training center", "training institute", "civil defense training institute", "training center license"],
+                keywordsAr: ["تسجيل متدربين", "معاهد التدريب", "مراكز التدريب", "تدريب الدفاع المدني", "تسجيل متدرب", "مركز تدريب", "ترخيص مركز تدريب"]
+            },
+            {
+                id: "gas_station_license",
+                legacyId: "Gas Station License",
+                nameEn: "Gas Station License",
+                nameAr: "إصدار الترخيص لمحطات تزويد الوقود، وتجديد الترخيص",
+                name: "إصدار الترخيص لمحطات تزويد الوقود، وتجديد الترخيص",
+                fee: "مجاناً",
+                keywordsEn: ["gas station", "gas station license", "fuel station", "petrol station", "fuel supply station"],
+                keywordsAr: ["محطة وقود", "تزويد الوقود", "بترول", "وقود ديزل", "محطة البترول", "محطه وقود", "محطات بيع الوقود", "بيع الوقود", "محطة بيع الوقود", "تصريح محطات وقود", "تصريح محطة وقود", "تصريح محطات الوقود", "محطات وقود", "تصريح محروقات", "تصريح محطة الوقود", "ترخيص محطة وقود", "ترخيص محطات وقود", "اقدم حق تصريح محطات وقود"]
+            },
+            {
+                id: "hazardous_material_permit",
+                legacyId: "Hazardous Material Permit",
+                nameEn: "Hazardous Material Permit",
+                nameAr: "إصدار ترخيص عدم ممانعة لتخزين مواد كيميائية أو المتفجرات، وتجديد الترخيص",
+                name: "إصدار ترخيص عدم ممانعة لتخزين مواد كيميائية أو المتفجرات، وتجديد الترخيص",
+                fee: "مجاناً",
+                keywordsEn: ["hazardous material", "hazardous material permit", "chemical storage", "chemical permit", "hazmat permit"],
+                keywordsAr: ["تخزين مواد خطرة", "مواد كيميائية", "تخزين مواد كيميائية", "تخزين مواد", "مادة خطرة", "ترخيص مواد كيميائية"]
+            },
+            {
+                id: "factories_hotels_malls_inspection_certificate",
+                legacyId: "إصدار شهادة فحص المصانع والفنادق والمجمعات التجارية قيد الإنشاء وتجديدها",
+                nameEn: "Inspection Certificate for Factories, Hotels, & Malls under Construction",
+                nameAr: "إصدار شهادة فحص المصانع والفنادق والمجمعات التجارية قيد الإنشاء وتجديدها",
+                name: "إصدار شهادة فحص المصانع والفنادق والمجمعات التجارية قيد الإنشاء وتجديدها",
+                fee: "100 دينار بحريني فقط",
+                keywordsEn: ["factory inspection", "hotel inspection", "mall inspection", "under construction inspection", "commercial complex inspection"],
+                keywordsAr: ["فحص المصانع", "فحص الفنادق", "مجمعات تجارية", "قيد الإنشاء", "إنشاء وتجديد", "فحص مصنع", "فندق قيد الإنشاء", "شهادة فحص المباني قيد الإنشاء"]
+            },
+            {
+                id: "incident_report_large_facilities",
+                legacyId: "إصدار تقرير الحوادث للمنشآت الكبيرة والمصانع والفنادق والمجمعات التجارية وما في حكمها",
+                nameEn: "Incident Report for Large Facilities, Factories, & Malls",
+                nameAr: "إصدار تقرير الحوادث للمنشآت الكبيرة والمصانع والفنادق والمجمعات التجارية وما في حكمها",
+                name: "إصدار تقرير الحوادث للمنشآت الكبيرة والمصانع والفنادق والمجمعات التجارية وما في حكمها",
+                fee: "50 دينار بحريني فقط",
+                keywordsEn: ["incident report large", "large facility incident", "factory incident report", "hotel fire report", "mall fire report"],
+                keywordsAr: ["تقرير الحوادث للمنشآت الكبيرة", "تقرير حادث مصنع", "تقرير حادث فندق", "حادث مجمع تجاري", "تقرير حريق كبير", "حادث منشأة كبيرة"]
+            },
+            {
+                id: "incident_report_small_facilities_homes",
+                legacyId: "إصدار تقرير الحوادث للمنشآت الصغيرة والمنازل وما في حكمها",
+                nameEn: "Incident Report for Small Facilities & Homes",
+                nameAr: "إصدار تقرير الحوادث للمنشآت الصغيرة والمنازل وما في حكمها",
+                name: "إصدار تقرير الحوادث للمنشآت الصغيرة والمنازل وما في حكمها",
+                fee: "مجاناً",
+                keywordsEn: ["incident report small", "home incident report", "house fire report", "personal incident report", "small facility report"],
+                keywordsAr: ["تقرير الحوادث للأشخاص", "تقرير الحوادث", "تقرير حادث", "تقرير حوادث", "تقرير الحوادث للأفراد", "تقرير حادث شخصي", "تقرير حادث منزلي", "تقرير حادث بيت", "حادث بسيط", "حريق منزل", "حادث منشأة صغيرة", "حريق بيت"]
+            },
+            {
+                id: "electrical_connection_final_inspection",
+                legacyId: "إصدار شهادة الفحص النهائي لتوصيل التيار الكهربائي للمباني الجديدة",
+                nameEn: "Final Inspection Certificate for Electrical Connection",
+                nameAr: "إصدار شهادة الفحص النهائي لتوصيل التيار الكهربائي للمباني الجديدة",
+                name: "إصدار شهادة الفحص النهائي لتوصيل التيار الكهربائي للمباني الجديدة",
+                fee: "30 دينار بحريني فقط",
+                keywordsEn: ["electrical connection", "power connection", "final electrical inspection", "electricity connection", "new building electricity"],
+                keywordsAr: ["تيار كهربائي", "توصيل الكهرباء", "فحص نهائي كهرباء", "توصيل تيار", "كهرباء مبنى جديد", "فحص كهرباء", "شهادة الفحص النهائي لتوصيل التيار الكهربائي"]
+            },
+            {
+                id: "factory_warehouse_maps_license",
+                legacyId: "إصدار ترخيص خرائط المصانع والمخازن وتجديد الترخيص",
+                nameEn: "Factory & Warehouse Maps License",
+                nameAr: "إصدار ترخيص خرائط المصانع والمخازن وتجديد الترخيص",
+                name: "إصدار ترخيص خرائط المصانع والمخازن وتجديد الترخيص",
+                fee: "50 دينار بحريني فقط",
+                keywordsEn: ["factory map", "warehouse map", "factory blueprint", "warehouse plan", "factory warehouse maps license", "factory maps license"],
+                keywordsAr: ["خرائط مصانع", "مخازن وتجديد", "مخطط مستودع", "مخطط مصنع", "خريطة مخزن", "ترخيص خرائط المصانع والمخازن"]
+            },
+            {
+                id: "commercial_centers_high_rise_maps_license",
+                legacyId: "إصدار ترخيص خرائط المراكز التجارية والمباني العالية",
+                nameEn: "Commercial Centers & High-Rise Buildings Maps License",
+                nameAr: "إصدار ترخيص خرائط المراكز التجارية والمباني العالية",
+                name: "إصدار ترخيص خرائط المراكز التجارية والمباني العالية",
+                fee: "300 دينار بحريني فقط",
+                keywordsEn: ["commercial center map", "high rise building map", "tower map", "high rise blueprint", "commercial mall maps"],
+                keywordsAr: ["خرائط مراكز تجارية", "مباني عالية", "خرائط مبنى مرتفع", "مخططات أبراج", "خرائط برج", "ترخيص خرائط المراكز التجارية"]
+            },
+            {
+                id: "residential_complexes_maps_license",
+                legacyId: "إصدار ترخيص خرائط المجمعات السكنية التي تحتوي على عشر فلل فأكثر",
+                nameEn: "Residential Complexes Maps License (10+ Villas)",
+                nameAr: "إصدار ترخيص خرائط المجمعات السكنية التي تحتوي على عشر فلل فأكثر",
+                name: "إصدار ترخيص خرائط المجمعات السكنية التي تحتوي على عشر فلل فأكثر",
+                fee: "100 دينار بحريني فقط",
+                keywordsEn: ["residential complex map", "villas complex map", "housing complex map", "10 villas map"],
+                keywordsAr: ["خرائط مجمعات سكنية", "عشر فلل", "مخطط مجمع فلل", "خريطة مجمع سكني", "مجمع 10 فلل"]
+            },
+            {
+                id: "worship_courts_museums_maps_review",
+                legacyId: "دراسة مخططات دور العبادة والمحاكم والمتاحف",
+                nameEn: "Review of Maps for Places of Worship, Courts, & Museums",
+                nameAr: "دراسة مخططات دور العبادة والمحاكم والمتاحف",
+                name: "دراسة مخططات دور العبادة والمحاكم والمتاحف",
+                fee: "مجاناً",
+                keywordsEn: ["worship place map", "mosque plan", "court plan", "museum plan", "worship review"],
+                keywordsAr: ["دور العبادة", "مخطط مسجد", "مخططات متاحف", "مخطط محكمة", "مخطط معبد", "دراسة مخططات دور العبادة"]
+            },
+            {
+                id: "new_gas_stations_maps_review",
+                legacyId: "دراسة الخرائط لمحطات الوقود الجديدة",
+                nameEn: "Review of Maps for New Fuel Stations",
+                nameAr: "دراسة الخرائط لمحطات الوقود الجديدة",
+                name: "دراسة الخرائط لمحطات الوقود الجديدة",
+                fee: "مجاناً",
+                keywordsEn: ["new gas station map", "fuel station map review", "petrol station blueprint"],
+                keywordsAr: ["خرائط محطة وقود", "مخطط محطة وقود جديدة", "مخطط بترول جديد", "دراسة الخرائط لمحطات الوقود"]
+            },
+            {
+                id: "electrical_engineering_plans_review",
+                legacyId: "دراسة المخططات الهندسية الكهربائية",
+                nameEn: "Review of Electrical Engineering Plans",
+                nameAr: "دراسة المخططات الهندسية الكهربائية",
+                name: "دراسة المخططات الهندسية الكهربائية",
+                fee: "مجاناً",
+                keywordsEn: ["electrical engineering plan", "electrical blueprint", "electrical wiring plan review", "electrical connection review"],
+                keywordsAr: ["مخططات هندسية كهربائية", "مخطط كهربائي هندسي", "خرائط كهرباء هندسية", "دراسة المخططات الكهربائية"]
+            },
+            {
+                id: "mechanical_engineering_plans_review",
+                legacyId: "دراسة المخططات الميكانيكية",
+                nameEn: "Review of Mechanical Engineering Plans",
+                nameAr: "دراسة المخططات الميكانيكية",
+                name: "دراسة المخططات الميكانيكية",
+                fee: "مجاناً",
+                keywordsEn: ["mechanical plan review", "mechanical blueprint", "mechanical engineering drawings"],
+                keywordsAr: ["مخططات ميكانيكية", "مخطط ميكانيكي", "خريطة ميكانيك", "دراسة المخططات الميكانيكية"]
+            },
+            {
+                id: "gas_piping_tanks_maps_review",
+                legacyId: "دراسة الخرائط على تمديدات الغاز والخزانات",
+                nameEn: "Review of Maps for Gas Extension Lines & Tanks",
+                nameAr: "دراسة الخرائط على تمديدات الغاز والخزانات",
+                name: "دراسة الخرائط على تمديدات الغاز والخزانات",
+                fee: "مجاناً",
+                keywordsEn: ["gas piping map", "gas tank plan", "gas extension blueprint", "gas pipe design"],
+                keywordsAr: ["تمديدات الغاز والخزانات", "مخطط تمديد غاز", "خريطة خزان غاز", "دراسة خرائط تمديدات الغاز"]
+            },
+            {
+                id: "trainee_registration_1day",
+                legacyId: "إصدار شهادة تدريب على أعمال الدفاع المدني لمدة يوم واحد",
+                nameEn: "Civil Defense Training Certificate (1 Day)",
+                nameAr: "إصدار شهادة تدريب على أعمال الدفاع المدني لمدة يوم واحد",
+                name: "إصدار شهادة تدريب على أعمال الدفاع المدني لمدة يوم واحد",
+                fee: "40 دينار بحريني",
+                keywordsEn: ["trainee registration 1day", "1 day training", "one day civil defense training", "1 day course"],
+                keywordsAr: ["تدريب يوم واحد", "شهادة تدريب يوم", "دورة يوم", "تدريب لمدة يوم"]
+            },
+            {
+                id: "trainee_registration_1week",
+                legacyId: "إصدار شهادة تدريب على أعمال الدفاع المدني لمدة  اسبوع",
+                nameEn: "Civil Defense Training Certificate (1 Week)",
+                nameAr: "إصدار شهادة تدريب على أعمال الدفاع المدني لمدة  اسبوع",
+                name: "إصدار شهادة تدريب على أعمال الدفاع المدني لمدة  اسبوع",
+                fee: "200 دينار بحريني فقط.",
+                keywordsEn: ["1 week training", "one week training course", "7 days training"],
+                keywordsAr: ["تدريب اسبوع", "دورة أسبوع", "تدريب لمدة أسبوع", "دورة اسبوع"]
+            },
+            {
+                id: "heavy_fire_vehicle_driving_training",
+                legacyId: "إصدار شهادة تدريب أفراد منشآت ومؤسسات القطاع الخاص على قيادة مركبات الإطفاء الثقيلة لمدة أسبوعين",
+                nameEn: "Heavy Firefighting Vehicle Driving Training Certificate (2 Weeks)",
+                nameAr: "إصدار شهادة تدريب أفراد منشآت ومؤسسات القطاع الخاص على قيادة مركبات الإطفاء الثقيلة لمدة أسبوعين",
+                name: "إصدار شهادة تدريب أفراد منشآت ومؤسسات القطاع الخاص على قيادة مركبات الإطفاء الثقيلة لمدة أسبوعين",
+                fee: "200 دينار بحريني فقط.",
+                keywordsEn: ["heavy fire vehicle", "firefighting truck driving", "heavy fire truck training", "fire engine driving"],
+                keywordsAr: ["مركبات الإطفاء الثقيلة", "سياقة سيارة إطفاء", "تدريب قيادة إطفاء", "شاحنة إطفاء ثقيلة"]
+            },
+            {
+                id: "trainee_registration_16weeks",
+                legacyId: "إصدار شهادة تدريب الفرد على أعمال الدفاع المدني لمدة ستة عشر أسبوعًا.",
+                nameEn: "Civil Defense Individual Training Certificate (16 Weeks)",
+                nameAr: "إصدار شهادة تدريب الفرد على أعمال الدفاع المدني لمدة ستة عشر أسبوعًا.",
+                name: "إصدار شهادة تدريب الفرد على أعمال الدفاع المدني لمدة ستة عشر أسبوعًا.",
+                fee: "2000 دينار بحريني فقط.",
+                keywordsEn: ["16 weeks training", "sixteen weeks course", "long civil defense training"],
+                keywordsAr: ["ستة عشر أسبوعا", "تدريب 16 أسبوع", "دورة 16 اسبوع", "ستة عشر اسبوع"]
+            },
+            {
+                id: "building_evacuation_training",
+                legacyId: "التدريب على عمليات إخلاء المباني والمنشآت",
+                nameEn: "Building & Facility Evacuation Operations Training",
+                nameAr: "التدريب على عمليات إخلاء المباني والمنشآت",
+                name: "التدريب على عمليات إخلاء المباني والمنشآت",
+                fee: "50 دينار بحريني فقط.",
+                keywordsEn: ["building evacuation", "evacuation training", "facility evacuation drill"],
+                keywordsAr: ["عمليات إخلاء", "إخلاء مباني", "إخلاء منشآت", "خطة إخلاء", "تدريب اخلاء"]
+            },
+            {
+                id: "fire_safety_equipment_license",
+                legacyId: "إصدار الترخيص لمعدات الحريق والسلامة، وتجديد الترخيص",
+                nameEn: "Fire Safety & Protection Equipment License",
+                nameAr: "إصدار الترخيص لمعدات الحريق والسلامة، وتجديد الترخيص",
+                name: "إصدار الترخيص لمعدات الحريق والسلامة، وتجديد الترخيص",
+                fee: "30 دينار بحريني فقط",
+                keywordsEn: ["fire safety equipment", "fire equipment license", "safety equipment renewal"],
+                keywordsAr: ["معدات الحريق والسلامة", "ترخيص معدات السلامة", "معدات إطفاء", "ترخيص معدات الحريق"]
+            },
+            {
+                id: "fire_safety_equipment_noc",
+                legacyId: "إصدار ترخيص عدم الممانعة لمعدات الحريق والسلامة، وتجديد الترخيص",
+                nameEn: "No-Objection Certificate (NOC) for Fire Safety Equipment",
+                nameAr: "إصدار ترخيص عدم الممانعة لمعدات الحريق والسلامة، وتجديد الترخيص",
+                name: "إصدار ترخيص عدم الممانعة لمعدات الحريق والسلامة، وتجديد الترخيص",
+                fee: "40 دينار بحريني فقط",
+                keywordsEn: ["fire equipment noc", "safety equipment no objection", "equipment noc"],
+                keywordsAr: ["عدم الممانعة لمعدات الحريق", "عدم ممانعة معدات السلامة", "ترخيص عدم ممانعة معدات"]
+            },
+            {
+                id: "local_fire_equipment_factory_license",
+                legacyId: "إصدار الترخيص لمصنع محلي لمعدات الإطفاء والوقاية من الحريق، وتجديد الترخيص",
+                nameEn: "License for Local Firefighting Equipment Factory",
+                nameAr: "إصدار الترخيص لمصنع محلي لمعدات الإطفاء والوقاية من الحريق، وتجديد الترخيص",
+                name: "إصدار الترخيص لمصنع محلي لمعدات الإطفاء والوقاية من الحريق، وتجديد الترخيص",
+                fee: "مجاناً",
+                keywordsEn: ["local fire equipment factory", "firefighting factory license", "local safety factory"],
+                keywordsAr: ["مصنع محلي لمعدات الإطفاء", "مصنع معدات حريق", "ترخيص مصنع إطفاء"]
+            },
+            {
+                id: "alarm_firefighting_maintenance_offices_license",
+                legacyId: "إصدار الترخيص للمكاتب الفنية ومكاتب صيانة أجهزة الإنذار والإطفاء، وتجديد الترخيص",
+                nameEn: "License for Alarm & Firefighting Maintenance Offices",
+                nameAr: "إصدار الترخيص للمكاتب الفنية ومكاتب صيانة أجهزة الإنذار والإطفاء، وتجديد الترخيص",
+                name: "إصدار الترخيص للمكاتب الفنية ومكاتب صيانة أجهزة الإنذار والإطفاء، وتجديد الترخيص",
+                fee: "100 دينار بحريني فقط",
+                keywordsEn: ["alarm maintenance office", "firefighting maintenance company", "technical office license"],
+                keywordsAr: ["مكاتب صيانة أجهزة الإنذار", "مكاتب صيانة الإطفاء", "مكتب فني صيانة حريق"]
+            },
+            {
+                id: "hazardous_materials_1day_transport",
+                legacyId: "ترخيص بالموافقة على نقل شحنات المواد الخطرة ليوم واحد",
+                nameEn: "One-Day Permit for Transporting Hazardous Material Shipments",
+                nameAr: "ترخيص بالموافقة على نقل شحنات المواد الخطرة ليوم واحد",
+                name: "ترخيص بالموافقة على نقل شحنات المواد الخطرة ليوم واحد",
+                fee: "50 دينار بحريني فقط",
+                keywordsEn: ["hazardous transport 1day", "chemical transport permit", "1 day hazardous transport", "dangerous goods transport"],
+                keywordsAr: ["نقل شحنات المواد الخطرة ليوم واحد", "نقل مواد خطرة يوم", "شحنة مواد خطرة"]
+            },
+            {
+                id: "chemical_hazmat_transport_vehicles_license",
+                legacyId: "إصدار ترخيص الموافقة على سيارات نقل المواد الكيميائية والخطرة، وتجديد الترخيص",
+                nameEn: "Approval License for Chemical & Hazardous Transport Vehicles",
+                nameAr: "إصدار ترخيص الموافقة على سيارات نقل المواد الكيميائية والخطرة، وتجديد الترخيص",
+                name: "إصدار ترخيص الموافقة على سيارات نقل المواد الكيميائية والخطرة، وتجديد الترخيص",
+                fee: "10 دينار بحريني فقط",
+                keywordsEn: ["chemical transport vehicle", "hazmat truck license", "hazardous transport vehicle", "chemical transport"],
+                keywordsAr: ["سيارات نقل المواد الكيميائية", "مركبات نقل مواد خطرة", "ترخيص سيارة نقل كيميائي", "شاحنة نقل غاز"]
+            },
+            {
+                id: "diesel_gas_tanks_installation_license",
+                legacyId: "إصدار ترخيص الموافقة النهائية على تركيب خزانات الديزل والغاز، وتجديد الترخيص",
+                nameEn: "Final Approval License for Installing Diesel & Gas Tanks",
+                nameAr: "إصدار ترخيص الموافقة النهائية على تركيب خزانات الديزل والغاز، وتجديد الترخيص",
+                name: "إصدار ترخيص الموافقة النهائية على تركيب خزانات الديزل والغاز، وتجديد الترخيص",
+                fee: "مجاناً",
+                keywordsEn: ["diesel tank", "gas tank installation", "diesel tank installation", "fuel tank installation license"],
+                keywordsAr: ["تركيب خزانات الديزل والغاز", "خزانات ديزل", "تركيب خزان غاز", "ترخيص خزان ديزل"]
+            },
+            {
+                id: "consulting_offices_gas_fuel_hazmat_license",
+                legacyId: "إصدار الترخيص للمكاتب الفنية والاستشارية المختصة بالغاز والوقود والمواد الخطرة، وتجديد الترخيص",
+                nameEn: "License for Technical & Consulting Offices (Gas, Fuel, & Hazmat)",
+                nameAr: "إصدار الترخيص للمكاتب الفنية والاستشارية المختصة بالغاز والوقود والمواد الخطرة، وتجديد الترخيص",
+                name: "إصدار الترخيص للمكاتب الفنية والاستشارية المختصة بالغاز والوقود والمواد الخطرة، وتجديد الترخيص",
+                fee: "100 دينار بحريني فقط",
+                keywordsEn: ["gas fuel consulting office", "hazmat consulting office", "gas technical office"],
+                keywordsAr: ["المكاتب الفنية والاستشارية المختصة بالغاز", "مكتب استشاري مواد خطرة", "استشاري غاز ووقود"]
+            },
+            {
+                id: "engineering_offices_fire_protection_license",
+                legacyId: "ترخيص المكاتب الهندسية لتصميم أنظمة الحماية والوقاية من الحريق وتجديد الترخيص",
+                nameEn: "License for Engineering Offices Designing Fire Protection Systems",
+                nameAr: "ترخيص المكاتب الهندسية لتصميم أنظمة الحماية والوقاية من الحريق وتجديد الترخيص",
+                name: "ترخيص المكاتب الهندسية لتصميم أنظمة الحماية والوقاية من الحريق وتجديد الترخيص",
+                fee: "100 دينار بحريني فقط",
+                keywordsEn: ["engineering office fire protection", "fire safety design office", "engineering design license"],
+                keywordsAr: ["ترخيص مكاتب هندسية", "مكتب تصميم أنظمة حماية", "تصميم أنظمة حريق", "مكتب هندسي حريق"]
+            },
+            {
+                id: "small_facilities_inspection_certificate",
+                legacyId: "إصدار شهادة فحص المنشآت الصغيرة، وتجديد الشهادة",
+                nameEn: "Small Facilities Inspection Certificate Renewal",
+                nameAr: "إصدار شهادة فحص المنشآت الصغيرة، وتجديد الشهادة",
+                name: "إصدار شهادة فحص المنشآت الصغيرة، وتجديد الشهادة",
+                fee: "30 دينار بحريني فقط",
+                keywordsEn: ["small facilities inspection", "small facility certificate", "small business inspection", "inspection certificate", "inspection", "inspect", "inspection_certificate"],
+                keywordsAr: ["فحص المنشآت الصغيرة", "فحص منشأة صغيرة", "شهادة فحص منشأة صغيرة", "شهادة فحص", "طلب التفتيش", "تفتيش", "فحص", "طلب تفتيش", "معاينة"]
+            },
+            {
+                id: "certified_prevention_inspector",
+                legacyId: "مفتش وقاية معتمد",
+                nameEn: "Certified Prevention Inspector",
+                nameAr: "مفتش وقاية معتمد",
+                name: "مفتش وقاية معتمد",
+                fee: "30 دينار بحريني فقط",
+                keywordsEn: ["prevention inspector", "certified inspector"],
+                keywordsAr: ["مفتش وقاية", "مفتش معتمد", "مفتش"]
+            },
+            {
+                id: "fire_equipment_sales_license",
+                legacyId: "ترخيص بيع وتداول وتخزين معدات الحريق",
+                nameEn: "Fire Equipment Sales, Trading & Storage License",
+                nameAr: "ترخيص بيع وتداول وتخزين معدات الحريق",
+                name: "ترخيص بيع وتداول وتخزين معدات الحريق",
+                fee: "30 دينار بحريني فقط",
+                keywordsEn: ["fire equipment sales", "fire equipment trading"],
+                keywordsAr: ["بيع معدات الحريق", "تداول معدات الحريق", "تخزين معدات الحريق"]
+            },
+            {
+                id: "fireworks_import_license",
+                legacyId: "ترخيص استيراد وتخزين الألعاب النارية",
+                nameEn: "Fireworks Import & Storage License",
+                nameAr: "ترخيص استيراد وتخزين الألعاب النارية",
+                name: "ترخيص استيراد وتخزين الألعاب النارية",
+                fee: "100 دينار بحريني فقط",
+                keywordsEn: ["fireworks import", "fireworks storage", "fireworks"],
+                keywordsAr: ["ألعاب نارية", "استيراد ألعاب نارية", "تخزين ألعاب نارية", "مفرقعات"]
+            },
+            {
+                id: "explosives_import_permit",
+                legacyId: "ترخيص استيراد مواد خطرة ومتفجرات",
+                nameEn: "Hazardous Material & Explosives Import Permit",
+                nameAr: "ترخيص استيراد مواد خطرة ومتفجرات",
+                name: "ترخيص استيراد مواد خطرة ومتفجرات",
+                fee: "10 دينار بحريني فقط",
+                keywordsEn: ["explosives import", "explosives permit"],
+                keywordsAr: ["استيراد متفجرات", "مواد خطرة ومتفجرات"]
+            },
+            {
+                id: "temporary_event_tents_permit",
+                legacyId: "طلب ترخيص الخيام للمناسبات العامة والخاصة المؤقتة",
+                nameEn: "Temporary Event Tents Permit",
+                nameAr: "طلب ترخيص الخيام للمناسبات العامة والخاصة المؤقتة",
+                name: "طلب ترخيص الخيام للمناسبات العامة والخاصة المؤقتة",
+                fee: "مجانًا",
+                keywordsEn: ["event tents", "temporary tents", "tents permit", "tent"],
+                keywordsAr: ["ترخيص خيام", "خيام مناسبات", "خيمة", "خيام مؤقتة"]
+            }
+        ];
 
-            let bestMatch = null;
-            let maxMatches = 0;
+        window.getServiceItem = function(serviceId) {
+            if (!serviceId) return null;
+            const clean = serviceId.toLowerCase().trim();
+            return window.servicesList.find(s => 
+                s.id.toLowerCase() === clean || 
+                (s.legacyId && s.legacyId.toLowerCase() === clean) ||
+                (s.nameAr && s.nameAr.toLowerCase() === clean) ||
+                (s.nameEn && s.nameEn.toLowerCase() === clean) ||
+                (s.name && s.name.toLowerCase() === clean)
+            ) || null;
+        };
+
+        window.findBestMatchingService = function(text) {
+            if (!text || typeof text !== 'string') return null;
             
-            serviceKeywords.forEach(item => {
-                let matchCount = 0;
-                item.keywords.forEach(kw => {
-                    if (cleanText.includes(kw.toLowerCase())) {
-                        matchCount++;
-                    }
-                });
-                if (cleanText.includes(item.id.toLowerCase())) {
-                    matchCount += 3;
+            const rawLower = text.toLowerCase().trim();
+            const normalizeAr = (str) => str ? str.toLowerCase()
+                .replace(/[أإآ]/g, 'ا')
+                .replace(/ة/g, 'ه')
+                .replace(/ى/g, 'ي')
+                .replace(/[^\u0621-\u064Aa-zA-Z0-9\s]/g, ' ')
+                .replace(/\s+/g, ' ').trim() : '';
+            
+            const cleanText = normalizeAr(text);
+            if (!cleanText) return null;
+
+            const stopWords = new Set([
+                'علي', 'على', 'في', 'من', 'عن', 'مع', 'الى', 'إلى', 'حق', 'ابي', 'اريد', 'بدي',
+                'طلب', 'طلبات', 'تقديم', 'ترخيص', 'تراخيص', 'اصدار', 'تجديد', 'الخدمة', 'الخدمه',
+                'شلون', 'كيف', 'طريقة', 'طريقه', 'ارغب', 'ابحث', 'عن', 'الي', 'اللي', 'هذا', 'هذه'
+            ]);
+
+            const stripAl = (word) => (word && word.startsWith('ال') && word.length > 3) ? word.slice(2) : word;
+
+            let bestMatchId = null;
+            let maxScore = 0;
+            
+            window.servicesList.forEach(item => {
+                let score = 0;
+                
+                const cleanId = item.id.toLowerCase().replace(/_/g, ' ').trim();
+                const cleanLegacyId = (item.legacyId || '').toLowerCase().replace(/_/g, ' ').trim();
+                const cleanNameEn = normalizeAr(item.nameEn || '');
+                const normNameAr = normalizeAr(item.nameAr || item.name || '');
+                
+                // 1. Direct ID or Legacy ID exact match (Highest Priority)
+                if (rawLower === item.id.toLowerCase() || (item.legacyId && rawLower === item.legacyId.toLowerCase())) {
+                    score += 1000;
+                } else if (cleanText === cleanId || (cleanLegacyId && cleanText === cleanLegacyId)) {
+                    score += 900;
                 }
-                if (matchCount > maxMatches) {
-                    maxMatches = matchCount;
-                    bestMatch = item.id;
+                
+                // 2. Exact Name Match (English or Arabic)
+                if (cleanText === cleanNameEn || cleanText === normNameAr) {
+                    score += 800;
+                }
+                
+                // 3. Substring Match in Name
+                if (normNameAr && (cleanText.includes(normNameAr) || normNameAr.includes(cleanText))) {
+                    score += 400;
+                }
+
+                // 4. Word Token Overlap Match (filtering stopWords & AL- prefix)
+                const textTokens = cleanText.split(' ').filter(w => w.length > 2 && !stopWords.has(w) && !stopWords.has(stripAl(w)));
+                const nameTokens = normNameAr.split(' ').filter(w => w.length > 2 && !stopWords.has(w) && !stopWords.has(stripAl(w)));
+                let tokenMatches = 0;
+                textTokens.forEach(t => {
+                    const strippedT = stripAl(t);
+                    const matchesNameToken = nameTokens.some(nt => {
+                        const strippedNt = stripAl(nt);
+                        return nt === t || strippedNt === strippedT || (strippedT.length > 3 && (nt.includes(strippedT) || strippedT.includes(nt)));
+                    });
+                    if (matchesNameToken) tokenMatches++;
+                });
+                if (tokenMatches > 0) {
+                    score += tokenMatches * 150;
+                }
+                
+                // 5. Keyword Matches (Arabic)
+                if (item.keywordsAr) {
+                    item.keywordsAr.forEach(kw => {
+                        const kwNorm = normalizeAr(kw);
+                        const kwStripped = stripAl(kwNorm);
+                        if (cleanText === kwNorm) {
+                            score += 350 + (kwNorm.length * 10);
+                        } else if (cleanText.includes(kwNorm) || kwNorm.includes(cleanText) || (kwStripped.length >= 3 && cleanText.includes(kwStripped))) {
+                            score += 200 + (kwNorm.length * 5);
+                        }
+                    });
+                }
+
+                // 6. Keyword Matches (English)
+                if (item.keywordsEn) {
+                    item.keywordsEn.forEach(kw => {
+                        const kwLower = kw.toLowerCase().trim();
+                        if (rawLower === kwLower) {
+                            score += 350 + (kwLower.length * 10);
+                        } else if (rawLower.includes(kwLower)) {
+                            score += 200 + (kwLower.length * 5);
+                        }
+                    });
+                }
+                
+                if (score > maxScore) {
+                    maxScore = score;
+                    bestMatchId = item.id;
                 }
             });
             
-            return bestMatch;
-        }
+            return maxScore >= 150 ? bestMatchId : null;
+        };
 
-        window.renderApplyNowButton = function(serviceId) {
+        const findBestMatchingService = window.findBestMatchingService;
+        const getServiceItem = window.getServiceItem;
+
+        window.renderApplyNowButton = function(serviceId, referenceNumber) {
             const messagesContainer = document.getElementById('chat-messages');
             if (!messagesContainer) return;
             
-            // Avoid creating duplicate cards for the exact same service if one is already showing at the bottom
-            const lastWrapper = messagesContainer.querySelector('.apply-now-wrapper:last-child');
-            if (lastWrapper && lastWrapper.getAttribute('data-service-id') === serviceId) {
+            let serviceItem = window.getServiceItem(serviceId);
+            if (!serviceItem) {
+                console.error("[UI] Cannot render Apply Now button: serviceId not found:", serviceId);
                 return;
             }
             
-            // Remove any other existing Apply Now card to avoid visual clutter
-            const existingWrappers = messagesContainer.querySelectorAll('.apply-now-wrapper');
-            existingWrappers.forEach(w => w.remove());
+            window.lastAppliedServiceId = serviceItem.id;
+            window.lastResolvedServiceId = serviceItem.id;
             
-            const serviceItem = servicesList.find(s => s.id === serviceId);
-            if (!serviceItem) return;
+            // If an apply button card already exists, remove or reposition to bottom
+            const existingCard = messagesContainer.querySelector('.apply-now-wrapper');
+            if (existingCard) {
+                if (existingCard.getAttribute('data-service-id') === serviceItem.id) {
+                    messagesContainer.appendChild(existingCard);
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    return;
+                }
+                existingCard.remove();
+            }
             
             const wrapper = document.createElement('div');
             wrapper.className = 'apply-now-wrapper fade-in';
-            wrapper.setAttribute('data-service-id', serviceId);
+            wrapper.setAttribute('data-service-id', serviceItem.id);
             
+            const refArg = referenceNumber ? `'${referenceNumber}'` : 'undefined';
             wrapper.innerHTML = `
                 <div class="apply-now-card">
                     <span class="apply-icon">📋</span>
                     <div class="apply-details">
-                        <span class="apply-title">تقديم طلب إلكتروني فوري</span>
-                        <span class="apply-service-name">${serviceItem.name}</span>
+                        <span class="apply-title">تقديم طلب إلكتروني فوري / Online Application</span>
+                        <span class="apply-service-name">${serviceItem.nameAr} <span style="font-size:0.85em; opacity:0.8; font-weight:normal;">(${serviceItem.nameEn})</span></span>
                     </div>
-                    <button class="apply-btn" onclick="openApplicationModal('${serviceId}'); this.closest('.apply-now-wrapper').remove();">قدّم الآن</button>
+                    <button class="apply-btn" onclick="openApplicationModal('${serviceItem.id}', ${refArg});">قدّم الآن / Apply</button>
                 </div>
             `;
             
@@ -2119,7 +3128,14 @@
             }
 
             wrapper.appendChild(msgDiv);
-            messagesContainer.appendChild(wrapper);
+
+            // Ensure message bubbles are always inserted BEFORE any apply button card so the card stays BELOW the agent message
+            const existingCard = messagesContainer.querySelector('.apply-now-wrapper');
+            if (existingCard) {
+                messagesContainer.insertBefore(wrapper, existingCard);
+            } else {
+                messagesContainer.appendChild(wrapper);
+            }
             
             // Allow browser rendering to complete before scrolling
             setTimeout(() => {
@@ -2148,11 +3164,28 @@
                 <div id="form-step-1" class="form-step active">
                     <h3 class="modal-title">تقديم طلب خدمة الدفاع المدني</h3>
                     
-                    <div class="form-group">
+                    <div class="form-group" style="position: relative;">
                         <label class="form-label" for="app-service-name">نوع الخدمة المطلوب التقديم عليها</label>
-                        <select id="app-service-name" class="form-select" onchange="renderDynamicFields()" required>
-                            <option value="" disabled selected>-- اختر الخدمة --</option>
+                        <!-- Hidden native select element for form state & validation -->
+                        <select id="app-service-name" class="form-select" style="display: none;" onchange="renderDynamicFields(); window.updateCustomDropdownTrigger();" required>
+                            <option value="" disabled selected>-- اختر الخدمة / Select Service --</option>
                         </select>
+
+                        <!-- Custom Dark Glassmorphic Searchable Select Component -->
+                        <div id="custom-service-dropdown" class="custom-dropdown-container">
+                            <div class="custom-dropdown-trigger" id="custom-dropdown-trigger" onclick="window.toggleCustomServiceDropdown(event)">
+                                <span id="custom-dropdown-label" class="custom-dropdown-trigger-text">-- اختر الخدمة / Select Service --</span>
+                                <span class="custom-dropdown-arrow">▼</span>
+                            </div>
+                            <div id="custom-dropdown-menu" class="custom-dropdown-menu">
+                                <div class="custom-dropdown-search-box">
+                                    <input type="text" id="custom-dropdown-search-input" class="custom-dropdown-search-input" placeholder="🔍 بحث في 34 خدمة / Search 34 services..." oninput="window.filterCustomServiceDropdown(this.value)">
+                                </div>
+                                <div id="custom-dropdown-options-list" class="custom-dropdown-list">
+                                    <!-- Dynamically populated custom items -->
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
@@ -2208,9 +3241,16 @@
                     <div id="dynamic-fields-container" style="margin-top: 10px;"></div>
 
                     <div class="form-group" style="margin-top: 10px;">
-                        <label class="form-label" for="app-attachment">المرفقات المطلوبة (نسخة PDF فقط، أقصى حجم 5 ميجابايت)</label>
-                        <input type="file" id="app-attachment" class="form-input" accept="application/pdf" onchange="handleFileSelect(event)" required>
-                        <div id="attachment-error" class="form-error" style="display: none;">الملف المرفوع يجب أن يكون بصيغة PDF فقط وحجمه أقل من 5 ميجابايت.</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <label class="form-label">المرفقات المطلوبة (نسخة PDF فقط، أقصى حجم 5MB لكل ملف)</label>
+                            <button type="button" class="btn-add-dynamic" onclick="window.addAttachmentRow()" title="إضافة ملف مرفق آخر">+</button>
+                        </div>
+                        <div id="attachments-list-container">
+                            <div class="attachment-field-row" style="display: flex; gap: 8px; margin-bottom: 8px;">
+                                <input type="file" class="form-input attachment-file-input" accept="application/pdf" onchange="window.handleMultiFileSelect(event, 0)" required style="flex-grow: 1;">
+                            </div>
+                        </div>
+                        <div id="attachment-error" class="form-error" style="display: none;">يرجى رفع ملف المرفق (PDF) المطلوب للخدمة.</div>
                     </div>
 
                     <div class="form-group">
@@ -2268,7 +3308,10 @@
 
                         <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 8px;">لقد قمنا أيضاً بإرسال رسالة تأكيد تحتوي على رابط التتبع عبر الواتساب والبريد الإلكتروني المدخلين.</p>
                         
-                        <div class="form-actions" style="width: 100%; justify-content: center;">
+                        <div class="form-actions" style="width: 100%; justify-content: center; gap: 12px; flex-wrap: wrap;">
+                            <a id="success-download-pdf" href="#" target="_blank" class="btn-step-next" style="background: linear-gradient(135deg, #1E3A8A, #0F172A); border: 1px solid #F59E0B; color: #FCD34D; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px;">
+                                <span>📄 تحميل الإيصال الرسمي مع رمز التحقق (PDF)</span>
+                            </a>
                             <button type="button" class="btn-step-next" style="background: var(--status-online);" onclick="closeApplicationModal()">إغلاق النافذة</button>
                         </div>
                     </div>
@@ -2281,66 +3324,139 @@
     <script>
         let fileBase64 = '';
         let fileName = '';
+        let attachmentsList = [];
 
-        const servicesList = [
-            { id: "Safety Certificate Renewal", name: "إصدار شهادة استيفاء شروط واحتياجات الحماية والوقاية من الحريق وتجديدها", fee: "50 دينار بحريني فقط" },
-            { id: "Gas Selling Shops License", name: "إصدار ترخيص محلات بيع الغاز، وتجديد الترخيص", fee: "20 دينار بحريني فقط" },
-            { id: "Bakery License", name: "إصدار ترخيص المخابز الشعبية والآلية، وتجديد الترخيص", fee: "10 دينار بحريني فقط" },
-            { id: "Gold Shop License", name: "إصدار ترخيص محلات وورش الذهب، وتجديد الترخيص", fee: "20 دينار بحريني فقط" },
-            { id: "Trainee Registration", name: "إصدار الترخيص لمعاهد ومراكز التدريب على أعمال الدفاع المدني", fee: "200 دينار بحريني فقط" },
-            { id: "Gas Station License", name: "إصدار الترخيص لمحطات تزويد الوقود، وتجديد الترخيص", fee: "مجاناً" },
-            { id: "Hazardous Material Permit", name: "إصدار ترخيص عدم ممانعة لتخزين مواد كيميائية أو المتفجرات، وتجديد الترخيص", fee: "مجاناً" },
+        window.populateServiceDropdown = function() {
+            const selectEl = document.getElementById('app-service-name');
+            if (!selectEl) return;
             
-            // services_2.txt
-            { id: "إصدار شهادة فحص المصانع والفنادق والمجمعات التجارية قيد الإنشاء وتجديدها", name: "إصدار شهادة فحص المصانع والفنادق والمجمعات التجارية قيد الإنشاء وتجديدها", fee: "100 دينار بحريني فقط" },
-            { id: "إصدار تقرير الحوادث للمنشآت الكبيرة والمصانع والفنادق والمجمعات التجارية وما في حكمها", name: "إصدار تقرير الحوادث للمنشآت الكبيرة والمصانع والفنادق والمجمعات التجارية وما في حكمها", fee: "50 دينار بحريني فقط" },
-            { id: "إصدار تقرير الحوادث للمنشآت الصغيرة والمنازل وما في حكمها", name: "إصدار تقرير الحوادث للمنشآت الصغيرة والمنازل وما في حكمها", fee: "مجاناً" },
-            { id: "إصدار شهادة الفحص النهائي لتوصيل التيار الكهربائي للمباني الجديدة", name: "إصدار شهادة الفحص النهائي لتوصيل التيار الكهربائي للمباني الجديدة", fee: "30 دينار بحريني فقط" },
+            const list = window.servicesList || [];
             
-            // services_3.txt
-            { id: "إصدار ترخيص خرائط المصانع والمخازن وتجديد الترخيص", name: "إصدار ترخيص خرائط المصانع والمخازن وتجديد الترخيص", fee: "50 دينار بحريني فقط" },
-            { id: "إصدار ترخيص خرائط المراكز التجارية والمباني العالية", name: "إصدار ترخيص خرائط المراكز التجارية والمباني العالية", fee: "300 دينار بحريني فقط" },
-            { id: "إصدار ترخيص خرائط المجمعات السكنية التي تحتوي على عشر فلل فأكثر", name: "إصدار ترخيص خرائط المجمعات السكنية التي تحتوي على عشر فلل فأكثر", fee: "100 دينار بحريني فقط" },
-            { id: "دراسة مخططات دور العبادة والمحاكم والمتاحف", name: "دراسة مخططات دور العبادة والمحاكم والمتاحف", fee: "مجاناً" },
-            { id: "دراسة الخرائط لمحطات الوقود الجديدة", name: "دراسة الخرائط لمحطات الوقود الجديدة", fee: "مجاناً" },
-            { id: "دراسة المخططات الهندسية الكهربائية", name: "دراسة المخططات الهندسية الكهربائية", fee: "مجاناً" },
-            { id: "دراسة المخططات الميكانيكية", name: "دراسة المخططات الميكانيكية", fee: "مجاناً" },
-            { id: "دراسة الخرائط على تمديدات الغاز والخزانات", name: "دراسة الخرائط على تمديدات الغاز والخزانات", fee: "مجاناً" },
-            
-            // services_4.txt
-            { id: "إصدار شهادة تدريب على أعمال الدفاع المدني لمدة يوم واحد", name: "إصدار شهادة تدريب على أعمال الدفاع المدني لمدة يوم واحد", fee: "40 دينار بحريني" },
-            { id: "إصدار شهادة تدريب على أعمال الدفاع المدني لمدة  اسبوع", name: "إصدار شهادة تدريب على أعمال الدفاع المدني لمدة  اسبوع", fee: "200 دينار بحريني فقط." },
-            { id: "إصدار شهادة تدريب أفراد منشآت ومؤسسات القطاع الخاص على قيادة مركبات الإطفاء الثقيلة لمدة أسبوعين", name: "إصدار شهادة تدريب أفراد منشآت ومؤسسات القطاع الخاص على قيادة مركبات الإطفاء الثقيلة لمدة أسبوعين", fee: "200 دينار بحريني فقط." },
-            { id: "إصدار شهادة تدريب الفرد على أعمال الدفاع المدني لمدة ستة عشر أسبوعًا.", name: "إصدار شهادة تدريب الفرد على أعمال الدفاع المدني لمدة ستة عشر أسبوعًا.", fee: "2000 دينار بحريني فقط." },
-            { id: "التدريب على عمليات إخلاء المباني والمنشآت", name: "التدريب على عمليات إخلاء المباني والمنشآت", fee: "50 دينار بحريني فقط." },
-            
-            // services_5.txt
-            { id: "إصدار الترخيص لمعدات الحريق والسلامة، وتجديد الترخيص", name: "إصدار الترخيص لمعدات الحريق والسلامة، وتجديد الترخيص", fee: "30 دينار بحريني فقط" },
-            { id: "إصدار ترخيص عدم الممانعة لمعدات الحريق والسلامة، وتجديد الترخيص", name: "إصدار ترخيص عدم الممانعة لمعدات الحريق والسلامة، وتجديد الترخيص", fee: "40 دينار بحريني فقط" },
-            { id: "إصدار الترخيص لمصنع محلي لمعدات الإطفاء والوقاية من الحريق، وتجديد الترخيص", name: "إصدار الترخيص لمصنع محلي لمعدات الإطفاء والوقاية من الحريق، وتجديد الترخيص", fee: "مجاناً" },
-            { id: "إصدار الترخيص للمكاتب الفنية ومكاتب صيانة أجهزة الإنذار والإطفاء، وتجديد الترخيص", name: "إصدار الترخيص للمكاتب الفنية ومكاتب صيانة أجهزة الإنذار والإطفاء، وتجديد الترخيص", fee: "100 دينار بحريني فقط" },
-            
-            // services_6.txt
-            { id: "ترخيص بالموافقة على نقل شحنات المواد الخطرة ليوم واحد", name: "ترخيص بالموافقة على نقل شحنات المواد الخطرة ليوم واحد", fee: "50 دينار بحريني فقط" },
-            { id: "إصدار ترخيص الموافقة على سيارات نقل المواد الكيميائية والخطرة، وتجديد الترخيص", name: "إصدار ترخيص الموافقة على سيارات نقل المواد الكيميائية والخطرة، وتجديد الترخيص", fee: "10 دينار بحريني فقط" },
-            
-            // services_7.txt
-            { id: "إصدار ترخيص الموافقة النهائية على تركيب خزانات الديزل والغاز، وتجديد الترخيص", name: "إصدار ترخيص الموافقة النهائية على تركيب خزانات الديزل والغاز، وتجديد الترخيص", fee: "مجاناً" },
-            { id: "إصدار الترخيص للمكاتب الفنية والاستشارية المختصة بالغاز والوقود والمواد الخطرة، وتجديد الترخيص", name: "إصدار الترخيص للمكاتب الفنية والاستشارية المختصة بالغاز والوقود والمواد الخطرة، وتجديد الترخيص", fee: "100 دينار بحريني فقط" },
-            { id: "إصدار شهادة فحص المنشآت الصغيرة، وتجديد الشهادة", name: "إصدار شهادة فحص المنشآت الصغيرة، وتجديد الشهادة", fee: "30 دينار بحريني فقط" }
-        ];
+            const currentVal = selectEl.value;
+            selectEl.innerHTML = '<option value="" disabled selected>-- اختر الخدمة / Select Service --</option>';
+            list.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.id;
+                opt.textContent = `${s.nameAr} (${s.nameEn})`;
+                selectEl.appendChild(opt);
+            });
+            if (currentVal && Array.from(selectEl.options).some(o => o.value === currentVal)) {
+                selectEl.value = currentVal;
+            }
 
-        document.addEventListener('DOMContentLoaded', () => {
+            window.renderCustomDropdownList(list);
+            window.updateCustomDropdownTrigger();
+        };
+
+        window.renderCustomDropdownList = function(list) {
+            const container = document.getElementById('custom-dropdown-options-list');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const selectEl = document.getElementById('app-service-name');
+            const currentVal = selectEl ? selectEl.value : '';
+
+            if (!list || list.length === 0) {
+                container.innerHTML = '<div style="padding: 12px; color: rgba(255,255,255,0.5); text-align: center; font-size: 0.85rem;">لا توجد نتائج مطابقة / No matching results</div>';
+                return;
+            }
+
+            list.forEach(s => {
+                const item = document.createElement('div');
+                item.className = 'custom-dropdown-item' + (s.id === currentVal ? ' selected' : '');
+                item.onclick = (e) => {
+                    e.stopPropagation();
+                    window.selectCustomServiceOption(s.id);
+                };
+                item.innerHTML = `
+                    <span class="custom-dropdown-item-ar">${s.nameAr}</span>
+                    <span class="custom-dropdown-item-en">${s.nameEn}</span>
+                `;
+                container.appendChild(item);
+            });
+        };
+
+        window.toggleCustomServiceDropdown = function(e) {
+            if (e) e.stopPropagation();
+            const trigger = document.getElementById('custom-dropdown-trigger');
+            const menu = document.getElementById('custom-dropdown-menu');
+            if (!menu) return;
+
+            const isShown = menu.classList.contains('show');
+            if (isShown) {
+                menu.classList.remove('show');
+                if (trigger) trigger.classList.remove('active');
+            } else {
+                menu.classList.add('show');
+                if (trigger) trigger.classList.add('active');
+                const searchInput = document.getElementById('custom-dropdown-search-input');
+                if (searchInput) {
+                    searchInput.value = '';
+                    window.filterCustomServiceDropdown('');
+                    setTimeout(() => searchInput.focus(), 100);
+                }
+            }
+        };
+
+        window.selectCustomServiceOption = function(serviceId) {
             const selectEl = document.getElementById('app-service-name');
             if (selectEl) {
-                selectEl.innerHTML = '<option value="" disabled selected>-- اختر الخدمة --</option>';
-                servicesList.forEach(s => {
-                    const opt = document.createElement('option');
-                    opt.value = s.id;
-                    opt.textContent = s.id === s.name ? s.name : `${s.name} (${s.id})`;
-                    selectEl.appendChild(opt);
-                });
+                selectEl.value = serviceId;
+                selectEl.dispatchEvent(new Event('change'));
             }
+            window.updateCustomDropdownTrigger();
+            
+            const menu = document.getElementById('custom-dropdown-menu');
+            const trigger = document.getElementById('custom-dropdown-trigger');
+            if (menu) menu.classList.remove('show');
+            if (trigger) trigger.classList.remove('active');
+        };
+
+        window.filterCustomServiceDropdown = function(query) {
+            const clean = (query || '').toLowerCase().trim();
+            const list = window.servicesList || [];
+            const filtered = list.filter(s => {
+                if (!clean) return true;
+                return (s.nameAr && s.nameAr.toLowerCase().includes(clean)) ||
+                       (s.nameEn && s.nameEn.toLowerCase().includes(clean)) ||
+                       (s.id && s.id.toLowerCase().includes(clean)) ||
+                       (s.keywordsAr && s.keywordsAr.some(k => k.toLowerCase().includes(clean))) ||
+                       (s.keywordsEn && s.keywordsEn.some(k => k.toLowerCase().includes(clean)));
+            });
+            window.renderCustomDropdownList(filtered);
+        };
+
+        window.updateCustomDropdownTrigger = function() {
+            const selectEl = document.getElementById('app-service-name');
+            const labelEl = document.getElementById('custom-dropdown-label');
+            if (!selectEl || !labelEl) return;
+
+            const currentVal = selectEl.value;
+            const targetItem = window.getServiceItem ? window.getServiceItem(currentVal) : (window.servicesList || []).find(s => s.id === currentVal);
+
+            if (targetItem) {
+                labelEl.textContent = `${targetItem.nameAr} (${targetItem.nameEn})`;
+                labelEl.style.color = '#ffffff';
+                labelEl.style.fontWeight = '600';
+            } else {
+                labelEl.textContent = '-- اختر الخدمة / Select Service --';
+                labelEl.style.color = 'rgba(255, 255, 255, 0.6)';
+                labelEl.style.fontWeight = 'normal';
+            }
+        };
+
+        document.addEventListener('click', (e) => {
+            const container = document.getElementById('custom-service-dropdown');
+            const menu = document.getElementById('custom-dropdown-menu');
+            const trigger = document.getElementById('custom-dropdown-trigger');
+            if (container && !container.contains(e.target)) {
+                if (menu) menu.classList.remove('show');
+                if (trigger) trigger.classList.remove('active');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            window.populateServiceDropdown();
 
             const countrySelect = document.getElementById('app-country-code');
             if (countrySelect) {
@@ -2423,73 +3539,151 @@
             }
         });
 
+        window.resetApplicationForm = function() {
+            const form = document.getElementById('service-app-form');
+            if (form) form.reset();
+            const dynContainer = document.getElementById('dynamic-fields-container');
+            if (dynContainer) dynContainer.innerHTML = '';
+            fileBase64 = '';
+            fileName = '';
+            attachmentsList = [];
+            const attachContainer = document.getElementById('attachments-list-container');
+            if (attachContainer) {
+                attachContainer.innerHTML = `
+                    <div class="attachment-field-row" style="display: flex; gap: 8px; margin-bottom: 8px;">
+                        <input type="file" class="form-input attachment-file-input" accept="application/pdf" onchange="window.handleMultiFileSelect(event, 0)" required style="flex-grow: 1;">
+                    </div>
+                `;
+            }
+            const inputs = document.querySelectorAll('.form-input, .form-select');
+            inputs.forEach(i => i.classList.remove('invalid'));
+            const whatsappError = document.getElementById('whatsapp-error');
+            if (whatsappError) whatsappError.style.display = 'none';
+            const emailError = document.getElementById('email-error');
+            if (emailError) emailError.style.display = 'none';
+            const attachmentError = document.getElementById('attachment-error');
+            if (attachmentError) attachmentError.style.display = 'none';
+            window.updateCustomDropdownTrigger();
+            goToStep1();
+        };
+
         window.openApplicationModal = function(serviceName, referenceNumber) {
             console.log("[openApplicationModal] called with serviceName:", serviceName, "referenceNumber:", referenceNumber);
+            
+            // Ensure service dropdown is 100% populated
+            window.populateServiceDropdown();
+
             const modal = document.getElementById('application-modal');
             modal.classList.add('active');
             
-            // Go to step 1
-            goToStep1();
+            // If a previous submission was completed (Step 3), reset for a new application
+            const isStep3Active = document.getElementById('form-step-3')?.classList.contains('active');
+            if (isStep3Active) {
+                window.resetApplicationForm();
+            }
             
             if (serviceName) {
                 const serviceSelect = document.getElementById('app-service-name');
                 if (serviceSelect) {
-                    // 1. Try setting option directly by s.id value match
-                    serviceSelect.value = serviceName;
+                    const matchedId = findBestMatchingService(serviceName);
+                    const cleanInput = serviceName.toLowerCase().replace(/\s+/g, ' ').trim();
+                    const cleanMatchedId = matchedId ? matchedId.toLowerCase().replace(/\s+/g, ' ').trim() : '';
                     
-                    // 2. If it did not register, fallback to fuzzy loop matching
-                    if (serviceSelect.value !== serviceName) {
-                        const cleanInput = serviceName.toLowerCase().replace(/\s+/g, ' ').trim();
+                    const currentVal = (serviceSelect.value || '').toLowerCase().replace(/\s+/g, ' ').trim();
+                    const alreadyMatches = currentVal && (currentVal === cleanInput || currentVal === cleanMatchedId);
+
+                    if (!alreadyMatches) {
+                        let found = false;
+                        // Pass 1: Strict Exact Option Value Match (Highest Precision)
                         for (let i = 0; i < serviceSelect.options.length; i++) {
                             const optVal = serviceSelect.options[i].value.toLowerCase().replace(/\s+/g, ' ').trim();
-                            const optText = serviceSelect.options[i].text.toLowerCase().replace(/\s+/g, ' ').trim();
-                            
-                            if (optVal === cleanInput || optText.includes(cleanInput) || cleanInput.includes(optVal)) {
+                            if (!optVal) continue;
+                            if (optVal === cleanMatchedId || optVal === cleanInput) {
                                 serviceSelect.selectedIndex = i;
                                 serviceSelect.value = serviceSelect.options[i].value;
+                                found = true;
                                 break;
                             }
                         }
+
+                        // Pass 2: Option Text / Title Match (Fallback)
+                        if (!found) {
+                            for (let i = 0; i < serviceSelect.options.length; i++) {
+                                const optVal = serviceSelect.options[i].value.toLowerCase().replace(/\s+/g, ' ').trim();
+                                const optText = serviceSelect.options[i].text.toLowerCase().replace(/\s+/g, ' ').trim();
+                                if (!optVal) continue;
+                                if (optText.includes(cleanInput) || (cleanMatchedId && optText.includes(cleanMatchedId))) {
+                                    serviceSelect.selectedIndex = i;
+                                    serviceSelect.value = serviceSelect.options[i].value;
+                                    found = true;
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        if (!found) {
+                            // Fallback to direct setting as last resort
+                            serviceSelect.value = matchedId || serviceName;
+                        }
+                        renderDynamicFields();
+                        window.updateCustomDropdownTrigger();
                     }
                 }
-                renderDynamicFields();
             } else {
-                console.log("[openApplicationModal] No serviceName provided. Dropdown remains unconfigured.");
+                console.log("[openApplicationModal] No serviceName provided. Retaining current dropdown selection.");
             }
+
             if (referenceNumber) {
-                document.getElementById('app-ref-number').value = referenceNumber;
+                const refInput = document.getElementById('app-ref-number');
+                if (refInput && !refInput.value) {
+                    refInput.value = referenceNumber;
+                }
             }
-        }
+        };
 
         function closeApplicationModal() {
             const modal = document.getElementById('application-modal');
-            modal.classList.remove('active');
-            document.getElementById('service-app-form').reset();
-            document.getElementById('dynamic-fields-container').innerHTML = '';
-            fileBase64 = '';
-            fileName = '';
+            if (modal) modal.classList.remove('active');
+            
+            // If the user closed after a completed submission, clean up for next time
+            const isStep3Active = document.getElementById('form-step-3')?.classList.contains('active');
+            if (isStep3Active) {
+                window.resetApplicationForm();
+                return;
+            }
+
+            // Otherwise, preserve all user entered inputs, files, and dynamic values.
+            // Only dismiss error visual highlights:
             const inputs = document.querySelectorAll('.form-input, .form-select');
             inputs.forEach(i => i.classList.remove('invalid'));
-            document.getElementById('whatsapp-error').style.display = 'none';
-            document.getElementById('email-error').style.display = 'none';
-            document.getElementById('attachment-error').style.display = 'none';
+            const whatsappError = document.getElementById('whatsapp-error');
+            if (whatsappError) whatsappError.style.display = 'none';
+            const emailError = document.getElementById('email-error');
+            if (emailError) emailError.style.display = 'none';
+            const attachmentError = document.getElementById('attachment-error');
+            if (attachmentError) attachmentError.style.display = 'none';
         }
+        window.closeApplicationModal = closeApplicationModal;
 
         function closeApplicationModalOuter(e) {
             if (e.target.id === 'application-modal') {
                 closeApplicationModal();
             }
         }
+        window.closeApplicationModalOuter = closeApplicationModalOuter;
 
         function renderDynamicFields() {
             const service = document.getElementById('app-service-name').value;
             const container = document.getElementById('dynamic-fields-container');
             container.innerHTML = '';
 
-            if (service === 'Trainee Registration') {
+            const targetItem = window.getServiceItem(service);
+            const key = targetItem ? targetItem.id : service;
+
+            if (['trainee_registration', 'trainee_registration_1day', 'trainee_registration_1week', 'heavy_fire_vehicle_driving_training', 'trainee_registration_16weeks', 'Trainee Registration'].includes(key)) {
                 container.innerHTML = `
                     <div class="form-group">
-                        <label class="form-label">أسماء المتدربين</label>
+                        <label class="form-label">أسماء المتدربين / Trainee Names</label>
                         <div id="trainee-list-container">
                             <div class="dynamic-field-row">
                                 <input type="text" class="form-input trainee-name-input" placeholder="اسم المتدرب الأول" required>
@@ -2498,14 +3692,14 @@
                         </div>
                     </div>
                 `;
-            } else if (service === 'Safety Certificate Renewal') {
+            } else if (['safety_certificate_renewal', 'Safety Certificate Renewal'].includes(key)) {
                 container.innerHTML = `
                     <div class="form-group">
                         <label class="form-label" for="app-inspection-area">مساحة المنشأة الإجمالية الخاضعة للتفتيش (بالمتر المربع)</label>
                         <input type="number" id="app-inspection-area" class="form-input" min="1" placeholder="مثال: 150" required>
                     </div>
                 `;
-            } else if (service === 'Hazardous Material Permit') {
+            } else if (['hazardous_material_permit', 'Hazardous Material Permit'].includes(key)) {
                 container.innerHTML = `
                     <div class="form-group">
                         <label class="form-label" for="app-chemical-type">نوع المادة الكيميائية المراد تخزينها أو استخدامها</label>
@@ -2518,28 +3712,28 @@
                         </select>
                     </div>
                 `;
-            } else if (service === 'Gold Shop License') {
+            } else if (['gold_shop_license', 'Gold Shop License'].includes(key)) {
                 container.innerHTML = `
                     <div class="form-group">
                         <label class="form-label" for="app-gold-alarm-details">تفاصيل عقد صيانة نظام الإنذار والإطفاء</label>
                         <input type="text" id="app-gold-alarm-details" class="form-input" placeholder="مثال: عقد صيانة صالحة، شركة السلامة" required>
                     </div>
                 `;
-            } else if (service === 'Gas Selling Shops License') {
+            } else if (['gas_selling_shops_license', 'Gas Selling Shops License'].includes(key)) {
                 container.innerHTML = `
                     <div class="form-group">
                         <label class="form-label" for="app-gas-ministry-letter">تفاصيل خطاب وزارة الصناعة والتجارة والسياحة</label>
                         <input type="text" id="app-gas-ministry-letter" class="form-input" placeholder="مثال: رسالة رقم 10234 بتاريخ 2026/05/12" required>
                     </div>
                 `;
-            } else if (service === 'Bakery License') {
+            } else if (['bakery_license', 'Bakery License'].includes(key)) {
                 container.innerHTML = `
                     <div class="form-group">
                         <label class="form-label" for="app-bakery-drawings">أرقام موافقات المخططات المعمارية والكهربائية</label>
                         <input type="text" id="app-bakery-drawings" class="form-input" placeholder="مثال: موافقة رقم MC-90234" required>
                     </div>
                 `;
-            } else if (service === 'Gas Station License') {
+            } else if (['gas_station_license', 'Gas Station License'].includes(key)) {
                 container.innerHTML = `
                     <div class="form-group">
                         <label class="form-label" for="app-station-capacity">إجمالي سعة خزانات الوقود (باللتر)</label>
@@ -2549,7 +3743,7 @@
             } else if (service) {
                 container.innerHTML = `
                     <div class="form-group">
-                        <label class="form-label" for="app-generic-details">تفاصيل إضافية للطلب (اختياري)</label>
+                        <label class="form-label" for="app-generic-details">تفاصيل إضافية للطلب (اختياري) / Additional Details</label>
                         <input type="text" id="app-generic-details" class="form-input" placeholder="يرجى كتابة أي تفاصيل إضافية للخدمة...">
                     </div>
                 `;
@@ -2567,14 +3761,13 @@
             container.appendChild(row);
         }
 
-        function handleFileSelect(e) {
+        window.handleMultiFileSelect = function(e, index) {
             const file = e.target.files[0];
             const errorEl = document.getElementById('attachment-error');
             errorEl.style.display = 'none';
 
             if (!file) {
-                fileBase64 = '';
-                fileName = '';
+                attachmentsList[index] = null;
                 return;
             }
 
@@ -2582,27 +3775,52 @@
                 errorEl.style.display = 'block';
                 errorEl.innerText = "الملف المرفوع يجب أن يكون بصيغة PDF فقط.";
                 e.target.value = '';
-                fileBase64 = '';
-                fileName = '';
+                attachmentsList[index] = null;
                 return;
             }
 
             if (file.size > 5 * 1024 * 1024) {
                 errorEl.style.display = 'block';
-                errorEl.innerText = "حجم الملف كبير جداً. الحد الأقصى المسموح به هو 5 ميجابايت.";
+                errorEl.innerText = "حجم الملف كبير جداً. الحد الأقصى المسموح به لكل ملف هو 5 ميجابايت.";
                 e.target.value = '';
-                fileBase64 = '';
-                fileName = '';
+                attachmentsList[index] = null;
                 return;
             }
 
-            fileName = file.name;
             const reader = new FileReader();
             reader.onload = function(evt) {
-                fileBase64 = evt.target.result;
+                attachmentsList[index] = {
+                    name: file.name,
+                    base64: evt.target.result
+                };
+                if (index === 0) {
+                    fileName = file.name;
+                    fileBase64 = evt.target.result;
+                }
             };
             reader.readAsDataURL(file);
-        }
+        };
+
+        window.addAttachmentRow = function() {
+            const container = document.getElementById('attachments-list-container');
+            if (!container) return;
+            const newIndex = container.children.length;
+            const row = document.createElement('div');
+            row.className = 'attachment-field-row';
+            row.style.cssText = 'display: flex; gap: 8px; margin-bottom: 8px;';
+            row.innerHTML = `
+                <input type="file" class="form-input attachment-file-input" accept="application/pdf" onchange="window.handleMultiFileSelect(event, ${newIndex})" required style="flex-grow: 1;">
+                <button type="button" class="btn-remove-dynamic" onclick="window.removeAttachmentRow(this, ${newIndex})">-</button>
+            `;
+            container.appendChild(row);
+        };
+
+        window.removeAttachmentRow = function(btn, index) {
+            if (btn && btn.parentElement) {
+                btn.parentElement.remove();
+            }
+            attachmentsList[index] = null;
+        };
 
         function goToStep1() {
             document.getElementById('form-step-1').classList.add('active');
@@ -2622,7 +3840,7 @@
             const emailInput = document.getElementById('app-email');
             const attachmentInput = document.getElementById('app-attachment');
 
-            const fields = [serviceSelect, firstNameInput, lastNameInput, whatsappInput, emailInput, attachmentInput];
+            const fields = [serviceSelect, firstNameInput, lastNameInput, whatsappInput, emailInput, attachmentInput].filter(Boolean);
             fields.forEach(f => f.classList.remove('invalid'));
 
             if (!serviceSelect.value) { serviceSelect.classList.add('invalid'); isValid = false; }
@@ -2652,15 +3870,20 @@
 
             const attachmentError = document.getElementById('attachment-error');
             attachmentError.style.display = 'none';
-            if (!fileBase64) {
-                attachmentInput.classList.add('invalid');
+            const validAttachments = attachmentsList.filter(a => a && a.base64);
+            if (validAttachments.length === 0) {
+                const firstInput = document.querySelector('.attachment-file-input');
+                if (firstInput) firstInput.classList.add('invalid');
                 attachmentError.style.display = 'block';
-                attachmentError.innerText = "يرجى رفع ملف المرفق (PDF) المطلوب للخدمة.";
+                attachmentError.innerText = "يرجى رفع ملف المرفق (PDF) المطلوب للخدمة على الأقل.";
                 isValid = false;
             }
 
             const service = serviceSelect.value;
-            if (service === 'Trainee Registration') {
+            const targetItem = window.getServiceItem(service);
+            const key = targetItem ? targetItem.id : service;
+
+            if (['trainee_registration', 'trainee_registration_1day', 'trainee_registration_1week', 'heavy_fire_vehicle_driving_training', 'trainee_registration_16weeks', 'Trainee Registration'].includes(key)) {
                 const traineeInputs = document.querySelectorAll('.trainee-name-input');
                 traineeInputs.forEach(input => {
                     input.classList.remove('invalid');
@@ -2669,7 +3892,7 @@
                         isValid = false;
                     }
                 });
-            } else if (service === 'Safety Certificate Renewal') {
+            } else if (['safety_certificate_renewal', 'Safety Certificate Renewal'].includes(key)) {
                 const areaInput = document.getElementById('app-inspection-area');
                 if (areaInput) {
                     areaInput.classList.remove('invalid');
@@ -2678,7 +3901,7 @@
                         isValid = false;
                     }
                 }
-            } else if (service === 'Hazardous Material Permit') {
+            } else if (['hazardous_material_permit', 'Hazardous Material Permit'].includes(key)) {
                 const chemicalSelect = document.getElementById('app-chemical-type');
                 if (chemicalSelect) {
                     chemicalSelect.classList.remove('invalid');
@@ -2687,7 +3910,7 @@
                         isValid = false;
                     }
                 }
-            } else if (service === 'Gold Shop License') {
+            } else if (['gold_shop_license', 'Gold Shop License'].includes(key)) {
                 const alarmInput = document.getElementById('app-gold-alarm-details');
                 if (alarmInput) {
                     alarmInput.classList.remove('invalid');
@@ -2696,7 +3919,7 @@
                         isValid = false;
                     }
                 }
-            } else if (service === 'Gas Selling Shops License') {
+            } else if (['gas_selling_shops_license', 'Gas Selling Shops License'].includes(key)) {
                 const gasLetterInput = document.getElementById('app-gas-ministry-letter');
                 if (gasLetterInput) {
                     gasLetterInput.classList.remove('invalid');
@@ -2705,7 +3928,7 @@
                         isValid = false;
                     }
                 }
-            } else if (service === 'Bakery License') {
+            } else if (['bakery_license', 'Bakery License'].includes(key)) {
                 const bakeryDrawingsInput = document.getElementById('app-bakery-drawings');
                 if (bakeryDrawingsInput) {
                     bakeryDrawingsInput.classList.remove('invalid');
@@ -2714,7 +3937,7 @@
                         isValid = false;
                     }
                 }
-            } else if (service === 'Gas Station License') {
+            } else if (['gas_station_license', 'Gas Station License'].includes(key)) {
                 const capacityInput = document.getElementById('app-station-capacity');
                 if (capacityInput) {
                     capacityInput.classList.remove('invalid');
@@ -2729,25 +3952,25 @@
 
             const summaryGrid = document.getElementById('summary-grid-el');
             let dynamicSummary = '';
-            if (service === 'Trainee Registration') {
+            if (['trainee_registration', 'trainee_registration_1day', 'trainee_registration_1week', 'heavy_fire_vehicle_driving_training', 'trainee_registration_16weeks', 'Trainee Registration'].includes(key)) {
                 const traineeNames = Array.from(document.querySelectorAll('.trainee-name-input')).map(i => i.value.trim());
                 dynamicSummary = `أسماء المتدربين: ${traineeNames.join(', ')}`;
-            } else if (service === 'Safety Certificate Renewal') {
+            } else if (['safety_certificate_renewal', 'Safety Certificate Renewal'].includes(key)) {
                 const area = document.getElementById('app-inspection-area').value;
                 dynamicSummary = `المساحة الخاضعة للتفتيش: ${area} متر مربع`;
-            } else if (service === 'Hazardous Material Permit') {
+            } else if (['hazardous_material_permit', 'Hazardous Material Permit'].includes(key)) {
                 const chemical = document.getElementById('app-chemical-type').value;
                 dynamicSummary = `نوع المادة الكيميائية: ${chemical}`;
-            } else if (service === 'Gas Selling Shops License') {
+            } else if (['gas_selling_shops_license', 'Gas Selling Shops License'].includes(key)) {
                 const gasLetter = document.getElementById('app-gas-ministry-letter').value.trim();
                 dynamicSummary = `تفاصيل خطاب وزارة الصناعة: ${gasLetter}`;
-            } else if (service === 'Bakery License') {
+            } else if (['bakery_license', 'Bakery License'].includes(key)) {
                 const bakeryDrawings = document.getElementById('app-bakery-drawings').value.trim();
                 dynamicSummary = `موافقات المخططات المعمارية: ${bakeryDrawings}`;
-            } else if (service === 'Gold Shop License') {
+            } else if (['gold_shop_license', 'Gold Shop License'].includes(key)) {
                 const alarm = document.getElementById('app-gold-alarm-details').value.trim();
                 dynamicSummary = `عقد صيانة نظام الإنذار: ${alarm}`;
-            } else if (service === 'Gas Station License') {
+            } else if (['gas_station_license', 'Gas Station License'].includes(key)) {
                 const capacity = document.getElementById('app-station-capacity').value;
                 dynamicSummary = `سعة خزانات الوقود: ${capacity} لتر`;
             } else {
@@ -2757,7 +3980,7 @@
                 }
             }
 
-            let serviceText = serviceSelect.options[serviceSelect.selectedIndex].text;
+            let serviceText = serviceSelect.options[serviceSelect.selectedIndex] ? serviceSelect.options[serviceSelect.selectedIndex].text : service;
             summaryGrid.innerHTML = `
                 <div class="summary-label">نوع الخدمة</div>
                 <div class="summary-value">${serviceText}</div>
@@ -2791,6 +4014,9 @@
             submitBtn.innerText = "جاري إرسال الطلب وحفظ البيانات...";
 
             const serviceName = document.getElementById('app-service-name').value;
+            const targetItem = window.getServiceItem(serviceName);
+            const key = targetItem ? targetItem.id : serviceName;
+
             const firstName = document.getElementById('app-first-name').value.trim();
             const lastName = document.getElementById('app-last-name').value.trim();
             const countryCodeSelect = document.getElementById('app-country-code');
@@ -2802,19 +4028,19 @@
             const notes = document.getElementById('app-notes').value.trim();
 
             let dynamicFields = {};
-            if (serviceName === 'Trainee Registration') {
+            if (['trainee_registration', 'trainee_registration_1day', 'trainee_registration_1week', 'heavy_fire_vehicle_driving_training', 'trainee_registration_16weeks', 'Trainee Registration'].includes(key)) {
                 dynamicFields.trainees = Array.from(document.querySelectorAll('.trainee-name-input')).map(i => i.value.trim());
-            } else if (serviceName === 'Safety Certificate Renewal') {
+            } else if (['safety_certificate_renewal', 'Safety Certificate Renewal'].includes(key)) {
                 dynamicFields.inspectionArea = parseInt(document.getElementById('app-inspection-area').value, 10);
-            } else if (serviceName === 'Hazardous Material Permit') {
+            } else if (['hazardous_material_permit', 'Hazardous Material Permit'].includes(key)) {
                 dynamicFields.chemicalType = document.getElementById('app-chemical-type').value;
-            } else if (serviceName === 'Gas Selling Shops License') {
+            } else if (['gas_selling_shops_license', 'Gas Selling Shops License'].includes(key)) {
                 dynamicFields.gasMinistryLetter = document.getElementById('app-gas-ministry-letter').value.trim();
-            } else if (serviceName === 'Bakery License') {
+            } else if (['bakery_license', 'Bakery License'].includes(key)) {
                 dynamicFields.bakeryDrawings = document.getElementById('app-bakery-drawings').value.trim();
-            } else if (serviceName === 'Gold Shop License') {
+            } else if (['gold_shop_license', 'Gold Shop License'].includes(key)) {
                 dynamicFields.goldAlarmDetails = document.getElementById('app-gold-alarm-details').value.trim();
-            } else if (serviceName === 'Gas Station License') {
+            } else if (['gas_station_license', 'Gas Station License'].includes(key)) {
                 dynamicFields.stationCapacity = parseInt(document.getElementById('app-station-capacity').value, 10);
             } else {
                 const genericInput = document.getElementById('app-generic-details');
@@ -2823,15 +4049,19 @@
                 }
             }
 
+            const validAttachments = attachmentsList.filter(a => a && a.base64);
+            const officialServiceName = targetItem ? targetItem.nameAr : serviceName;
             const payload = {
-                serviceName,
+                serviceName: officialServiceName,
+                serviceId: targetItem ? targetItem.id : serviceName,
                 firstName,
                 lastName,
                 whatsapp,
                 email,
                 referenceNumber,
-                attachmentName: fileName,
-                attachmentBase64: fileBase64,
+                attachmentName: validAttachments[0] ? validAttachments[0].name : fileName,
+                attachmentBase64: validAttachments[0] ? validAttachments[0].base64 : fileBase64,
+                attachments: validAttachments,
                 dynamicFields,
                 paymentMethod,
                 notes
@@ -2848,7 +4078,14 @@
                     const resData = await response.json();
                     document.getElementById('success-app-id').innerText = resData.appId;
                     document.getElementById('success-tracking-url').innerText = resData.trackingLink;
+                    const pdfBtn = document.getElementById('success-download-pdf');
+                    if (pdfBtn && resData.appId) {
+                        pdfBtn.href = '/receipt?id=' + encodeURIComponent(resData.appId);
+                    }
                     
+                    if (payload.whatsapp) localStorage.setItem('civil_defense_applicant_phone', payload.whatsapp);
+                    if (resData.appId) localStorage.setItem('civil_defense_applicant_appid', resData.appId);
+
                     document.getElementById('form-step-2').classList.remove('active');
                     document.getElementById('form-step-3').classList.add('active');
                     
@@ -2876,6 +4113,181 @@
                 console.error("Copy failed:", err);
             });
         }
+
+        // =========================================================================
+        // Progressive Web App (PWA) & Service Worker Registration
+        // =========================================================================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => {
+                        console.log('[PWA] Service Worker registered successfully (Scope: ' + reg.scope + ')');
+                    })
+                    .catch(err => {
+                        console.warn('[PWA] Service Worker registration failed:', err);
+                    });
+            });
+        }
+
+        let deferredPwaPrompt = null;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent default mini-infobar from appearing on mobile
+            e.preventDefault();
+            deferredPwaPrompt = e;
+            console.log('[PWA] beforeinstallprompt event captured.');
+            const installBtn = document.getElementById('pwa-install-btn');
+            if (installBtn) {
+                installBtn.style.display = 'inline-flex';
+            }
+        });
+
+        window.installPWA = async function() {
+            if (!deferredPwaPrompt) {
+                alert("لتثبيت التطبيق على جهازك، اضغط على زر المشاركة (Share) في المتصفح ثم اختر 'إضافة إلى الصفحة الرئيسية (Add to Home Screen)'.");
+                return;
+            }
+            deferredPwaPrompt.prompt();
+            const { outcome } = await deferredPwaPrompt.userChoice;
+            console.log('[PWA] Install choice outcome:', outcome);
+            deferredPwaPrompt = null;
+            const installBtn = document.getElementById('pwa-install-btn');
+            if (installBtn) installBtn.style.display = 'none';
+        };
+
+        window.addEventListener('appinstalled', () => {
+            console.log('[PWA] Application successfully installed on home screen!');
+            const installBtn = document.getElementById('pwa-install-btn');
+            if (installBtn) installBtn.style.display = 'none';
+        });
+
+        // =========================================================================
+        // Internationalization (i18n) Engine - English & Arabic Switcher
+        // =========================================================================
+        const portalTranslations = {
+            ar: {
+                main_lang_btn: "🌐 English",
+                pwa_btn: "تثبيت التطبيق",
+                badge_pill: "بوابة الاتصال بالذكاء الاصطناعي",
+                hero_title: "مركز اتصال الدفاع المدني التفاعلي",
+                hero_subtitle: "أهلاً بك في منصة خدمات الدفاع المدني. عبر هذه البوابة، يمكنك التحدث بشكل صوتي ومباشر مع وكيلنا الذكي لتسجيل بياناتك وطلب أي خدمة أو استفسار بكل مرونة وسرعة دون انتظار.",
+                btn_start_voice: "🎙️ ابدأ التحدث الصوتي الآن",
+                btn_open_app: "📝 تقديم طلب إلكتروني",
+                btn_explore: "استكشف التقنيات",
+                instructions_title: "إرشادات الاستخدام:",
+                console_title: "قناة الاتصال الذكية",
+                call_btn_start: "بدء محادثة صوتية الآن 🎙️",
+                call_btn_end: "إنهاء المكالمة الصوتية ⏹️",
+                input_placeholder: "اكتب استفسارك هنا (أو تحدث صوتياً مباشرة)...",
+                send_btn: "إرسال",
+                modal_title: "طلب خدمة الدفاع المدني",
+                step1_title: "1. البيانات الأساسية",
+                step2_title: "2. المواصفات والمستندات",
+                step3_title: "3. استلام الطلب",
+                lbl_service_select: "نوع الخدمة المطلوبة:",
+                lbl_first_name: "الاسم الأول:",
+                lbl_last_name: "اسم العائلة:",
+                lbl_cr: "رقم السجل التجاري / البطاقة الذكية (CR / CPR):",
+                lbl_whatsapp: "رقم الهاتف / الواتساب:",
+                lbl_email: "البريد الإلكتروني:",
+                btn_next: "التالي ➔",
+                btn_prev: "⬅ السابق",
+                btn_submit: "تأكيد وتقديم الطلب الآن ✓",
+                lbl_payment: "طريقة الدفع المفضلة:",
+                lbl_notes: "ملاحظات إضافية:",
+                lbl_upload_dropzone: "📁 اضغط لاختيار ملف PDF أو اسحب وأفلت الملف هنا (الحد الأقصى 10MB)",
+                success_title: "تم تقديم طلب الخدمة بنجاح!",
+                success_sub: "شكراً لك. تم إرسال طلبك وحفظه بنجاح وتوليد رابط تتبع خاص بك.",
+                success_app_lbl: "رقم الطلب الخاص بك:",
+                success_track_lbl: "رابط تتبع حالة الطلب:",
+                success_copy_btn: "نسخ الرابط",
+                success_download_pdf: "📄 تحميل الإيصال الرسمي مع رمز التحقق (PDF)",
+                success_close_btn: "إغلاق النافذة"
+            },
+            en: {
+                main_lang_btn: "🌐 العربية",
+                pwa_btn: "Install App",
+                badge_pill: "AI Voice Services Portal",
+                hero_title: "Civil Defense Interactive Voice Center",
+                hero_subtitle: "Welcome to the Bahrain Civil Defense platform. Talk directly in real-time with our AI Assistant to register your details and apply for any Civil Defense permit instantly.",
+                btn_start_voice: "🎙️ Start Voice Call Now",
+                btn_open_app: "📝 Apply for Service",
+                btn_explore: "Explore Features",
+                instructions_title: "User Guide & Instructions:",
+                console_title: "Smart Communication Channel",
+                call_btn_start: "Start Voice Conversation Now 🎙️",
+                call_btn_end: "End Voice Call ⏹️",
+                input_placeholder: "Type your inquiry here (or speak directly)...",
+                send_btn: "Send",
+                modal_title: "Civil Defense Service Application",
+                step1_title: "1. Basic Details",
+                step2_title: "2. Specs & Documents",
+                step3_title: "3. Confirmation",
+                lbl_service_select: "Select Requested Service:",
+                lbl_first_name: "First Name:",
+                lbl_last_name: "Last Name:",
+                lbl_cr: "CR / CPR Reference Number:",
+                lbl_whatsapp: "Phone / WhatsApp Number:",
+                lbl_email: "Email Address:",
+                btn_next: "Next ➔",
+                btn_prev: "⬅ Back",
+                btn_submit: "Confirm & Submit Application ✓",
+                lbl_payment: "Preferred Payment Method:",
+                lbl_notes: "Additional Notes:",
+                lbl_upload_dropzone: "📁 Click to select a PDF file or drag & drop here (Max 10MB)",
+                success_title: "Service Application Submitted Successfully!",
+                success_sub: "Thank you. Your application has been logged and a unique tracking link generated.",
+                success_app_lbl: "Your Application Reference ID:",
+                success_track_lbl: "Live Tracking Portal Link:",
+                success_copy_btn: "Copy Link",
+                success_download_pdf: "📄 Download Official PDF Receipt & QR (PDF)",
+                success_close_btn: "Close Window"
+            }
+        };
+
+        window.applyPortalLanguage = function(lang) {
+            localStorage.setItem('civil_defense_lang', lang);
+            const t = portalTranslations[lang];
+            if (!t) return;
+
+            document.documentElement.dir = (lang === 'ar' ? 'rtl' : 'ltr');
+            document.documentElement.lang = lang;
+
+            const safeSet = (id, text) => {
+                const el = document.getElementById(id);
+                if (el) el.innerText = text;
+            };
+
+            safeSet('main-lang-text', t.main_lang_btn);
+            safeSet('txt-pwa-btn', t.pwa_btn);
+
+            const chatIn = document.getElementById('chat-input');
+            if (chatIn) chatIn.placeholder = t.input_placeholder;
+
+            const safeSetVal = (id, text) => {
+                const el = document.getElementById(id);
+                if (el) el.innerText = text;
+            };
+
+            safeSetVal('modal-main-title', t.modal_title);
+            safeSetVal('lbl-step1-indicator', t.step1_title);
+            safeSetVal('lbl-step2-indicator', t.step2_title);
+            safeSetVal('lbl-step3-indicator', t.step3_title);
+
+            // Re-populate services dropdown in target language
+            window.populateServiceDropdown();
+        };
+
+        window.togglePortalLanguage = function() {
+            const current = localStorage.getItem('civil_defense_lang') || 'ar';
+            const next = current === 'ar' ? 'en' : 'ar';
+            window.applyPortalLanguage(next);
+        };
+
+        // Initialize portal language
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('civil_defense_lang') || 'ar';
+            window.applyPortalLanguage(savedLang);
+        });
     </script>
 </body>
 </html>

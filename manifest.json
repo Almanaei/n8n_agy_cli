@@ -1,0 +1,55 @@
+{
+  "name": "الإدارة العامة للدفاع المدني - المساعد الذكي",
+  "short_name": "الدفاع المدني",
+  "description": "المنصة الذكية لخدمات وإجراءات الإدارة العامة للدفاع المدني بمملكة البحرين",
+  "start_url": "/",
+  "id": "/?source=pwa",
+  "display": "standalone",
+  "background_color": "#0B1120",
+  "theme_color": "#0F172A",
+  "orientation": "portrait-primary",
+  "dir": "rtl",
+  "lang": "ar",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "categories": ["government", "utilities", "productivity"],
+  "shortcuts": [
+    {
+      "name": "تتبع الطلبات",
+      "short_name": "تتبع الطلب",
+      "description": "تتبع حالة طلبات خدمات الدفاع المدني",
+      "url": "/track",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "بدء محادثة صوتية",
+      "short_name": "محادثة صوتية",
+      "description": "التحدث مباشرة مع المساعد الذكي للدفاع المدني",
+      "url": "/",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

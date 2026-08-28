@@ -31,10 +31,10 @@ async function run() {
     timer = setTimeout(() => {
       switch (step) {
         case 0:
-          console.log("\n\x1b[32m[User Speech]\x1b[0m: اسمي سالم أحمد ورقم هاتفي هو 39485760.");
+          console.log("\n\x1b[32m[User Speech]\x1b[0m: اسمي سالم أحمد ورقم هاتفي هو 17461100.");
           ws.send(JSON.stringify({
             type: "user_message",
-            text: "اسمي سالم أحمد ورقم هاتفي هو 39485760."
+            text: "اسمي سالم أحمد ورقم هاتفي هو 17461100."
           }));
           step++;
           break;

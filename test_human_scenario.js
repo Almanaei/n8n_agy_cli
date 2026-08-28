@@ -101,12 +101,12 @@ function runConversationalTimeline(ws) {
     }));
   }, 4000);
 
-  // Step 2: User provides mobile number ( رقمي هو 39485760 )
+  // Step 2: User provides mobile number ( رقمي هو 17461100 )
   setTimeout(() => {
-    console.log("\n\x1b[32m[User Speech]\x1b[0m: رقمي هو 39485760.");
+    console.log("\n\x1b[32m[User Speech]\x1b[0m: رقمي هو 17461100.");
     ws.send(JSON.stringify({
       type: "user_message",
-      text: "رقمي هو 39485760."
+      text: "رقمي هو 17461100."
     }));
   }, 10000);
 

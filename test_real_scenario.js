@@ -35,10 +35,10 @@ ws.on('message', (data) => {
       switch (step) {
       case 0:
         // Turn 1: User introduces name and phone number
-        console.log("\n\x1b[32m[User Speech]\x1b[0m: اسمي محمد علي، ورقمي هو 39485760.");
+        console.log("\n\x1b[32m[User Speech]\x1b[0m: اسمي محمد علي، ورقمي هو 17461100.");
         ws.send(JSON.stringify({
           event: "user_message",
-          text: "اسمي محمد علي، ورقمي هو 39485760."
+          text: "اسمي محمد علي، ورقمي هو 17461100."
         }));
         step++;
         break;
