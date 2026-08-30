@@ -353,6 +353,25 @@
                     <span class="info-label">تاريخ التقديم</span>
                     <span class="info-value">{{TIMESTAMP}}</span>
                 </div>
+                <div class="info-group">
+                    <span class="info-label">⏱️ الوقت الإجمالي المنقضي</span>
+                    <span class="info-value" style="color: #38bdf8;">{{ELAPSED_TIME}}</span>
+                </div>
+                <div class="info-group" style="display: {{DECISION_DATE_DISPLAY}};">
+                    <span class="info-label">✅ تاريخ صدور القرار النهائي</span>
+                    <span class="info-value" style="color: #34d399; font-weight: bold;">{{DECISION_DATE}}</span>
+                </div>
+                <div class="info-group" style="display: {{SLA_TIME_DISPLAY}};">
+                    <span class="info-label">⚡ صافي مدة الإنجاز الإداري (SLA)</span>
+                    <span class="info-value" style="color: #38bdf8; font-weight: bold;">{{SLA_TIME}}</span>
+                </div>
+                <div class="info-group" style="display: {{USER_PAUSE_DISPLAY}};">
+                    <span class="info-label">⏸️ مدة توقف الطلب لانتظار العميل</span>
+                    <span class="info-value" style="color: #fbbf24; font-weight: bold;">{{USER_PAUSE_DURATION}}</span>
+                </div>
+                <div class="info-group" style="display: {{LIVE_PAUSE_DISPLAY}}; grid-column: span 2; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 6px; padding: 8px 12px;">
+                    <span class="info-value" style="color: #fef08a; font-size: 0.88rem;">⏸️ <strong>مؤقت المعاملة متوقف حالياً:</strong> بانتظار استجابة وتعديل المتعامل.</span>
+                </div>
                 <div class="info-group" style="grid-column: span 2;">
                     <span class="info-label">ملاحظات/رد المستخدم (إن وجد)</span>
                     <span class="info-value" style="color: #cbd5e1; font-weight: normal;">{{USER_RESPONSE}}</span>

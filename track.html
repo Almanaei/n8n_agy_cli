@@ -653,23 +653,25 @@
                 </div>
             </div>
 
-            <!-- Document Version History Container -->
-            <div style="margin-top: 24px; background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px;">
-                <h3 style="color: #38bdf8; font-size: 1.1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-                    <span>📂</span> <span id="lbl-doc-history-title">سجل نسخ المستندات والمخططات المرفقة</span>
-                </h3>
-                <div id="doc-history-container">
-                    <p style="color: var(--text-secondary); font-size: 0.9rem;">لا يوجد تغييرات أو نسخ سابقة على المستندات المرفقة.</p>
-                </div>
-            </div>
-
-            <!-- AI Voice Interaction History Container -->
-            <div style="margin-top: 24px; background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px;">
-                <h3 style="color: #38bdf8; font-size: 1.1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-                    <span>🎙️</span> سجل التواصل والتفاعلات مع المساعد الصوتي الذكي (AI Call History)
-                </h3>
-                <div id="call-history-container">
-                    <p style="color: var(--text-secondary); font-size: 0.9rem;">لم يتم تسجيل مكالمات صوتية بعد لهذه المعاملة.</p>
+            <!-- Application Timings & SLA Telemetry Card -->
+            <div class="timing-card" id="timing-card-el" style="margin-top: 20px; background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 12px; padding: 18px 20px;">
+                <h4 style="margin: 0 0 14px 0; color: #38bdf8; font-size: 1rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
+                    <span style="display: flex; align-items: center; gap: 8px;">⏱️ <span id="lbl-sla-title">بيانات وتوقيتات معالجة المعاملة (SLA Processing Metrics)</span></span>
+                    <span style="font-size: 0.78rem; font-weight: normal; color: #94a3b8;">توقيت مملكة البحرين الرسمي (GMT+3)</span>
+                </h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;">
+                    <div style="background: rgba(30, 41, 59, 0.6); padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                        <span style="display: block; font-size: 0.78rem; color: #94a3b8; margin-bottom: 4px;" id="lbl-sub-time">تاريخ ووقت التقديم</span>
+                        <span style="font-size: 0.95rem; font-weight: 700; color: #f8fafc;">{{TIMESTAMP}}</span>
+                    </div>
+                    <div style="background: rgba(30, 41, 59, 0.6); padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); display: {{DECISION_DATE_DISPLAY}};">
+                        <span style="display: block; font-size: 0.78rem; color: #94a3b8; margin-bottom: 4px;" id="lbl-dec-time">تاريخ صدور القرار النهائي</span>
+                        <span style="font-size: 0.95rem; font-weight: 700; color: #34d399;">{{DECISION_DATE}}</span>
+                    </div>
+                    <div style="background: rgba(30, 41, 59, 0.6); padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); display: {{SLA_TIME_DISPLAY}};">
+                        <span style="display: block; font-size: 0.78rem; color: #94a3b8; margin-bottom: 4px;" id="lbl-net-sla">صافي مدة الإنجاز الإداري</span>
+                        <span style="font-size: 0.95rem; font-weight: 700; color: #38bdf8;">{{SLA_TIME}}</span>
+                    </div>
                 </div>
             </div>
 
@@ -1386,7 +1388,13 @@
                 notes: "ملاحظات إضافية",
                 doc_history_title: "سجل نسخ المستندات والمخططات المرفقة",
                 call_history_title: "سجل التواصل والتفاعلات مع المساعد الصوتي الذكي (AI Call History)",
-                support_btn: "الدعم الفني المباشر"
+                support_btn: "الدعم الفني المباشر",
+                sla_title: "بيانات وتوقيتات معالجة المعاملة (SLA Processing Metrics)",
+                sub_time: "تاريخ ووقت التقديم",
+                dec_time: "تاريخ صدور القرار النهائي",
+                net_sla: "صافي مدة الإنجاز الإداري",
+                pause_dur: "مدة توقف الطلب لانتظار العميل",
+                pause_desc: "مؤقت المعاملة متوقف مؤقتاً لصالح المتعامل حتى استكمال التعديلات المطلوبة."
             },
             en: {
                 logo: "Civil Defense Smart Services Center",
@@ -1414,7 +1422,13 @@
                 notes: "Additional Notes",
                 doc_history_title: "Document & Blueprint Version History",
                 call_history_title: "AI Voice Interaction & Call History",
-                support_btn: "Live WhatsApp Support"
+                support_btn: "Live WhatsApp Support",
+                sla_title: "SLA & Application Processing Metrics",
+                sub_time: "Submission Date & Time",
+                dec_time: "Official Final Decision Date",
+                net_sla: "Net Admin Processing SLA",
+                pause_dur: "Customer Pause Duration",
+                pause_desc: "Application SLA timer is paused pending required customer modifications."
             }
         };
 
@@ -1453,7 +1467,13 @@
             safeSet('lbl-notes', t.notes);
             safeSet('lbl-doc-history-title', t.doc_history_title);
             safeSet('lbl-call-history-title', t.call_history_title);
-            safeSet('track-support-text', t.support_btn);
+            safeSet('support-btn-text', t.support_btn);
+            safeSet('lbl-sla-title', t.sla_title);
+            safeSet('lbl-sub-time', t.sub_time);
+            safeSet('lbl-dec-time', t.dec_time);
+            safeSet('lbl-net-sla', t.net_sla);
+            safeSet('lbl-pause-dur', t.pause_dur);
+            safeSet('lbl-pause-desc', t.pause_desc);
         }
 
         function toggleTrackLanguage() {

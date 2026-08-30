@@ -456,6 +456,15 @@ async function generateApplicationPdfBuffer(appData, trackingUrl) {
           </td>
           <td class="value-col">${submissionDate}</td>
         </tr>
+        ${(isApproved && appData.decisionDate) ? `
+        <tr>
+          <td class="label-col" style="background: #F0FDF4; color: #166534;">
+            تاريخ الاعتماد والموافقة
+            <span class="label-sub" style="color: #15803D;">Official Decision / Approval Date</span>
+          </td>
+          <td class="value-col" style="color: #166534; font-weight: 800;">${appData.decisionDate}</td>
+        </tr>
+        ` : ''}
         <tr>
           <td class="label-col">
             طريقة الدفع

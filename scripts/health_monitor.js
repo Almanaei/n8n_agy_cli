@@ -1,7 +1,7 @@
 // scripts/health_monitor.js - Automated System Healthcheck & Uptime Monitor
 const http = require('http');
 
-const HEALTH_URL = 'http://localhost:3000/health';
+const HEALTH_URL = 'http://127.0.0.1:3000/health';
 
 function fetchHealthData() {
   return new Promise((resolve, reject) => {

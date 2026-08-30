@@ -690,6 +690,248 @@
             transform: scale(0.97);
         }
 
+        /* Modern Glassy Collapsible Quick Actions Container */
+        .conversation-quick-actions {
+            margin: 4px 10px 6px 10px;
+            background: rgba(15, 23, 42, 0.78);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: hidden;
+            direction: rtl;
+            flex-shrink: 0;
+            animation: slideInQuickActions 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .conversation-quick-actions.open {
+            border-color: rgba(212, 175, 55, 0.28);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.38);
+            background: rgba(15, 23, 42, 0.88);
+        }
+
+        /* Compact Header Toggle Pill */
+        .quick-actions-toggle {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 10px;
+            background: transparent;
+            border: none;
+            color: #94A3B8;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.78rem;
+            font-weight: 700;
+            transition: all 0.2s ease;
+            user-select: none;
+            outline: none;
+        }
+
+        .quick-actions-toggle:hover {
+            color: #F8FAFC;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .toggle-left {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .toggle-icon {
+            font-size: 0.85rem;
+            color: #F6E05E;
+        }
+
+        .toggle-title {
+            color: #E2E8F0;
+            font-size: 0.78rem;
+            letter-spacing: 0.2px;
+        }
+
+        .toggle-badge {
+            background: rgba(255, 255, 255, 0.08);
+            color: #94A3B8;
+            font-size: 0.68rem;
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        .chevron-icon {
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            color: #94A3B8;
+        }
+
+        .conversation-quick-actions.open .chevron-icon {
+            transform: rotate(180deg);
+            color: #F6E05E;
+        }
+
+        /* Collapsible Drawer */
+        .quick-actions-drawer {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+            padding: 0 8px;
+        }
+
+        .conversation-quick-actions.open .quick-actions-drawer {
+            max-height: 220px;
+            opacity: 1;
+            padding: 0 8px 8px 8px;
+        }
+
+        .quick-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+            padding-top: 4px;
+        }
+
+        .glass-action-btn {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 7px;
+            padding: 7px 10px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 9px;
+            color: #F8FAFC;
+            font-size: 0.78rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            white-space: nowrap;
+            text-decoration: none;
+            user-select: none;
+        }
+
+        .glass-action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .glass-action-btn:hover::before {
+            left: 100%;
+        }
+
+        .glass-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+        }
+
+        .glass-action-btn:active {
+            transform: translateY(0) scale(0.97);
+        }
+
+        .glass-btn-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 7px;
+            flex-shrink: 0;
+            transition: transform 0.2s ease;
+        }
+
+        .glass-action-btn:hover .glass-btn-icon {
+            transform: scale(1.12);
+        }
+
+        /* Specific Glass Action Button Accents */
+        .action-apply {
+            border-color: rgba(212, 175, 55, 0.35);
+        }
+        .action-apply .glass-btn-icon {
+            background: rgba(212, 175, 55, 0.16);
+            color: #F6E05E;
+        }
+        .action-apply:hover {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.22) 0%, rgba(212, 175, 55, 0.08) 100%);
+            border-color: #D4AF37;
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.25);
+        }
+
+        .action-call {
+            border-color: rgba(48, 209, 88, 0.35);
+        }
+        .action-call .glass-btn-icon {
+            background: rgba(48, 209, 88, 0.16);
+            color: #30D158;
+        }
+        .action-call:hover {
+            background: linear-gradient(135deg, rgba(48, 209, 88, 0.22) 0%, rgba(48, 209, 88, 0.08) 100%);
+            border-color: #30D158;
+            box-shadow: 0 6px 20px rgba(48, 209, 88, 0.25);
+        }
+
+        .action-email {
+            border-color: rgba(56, 189, 248, 0.35);
+        }
+        .action-email .glass-btn-icon {
+            background: rgba(56, 189, 248, 0.16);
+            color: #38BDF8;
+        }
+        .action-email:hover {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.22) 0%, rgba(56, 189, 248, 0.08) 100%);
+            border-color: #38BDF8;
+            box-shadow: 0 6px 20px rgba(56, 189, 248, 0.25);
+        }
+
+        .action-web {
+            border-color: rgba(168, 85, 247, 0.35);
+        }
+        .action-web .glass-btn-icon {
+            background: rgba(168, 85, 247, 0.16);
+            color: #C084FC;
+        }
+        .action-web:hover {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.22) 0%, rgba(168, 85, 247, 0.08) 100%);
+            border-color: #A855F7;
+            box-shadow: 0 6px 20px rgba(168, 85, 247, 0.25);
+        }
+
+        .action-guide {
+            border-color: rgba(249, 115, 22, 0.35);
+        }
+        .action-guide .glass-btn-icon {
+            background: rgba(249, 115, 22, 0.16);
+            color: #FB923C;
+        }
+        .action-guide:hover {
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.22) 0%, rgba(249, 115, 22, 0.08) 100%);
+            border-color: #F97316;
+            box-shadow: 0 6px 20px rgba(249, 115, 22, 0.25);
+        }
+
+        @keyframes slideInQuickActions {
+            from {
+                opacity: 0;
+                transform: translateY(-8px) scale(0.97);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
         .chat-input-area {
             display: flex;
             gap: 12px;
@@ -1631,9 +1873,84 @@
                 <div class="console-header">
                     <div class="console-title">
                         <span class="pulse-dot" id="status-dot"></span>
-                        <h3>قناة الاتصال الذكية</h3>
+                        <h3 id="console-title-text">قناة الاتصال الذكية</h3>
                     </div>
                     <div class="status-badge" id="status-badge">غير متصل</div>
+                </div>
+
+                <!-- Modern Glassy Collapsible Quick Actions Menu (Always Accessible) -->
+                <div id="conversation-quick-actions" class="conversation-quick-actions">
+                    <!-- Compact Header Toggle Pill -->
+                    <button type="button" class="quick-actions-toggle" onclick="window.toggleQuickActionsMenu()" aria-expanded="false" title="إجراءات سريعة">
+                        <div class="toggle-left">
+                            <span class="toggle-icon">⚡</span>
+                            <span class="toggle-title" id="qa-menu-title">إجراءات وخدمات سريعة</span>
+                            <span class="toggle-badge">5</span>
+                        </div>
+                        <div class="toggle-right">
+                            <svg class="chevron-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                    </button>
+
+                    <!-- Collapsible Drawer Container with 5 Glassy Action Buttons -->
+                    <div class="quick-actions-drawer" id="quick-actions-drawer">
+                        <div class="quick-actions-grid">
+                            <button type="button" class="glass-action-btn action-apply" onclick="window.handleQuickAction('apply')" title="التقديم على خدمة">
+                                <div class="glass-btn-icon">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                                        <polyline points="10 9 9 9 8 9"></polyline>
+                                    </svg>
+                                </div>
+                                <span class="glass-btn-text" id="qa-apply-text">التقديم على خدمة</span>
+                            </button>
+
+                            <button type="button" class="glass-action-btn action-guide" onclick="window.handleQuickAction('guide')" title="دليل التقديم على الخدمات">
+                                <div class="glass-btn-icon">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                                    </svg>
+                                </div>
+                                <span class="glass-btn-text" id="qa-guide-text">دليل التقديم</span>
+                            </button>
+
+                            <button type="button" class="glass-action-btn action-call" onclick="window.handleQuickAction('call')" title="الاتصال بمركز الخدمة (17461100)">
+                                <div class="glass-btn-icon">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                                    </svg>
+                                </div>
+                                <span class="glass-btn-text" id="qa-call-text">الاتصال بالمركز</span>
+                            </button>
+
+                            <button type="button" class="glass-action-btn action-email" onclick="window.handleQuickAction('email')" title="إرسال المحادثة بالبريد">
+                                <div class="glass-btn-icon">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                        <polyline points="22,6 12,13 2,6"></polyline>
+                                    </svg>
+                                </div>
+                                <span class="glass-btn-text" id="qa-email-text">إرسال بالبريد</span>
+                            </button>
+
+                            <button type="button" class="glass-action-btn action-web" onclick="window.handleQuickAction('web')" title="موقع الدفاع المدني الرسمي">
+                                <div class="glass-btn-icon">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                                    </svg>
+                                </div>
+                                <span class="glass-btn-text" id="qa-web-text">موقع الدفاع المدني</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Live Chat Scroll Area -->
@@ -2408,15 +2725,26 @@
 
                         // If it's a user message, check if there is a pending typed message that matches the text
                         if (sender === 'user') {
-                            const pendingMsg = document.querySelector('[data-pending="true"]');
-                            if (pendingMsg && pendingMsg.innerText.trim() === message.message.trim()) {
-                                pendingMsg.removeAttribute('data-pending');
-                                pendingMsg.setAttribute('data-event-id', eventId);
+                            const pendingBubbles = Array.from(document.querySelectorAll('.message.user.pending-sync'));
+                            const matchingBubble = pendingBubbles.find(b => b.innerText.trim() === message.message.trim());
+                            if (matchingBubble) {
+                                matchingBubble.setAttribute('data-event-id', eventId);
+                                matchingBubble.classList.remove('pending-sync');
                                 return;
                             }
                         }
 
-                        appendMessage(sender, message.message, eventId);
+                        const wrapper = document.createElement('div');
+                        wrapper.className = `message-wrapper ${sender}`;
+
+                        const bubble = document.createElement('div');
+                        bubble.className = `message ${sender}`;
+                        bubble.innerText = message.message;
+                        bubble.setAttribute('data-event-id', eventId);
+
+                        wrapper.appendChild(bubble);
+                        messagesContainer.appendChild(wrapper);
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
                     },
                     onAgentResponseCorrection: (correction) => {
                         console.log("Correction received:", correction);
@@ -2434,7 +2762,7 @@
                 });
 
             } catch (error) {
-                console.error("Failed to start session:", error);
+                console.error("Failed to start conversation:", error);
                 
                 // Show connection error state
                 statusBadge.innerText = "خطأ في الاتصال";
@@ -3097,6 +3425,89 @@
             messagesContainer.appendChild(wrapper);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
+
+        window.toggleQuickActionsMenu = function() {
+            const qaContainer = document.getElementById('conversation-quick-actions');
+            const toggleBtn = qaContainer ? qaContainer.querySelector('.quick-actions-toggle') : null;
+            if (!qaContainer) return;
+            
+            const isOpen = qaContainer.classList.toggle('open');
+            if (toggleBtn) {
+                toggleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            }
+        };
+
+        window.handleQuickAction = function(actionType) {
+            console.log("[Quick Action Clicked]:", actionType);
+            if (actionType === 'apply') {
+                const targetService = window.activeServiceContext || window.lastResolvedServiceId || 'bakery_license';
+                window.openApplicationModal(targetService);
+            } else if (actionType === 'guide') {
+                window.open('/guide', '_blank');
+            } else if (actionType === 'call') {
+                window.location.href = 'tel:+97317461100';
+            } else if (actionType === 'email') {
+                window.requestEmailTranscript();
+            } else if (actionType === 'web') {
+                window.open('https://www.gdcd.gov.bh/', '_blank', 'noopener,noreferrer');
+            }
+        };
+
+        window.requestEmailTranscript = function() {
+            const chatIn = document.getElementById('chat-input');
+            const currentLang = localStorage.getItem('civil_defense_lang') || 'ar';
+            
+            const guideCardHtml = currentLang === 'en'
+                ? `
+                    <div class="message agent" style="background: linear-gradient(135deg, rgba(56, 189, 248, 0.15) 0%, rgba(30, 58, 138, 0.2) 100%); border: 1.5px solid rgba(56, 189, 248, 0.4); color: #F1F5F9; font-size: 0.88rem; line-height: 1.6; border-radius: 14px; padding: 12px 14px;">
+                        <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; color: #38BDF8; margin-bottom: 4px; font-size: 0.95rem;">
+                            <span>✉️</span>
+                            <span>Email Conversation Transcript Guide:</span>
+                        </div>
+                        <div>
+                            Please continue chatting with the AI Assistant until you finish. Once you complete your inquiries, simply ask the AI agent: <em>"Please send the conversation details to my email"</em> and provide your email address (verbally or by typing below).
+                        </div>
+                    </div>
+                `
+                : `
+                    <div class="message agent" style="background: linear-gradient(135deg, rgba(56, 189, 248, 0.15) 0%, rgba(30, 58, 138, 0.2) 100%); border: 1.5px solid rgba(56, 189, 248, 0.4); color: #F1F5F9; font-size: 0.88rem; line-height: 1.6; border-radius: 14px; padding: 12px 14px; direction: rtl; text-align: right;">
+                        <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; color: #38BDF8; margin-bottom: 4px; font-size: 0.95rem;">
+                            <span>✉️</span>
+                            <span>إرشادات استلام المحادثة عبر البريد الإلكتروني:</span>
+                        </div>
+                        <div>
+                            تفضل بمواصلة التحدث وطرح استفساراتك مع المساعد الذكي حتى الانتهاء بالكامل. وعند رغبتك بالإنهاء، اطلب من المساعد الصوتي: <strong>"أرسل تفاصيل المحادثة إلى بريدي الإلكتروني"</strong> وزوّده ببريدك مباشرة (صوتياً أو كتابةً بالأسفل).
+                        </div>
+                    </div>
+                `;
+
+            // If an email tip card already exists, remove or reposition
+            const messagesContainer = document.getElementById('chat-messages');
+            if (messagesContainer) {
+                const existingTip = messagesContainer.querySelector('.email-guide-tip');
+                if (existingTip) existingTip.remove();
+
+                const tipEl = document.createElement('div');
+                tipEl.className = 'message-wrapper agent email-guide-tip fade-in';
+                tipEl.innerHTML = guideCardHtml;
+                
+                // Insert before apply card if present
+                const existingCard = messagesContainer.querySelector('.apply-now-wrapper');
+                if (existingCard) {
+                    messagesContainer.insertBefore(tipEl, existingCard);
+                } else {
+                    messagesContainer.appendChild(tipEl);
+                }
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            if (chatIn) {
+                chatIn.placeholder = currentLang === 'en'
+                    ? "Type your email address here when you finish chatting..."
+                    : "اكتب بريدك الإلكتروني هنا عند انتهاء المحادثة...";
+                chatIn.focus();
+            }
+        };
 
         window.useSuggestion = function(text, serviceName) {
             const chatInput = document.getElementById('chat-input');
@@ -4201,7 +4612,13 @@
                 success_track_lbl: "رابط تتبع حالة الطلب:",
                 success_copy_btn: "نسخ الرابط",
                 success_download_pdf: "📄 تحميل الإيصال الرسمي مع رمز التحقق (PDF)",
-                success_close_btn: "إغلاق النافذة"
+                success_close_btn: "إغلاق النافذة",
+                qa_menu_title: "إجراءات وخدمات سريعة",
+                qa_apply: "التقديم على خدمة",
+                qa_guide: "دليل التقديم",
+                qa_call: "الاتصال بالمركز",
+                qa_email: "إرسال بالبريد",
+                qa_web: "موقع الدفاع المدني"
             },
             en: {
                 main_lang_btn: "🌐 العربية",
@@ -4240,7 +4657,13 @@
                 success_track_lbl: "Live Tracking Portal Link:",
                 success_copy_btn: "Copy Link",
                 success_download_pdf: "📄 Download Official PDF Receipt & QR (PDF)",
-                success_close_btn: "Close Window"
+                success_close_btn: "Close Window",
+                qa_menu_title: "Quick Actions & Services",
+                qa_apply: "Apply for Service",
+                qa_guide: "Application Guide",
+                qa_call: "Call Center",
+                qa_email: "Email Chat",
+                qa_web: "Civil Defence Site"
             }
         };
 
@@ -4273,6 +4696,14 @@
             safeSetVal('lbl-step2-indicator', t.step2_title);
             safeSetVal('lbl-step3-indicator', t.step3_title);
 
+            // Quick Actions Button Labels
+            safeSet('qa-menu-title', t.qa_menu_title);
+            safeSet('qa-apply-text', t.qa_apply);
+            safeSet('qa-guide-text', t.qa_guide);
+            safeSet('qa-call-text', t.qa_call);
+            safeSet('qa-email-text', t.qa_email);
+            safeSet('qa-web-text', t.qa_web);
+
             // Re-populate services dropdown in target language
             window.populateServiceDropdown();
         };
@@ -4283,10 +4714,21 @@
             window.applyPortalLanguage(next);
         };
 
-        // Initialize portal language
+        // Initialize portal language and check action URL parameter
         document.addEventListener('DOMContentLoaded', () => {
             const savedLang = localStorage.getItem('civil_defense_lang') || 'ar';
             window.applyPortalLanguage(savedLang);
+
+            // Auto-open application modal if requested via URL (e.g. from Guide)
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('action') === 'apply') {
+                const serviceParam = urlParams.get('service') || 'bakery_license';
+                setTimeout(() => {
+                    if (typeof window.openApplicationModal === 'function') {
+                        window.openApplicationModal(serviceParam);
+                    }
+                }, 300);
+            }
         });
     </script>
 </body>

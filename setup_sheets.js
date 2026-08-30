@@ -2,17 +2,26 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-// Extract Service Account Private Key from server.js dynamically
-const serverContent = fs.readFileSync(path.join(__dirname, 'server.js'), 'utf8');
-const parts = serverContent.split('-----BEGIN PRIVATE KEY-----');
-if (parts.length < 2) {
-  console.error("Failed to locate private key in server.js");
-  process.exit(1);
-}
-const keyContent = parts[1].split('-----END PRIVATE KEY-----')[0];
-const privateKey = '-----BEGIN PRIVATE KEY-----' + keyContent + '-----END PRIVATE KEY-----';
+let googlePrivateKey = process.env.GOOGLE_PRIVATE_KEY;
+let googleClientEmail = process.env.GOOGLE_CLIENT_EMAIL;
 
-const clientEmail = "n8n-sheets-tracker@gen-lang-client-0132494438.iam.gserviceaccount.com";
+if (!googlePrivateKey || !googleClientEmail) {
+  if (fs.existsSync(path.join(__dirname, '.env'))) {
+    const envContent = fs.readFileSync(path.join(__dirname, '.env'), 'utf8');
+    envContent.split('\n').forEach(line => {
+      const match = line.match(/^\s*([\w.-]+)\s*=\s*(.*)?\s*$/);
+      if (match) {
+        let val = match[2] || '';
+        if (val.startsWith('"') && val.endsWith('"')) val = val.slice(1, -1);
+        if (match[1] === 'GOOGLE_PRIVATE_KEY') googlePrivateKey = val;
+        if (match[1] === 'GOOGLE_CLIENT_EMAIL') googleClientEmail = val;
+      }
+    });
+  }
+}
+
+const privateKey = (googlePrivateKey || "").replace(/\\n/g, '\n');
+const clientEmail = googleClientEmail || "n8n-sheets-tracker@gen-lang-client-0132494438.iam.gserviceaccount.com";
 const spreadsheetId = "1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8";
 const sheetName = "ServiceApplications";
 const headers = [
@@ -31,7 +40,15 @@ const headers = [
   "Status",
   "Notes",
   "Alert Sent",
-  "Modification Details"
+  "Modification Details",
+  "User Modification Response",
+  "Quick Admin Action",
+  "Decision Date",
+  "Net Admin SLA Time",
+  "User Pause Duration",
+  "Mod Request Sent At",
+  "Document Audit History",
+  "Call Summary History"
 ];
 
 function generateGoogleAccessToken(clientEmail, privateKey, scopes) {
@@ -107,7 +124,7 @@ async function run() {
   }
 
   console.log("Writing headers unconditionally...");
-  const writeHeaderRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}!A1:P1?valueInputOption=USER_ENTERED`, {
+  const writeHeaderRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}!A1:X1?valueInputOption=USER_ENTERED`, {
     method: "PUT",
     headers: {
       "Authorization": `Bearer ${accessToken}`,

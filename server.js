@@ -379,6 +379,41 @@ async function formatKpiCell(conversationId, kpiValue) {
   console.log(`[Google Sheets Formatter] Successfully formatted Row ${rowIndex + 1} KPI cell to ${kpiValue}! 🎉`);
 }
 
+/**
+ * Resolves standard Arabic label for any given application status
+ * strictly distinguishing Under Review from In Progress, Inspection, etc.
+ */
+function resolveArabicStatusName(rawStatus) {
+  if (!rawStatus) return 'تم استلام الطلب والتحقق المبدئي';
+  const s = rawStatus.trim().toLowerCase();
+  
+  if (s.includes('modification') || s.includes('تعديل') || s.includes('استكمال')) {
+    if (s.includes('resubmit') || s.includes('إعادة') || s.includes('تحديث')) {
+      return 'تم استلام التعديل وقيد إعادة التدقيق';
+    }
+    return 'مطلوب تعديل بيانات ومستندات';
+  }
+  if (s.includes('approv') || s.includes('قبول') || s.includes('اعتماد') || s.includes('مكتمل')) {
+    return 'مقبول والمعاملة معتمدة بنجاح';
+  }
+  if (s.includes('reject') || s.includes('رفض') || s.includes('ملغي') || s.includes('غير مستوف')) {
+    return 'مرفوض / غير مستوفٍ للشروط';
+  }
+  if (s.includes('review') || s.includes('مراجعة') || s.includes('تدقيق') || s.includes('دراسة')) {
+    return 'قيد المراجعة والتدقيق الفني';
+  }
+  if (s.includes('progress') || s.includes('معالجة') || s.includes('إجراء')) {
+    return 'قيد المعالجة والإجراء الإداري';
+  }
+  if (s.includes('inspect') || s.includes('معاينة') || s.includes('فحص')) {
+    return 'قيد المعاينة الميدانية';
+  }
+  if (s === 'pending' || s === 'submitted' || s === 'جديد' || s === 'قيد الانتظار') {
+    return 'تم استلام الطلب والتحقق المبدئي';
+  }
+  return rawStatus;
+}
+
 async function writeFeedbackComment(conversationId, commentText) {
   const clientEmail = globalClientEmail;
   const privateKey = globalPrivateKey;
@@ -1122,7 +1157,7 @@ async function appendServiceApplication(appData) {
     appData.trackingLink || "", // Tracking Link
     dynamicFieldsStr,
     appData.paymentMethod,
-    "In Progress", // Status
+    appData.status || "Submitted", // Status (Initial application status is Submitted)
     appData.notes || "",
     "Yes", // Alert Sent (Initial confirmation already sent on submit)
     "", // Admin Modification Request (Col P)
@@ -1306,6 +1341,30 @@ async function updateModificationRequest(appId, details) {
   if (!updateRes.ok) throw new Error("Failed to update cells");
 }
 
+function parseTimestampToMs(dateStr) {
+  if (!dateStr || typeof dateStr !== 'string') return 0;
+  const trimmed = dateStr.trim();
+  if (!trimmed) return 0;
+
+  // 1. Match YYYY-MM-DD HH:mm:ss (supports single or double digits for M, D, H, m, s)
+  const match = trimmed.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})(?:[ T](\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?/);
+  if (match) {
+    const year = parseInt(match[1], 10);
+    const month = parseInt(match[2], 10) - 1;
+    const day = parseInt(match[3], 10);
+    const hour = match[4] ? parseInt(match[4], 10) : 0;
+    const minute = match[5] ? parseInt(match[5], 10) : 0;
+    const second = match[6] ? parseInt(match[6], 10) : 0;
+    return Date.UTC(year, month, day, hour, minute, second);
+  }
+
+  // 2. Direct ISO parsing fallback
+  const isoMs = Date.parse(trimmed);
+  if (!isNaN(isoMs)) return isoMs;
+
+  return 0;
+}
+
 async function updateUserModificationResponse(appId, userMessage) {
   const clientEmail = globalClientEmail;
   const privateKey = globalPrivateKey;
@@ -1325,7 +1384,7 @@ async function updateUserModificationResponse(appId, userMessage) {
   const tokenData = await tokenRes.json();
   const accessToken = tokenData.access_token;
 
-  const getRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}!A1:V2000`, {
+  const getRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}!A1:Z2000`, {
     headers: { "Authorization": `Bearer ${accessToken}` }
   });
   if (!getRes.ok) throw new Error("Failed to get sheet rows");
@@ -1342,8 +1401,8 @@ async function updateUserModificationResponse(appId, userMessage) {
   let accumulatedPauseMs = 0;
 
   if (modSentAt) {
-    const sentMs = Date.parse(modSentAt);
-    if (!isNaN(sentMs)) {
+    const sentMs = parseTimestampToMs(modSentAt);
+    if (sentMs > 0) {
       accumulatedPauseMs += Math.max(0, now.getTime() - sentMs);
     }
   }
@@ -1364,6 +1423,7 @@ async function updateUserModificationResponse(appId, userMessage) {
     data: [
       { range: `${sheetName}!M${rowNum}`, values: [["In Progress"]] },
       { range: `${sheetName}!O${rowNum}`, values: [[""]] },
+      { range: `${sheetName}!P${rowNum}`, values: [[""]] }, // Clear old Admin Mod Request (Col P) upon User Resubmit to prevent stale message re-sending!
       { range: `${sheetName}!Q${rowNum}`, values: [[userMessage]] },
       { range: `${sheetName}!U${rowNum}`, values: [[pauseStr]] },
       { range: `${sheetName}!V${rowNum}`, values: [[""]] } // Clear Mod Sent At
@@ -1400,7 +1460,7 @@ async function executeAdminQuickAction(appId, action, reason) {
   const tokenData = await tokenRes.json();
   const accessToken = tokenData.access_token;
 
-  const getRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}!A1:V2000`, {
+  const getRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}!A1:Z2000`, {
     headers: { "Authorization": `Bearer ${accessToken}` }
   });
   if (!getRes.ok) throw new Error("Failed to get sheet rows");
@@ -1431,7 +1491,8 @@ async function executeAdminQuickAction(appId, action, reason) {
   }
 
   if (action === "request_modification") {
-    // Record Sent At in Col V to start pause timer
+    // Record Sent At in Col V to start pause timer and clear Col Q on new request
+    updateData.data.push({ range: `${sheetName}!Q${rowNum}`, values: [[""]] }); // Clear old User Mod Response (Col Q)
     updateData.data.push({ range: `${sheetName}!V${rowNum}`, values: [[now.toISOString()]] });
   } else if (action === "approve" || action === "reject") {
     const decisionDate = now.toISOString().replace('T', ' ').substring(0, 19);
@@ -1439,8 +1500,8 @@ async function executeAdminQuickAction(appId, action, reason) {
     let totalCalendarMs = 0;
     const createdTimeStr = targetRow[1]; // Column B Timestamp
     if (createdTimeStr) {
-      const createdMs = Date.parse(createdTimeStr);
-      if (!isNaN(createdMs)) {
+      const createdMs = parseTimestampToMs(createdTimeStr);
+      if (createdMs > 0) {
         totalCalendarMs = Math.max(0, now.getTime() - createdMs);
       }
     }
@@ -1454,8 +1515,8 @@ async function executeAdminQuickAction(appId, action, reason) {
 
     const modSentAt = targetRow[21]; // Col V
     if (modSentAt) {
-      const sentMs = Date.parse(modSentAt);
-      if (!isNaN(sentMs)) {
+      const sentMs = parseTimestampToMs(modSentAt);
+      if (sentMs > 0) {
         userPauseMs += Math.max(0, now.getTime() - sentMs);
       }
     }
@@ -1472,6 +1533,7 @@ async function executeAdminQuickAction(appId, action, reason) {
     updateData.data.push({ range: `${sheetName}!S${rowNum}`, values: [[decisionDate]] });
     updateData.data.push({ range: `${sheetName}!T${rowNum}`, values: [[netSlaStr]] });
     updateData.data.push({ range: `${sheetName}!U${rowNum}`, values: [[pauseStr]] });
+    updateData.data.push({ range: `${sheetName}!V${rowNum}`, values: [[""]] }); // Clear Mod Sent At upon final decision
   }
 
   const updateRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values:batchUpdate`, {
@@ -1515,8 +1577,8 @@ async function executeAdminQuickAction(appId, action, reason) {
     console.log(`[Admin Action] Notification Policy: Intermediate status '${action}' (Modification Requested). Skipping SMS dispatch. User notified via Email.`);
   }
 
-  // 2. Instant Email Dispatch via n8n Webhook
-  fetch('http://localhost:5678/webhook/service-application', {
+  // 2. Instant Email Dispatch via n8n Webhook (Status Update Webhook)
+  fetch('http://127.0.0.1:5678/webhook/status-update', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -1534,9 +1596,28 @@ async function executeAdminQuickAction(appId, action, reason) {
   }).then(res => console.log(`[Admin Action] Forwarded status update to n8n email webhook: HTTP ${res.status}`))
     .catch(err => console.error("Failed to forward status update to n8n:", err));
 
-  // Direct Admin Status Audit Email Notification
+  // Direct Multi-Target Status Email Notifications (Applicant/User + Admin)
   try {
-    const { sendAdminApplicationNotification } = require('./scripts/admin_email_notifier');
+    const { sendAdminApplicationNotification, sendUserApplicationStatusEmail } = require('./scripts/admin_email_notifier');
+    
+    // 1. Direct Email Dispatch to Citizen / Applicant
+    const applicantEmail = targetRow[6] || process.env.ADMIN_EMAIL || 'mnaaaei@gmail.com';
+    sendUserApplicationStatusEmail({
+      appId,
+      status: newStatus,
+      serviceName: officialServiceTitle,
+      firstName: targetRow[3],
+      lastName: targetRow[4],
+      email: applicantEmail,
+      whatsapp: targetRow[5],
+      reason: reason || '',
+      modificationDetails: reason || '',
+      trackingLink: trackingUrl,
+      certificateLink: `${baseUrl}/receipt?id=${appId}`
+    }).then(res => console.log(`[User Email Direct] Dispatched user status change email (${newStatus}) to <${applicantEmail}> for ${appId}:`, res.status))
+      .catch(err => console.error(`[User Email Direct] User status change email error for ${appId}:`, err));
+
+    // 2. Direct Admin Audit Alert Email Notification
     sendAdminApplicationNotification({
       appId,
       status: newStatus,
@@ -1551,9 +1632,9 @@ async function executeAdminQuickAction(appId, action, reason) {
       certificateLink: `${baseUrl}/receipt?id=${appId}`,
       quickActionLink: `${baseUrl}/admin/quick-action?id=${appId}&key=${adminSecretKey}`
     }).then(res => console.log(`[Admin Email Direct] Dispatched admin status change email (${newStatus}) for ${appId}:`, res.status))
-      .catch(err => console.error(`[Admin Email Direct] Status change email error:`, err));
+      .catch(err => console.error(`[Admin Email Direct] Status change email error for ${appId}:`, err));
   } catch (notifierErr) {
-    console.error("[Admin Email Direct] Status change notifier exception:", notifierErr);
+    console.error("[Email Direct] Status change notifier exception:", notifierErr);
   }
 }
 
@@ -1576,7 +1657,7 @@ async function updateServiceApplicationFull(appId, updatedData) {
   const tokenData = await tokenRes.json();
   const accessToken = tokenData.access_token;
 
-  const getRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}!A1:V2000`, {
+  const getRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}!A1:Z2000`, {
     headers: { "Authorization": `Bearer ${accessToken}` }
   });
   if (!getRes.ok) throw new Error("Failed to get sheet rows");
@@ -1593,8 +1674,8 @@ async function updateServiceApplicationFull(appId, updatedData) {
   let accumulatedPauseMs = 0;
 
   if (modSentAt) {
-    const sentMs = Date.parse(modSentAt);
-    if (!isNaN(sentMs)) {
+    const sentMs = parseTimestampToMs(modSentAt);
+    if (sentMs > 0) {
       accumulatedPauseMs += Math.max(0, now.getTime() - sentMs);
     }
   }
@@ -1955,7 +2036,7 @@ const server = http.createServer(async (req, res) => {
           });
           const tokenData = await tokenRes.json();
 
-          const getRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}!A1:W2000`, {
+          const getRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}!A1:Z2000`, {
             headers: { "Authorization": `Bearer ${tokenData.access_token}` }
           });
           const sheetsData = await getRes.json();
@@ -1974,13 +2055,10 @@ const server = http.createServer(async (req, res) => {
 
           if (matchedRow) {
             const rawStatus = (matchedRow[12] || 'Pending').trim();
-            let statusAr = 'قيد المراجعة';
-            if (rawStatus === 'Pending') statusAr = 'تم استلام الطلب والتحقق';
-            else if (rawStatus === 'Approved') statusAr = 'مقبول والمعاملة مكتملة';
-            else if (rawStatus === 'Rejected') statusAr = 'مرفوض';
-            else if (rawStatus === 'Modification Requested') statusAr = 'مطلوب تعديل مستندات';
-            else if (rawStatus === 'Technical Review' || rawStatus === 'Under Review' || rawStatus === 'In Progress') statusAr = 'تدقيق المستندات والمخططات';
-            else if (rawStatus === 'Site Inspection' || rawStatus === 'Approval Phase') statusAr = 'مرحلة الاعتماد والتدقيق';
+            const statusAr = resolveArabicStatusName(rawStatus);
+            const decisionDate = matchedRow[18] || '';
+            const slaCompletionTime = matchedRow[19] || '';
+            const userPauseDuration = matchedRow[20] || '';
 
             const clientName = `${matchedRow[3] || ''} ${matchedRow[4] || ''}`.trim() || 'العزيز';
             preLookup = {
@@ -1990,6 +2068,10 @@ const server = http.createServer(async (req, res) => {
               serviceName: matchedRow[2],
               status: rawStatus,
               statusAr: statusAr,
+              timestamp: matchedRow[1] || '',
+              decisionDate: decisionDate,
+              slaCompletionTime: slaCompletionTime,
+              userPauseDuration: userPauseDuration,
               greetingAr: `أهلاً بك ${clientName}! أرى أن لديك طلباً نشطاً لخدمة (${matchedRow[2]}) وحالته الحالية هي (${statusAr}). كيف يمكنني مساعدتك اليوم؟`,
               greetingEn: `Welcome back ${clientName}! I see you have an active application for ${matchedRow[2]} currently (${rawStatus}). How can I help you today?`
             };
@@ -2231,7 +2313,7 @@ const server = http.createServer(async (req, res) => {
       // 2. Fetch Service Applications (ServiceApplications)
       let appRows = [];
       try {
-        const appRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/ServiceApplications!A1:P2000`, {
+        const appRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/ServiceApplications!A1:X2000`, {
           headers: { "Authorization": `Bearer ${accessToken}` }
         });
         if (appRes.ok) {
@@ -2721,13 +2803,13 @@ const server = http.createServer(async (req, res) => {
           .catch(err => console.error(`[Application Created] Failed to send SMS for ${appId}:`, err));
 
         // Forward to n8n with skipSms: true to prevent duplicate secondary SMS dispatch
-        fetch('http://localhost:5678/webhook/service-application', {
+        fetch('http://127.0.0.1:5678/webhook/service-application', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ ...fullAppData, trackingLink, skipSms: true })
         }).catch(err => console.error("Failed to forward app to n8n webhook:", err));
 
-        fetch('http://localhost:5678/webhook/admin-notification', {
+        fetch('http://127.0.0.1:5678/webhook/admin-notification', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -2750,7 +2832,7 @@ const server = http.createServer(async (req, res) => {
 
         // Direct Admin Email Alert via Nodemailer Engine
         try {
-          const { sendAdminApplicationNotification } = require('./scripts/admin_email_notifier');
+          const { sendAdminApplicationNotification, sendUserApplicationStatusEmail } = require('./scripts/admin_email_notifier');
           sendAdminApplicationNotification({
             appId,
             serviceName: officialServiceName,
@@ -2767,8 +2849,22 @@ const server = http.createServer(async (req, res) => {
             isNewApplication: true
           }).then(r => console.log(`[Admin Email Direct] Dispatched admin alert for ${appId}:`, r.status))
             .catch(e => console.error(`[Admin Email Direct] Error:`, e));
+
+          // Direct Customer Confirmation Email (Rule: ALL STATUS OF APPLICATION SENT TO CLIENT EMAIL)
+          sendUserApplicationStatusEmail({
+            appId,
+            serviceName: officialServiceName,
+            firstName: appData.firstName,
+            lastName: appData.lastName,
+            email: appData.email,
+            status: 'Submitted',
+            trackingLink,
+            attachmentLink,
+            notes: appData.notes
+          }).then(r => console.log(`[Customer Submit Email Direct] Dispatched confirmation to <${appData.email}> for ${appId}:`, r.status))
+            .catch(e => console.error(`[Customer Submit Email Direct] Error:`, e));
         } catch (notifierErr) {
-          console.error("[Admin Email Direct] Notifier exception:", notifierErr);
+          console.error("[Email Direct] Notifier exception:", notifierErr);
         }
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -2873,12 +2969,24 @@ const server = http.createServer(async (req, res) => {
 
           await updateServiceApplicationFull(appId, updatedFields);
 
-          // Forward to webhook too
-          fetch('http://localhost:5678/webhook/service-application', {
+          // Forward to Admin Notification Webhook
+          const publicUrl = (req.headers['x-forwarded-proto'] || 'http') + '://' + req.headers.host;
+          fetch('http://127.0.0.1:5678/webhook/admin-notification', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...updatedFields, appId, trackingLink: appDetails.trackingLink, action: "update" })
-          }).catch(err => console.error("Failed to forward app update to n8n webhook:", err));
+            body: JSON.stringify({
+              ...updatedFields,
+              appId,
+              clientName: `${modData.firstName || ''} ${modData.lastName || ''}`.trim() || 'عزيزنا المتعامل',
+              adminEmail: process.env.ADMIN_EMAIL || 'mnaaaei@gmail.com',
+              trackingLink: appDetails.trackingLink,
+              quickActionLink: `${publicUrl}/admin/quick-action?id=${appId}&key=${adminSecretKey}`,
+              isNewApplication: false,
+              status: 'Modification Resubmitted',
+              modificationDetails: modData.notes || 'تم تحديث بيانات ومرفقات المعاملة'
+            })
+          }).then(res => console.log(`[Admin Notify] Forwarded full data update for ${appId} to n8n: HTTP ${res.status}`))
+            .catch(err => console.error("Failed to forward app update to n8n admin-notification webhook:", err));
 
           // Direct Admin Email Alert for Document / Data Update
           try {
@@ -2894,7 +3002,7 @@ const server = http.createServer(async (req, res) => {
               notes: modData.notes,
               attachmentLink,
               trackingLink: appDetails.trackingLink,
-              quickActionLink: `${(req.headers['x-forwarded-proto'] || 'http')}://${req.headers.host}/admin/quick-action?id=${appId}&key=${adminSecretKey}`,
+              quickActionLink: `${publicUrl}/admin/quick-action?id=${appId}&key=${adminSecretKey}`,
               paymentMethod: modData.paymentMethod
             }).then(res => console.log(`[Admin Email Direct] Dispatched document update email for ${appId}:`, res.status))
               .catch(err => console.error("[Admin Email Direct] Document update email error:", err));
@@ -2914,22 +3022,29 @@ const server = http.createServer(async (req, res) => {
           await updateUserModificationResponse(appId, modificationDetails);
 
           const publicUrl = (req.headers['x-forwarded-proto'] || 'http') + '://' + req.headers.host;
-          fetch('http://localhost:5678/webhook/admin-notification', {
+          fetch('http://127.0.0.1:5678/webhook/admin-notification', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               appId,
               modificationDetails,
+              notes: modificationDetails,
               serviceName: appDetails.serviceName,
-              clientName: `${appDetails.firstName} ${appDetails.lastName}`,
-              email: appDetails.email,
-              whatsapp: appDetails.whatsapp,
+              clientName: `${appDetails.firstName || ''} ${appDetails.lastName || ''}`.trim() || 'عزيزنا المتعامل',
+              firstName: appDetails.firstName || '',
+              lastName: appDetails.lastName || '',
+              email: appDetails.email || '',
+              whatsapp: appDetails.whatsapp || '',
+              adminEmail: process.env.ADMIN_EMAIL || 'mnaaaei@gmail.com',
               quickActionLink: `${publicUrl}/admin/quick-action?id=${appId}&key=${adminSecretKey}`,
               attachmentLink: appDetails.attachmentLink || '',
               paymentMethod: appDetails.paymentMethod || '',
-              dynamicFields: appDetails.dynamicFields || ''
+              dynamicFields: appDetails.dynamicFields || '',
+              isNewApplication: false,
+              status: 'Modification Resubmitted'
             })
-          }).catch(err => console.error("Failed to trigger n8n admin notification:", err));
+          }).then(res => console.log(`[Admin Notify] Forwarded citizen modification request for ${appId} to n8n: HTTP ${res.status}`))
+            .catch(err => console.error("Failed to trigger n8n admin notification:", err));
 
           // Direct Admin Email Alert for Citizen Response Notes
           try {
@@ -3025,7 +3140,7 @@ const server = http.createServer(async (req, res) => {
         res.end(JSON.stringify({ status: 'error', error: err.message }));
       }
     });
-  } else if (pathname === '/api/voice/lookup-application' && (req.method === 'POST' || req.method === 'GET')) {
+  } else if ((pathname === '/api/voice/lookup-application' || pathname === '/api/track' || pathname === '/api/applications/status') && (req.method === 'POST' || req.method === 'GET')) {
     const clientIp = getClientIp(req);
     const rlCheck = statusLookupRateLimiter.check(clientIp);
     if (!rlCheck.allowed) {
@@ -3075,7 +3190,7 @@ const server = http.createServer(async (req, res) => {
         });
         const tokenData = await tokenRes.json();
 
-        const getRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}!A1:W2000`, {
+        const getRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}!A1:Z2000`, {
           headers: { "Authorization": `Bearer ${tokenData.access_token}` }
         });
         const data = await getRes.json();
@@ -3100,13 +3215,7 @@ const server = http.createServer(async (req, res) => {
 
         const formatRowRecord = (row) => {
           const rawStatus = (row[12] || 'Pending').trim();
-          let statusAr = 'قيد المراجعة';
-          if (rawStatus === 'Pending') statusAr = 'تم استلام الطلب والتحقق';
-          else if (rawStatus === 'Approved') statusAr = 'مقبول والمعاملة مكتملة';
-          else if (rawStatus === 'Rejected') statusAr = 'مرفوض';
-          else if (rawStatus === 'Modification Requested') statusAr = 'مطلوب تعديل مستندات';
-          else if (rawStatus === 'Technical Review' || rawStatus === 'Under Review' || rawStatus === 'In Progress') statusAr = 'تدقيق المستندات والمخططات';
-          else if (rawStatus === 'Site Inspection' || rawStatus === 'Approval Phase') statusAr = 'مرحلة الاعتماد والتدقيق';
+          const statusAr = resolveArabicStatusName(rawStatus);
 
           return {
             appId: row[0],
@@ -3116,7 +3225,10 @@ const server = http.createServer(async (req, res) => {
             status: rawStatus,
             statusAr: statusAr,
             trackingLink: row[9],
-            modificationDetails: row[15] || ""
+            modificationDetails: row[15] || "",
+            decisionDate: row[18] || "",
+            slaCompletionTime: row[19] || "",
+            userPauseDuration: row[20] || ""
           };
         };
 
@@ -3125,13 +3237,24 @@ const server = http.createServer(async (req, res) => {
           let modGuidanceAr = rec.status === 'Modification Requested' ? " لمراجعة التفاصيل المطلوبة والتعديل، يُرجى مراجعة صفحة التتبع." : "";
           let modGuidanceEn = rec.status === 'Modification Requested' ? " For detailed modification requests, please refer to your tracking page." : "";
 
+          let timingAr = "";
+          let timingEn = "";
+          if (rec.status === 'Approved' && rec.decisionDate) {
+            timingAr = `، وتم اعتماد الطلب رسمياً بتاريخ ${rec.decisionDate}`;
+            timingEn = `, officially approved on ${rec.decisionDate}`;
+            if (rec.slaCompletionTime) {
+              timingAr += ` واستغرقت مدة الإنجاز الفعلي ${rec.slaCompletionTime}`;
+              timingEn += ` with net SLA processing time of ${rec.slaCompletionTime}`;
+            }
+          }
+
           const record = {
             found: true,
             multiple: false,
             count: 1,
             ...rec,
-            spokenSummaryAr: `أهلاً بك ${rec.clientName}! يوجد لديك طلب نشط لخدمة (${rec.serviceName}) وحالته الحالية هي (${rec.statusAr}).${modGuidanceAr} تم إرسال رقم الطلب ورابط التتبع مباشرة إلى رقم الواتساب الخاص بك.`,
-            spokenSummaryEn: `Welcome back ${rec.clientName}! You have an active application for ${rec.serviceName} currently (${rec.status}).${modGuidanceEn} Your Application ID and tracking link have been sent directly to your WhatsApp number.`
+            spokenSummaryAr: `أهلاً بك ${rec.clientName}! يوجد لديك طلب نشط لخدمة (${rec.serviceName}) وحالته الحالية هي (${rec.statusAr})${timingAr}.${modGuidanceAr} تم إرسال رقم الطلب ورابط التتبع مباشرة إلى رقم الواتساب الخاص بك.`,
+            spokenSummaryEn: `Welcome back ${rec.clientName}! You have an active application for ${rec.serviceName} currently (${rec.status})${timingEn}.${modGuidanceEn} Your Application ID and tracking link have been sent directly to your WhatsApp number.`
           };
 
           res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
@@ -3208,7 +3331,7 @@ const server = http.createServer(async (req, res) => {
         // Forward to n8n workflow as backup
         const isTest = targetPhone.includes('000000') || targetPhone.includes('35555563');
         if (!isTest && targetPhone) {
-          fetch('http://localhost:5678/webhook/service-application', {
+          fetch('http://127.0.0.1:5678/webhook/service-application', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -3267,6 +3390,21 @@ const server = http.createServer(async (req, res) => {
           return;
         }
 
+        const nowMs = Date.now();
+        const createdMs = parseTimestampToMs(app.timestamp);
+        let elapsedCalendarStr = 'غير محدد';
+        if (createdMs > 0) {
+          const diffMs = Math.max(0, nowMs - createdMs);
+          const hrs = (diffMs / (1000 * 3600)).toFixed(1);
+          const days = (diffMs / (1000 * 3600 * 24)).toFixed(2);
+          elapsedCalendarStr = `${days} days (${hrs} hrs)`;
+        }
+
+        const decisionDateDisplay = app.decisionDate ? 'flex' : 'none';
+        const slaTimeDisplay = app.slaCompletionTime ? 'flex' : 'none';
+        const userPauseDisplay = app.userPauseDuration ? 'flex' : 'none';
+        const livePauseDisplay = (app.status === 'Modification Requested') ? 'flex' : 'none';
+
         const rendered = html
           .replace(/\{\{APP_ID\}\}/g, escapeHtml(app.appId || ''))
           .replace(/\{\{SERVICE_NAME\}\}/g, escapeHtml(app.serviceName || ''))
@@ -3276,6 +3414,14 @@ const server = http.createServer(async (req, res) => {
           .replace(/\{\{ATTACHMENT_LINK\}\}/g, app.attachmentLink || '#')
           .replace(/\{\{TIMESTAMP\}\}/g, escapeHtml(app.timestamp || ''))
           .replace(/\{\{STATUS\}\}/g, escapeHtml(app.status || 'Pending'))
+          .replace(/\{\{ELAPSED_TIME\}\}/g, escapeHtml(elapsedCalendarStr))
+          .replace(/\{\{DECISION_DATE\}\}/g, escapeHtml(app.decisionDate || ''))
+          .replace(/\{\{DECISION_DATE_DISPLAY\}\}/g, decisionDateDisplay)
+          .replace(/\{\{SLA_TIME\}\}/g, escapeHtml(app.slaCompletionTime || ''))
+          .replace(/\{\{SLA_TIME_DISPLAY\}\}/g, slaTimeDisplay)
+          .replace(/\{\{USER_PAUSE_DURATION\}\}/g, escapeHtml(app.userPauseDuration || ''))
+          .replace(/\{\{USER_PAUSE_DISPLAY\}\}/g, userPauseDisplay)
+          .replace(/\{\{LIVE_PAUSE_DISPLAY\}\}/g, livePauseDisplay)
           .replace(/\{\{EXISTING_ADMIN_NOTE\}\}/g, escapeHtml(app.modificationDetails || ''))
           .replace(/\{\{USER_RESPONSE\}\}/g, escapeHtml(app.userModificationResponse || 'لا يوجد ملاحظات إضافية من المستخدم حتى الآن.'))
           .replace(/\{\{DOCUMENT_AUDIT_HISTORY_JSON\}\}/g, JSON.stringify(app.documentAuditHistory || []));
@@ -3417,29 +3563,57 @@ const server = http.createServer(async (req, res) => {
         let bannerDisplay = 'none';
 
         const status = app.status ? app.status.trim() : 'Pending';
-        if (status === 'Pending') {
-          statusText = 'تم الاستلام والتحقق';
+        const s = status.toLowerCase();
+
+        if (s === 'pending' || s === 'submitted' || s === 'جديد' || s === 'قيد الانتظار') {
+          statusText = 'تم استلام الطلب والتحقق المبدئي (Submitted)';
           statusClass = 'pending';
-          progressWidth = '0%';
+          progressWidth = '15%';
           step1Class = 'active';
           editFormDisplay = 'block'; // Show full edit form!
-        } else if (status === 'Technical Review' || status === 'Under Review' || status === 'In Progress') {
-          statusText = 'تدقيق المستندات والمخططات';
+        } else if (s.includes('review') || s.includes('مراجعة') || s.includes('تدقيق') || s.includes('دراسة')) {
+          statusText = 'قيد المراجعة والتدقيق الفني (Under Review)';
           statusClass = 'pending';
-          progressWidth = '33%';
+          progressWidth = '38%';
           step1Class = 'completed';
           step2Class = 'active';
           formDisplay = 'block'; // Show comment request box!
-        } else if (status === 'Approval Phase' || status === 'Site Inspection' || status === 'Under Inspection' || status === 'Site Assessment') {
-          statusText = 'مرحلة الاعتماد والتدقيق';
+        } else if (s.includes('progress') || s.includes('معالجة') || s.includes('إجراء')) {
+          statusText = 'قيد المعالجة والإجراء الإداري (In Progress)';
           statusClass = 'pending';
-          progressWidth = '66%';
+          progressWidth = '62%';
           step1Class = 'completed';
           step2Class = 'completed';
           step3Class = 'active';
           formDisplay = 'block'; // Show comment request box!
-        } else if (status === 'Approved') {
-          statusText = 'مقبول والمعاملة مكتملة';
+        } else if (s.includes('inspect') || s.includes('معاينة') || s.includes('فحص')) {
+          statusText = 'قيد المعاينة الميدانية (Under Field Inspection)';
+          statusClass = 'pending';
+          progressWidth = '75%';
+          step1Class = 'completed';
+          step2Class = 'completed';
+          step3Class = 'active';
+          formDisplay = 'block'; // Show comment request box!
+        } else if (s.includes('modification') || s.includes('تعديل') || s.includes('استكمال')) {
+          if (s.includes('resubmit') || s.includes('إعادة') || s.includes('تحديث')) {
+            statusText = 'تم استلام التعديل وقيد إعادة التدقيق (Modification Resubmitted)';
+            statusClass = 'pending';
+            progressWidth = '50%';
+            step1Class = 'completed';
+            step2Class = 'active';
+            formDisplay = 'block';
+          } else {
+            statusText = 'مطلوب تعديل بيانات ومستندات (Modification Requested)';
+            statusClass = 'modification';
+            progressWidth = '38%';
+            step1Class = 'completed';
+            step2Class = 'active';
+            bannerDisplay = 'flex';
+            formDisplay = 'block'; // Show comment request box!
+            editFormDisplay = 'block'; // Show full edit & file upload form!
+          }
+        } else if (s.includes('approv') || s.includes('قبول') || s.includes('اعتماد') || s.includes('مكتمل')) {
+          statusText = 'مقبول والمعاملة معتمدة بنجاح (Approved)';
           statusClass = 'approved';
           progressWidth = '100%';
           step1Class = 'completed';
@@ -3448,8 +3622,8 @@ const server = http.createServer(async (req, res) => {
           step4Class = 'completed';
           step4Emoji = '✅';
           step4Label = '4. تمت الموافقة والاعتماد';
-        } else if (status === 'Rejected') {
-          statusText = 'مرفوض';
+        } else if (s.includes('reject') || s.includes('رفض') || s.includes('ملغي') || s.includes('غير مستوف')) {
+          statusText = 'مرفوض / غير مستوفٍ للشروط (Rejected)';
           statusClass = 'rejected';
           progressWidth = '100%';
           step1Class = 'completed';
@@ -3458,21 +3632,39 @@ const server = http.createServer(async (req, res) => {
           step4Class = 'rejected-step';
           step4Emoji = '❌';
           step4Label = '4. الطلب مرفوض';
-        } else if (status === 'Modification Requested') {
-          statusText = 'مطلوب تعديل بيانات';
-          statusClass = 'modification';
-          progressWidth = '33%';
+        } else {
+          statusText = `${status} - قيد المتابعة`;
+          statusClass = 'pending';
+          progressWidth = '50%';
           step1Class = 'completed';
           step2Class = 'active';
-          bannerDisplay = 'flex';
-          formDisplay = 'block'; // Show comment request box!
-          editFormDisplay = 'block'; // Show full edit & file upload form!
+          formDisplay = 'block';
         }
 
         let formattedDate = app.timestamp;
         try {
-          formattedDate = new Date(app.timestamp).toLocaleString('ar-BH', { timeZone: 'Asia/Bahrain' });
+          const ms = parseTimestampToMs(app.timestamp);
+          if (ms > 0) {
+            formattedDate = new Date(ms).toLocaleString('ar-BH', { timeZone: 'Asia/Bahrain' });
+          }
         } catch (e) {}
+
+        let formattedDecisionDate = app.decisionDate || '';
+        if (app.decisionDate) {
+          try {
+            const dMs = parseTimestampToMs(app.decisionDate);
+            if (dMs > 0) {
+              formattedDecisionDate = new Date(dMs).toLocaleString('ar-BH', { timeZone: 'Asia/Bahrain' });
+            }
+          } catch (e) {
+            formattedDecisionDate = app.decisionDate;
+          }
+        }
+
+        const decisionDateDisplay = app.decisionDate ? 'block' : 'none';
+        const slaTimeDisplay = app.slaCompletionTime ? 'block' : 'none';
+        const userPauseDisplay = app.userPauseDuration ? 'block' : 'none';
+        const livePauseIndicatorDisplay = (statusClass === 'modification') ? 'flex' : 'none';
 
         const benefitSelected = app.paymentMethod === 'BenefitPay' ? 'selected' : '';
         const creditSelected = app.paymentMethod === 'CreditCard' ? 'selected' : '';
@@ -3500,6 +3692,13 @@ const server = http.createServer(async (req, res) => {
           .replace(/\{\{SERVICE_NAME\}\}/g, app.serviceName)
           .replace(/\{\{SERVICE_NAME_RAW\}\}/g, app.serviceName)
           .replace(/\{\{TIMESTAMP\}\}/g, formattedDate)
+          .replace(/\{\{DECISION_DATE\}\}/g, formattedDecisionDate)
+          .replace(/\{\{DECISION_DATE_DISPLAY\}\}/g, decisionDateDisplay)
+          .replace(/\{\{SLA_TIME\}\}/g, app.slaCompletionTime || '')
+          .replace(/\{\{SLA_TIME_DISPLAY\}\}/g, slaTimeDisplay)
+          .replace(/\{\{USER_PAUSE_DURATION\}\}/g, app.userPauseDuration || '')
+          .replace(/\{\{USER_PAUSE_DISPLAY\}\}/g, userPauseDisplay)
+          .replace(/\{\{LIVE_PAUSE_INDICATOR_DISPLAY\}\}/g, livePauseIndicatorDisplay)
           .replace(/\{\{CLIENT_NAME\}\}/g, `${app.firstName} ${app.lastName}`)
           .replace(/\{\{FIRST_NAME_RAW\}\}/g, app.firstName)
           .replace(/\{\{LAST_NAME_RAW\}\}/g, app.lastName)
@@ -3574,6 +3773,16 @@ const server = http.createServer(async (req, res) => {
         res.end(content);
       }
     });
+  } else if (pathname === '/guide' || pathname === '/guide.html' || pathname === '/how-to-apply' || pathname === '/help') {
+    fs.readFile(path.join(__dirname, 'guide.html'), (err, content) => {
+      if (err) {
+        res.writeHead(500);
+        res.end('Error loading guide.html');
+      } else {
+        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+        res.end(content);
+      }
+    });
   } else if (pathname === '/manifest.json') {
     fs.readFile(path.join(__dirname, 'manifest.json'), (err, content) => {
       if (err) {
@@ -3643,4 +3852,13 @@ setInterval(() => {
 
 server.listen(3000, () => {
   console.log('Test server running at http://localhost:3000');
+  
+  // Real-Time Google Sheets Status Change Monitor & Immediate Customer Email Dispatcher
+  try {
+    const { startSheetStatusWatcher } = require('./scripts/sheet_status_watcher');
+    startSheetStatusWatcher(10000); // Check sheet every 10 seconds for Column M changes
+  } catch (err) {
+    console.error('[Server] Failed to initialize Real-Time Sheet Status Watcher:', err);
+  }
 });
+

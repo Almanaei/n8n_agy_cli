@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>دليل التقديم على خدمات الدفاع المدني | Step-by-Step Service Application Guide</title>
+    <link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0071e3">
+    
+    <!-- Google Fonts: Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-dark: #0b1120;
+            --bg-card: rgba(15, 23, 42, 0.78);
+            --bg-card-hover: rgba(30, 41, 59, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-border-gold: rgba(212, 175, 55, 0.35);
+            --accent-gold: #D4AF37;
+            --accent-gold-glow: rgba(212, 175, 55, 0.4);
+            --accent-blue: #0284c7;
+            --accent-sky: #38bdf8;
+            --accent-emerald: #10b981;
+            --accent-purple: #a855f7;
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --text-muted: #64748B;
+            --status-online: #30D158;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --transition-smooth: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Cairo', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(2, 132, 199, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(212, 175, 55, 0.12) 0px, transparent 50%),
+                radial-gradient(at 50% 100%, rgba(15, 23, 42, 0.8) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Frosted Glass Header */
+        .header-nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(11, 17, 32, 0.82);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 12px 24px;
+        }
+
+        .header-container {
+            max-width: 1140px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .brand-logo-area {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .brand-crest {
+            width: 44px;
+            height: 44px;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 8px rgba(212, 175, 55, 0.3));
+        }
+
+        .brand-text h1 {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #FFFFFF;
+            letter-spacing: 0.2px;
+            line-height: 1.2;
+        }
+
+        .brand-text p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-glass-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            padding: 7px 14px;
+            border-radius: 50px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            transition: var(--transition-smooth);
+            font-family: inherit;
+        }
+
+        .btn-glass-nav:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--accent-sky);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary-portal {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            color: white;
+            padding: 7px 18px;
+            border-radius: 50px;
+            font-size: 0.82rem;
+            font-weight: 800;
+            text-decoration: none;
+            transition: var(--transition-smooth);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+        }
+
+        .btn-primary-portal:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(2, 132, 199, 0.5);
+            background: linear-gradient(135deg, #0369a1 0%, #0284c7 100%);
+        }
+
+        /* Main Container */
+        .main-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 32px 20px 60px 20px;
+            flex: 1;
+            width: 100%;
+        }
+
+        /* Hero Banner */
+        .guide-hero {
+            text-align: center;
+            margin-bottom: 36px;
+            position: relative;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(212, 175, 55, 0.12);
+            border: 1px solid var(--glass-border-gold);
+            color: #F6E05E;
+            padding: 5px 16px;
+            border-radius: 50px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            margin-bottom: 14px;
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15);
+        }
+
+        .guide-title {
+            font-size: 2.1rem;
+            font-weight: 900;
+            color: #FFFFFF;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .guide-subtitle {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            max-width: 680px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Progress Bar Timeline */
+        .timeline-container {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 20px 16px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        .progress-track-wrapper {
+            position: relative;
+            margin: 10px 20px 24px 20px;
+        }
+
+        .progress-track-bg {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+
+        .progress-track-fill {
+            height: 4px;
+            background: linear-gradient(90deg, #D4AF37, #38BDF8);
+            border-radius: 10px;
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 20%;
+            transform: translateY(-50%);
+            z-index: 2;
+            transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .timeline-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            z-index: 3;
+        }
+
+        .step-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-family: inherit;
+            transition: var(--transition-smooth);
+            padding: 0 4px;
+            outline: none;
+        }
+
+        .step-circle {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #0f172a;
+            border: 2px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            transition: var(--transition-smooth);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .step-node.active .step-circle {
+            background: #D4AF37;
+            border-color: #F6E05E;
+            color: #0b1120;
+            box-shadow: 0 0 16px var(--accent-gold-glow);
+            transform: scale(1.15);
+        }
+
+        .step-node.completed .step-circle {
+            background: var(--accent-blue);
+            border-color: var(--accent-sky);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-align: center;
+            max-width: 110px;
+            line-height: 1.3;
+        }
+
+        .step-node.active .step-label {
+            color: #F8FAFC;
+            font-weight: 800;
+        }
+
+        .step-node.completed .step-label {
+            color: var(--accent-sky);
+        }
+
+        /* Step Card Display Area */
+        .step-card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 30px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+            margin-bottom: 30px;
+            display: none;
+            animation: fadeInStep 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .step-card.active {
+            display: block;
+        }
+
+        @keyframes fadeInStep {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-header-badge {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .step-badge-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--accent-gold);
+        }
+
+        .step-duration {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+
+        .card-main-title {
+            font-size: 1.45rem;
+            font-weight: 800;
+            color: #FFFFFF;
+            margin-bottom: 12px;
+        }
+
+        .card-description {
+            font-size: 0.95rem;
+            color: #CBD5E1;
+            margin-bottom: 24px;
+            line-height: 1.7;
+        }
+
+        /* Feature Grid within Step */
+        .step-features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .step-feature-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            transition: var(--transition-smooth);
+        }
+
+        .step-feature-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(56, 189, 248, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .feature-icon-box {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        .feature-title {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 6px;
+        }
+
+        .feature-desc {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Visual Interactive Mock Box */
+        .mock-interactive-box {
+            background: #090e17;
+            border: 1.5px dashed rgba(212, 175, 55, 0.35);
+            border-radius: var(--radius-md);
+            padding: 18px;
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .mock-tag {
+            position: absolute;
+            top: -10px;
+            right: 16px;
+            background: #D4AF37;
+            color: #0b1120;
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 2px 10px;
+            border-radius: 20px;
+        }
+
+        [dir="ltr"] .mock-tag {
+            right: auto;
+            left: 16px;
+        }
+
+        .mock-inner {
+            font-size: 0.86rem;
+            color: #E2E8F0;
+            line-height: 1.6;
+        }
+
+        .mock-tip-title {
+            color: #F6E05E;
+            font-weight: 700;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Navigation Buttons */
+        .step-navigation-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .btn-step-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 22px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-step-prev {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+        }
+
+        .btn-step-prev:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #CBD5E1;
+        }
+
+        .btn-step-prev:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .btn-step-next {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            color: white;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+        }
+
+        .btn-step-next:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(2, 132, 199, 0.5);
+            background: linear-gradient(135deg, #0369a1 0%, #0284c7 100%);
+        }
+
+        .btn-step-finish {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: 1px solid rgba(52, 211, 153, 0.4);
+            color: white;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+        }
+
+        .btn-step-finish:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+        }
+
+        /* FAQ & Tips Accordion */
+        .faq-section {
+            margin-top: 40px;
+        }
+
+        .faq-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .faq-header h3 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #FFFFFF;
+            margin-bottom: 6px;
+        }
+
+        .faq-header p {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+        }
+
+        .faq-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .faq-card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: 16px 20px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .faq-card:hover {
+            border-color: var(--glass-border-gold);
+            background: var(--bg-card-hover);
+        }
+
+        .faq-question {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+
+        .faq-answer {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+            font-size: 0.88rem;
+            color: #CBD5E1;
+            line-height: 1.6;
+        }
+
+        .faq-card.open .faq-answer {
+            max-height: 160px;
+            opacity: 1;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .faq-card.open .faq-question {
+            color: #F6E05E;
+        }
+
+        /* Footer */
+        .footer-guide {
+            text-align: center;
+            padding: 24px;
+            background: rgba(11, 17, 32, 0.9);
+            border-top: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            margin-top: auto;
+        }
+
+        @media (max-width: 640px) {
+            .timeline-steps {
+                gap: 4px;
+            }
+            .step-circle {
+                width: 32px;
+                height: 32px;
+                font-size: 0.85rem;
+            }
+            .step-label {
+                font-size: 0.68rem;
+                max-width: 60px;
+            }
+            .guide-title {
+                font-size: 1.6rem;
+            }
+            .step-card {
+                padding: 20px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Frosted Navigation Header -->
+    <header class="header-nav">
+        <div class="header-container">
+            <a href="/" class="brand-logo-area">
+                <img src="/icons/64f5d224596566bd337009fc_civil defense.svg" alt="Civil Defense Emblem" class="brand-crest">
+                <div class="brand-text">
+                    <h1 id="txt-nav-title">الإدارة العامة للدفاع المدني</h1>
+                    <p id="txt-nav-sub">دليل التقديم التفاعلي الذكي</p>
+                </div>
+            </a>
+
+            <div class="header-actions">
+                <button type="button" class="btn-glass-nav" onclick="toggleLanguage()" id="btn-lang-toggle">
+                    <span>🌐</span>
+                    <span id="txt-lang-label">English</span>
+                </button>
+                <a href="/?action=apply" class="btn-primary-portal" id="btn-start-app-header">
+                    <span>📝</span>
+                    <span id="txt-start-app-nav">بدء التقديم الآن</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <!-- Hero Header -->
+        <div class="guide-hero">
+            <div class="hero-badge" id="txt-hero-badge">✨ دليل الإرشاد الرقمي الشامل</div>
+            <h2 class="guide-title" id="txt-hero-title">كيفية التقديم على خدمات الدفاع المدني</h2>
+            <p class="guide-subtitle" id="txt-hero-subtitle">خطوة بخطوة من اختيار الخدمة المناسبة وحتى استلام الاعتماد والإيصال الرقمي الرسمي المعتمد.</p>
+        </div>
+
+        <!-- Progress Timeline Bar -->
+        <div class="timeline-container">
+            <div class="progress-track-wrapper">
+                <div class="progress-track-bg"></div>
+                <div class="progress-track-fill" id="progress-bar-fill"></div>
+                <div class="timeline-steps">
+                    <button type="button" class="step-node active" onclick="goToStep(1)">
+                        <div class="step-circle">1</div>
+                        <span class="step-label" id="txt-step1-lbl">تحديد الخدمة</span>
+                    </button>
+                    <button type="button" class="step-node" onclick="goToStep(2)">
+                        <div class="step-circle">2</div>
+                        <span class="step-label" id="txt-step2-lbl">البيانات الأساسية</span>
+                    </button>
+                    <button type="button" class="step-node" onclick="goToStep(3)">
+                        <div class="step-circle">3</div>
+                        <span class="step-label" id="txt-step3-lbl">المواصفات والملفات</span>
+                    </button>
+                    <button type="button" class="step-node" onclick="goToStep(4)">
+                        <div class="step-circle">4</div>
+                        <span class="step-label" id="txt-step4-lbl">التأكيد والإيصال</span>
+                    </button>
+                    <button type="button" class="step-node" onclick="goToStep(5)">
+                        <div class="step-circle">5</div>
+                        <span class="step-label" id="txt-step5-lbl">التتبع والاعتماد</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 1 Card -->
+        <div class="step-card active" id="step-card-1">
+            <div class="card-header-badge">
+                <span class="step-badge-indicator" id="txt-s1-badge">🎙️ الخطوة 1 من 5: اختيار وتحديد الخدمة</span>
+                <span class="step-duration" id="txt-s1-dur">⏱️ دقيقة واحدة</span>
+            </div>
+            <h3 class="card-main-title" id="txt-s1-title">التحدث مع المساعد الذكي واختيار الخدمة المناسبة</h3>
+            <p class="card-description" id="txt-s1-desc">
+                توفر منصة الدفاع المدني 39 خدمة معتمدة تشمل التراخيص التجارية، تراخيص محطات الغاز والوقود، شهادات استيفاء شروط السلامة، وفحص المنشآت. يمكنك التحدث بحرية كاملة بالصوت وسيقوم المساعد الذكي باقتراح الخدمة الأنسب لطلبك.
+            </p>
+
+            <div class="step-features-grid">
+                <div class="step-feature-item">
+                    <span class="feature-icon-box">🗣️</span>
+                    <h4 class="feature-title" id="txt-s1-f1-t">التحدث الصوتي المباشر</h4>
+                    <p class="feature-desc" id="txt-s1-f1-d">اضغط على زر "بدء محادثة صوتية" واشرح نشاطك (مثلاً: "أريد ترخيص مخبز جديد").</p>
+                </div>
+                <div class="step-feature-item">
+                    <span class="feature-icon-box">🎯</span>
+                    <h4 class="feature-title" id="txt-s1-f2-t">التعرف الذكي بدون أخطاء</h4>
+                    <p class="feature-desc" id="txt-s1-f2-d">يقوم النظام بربط طلبك تلقائياً بالخدمة المعتمدة دون أي تشابه أو خلط بالخدمات.</p>
+                </div>
+                <div class="step-feature-item">
+                    <span class="feature-icon-box">📋</span>
+                    <h4 class="feature-title" id="txt-s1-f3-t">زر "قدّم الآن" الفوري</h4>
+                    <p class="feature-desc" id="txt-s1-f3-d">سيظهر زر التقديم مباشرة أسفل رد المساعد الذكي لتفتح النموذج بضغطة واحدة.</p>
+                </div>
+            </div>
+
+            <div class="mock-interactive-box">
+                <span class="mock-tag" id="txt-s1-mock-tag">💡 نصيحة ذكية</span>
+                <div class="mock-inner">
+                    <div class="mock-tip-title" id="txt-s1-mock-title">⚡ التقديم السريع المباشر</div>
+                    <span id="txt-s1-mock-desc">بإمكانك أيضاً فتح نموذج التقديم مباشرة في أي وقت بالضغط على زر "التقديم على خدمة" من القائمة العلوية السريعة.</span>
+                </div>
+            </div>
+
+            <div class="step-navigation-bar">
+                <button type="button" class="btn-step-nav btn-step-prev" disabled>السابق</button>
+                <button type="button" class="btn-step-nav btn-step-next" onclick="goToStep(2)">
+                    <span id="txt-btn-next-1">متابعة: البيانات الأساسية</span>
+                    <span>➔</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 2 Card -->
+        <div class="step-card" id="step-card-2">
+            <div class="card-header-badge">
+                <span class="step-badge-indicator" id="txt-s2-badge">👤 الخطوة 2 من 5: البيانات الأساسية والمقدم</span>
+                <span class="step-duration" id="txt-s2-dur">⏱️ دقيقة واحدة</span>
+            </div>
+            <h3 class="card-main-title" id="txt-s2-title">إدخال بيانات مقدم الطلب ورقم السجل أو البطاقة</h3>
+            <p class="card-description" id="txt-s2-desc">
+                في المرحلة الأولى من النموذج، يتم تسجيل البيانات التعريفية لربط المعاملة بسجل الدفاع المدني وإرسال التنبيهات الفورية عبر الرسائل النصية.
+            </p>
+
+            <div class="step-features-grid">
+                <div class="step-feature-item">
+                    <span class="feature-icon-box">🆔</span>
+                    <h4 class="feature-title" id="txt-s2-f1-t">رقم السجل التجاري / البطاقة (CR / CPR)</h4>
+                    <p class="feature-desc" id="txt-s2-f1-d">أدخل رقم السجل للشركات أو الرقم الشخصي للأفراد للتوثيق المعتمد.</p>
+                </div>
+                <div class="step-feature-item">
+                    <span class="feature-icon-box">📱</span>
+                    <h4 class="feature-title" id="txt-s2-f2-t">رقم الهاتف (+973)</h4>
+                    <p class="feature-desc" id="txt-s2-f2-d">رقم التواصل المعتمد لاستلام إشعارات SMS ورابط التتبع الحي الرسمي.</p>
+                </div>
+                <div class="step-feature-item">
+                    <span class="feature-icon-box">📧</span>
+                    <h4 class="feature-title" id="txt-s2-f3-t">البريد الإلكتروني</h4>
+                    <p class="feature-desc" id="txt-s2-f3-d">لاستلام نسخة كاملة من تفاصيل المعاملة والإيصال الرسمي والشهادة النهائية.</p>
+                </div>
+            </div>
+
+            <div class="mock-interactive-box">
+                <span class="mock-tag" id="txt-s2-mock-tag">🔒 خصوصية وأمان</span>
+                <div class="mock-inner">
+                    <div class="mock-tip-title" id="txt-s2-mock-title">🛡️ التعبئة التلقائية للعملاء السابقين</div>
+                    <span id="txt-s2-mock-desc">إذا كنت قد تواصلت معنا مسبقاً، يتعرف عليك النظام تلقائياً ويعبئ بياناتك لتوفير وقتك.</span>
+                </div>
+            </div>
+
+            <div class="step-navigation-bar">
+                <button type="button" class="btn-step-nav btn-step-prev" onclick="goToStep(1)">⬅ السابق</button>
+                <button type="button" class="btn-step-nav btn-step-next" onclick="goToStep(3)">
+                    <span id="txt-btn-next-2">متابعة: المواصفات والملفات</span>
+                    <span>➔</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 3 Card -->
+        <div class="step-card" id="step-card-3">
+            <div class="card-header-badge">
+                <span class="step-badge-indicator" id="txt-s3-badge">📐 الخطوة 3 من 5: المواصفات الفنية والمستندات</span>
+                <span class="step-duration" id="txt-s3-dur">⏱️ دقيقتان</span>
+            </div>
+            <h3 class="card-main-title" id="txt-s3-title">تعبئة التفاصيل الهندسية وإرفاق المخططات والشهادات</h3>
+            <p class="card-description" id="txt-s3-desc">
+                تختلف متطلبات السلامة وفقاً لنوع الخدمة. يُنشئ النظام تلقائياً حقولاً ذكية مخصصة لنشاطك مع إمكانية رفع المخططات الهندسية بصيغة PDF.
+            </p>
+
+            <div class="step-features-grid">
+                <div class="step-feature-item">
+                    <span class="feature-icon-box">⚙️</span>
+                    <h4 class="feature-title" id="txt-s3-f1-t">حقول فنية ديناميكية</h4>
+                    <p class="feature-desc" id="txt-s3-f1-d">مثل مساحة المنشأة (م²)، عدد الأفران، نوع الوقود، أو أنظمة مكافحة الحريق المتوفرة.</p>
+                </div>
+                <div class="step-feature-item">
+                    <span class="feature-icon-box">📂</span>
+                    <h4 class="feature-title" id="txt-s3-f2-t">إرفاق ملفات PDF (حتى 10MB)</h4>
+                    <p class="feature-desc" id="txt-s3-f2-d">اسحب وأفلت المخططات الهندسية أو عقود الصيانة وسيقوم النظام بحفظها بأمان.</p>
+                </div>
+                <div class="step-feature-item">
+                    <span class="feature-icon-box">🔐</span>
+                    <h4 class="feature-title" id="txt-s3-f3-t">التوثيق الرقمي والأرشفة</h4>
+                    <p class="feature-desc" id="txt-s3-f3-d">تُوثق كافة المرفقات ببصمة رقمية مشفرة لضمان سلامتها وعدم التلاعب بها.</p>
+                </div>
+            </div>
+
+            <div class="mock-interactive-box">
+                <span class="mock-tag" id="txt-s3-mock-tag">📑 متطلبات الملفات</span>
+                <div class="mock-inner">
+                    <div class="mock-tip-title" id="txt-s3-mock-title">💡 نصيحة لإرفاق المستندات</div>
+                    <span id="txt-s3-mock-desc">تأكد من وضوح المخطط الهندسي وأن يحتوي على مخارج الطوارئ ومواقع طفايات وكواشف الدخان.</span>
+                </div>
+            </div>
+
+            <div class="step-navigation-bar">
+                <button type="button" class="btn-step-nav btn-step-prev" onclick="goToStep(2)">⬅ السابق</button>
+                <button type="button" class="btn-step-nav btn-step-next" onclick="goToStep(4)">
+                    <span id="txt-btn-next-3">متابعة: التأكيد والإيصال</span>
+                    <span>➔</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 4 Card -->
+        <div class="step-card" id="step-card-4">
+            <div class="card-header-badge">
+                <span class="step-badge-indicator" id="txt-s4-badge">💳 الخطوة 4 من 5: التأكيد واستلام الإيصال الرسمي</span>
+                <span class="step-duration" id="txt-s4-dur">⏱️ فوري</span>
+            </div>
+            <h3 class="card-main-title" id="txt-s4-title">إتمام الطلب، إشعار SMS، وتحميل إيصال الـ PDF بـ QR</h3>
+            <p class="card-description" id="txt-s4-desc">
+                بمجرد الضغط على "تأكيد وتقديم الطلب"، يُسجل الطلب فوراً في قاعدة بيانات الدفاع المدني وتصلك رسالة نصية بالرقم المرجعي ورابط التتبع.
+            </p>
+
+            <div class="step-features-grid">
+                <div class="step-feature-item">
+                    <span class="feature-icon-box">📱</span>
+                    <h4 class="feature-title" id="txt-s4-f1-t">رسالة SMS واحدة مؤكدة</h4>
+                    <p class="feature-desc" id="txt-s4-f1-d">استلام رسالة نصية فورية تتضمن رقم طلبك المعتمد (مثل: APP-20260828-0142).</p>
+                </div>
+                <div class="step-feature-item">
+                    <span class="feature-icon-box">🧾</span>
+                    <h4 class="feature-title" id="txt-s4-f2-t">إيصال PDF رسمي بختم وQR</h4>
+                    <p class="feature-desc" id="txt-s4-f2-d">تحميل فوري للإيصال الرسمي متضمناً رقم هاتفك وبياناتك ورمز التحقق الرقمي.</p>
+                </div>
+                <div class="step-feature-item">
+                    <span class="feature-icon-box">💳</span>
+                    <h4 class="feature-title" id="txt-s4-f3-t">طرق دفع مرنة</h4>
+                    <p class="feature-desc" id="txt-s4-f3-d">دعم الدفع الإلكتروني عبر BenefitPay والبطاقات البنكية المعتمدة بمملكة البحرين.</p>
+                </div>
+            </div>
+
+            <div class="mock-interactive-box">
+                <span class="mock-tag" id="txt-s4-mock-tag">⚡ فوري</span>
+                <div class="mock-inner">
+                    <div class="mock-tip-title" id="txt-s4-mock-title">🔍 التحقق السريع من صحة المستند</div>
+                    <span id="txt-s4-mock-desc">يحتوي الإيصال على رمز QR حي؛ يمكن لأي جهة تفتيش مسحه بكاميرا الهاتف للتحقق المباشر من صحة الطلب.</span>
+                </div>
+            </div>
+
+            <div class="step-navigation-bar">
+                <button type="button" class="btn-step-nav btn-step-prev" onclick="goToStep(3)">⬅ السابق</button>
+                <button type="button" class="btn-step-nav btn-step-next" onclick="goToStep(5)">
+                    <span id="txt-btn-next-4">متابعة: التتبع الحي والاعتماد</span>
+                    <span>➔</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 5 Card -->
+        <div class="step-card" id="step-card-5">
+            <div class="card-header-badge">
+                <span class="step-badge-indicator" id="txt-s5-badge">🔍 الخطوة 5 من 5: التتبع الحي وإصدار الشهادة</span>
+                <span class="step-duration" id="txt-s5-dur">⏱️ متابعة حية</span>
+            </div>
+            <h3 class="card-main-title" id="txt-s5-title">متابعة حالة الطلب ورفع التعديلات واستلام شهادة الاعتماد</h3>
+            <p class="card-description" id="txt-s5-desc">
+                عبر بوابة التتبع الذكية، يمكنك متابعة مسار معاملتك لحظة بلحظة، ورفع أي نواقص أو تعديلات يطلبها المهندس الفاحص بضغطة زر واحدة.
+            </p>
+
+            <div class="step-features-grid">
+                <div class="step-feature-item">
+                    <span class="feature-icon-box">⏳</span>
+                    <h4 class="feature-title" id="txt-s5-f1-t">مراحل التدقيق الحي</h4>
+                    <p class="feature-desc" id="txt-s5-f1-d">مؤشر واضح يعرض: قيد المراجعة ➔ مطلوب تعديل ➔ معتمد وموافق عليه.</p>
+                </div>
+                <div class="step-feature-item">
+                    <span class="feature-icon-box">🔄</span>
+                    <h4 class="feature-title" id="txt-s5-f2-t">إعادة رفع النواقص بسهولة</h4>
+                    <p class="feature-desc" id="txt-s5-f2-d">إذا طُلب تعديل، يُمكنك رفع المخطط المحدث مباشرة عبر رابط التتبع دون بدء طلب جديد.</p>
+                </div>
+                <div class="step-feature-item">
+                    <span class="feature-icon-box">🏆</span>
+                    <h4 class="feature-title" id="txt-s5-f3-t">شهادة الاعتماد الرسمية</h4>
+                    <p class="feature-desc" id="txt-s5-f3-d">عند الموافقة، يتحول الإيصال تلقائياً إلى "شهادة اعتماد وموافقة الدفاع المدني الرسمية".</p>
+                </div>
+            </div>
+
+            <div class="mock-interactive-box" style="border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.05);">
+                <span class="mock-tag" style="background: #10B981; color: white;" id="txt-s5-mock-tag">🎉 مبروك!</span>
+                <div class="mock-inner">
+                    <div class="mock-tip-title" style="color: #34D399;" id="txt-s5-mock-title">✅ أنت الآن جاهز لتقديم طلبك</div>
+                    <span id="txt-s5-mock-desc">بإمكانك الآن فتح المنصة والبدء فوراً في التقديم على أي خدمة من خدمات الدفاع المدني.</span>
+                </div>
+            </div>
+
+            <div class="step-navigation-bar">
+                <button type="button" class="btn-step-nav btn-step-prev" onclick="goToStep(4)">⬅ السابق</button>
+                <a href="/?action=apply" class="btn-step-nav btn-step-finish" id="btn-launch-application-final">
+                    <span>🚀</span>
+                    <span id="txt-btn-finish">ابدأ التقديم الآن على المنصة</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <section class="faq-section">
+            <div class="faq-header">
+                <h3 id="txt-faq-title">الأسئلة الشائعة حول التقديم</h3>
+                <p id="txt-faq-sub">إجابات سريعة على الاستفسارات الأكثر تكراراً</p>
+            </div>
+
+            <div class="faq-grid">
+                <div class="faq-card" onclick="toggleFaq(this)">
+                    <div class="faq-question">
+                        <span id="txt-q1">ما هي صيغ الملفات المسموح بإرفاقها؟</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="faq-answer" id="txt-a1">
+                        الصيغة المعتمدة هي PDF بحجم أقصى 10 ميغابايت لكل معاملة. يمكنك إرفاق المخططات الهندسية وعقود الصيانة والتقارير الفنية.
+                    </div>
+                </div>
+
+                <div class="faq-card" onclick="toggleFaq(this)">
+                    <div class="faq-question">
+                        <span id="txt-q2">كيف يمكنني الاستفسار صوتياً عن خدمة معينة؟</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="faq-answer" id="txt-a2">
+                        اضغط على زر "بدء محادثة صوتية" وتحدث مع المساعد باللغة العربية أو الإنجليزية واشرح مشروعك، وسيقوم المساعد بتوجيهك فوراً للخدمة المناسبة.
+                    </div>
+                </div>
+
+                <div class="faq-card" onclick="toggleFaq(this)">
+                    <div class="faq-question">
+                        <span id="txt-q3">كم يستغرق الرد على الطلب والموافقة؟</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="faq-answer" id="txt-a3">
+                        يتم تدقيق الطلبات والمخططات الفنية خلال 24 إلى 48 ساعة عمل رسمية، وتصلك تحديثات فورية عبر الرسائل القصيرة SMS ورابط التتبع.
+                    </div>
+                </div>
+
+                <div class="faq-card" onclick="toggleFaq(this)">
+                    <div class="faq-question">
+                        <span id="txt-q4">أين أجد رقم المعاملة لمتابعة طلبي؟</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="faq-answer" id="txt-a4">
+                        يصلك رقم المعاملة (مثل APP-20260828-0142) في رسالة SMS فورية على هاتفك، كما يظهر على شاشة النجاح وفي أعلى الإيصال الإلكتروني.
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer-guide">
+        <p id="txt-footer-copy">الإدارة العامة للدفاع المدني - وزارة الداخلية - مملكة البحرين © 2026</p>
+        <p style="margin-top: 4px; color: var(--text-secondary); font-size: 0.75rem;" id="txt-footer-contact">مركز الاتصال الموحد: 17461100 • الطوارئ: 999</p>
+    </footer>
+
+    <!-- Interactive Script -->
+    <script>
+        let currentStep = 1;
+        const totalSteps = 5;
+
+        const translations = {
+            ar: {
+                nav_title: "الإدارة العامة للدفاع المدني",
+                nav_sub: "دليل التقديم التفاعلي الذكي",
+                lang_toggle: "🌐 English",
+                start_app_nav: "بدء التقديم الآن",
+                hero_badge: "✨ دليل الإرشاد الرقمي الشامل",
+                hero_title: "كيفية التقديم على خدمات الدفاع المدني",
+                hero_subtitle: "خطوة بخطوة من اختيار الخدمة المناسبة وحتى استلام الاعتماد والإيصال الرقمي الرسمي المعتمد.",
+                step1_lbl: "تحديد الخدمة",
+                step2_lbl: "البيانات الأساسية",
+                step3_lbl: "المواصفات والملفات",
+                step4_lbl: "التأكيد والإيصال",
+                step5_lbl: "التتبع والاعتماد",
+                
+                // Step 1
+                s1_badge: "🎙️ الخطوة 1 من 5: اختيار وتحديد الخدمة",
+                s1_dur: "⏱️ دقيقة واحدة",
+                s1_title: "التحدث مع المساعد الذكي واختيار الخدمة المناسبة",
+                s1_desc: "توفر منصة الدفاع المدني 39 خدمة معتمدة تشمل التراخيص التجارية، تراخيص محطات الغاز والوقود، شهادات استيفاء شروط السلامة، وفحص المنشآت. يمكنك التحدث بحرية كاملة بالصوت وسيقوم المساعد الذكي باقتراح الخدمة الأنسب لطلبك.",
+                s1_f1_t: "التحدث الصوتي المباشر",
+                s1_f1_d: "اضغط على زر 'بدء محادثة صوتية' واشرح نشاطك (مثلاً: 'أريد ترخيص مخبز جديد').",
+                s1_f2_t: "التعرف الذكي بدون أخطاء",
+                s1_f2_d: "يقوم النظام بربط طلبك تلقائياً بالخدمة المعتمدة دون أي تشابه أو خلط بالخدمات.",
+                s1_f3_t: "زر 'قدّم الآن' الفوري",
+                s1_f3_d: "سيظهر زر التقديم مباشرة أسفل رد المساعد الذكي لتفتح النموذج بضغطة واحدة.",
+                s1_mock_tag: "💡 نصيحة ذكية",
+                s1_mock_title: "⚡ التقديم السريع المباشر",
+                s1_mock_desc: "بإمكانك أيضاً فتح نموذج التقديم مباشرة في أي وقت بالضغط على زر 'التقديم على خدمة' من القائمة العلوية السريعة.",
+                btn_next_1: "متابعة: البيانات الأساسية",
+
+                // Step 2
+                s2_badge: "👤 الخطوة 2 من 5: البيانات الأساسية والمقدم",
+                s2_dur: "⏱️ دقيقة واحدة",
+                s2_title: "إدخال بيانات مقدم الطلب ورقم السجل أو البطاقة",
+                s2_desc: "في المرحلة الأولى من النموذج، يتم تسجيل البيانات التعريفية لربط المعاملة بسجل الدفاع المدني وإرسال التنبيهات الفورية عبر الرسائل النصية.",
+                s2_f1_t: "رقم السجل التجاري / البطاقة (CR / CPR)",
+                s2_f1_d: "أدخل رقم السجل للشركات أو الرقم الشخصي للأفراد للتوثيق المعتمد.",
+                s2_f2_t: "رقم الهاتف (+973)",
+                s2_f2_d: "رقم التواصل المعتمد لاستلام إشعارات SMS ورابط التتبع الحي الرسمي.",
+                s2_f3_t: "البريد الإلكتروني",
+                s2_f3_d: "لاستلام نسخة كاملة من تفاصيل المعاملة والإيصال الرسمي والشهادة النهائية.",
+                s2_mock_tag: "🔒 خصوصية وأمان",
+                s2_mock_title: "🛡️ التعبئة التلقائية للعملاء السابقين",
+                s2_mock_desc: "إذا كنت قد تواصلت معنا مسبقاً، يتعرف عليك النظام تلقائياً ويعبئ بياناتك لتوفير وقتك.",
+                btn_next_2: "متابعة: المواصفات والملفات",
+
+                // Step 3
+                s3_badge: "📐 الخطوة 3 من 5: المواصفات الفنية والمستندات",
+                s3_dur: "⏱️ دقيقتان",
+                s3_title: "تعبئة التفاصيل الهندسية وإرفاق المخططات والشهادات",
+                s3_desc: "تختلف متطلبات السلامة وفقاً لنوع الخدمة. يُنشئ النظام تلقائياً حقولاً ذكية مخصصة لنشاطك مع إمكانية رفع المخططات الهندسية بصيغة PDF.",
+                s3_f1_t: "حقول فنية ديناميكية",
+                s3_f1_d: "مثل مساحة المنشأة (م²)، عدد الأفران، نوع الوقود، أو أنظمة مكافحة الحريق المتوفرة.",
+                s3_f2_t: "إرفاق ملفات PDF (حتى 10MB)",
+                s3_f2_d: "اسحب وأفلت المخططات الهندسية أو عقود الصيانة وسيقوم النظام بحفظها بأمان.",
+                s3_f3_t: "التوثيق الرقمي والأرشفة",
+                s3_f3_d: "تُوثق كافة المرفقات ببصمة رقمية مشفرة لضمان سلامتها وعدم التلاعب بها.",
+                s3_mock_tag: "📑 متطلبات الملفات",
+                s3_mock_title: "💡 نصيحة لإرفاق المستندات",
+                s3_mock_desc: "تأكد من وضوح المخطط الهندسي وأن يحتوي على مخارج الطوارئ ومواقع طفايات وكواشف الدخان.",
+                btn_next_3: "متابعة: التأكيد والإيصال",
+
+                // Step 4
+                s4_badge: "💳 الخطوة 4 من 5: التأكيد واستلام الإيصال الرسمي",
+                s4_dur: "⏱️ فوري",
+                s4_title: "إتمام الطلب، إشعار SMS، وتحميل إيصال الـ PDF بـ QR",
+                s4_desc: "بمجرد الضغط على 'تأكيد وتقديم الطلب'، يُسجل الطلب فوراً في قاعدة بيانات الدفاع المدني وتصلك رسالة نصية بالرقم المرجعي ورابط التتبع.",
+                s4_f1_t: "رسالة SMS واحدة مؤكدة",
+                s4_f1_d: "استلام رسالة نصية فورية تتضمن رقم طلبك المعتمد (مثل: APP-20260828-0142).",
+                s4_f2_t: "إيصال PDF رسمي بختم وQR",
+                s4_f2_d: "تحميل فوري للإيصال الرسمي متضمناً رقم هاتفك وبياناتك ورمز التحقق الرقمي.",
+                s4_f3_t: "طرق دفع مرنة",
+                s4_f3_d: "دعم الدفع الإلكتروني عبر BenefitPay والبطاقات البنكية المعتمدة بمملكة البحرين.",
+                s4_mock_tag: "⚡ فوري",
+                s4_mock_title: "🔍 التحقق السريع من صحة المستند",
+                s4_mock_desc: "يحتوي الإيصال على رمز QR حي؛ يمكن لأي جهة تفتيش مسحه بكاميرا الهاتف للتحقق المباشر من صحة الطلب.",
+                btn_next_4: "متابعة: التتبع الحي والاعتماد",
+
+                // Step 5
+                s5_badge: "🔍 الخطوة 5 من 5: التتبع الحي وإصدار الشهادة",
+                s5_dur: "⏱️ متابعة حية",
+                s5_title: "متابعة حالة الطلب ورفع التعديلات واستلام شهادة الاعتماد",
+                s5_desc: "عبر بوابة التتبع الذكية، يمكنك متابعة مسار معاملتك لحظة بلحظة، ورفع أي نواقص أو تعديلات يطلبها المهندس الفاحص بضغطة زر واحدة.",
+                s5_f1_t: "مراحل التدقيق الحي",
+                s5_f1_d: "مؤشر واضح يعرض: قيد المراجعة ➔ مطلوب تعديل ➔ معتمد وموافق عليه.",
+                s5_f2_t: "إعادة رفع النواقص بسهولة",
+                s5_f2_d: "إذا طُلب تعديل، يُمكنك رفع المخطط المحدث مباشرة عبر رابط التتبع دون بدء طلب جديد.",
+                s5_f3_t: "شهادة الاعتماد الرسمية",
+                s5_f3_d: "عند الموافقة، يتحول الإيصال تلقائياً إلى 'شهادة اعتماد وموافقة الدفاع المدني الرسمية'.",
+                s5_mock_tag: "🎉 مبروك!",
+                s5_mock_title: "✅ أنت الآن جاهز لتقديم طلبك",
+                s5_mock_desc: "بإمكانك الآن فتح المنصة والبدء فوراً في التقديم على أي خدمة من خدمات الدفاع المدني.",
+                btn_finish: "ابدأ التقديم الآن على المنصة",
+
+                // FAQ
+                faq_title: "الأسئلة الشائعة حول التقديم",
+                faq_sub: "إجابات سريعة على الاستفسارات الأكثر تكراراً",
+                q1: "ما هي صيغ الملفات المسموح بإرفاقها؟",
+                a1: "الصيغة المعتمدة هي PDF بحجم أقصى 10 ميغابايت لكل معاملة. يمكنك إرفاق المخططات الهندسية وعقود الصيانة والتقارير الفنية.",
+                q2: "كيف يمكنني الاستفسار صوتياً عن خدمة معينة؟",
+                a2: "اضغط على زر 'بدء محادثة صوتية' وتحدث مع المساعد باللغة العربية أو الإنجليزية واشرح مشروعك، وسيقوم المساعد بتوجيهك فوراً للخدمة المناسبة.",
+                q3: "كم يستغرق الرد على الطلب والموافقة؟",
+                a3: "يتم تدقيق الطلبات والمخططات الفنية خلال 24 إلى 48 ساعة عمل رسمية، وتصلك تحديثات فورية عبر الرسائل القصيرة SMS ورابط التتبع.",
+                q4: "أين أجد رقم المعاملة لمتابعة طلبي؟",
+                a4: "يصلك رقم المعاملة (مثل APP-20260828-0142) في رسالة SMS فورية على هاتفك، كما يظهر على شاشة النجاح وفي أعلى الإيصال الإلكتروني.",
+
+                footer_copy: "الإدارة العامة للدفاع المدني - وزارة الداخلية - مملكة البحرين © 2026",
+                footer_contact: "مركز الاتصال الموحد: 17461100 • الطوارئ: 999"
+            },
+            en: {
+                nav_title: "General Directorate of Civil Defense",
+                nav_sub: "Interactive Service Application Guide",
+                lang_toggle: "🌐 العربية",
+                start_app_nav: "Start Application Now",
+                hero_badge: "✨ Comprehensive Digital Guide",
+                hero_title: "How to Apply for Civil Defense Services",
+                hero_subtitle: "Step-by-step guidance from discovering the right service to receiving your official QR receipt and approval certificate.",
+                step1_lbl: "Select Service",
+                step2_lbl: "Basic Details",
+                step3_lbl: "Specs & Uploads",
+                step4_lbl: "Confirm & Receipt",
+                step5_lbl: "Tracking & Approval",
+                
+                // Step 1
+                s1_badge: "🎙️ Step 1 of 5: Discover & Select Service",
+                s1_dur: "⏱️ 1 minute",
+                s1_title: "Talk with the AI Assistant & Identify Your Service",
+                s1_desc: "The Civil Defense platform offers 39 certified services including commercial permits, gas station licenses, safety compliance certificates, and technical inspections. Speak freely in Arabic or English to find your exact service.",
+                s1_f1_t: "Live Voice Conversation",
+                s1_f1_d: "Click 'Start Voice Conversation' and describe your establishment (e.g., 'I need a new bakery license').",
+                s1_f2_t: "Precise Zero-Error Matching",
+                s1_f2_d: "The system automatically matches your intent to the correct official Civil Defense service ID without ambiguity.",
+                s1_f3_t: "Instant 'Apply Now' Button",
+                s1_f3_d: "A dedicated apply button appears right below the AI Assistant response to open the application modal in 1 click.",
+                s1_mock_tag: "💡 Pro Tip",
+                s1_mock_title: "⚡ Direct Fast Application",
+                s1_mock_desc: "You can also launch the application form directly anytime by clicking 'Apply for Service' from the top Quick Actions menu.",
+                btn_next_1: "Next: Basic Details",
+
+                // Step 2
+                s2_badge: "👤 Step 2 of 5: Basic Details & Contact Info",
+                s2_dur: "⏱️ 1 minute",
+                s2_title: "Enter Applicant Info & CR / CPR Reference Number",
+                s2_desc: "In step 1 of the application form, record your identification details to link your transaction with the Civil Defense registry and receive instant SMS notifications.",
+                s2_f1_t: "CR / CPR Reference Number",
+                s2_f1_d: "Enter your Commercial Registration (CR) for businesses or CPR ID for personal requests.",
+                s2_f2_t: "Phone Number (+973)",
+                s2_f2_d: "Your verified phone number to receive instant SMS dispatches and live tracking links.",
+                s2_f3_t: "Email Address",
+                s2_f3_d: "To receive your complete application details, official stamped PDF receipt, and final certificate.",
+                s2_mock_tag: "🔒 Privacy & Speed",
+                s2_mock_title: "🛡️ Automated Pre-Fill for Returning Users",
+                s2_mock_desc: "If you have interacted with us previously, the system automatically recognizes you and fills your details to save time.",
+                btn_next_2: "Next: Specs & Uploads",
+
+                // Step 3
+                s3_badge: "📐 Step 3 of 5: Technical Specs & Document Upload",
+                s3_dur: "⏱️ 2 minutes",
+                s3_title: "Complete Engineering Specs & Attach PDF Drawings",
+                s3_desc: "Safety standards vary per service type. The system generates dynamic technical fields tailored to your service with secure PDF engineering drawing upload.",
+                s3_f1_t: "Dynamic Field Customization",
+                s3_f1_d: "Such as facility area (sqm), number of ovens, fuel type, or available fire extinguishing systems.",
+                s3_f2_t: "PDF Document Upload (Up to 10MB)",
+                s3_f2_d: "Drag and drop your engineering layout drawings or maintenance contracts for secure encrypted archiving.",
+                s3_f3_t: "Digital Verification & Security",
+                s3_f3_d: "All attachments receive cryptographic SHA-256 hashes to guarantee data authenticity.",
+                s3_mock_tag: "📑 File Guidelines",
+                s3_mock_title: "💡 Upload Success Tip",
+                s3_mock_desc: "Ensure your PDF drawings clearly display emergency exit routes, extinguisher locations, and smoke detectors.",
+                btn_next_3: "Next: Confirm & Receipt",
+
+                // Step 4
+                s4_badge: "💳 Step 4 of 5: Confirmation & Official PDF Receipt",
+                s4_dur: "⏱️ Instant",
+                s4_title: "Submit Application, Receive SMS & Download PDF Receipt with QR",
+                s4_desc: "Upon clicking 'Confirm & Submit', your application is instantly logged in the Civil Defense database and an SMS notification is dispatched with your reference ID.",
+                s4_f1_t: "Single Guaranteed SMS Dispatch",
+                s4_f1_d: "Instant cellular SMS delivered to your phone with your unique Reference ID (e.g. APP-20260828-0142).",
+                s4_f2_t: "Official Stamped PDF Receipt",
+                s4_f2_d: "Download your official receipt containing your phone number, details, and dynamic QR verification barcode.",
+                s4_f3_t: "Flexible Payment Methods",
+                s4_f3_d: "Supports BenefitPay and all approved debit/credit cards in the Kingdom of Bahrain.",
+                s4_mock_tag: "⚡ Real-time QR",
+                s4_mock_title: "🔍 Instant Digital Verification",
+                s4_mock_desc: "The receipt features a live QR code that inspectors can scan with any phone camera to verify status immediately.",
+                btn_next_4: "Next: Tracking & Approval",
+
+                // Step 5
+                s5_badge: "🔍 Step 5 of 5: Live Tracking & Official Certificate",
+                s5_dur: "⏱️ Live Tracking",
+                s5_title: "Track Application Progress, Upload Modifications & Get Certificate",
+                s5_desc: "Using the Citizen Tracking Portal, follow your application in real-time, respond to engineer modification requests, and download your final approval certificate.",
+                s5_f1_t: "Real-time Status Stages",
+                s5_f1_d: "Clear progress indicators showing: Under Review ➔ Modification Requested ➔ Approved.",
+                s5_f2_t: "Seamless Revision Upload",
+                s5_f2_d: "If revisions are requested, re-upload updated drawings directly via the tracking link without starting over.",
+                s5_f3_t: "Official Approval Certificate",
+                s5_f3_d: "Upon approval, your receipt automatically upgrades into the official Civil Defense Approval Certificate.",
+                s5_mock_tag: "🎉 Congratulations!",
+                s5_mock_title: "✅ You Are Now Ready to Apply",
+                s5_mock_desc: "You can now launch the application portal and submit your Civil Defense service request immediately.",
+                btn_finish: "Start Application on Platform Now",
+
+                // FAQ
+                faq_title: "Frequently Asked Questions",
+                faq_sub: "Quick answers to common inquiries about service applications",
+                q1: "What file formats are accepted for document uploads?",
+                a1: "The approved format is PDF with a maximum file size of 10MB per submission. You can attach architectural layouts, maintenance contracts, and safety reports.",
+                q2: "How can I inquire about a service using voice?",
+                a2: "Click 'Start Voice Conversation' and speak with our AI Assistant in Arabic or English to explain your requirements for instant guidance.",
+                q3: "How long does review and approval take?",
+                a3: "Engineering review is completed within 24 to 48 business hours. You receive instant SMS and email updates upon any status change.",
+                q4: "Where can I find my Application Reference ID?",
+                a4: "Your Reference ID (e.g. APP-20260828-0142) is sent via instant SMS to your phone, shown on the confirmation screen, and printed on your PDF receipt.",
+
+                footer_copy: "General Directorate of Civil Defense - Ministry of Interior - Kingdom of Bahrain © 2026",
+                footer_contact: "Unified Call Center: 17461100 • Emergency: 999"
+            }
+        };
+
+        function goToStep(stepNumber) {
+            if (stepNumber < 1 || stepNumber > totalSteps) return;
+            currentStep = stepNumber;
+
+            // Update step cards
+            document.querySelectorAll('.step-card').forEach((card, idx) => {
+                if (idx + 1 === currentStep) {
+                    card.classList.add('active');
+                } else {
+                    card.classList.remove('active');
+                }
+            });
+
+            // Update step nodes
+            document.querySelectorAll('.step-node').forEach((node, idx) => {
+                const nodeStep = idx + 1;
+                node.classList.remove('active', 'completed');
+                if (nodeStep === currentStep) {
+                    node.classList.add('active');
+                } else if (nodeStep < currentStep) {
+                    node.classList.add('completed');
+                }
+            });
+
+            // Update progress track fill
+            const fillWidth = ((currentStep - 1) / (totalSteps - 1)) * 100;
+            const fillEl = document.getElementById('progress-bar-fill');
+            if (fillEl) {
+                fillEl.style.width = `${Math.max(10, fillWidth)}%`;
+            }
+
+            // Smooth scroll up to step card
+            const activeCard = document.getElementById(`step-card-${currentStep}`);
+            if (activeCard) {
+                activeCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        function toggleFaq(card) {
+            card.classList.toggle('open');
+        }
+
+        function applyLanguage(lang) {
+            localStorage.setItem('civil_defense_lang', lang);
+            const t = translations[lang];
+            if (!t) return;
+
+            document.documentElement.dir = (lang === 'ar' ? 'rtl' : 'ltr');
+            document.documentElement.lang = lang;
+
+            const safeSet = (id, text) => {
+                const el = document.getElementById(id);
+                if (el) el.innerText = text;
+            };
+
+            safeSet('txt-nav-title', t.nav_title);
+            safeSet('txt-nav-sub', t.nav_sub);
+            safeSet('txt-lang-label', t.lang_toggle);
+            safeSet('txt-start-app-nav', t.start_app_nav);
+            safeSet('txt-hero-badge', t.hero_badge);
+            safeSet('txt-hero-title', t.hero_title);
+            safeSet('txt-hero-subtitle', t.hero_subtitle);
+
+            safeSet('txt-step1-lbl', t.step1_lbl);
+            safeSet('txt-step2-lbl', t.step2_lbl);
+            safeSet('txt-step3-lbl', t.step3_lbl);
+            safeSet('txt-step4-lbl', t.step4_lbl);
+            safeSet('txt-step5-lbl', t.step5_lbl);
+
+            // Step 1
+            safeSet('txt-s1-badge', t.s1_badge);
+            safeSet('txt-s1-dur', t.s1_dur);
+            safeSet('txt-s1-title', t.s1_title);
+            safeSet('txt-s1-desc', t.s1_desc);
+            safeSet('txt-s1-f1-t', t.s1_f1_t);
+            safeSet('txt-s1-f1-d', t.s1_f1_d);
+            safeSet('txt-s1-f2-t', t.s1_f2_t);
+            safeSet('txt-s1-f2-d', t.s1_f2_d);
+            safeSet('txt-s1-f3-t', t.s1_f3_t);
+            safeSet('txt-s1-f3-d', t.s1_f3_d);
+            safeSet('txt-s1-mock-tag', t.s1_mock_tag);
+            safeSet('txt-s1-mock-title', t.s1_mock_title);
+            safeSet('txt-s1-mock-desc', t.s1_mock_desc);
+            safeSet('txt-btn-next-1', t.btn_next_1);
+
+            // Step 2
+            safeSet('txt-s2-badge', t.s2_badge);
+            safeSet('txt-s2-dur', t.s2_dur);
+            safeSet('txt-s2-title', t.s2_title);
+            safeSet('txt-s2-desc', t.s2_desc);
+            safeSet('txt-s2-f1-t', t.s2_f1_t);
+            safeSet('txt-s2-f1-d', t.s2_f1_d);
+            safeSet('txt-s2-f2-t', t.s2_f2_t);
+            safeSet('txt-s2-f2-d', t.s2_f2_d);
+            safeSet('txt-s2-f3-t', t.s2_f3_t);
+            safeSet('txt-s2-f3-d', t.s2_f3_d);
+            safeSet('txt-s2-mock-tag', t.s2_mock_tag);
+            safeSet('txt-s2-mock-title', t.s2_mock_title);
+            safeSet('txt-s2-mock-desc', t.s2_mock_desc);
+            safeSet('txt-btn-next-2', t.btn_next_2);
+
+            // Step 3
+            safeSet('txt-s3-badge', t.s3_badge);
+            safeSet('txt-s3-dur', t.s3_dur);
+            safeSet('txt-s3-title', t.s3_title);
+            safeSet('txt-s3-desc', t.s3_desc);
+            safeSet('txt-s3-f1-t', t.s3_f1_t);
+            safeSet('txt-s3-f1-d', t.s3_f1_d);
+            safeSet('txt-s3-f2-t', t.s3_f2_t);
+            safeSet('txt-s3-f2-d', t.s3_f2_d);
+            safeSet('txt-s3-f3-t', t.s3_f3_t);
+            safeSet('txt-s3-f3-d', t.s3_f3_d);
+            safeSet('txt-s3-mock-tag', t.s3_mock_tag);
+            safeSet('txt-s3-mock-title', t.s3_mock_title);
+            safeSet('txt-s3-mock-desc', t.s3_mock_desc);
+            safeSet('txt-btn-next-3', t.btn_next_3);
+
+            // Step 4
+            safeSet('txt-s4-badge', t.s4_badge);
+            safeSet('txt-s4-dur', t.s4_dur);
+            safeSet('txt-s4-title', t.s4_title);
+            safeSet('txt-s4-desc', t.s4_desc);
+            safeSet('txt-s4-f1-t', t.s4_f1_t);
+            safeSet('txt-s4-f1-d', t.s4_f1_d);
+            safeSet('txt-s4-f2-t', t.s4_f2_t);
+            safeSet('txt-s4-f2-d', t.s4_f2_d);
+            safeSet('txt-s4-f3-t', t.s4_f3_t);
+            safeSet('txt-s4-f3-d', t.s4_f3_d);
+            safeSet('txt-s4-mock-tag', t.s4_mock_tag);
+            safeSet('txt-s4-mock-title', t.s4_mock_title);
+            safeSet('txt-s4-mock-desc', t.s4_mock_desc);
+            safeSet('txt-btn-next-4', t.btn_next_4);
+
+            // Step 5
+            safeSet('txt-s5-badge', t.s5_badge);
+            safeSet('txt-s5-dur', t.s5_dur);
+            safeSet('txt-s5-title', t.s5_title);
+            safeSet('txt-s5-desc', t.s5_desc);
+            safeSet('txt-s5-f1-t', t.s5_f1_t);
+            safeSet('txt-s5-f1-d', t.s5_f1_d);
+            safeSet('txt-s5-f2-t', t.s5_f2_t);
+            safeSet('txt-s5-f2-d', t.s5_f2_d);
+            safeSet('txt-s5-f3-t', t.s5_f3_t);
+            safeSet('txt-s5-f3-d', t.s5_f3_d);
+            safeSet('txt-s5-mock-tag', t.s5_mock_tag);
+            safeSet('txt-s5-mock-title', t.s5_mock_title);
+            safeSet('txt-s5-mock-desc', t.s5_mock_desc);
+            safeSet('txt-btn-finish', t.btn_finish);
+
+            // FAQ
+            safeSet('txt-faq-title', t.faq_title);
+            safeSet('txt-faq-sub', t.faq_sub);
+            safeSet('txt-q1', t.q1);
+            safeSet('txt-a1', t.a1);
+            safeSet('txt-q2', t.q2);
+            safeSet('txt-a2', t.a2);
+            safeSet('txt-q3', t.q3);
+            safeSet('txt-a3', t.a3);
+            safeSet('txt-q4', t.q4);
+            safeSet('txt-a4', t.a4);
+
+            safeSet('txt-footer-copy', t.footer_copy);
+            safeSet('txt-footer-contact', t.footer_contact);
+        }
+
+        function toggleLanguage() {
+            const current = localStorage.getItem('civil_defense_lang') || 'ar';
+            const next = current === 'ar' ? 'en' : 'ar';
+            applyLanguage(next);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('civil_defense_lang') || 'ar';
+            applyLanguage(savedLang);
+            goToStep(1);
+        });
+    </script>
+</body>
+</html>
