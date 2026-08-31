@@ -173,27 +173,6 @@ async function checkStatusChangesOnce() {
           console.error(`[Sheet Status Watcher] ❌ Email dispatch error for ${appId}:`, emailErr.message);
         }
 
-        // 2. n8n Webhook Notification Engine Trigger (Status Update Webhook)
-        try {
-          fetch('http://127.0.0.1:5678/webhook/status-update', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              appId,
-              status: currentStatus,
-              modificationDetails: adminModRequest || notes || '',
-              email: recipientEmail,
-              whatsapp,
-              firstName,
-              lastName,
-              serviceName,
-              trackingLink: `${baseUrl}/track?id=${appId}`,
-              isStatusUpdate: true
-            })
-          }).then(res => console.log(`[Sheet Status Watcher] 🔄 n8n webhook forwarded for ${appId}: HTTP ${res.status}`))
-            .catch(err => console.warn(`[Sheet Status Watcher] n8n webhook warning for ${appId}:`, err.message));
-        } catch (n8nErr) {}
-
         // 3. Queue update to Google Sheets to mark Alert Sent = 'Yes'
         updatesToSheet.push({
           range: `${sheetName}!O${rowNumber}`,

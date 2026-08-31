@@ -522,11 +522,6 @@
             "index": 0
           },
           {
-            "node": "Send Submit Email",
-            "type": "main",
-            "index": 0
-          },
-          {
             "node": "Send Submit WhatsApp",
             "type": "main",
             "index": 0
@@ -544,11 +539,6 @@
         [
           {
             "node": "Respond Status Update",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Send Alert Email",
             "type": "main",
             "index": 0
           },
@@ -601,11 +591,6 @@
     "Filter Unsent Statuses": {
       "main": [
         [
-          {
-            "node": "Send Alert Email",
-            "type": "main",
-            "index": 0
-          },
           {
             "node": "Send Alert WhatsApp",
             "type": "main",

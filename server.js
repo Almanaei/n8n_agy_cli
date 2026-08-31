@@ -1422,6 +1422,7 @@ async function updateUserModificationResponse(appId, userMessage) {
     valueInputOption: "USER_ENTERED",
     data: [
       { range: `${sheetName}!M${rowNum}`, values: [["In Progress"]] },
+      { range: `${sheetName}!N${rowNum}`, values: [[userMessage]] }, // Column N (Notes / ملاحظات إضافية)
       { range: `${sheetName}!O${rowNum}`, values: [[""]] },
       { range: `${sheetName}!P${rowNum}`, values: [[""]] }, // Clear old Admin Mod Request (Col P) upon User Resubmit to prevent stale message re-sending!
       { range: `${sheetName}!Q${rowNum}`, values: [[userMessage]] },
@@ -1577,25 +1578,6 @@ async function executeAdminQuickAction(appId, action, reason) {
     console.log(`[Admin Action] Notification Policy: Intermediate status '${action}' (Modification Requested). Skipping SMS dispatch. User notified via Email.`);
   }
 
-  // 2. Instant Email Dispatch via n8n Webhook (Status Update Webhook)
-  fetch('http://127.0.0.1:5678/webhook/status-update', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      appId: appId,
-      status: newStatus,
-      modificationDetails: reason || '',
-      email: targetRow[6],
-      whatsapp: targetRow[5],
-      firstName: targetRow[3],
-      lastName: targetRow[4],
-      serviceName: officialServiceTitle,
-      trackingLink: trackingUrl,
-      isStatusUpdate: true
-    })
-  }).then(res => console.log(`[Admin Action] Forwarded status update to n8n email webhook: HTTP ${res.status}`))
-    .catch(err => console.error("Failed to forward status update to n8n:", err));
-
   // Direct Multi-Target Status Email Notifications (Applicant/User + Admin)
   try {
     const { sendAdminApplicationNotification, sendUserApplicationStatusEmail } = require('./scripts/admin_email_notifier');
@@ -1701,8 +1683,10 @@ async function updateServiceApplicationFull(appId, updatedData) {
     { range: `${sheetName}!K${rowNum}`, values: [[updatedData.dynamicFields || ""]] },
     { range: `${sheetName}!L${rowNum}`, values: [[updatedData.paymentMethod]] },
     { range: `${sheetName}!M${rowNum}`, values: [["In Progress"]] },
+    { range: `${sheetName}!N${rowNum}`, values: [[updatedData.notes || ""]] }, // Column N (Notes / ملاحظات إضافية)
     { range: `${sheetName}!O${rowNum}`, values: [[""]] },
-    { range: `${sheetName}!Q${rowNum}`, values: [[updatedData.notes || "تم تعديل البيانات بواسطة المستخدم"]] },
+    { range: `${sheetName}!P${rowNum}`, values: [[""]] }, // Clear old Admin Mod Request (Col P)
+    { range: `${sheetName}!Q${rowNum}`, values: [[updatedData.notes || "تم تعديل البيانات بواسطة المستخدم"]] }, // Column Q (User Modification Response)
     { range: `${sheetName}!U${rowNum}`, values: [[pauseStr]] },
     { range: `${sheetName}!V${rowNum}`, values: [[""]] } // Clear Mod Sent At
   ];
@@ -2911,10 +2895,10 @@ const server = http.createServer(async (req, res) => {
         }
 
         if (modData.firstName && modData.lastName) {
-          // Full form fields update (allowed if status is Pending or Modification Requested)
-          if (appDetails.status !== 'Pending' && appDetails.status !== 'Modification Requested') {
+          // Full form fields update (allowed if status is Submitted, Pending, or Modification Requested)
+          if (appDetails.status !== 'Submitted' && appDetails.status !== 'Pending' && appDetails.status !== 'Modification Requested') {
             res.writeHead(403, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ error: "Cannot edit full form fields unless application is in Pending or Modification Requested status" }));
+            res.end(JSON.stringify({ error: "Cannot edit full form fields unless application is in Submitted, Pending, or Modification Requested status" }));
             return;
           }
 
