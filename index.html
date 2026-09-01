@@ -2498,7 +2498,84 @@
 
         // Note: window.renderApplyNowButton is defined after window.servicesList at line 2805
 
+        // Universal Hardware & Network Mute Shield (Guarantees absolute zero audio transmission when muted)
+        window.localCapturedStreams = window.localCapturedStreams || [];
+        
+        // Interceptor 1: getUserMedia stream tracker
+        if (navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function') {
+            if (!navigator.mediaDevices._originalGetUserMedia) {
+                navigator.mediaDevices._originalGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+                navigator.mediaDevices.getUserMedia = async function(constraints) {
+                    const stream = await navigator.mediaDevices._originalGetUserMedia(constraints);
+                    if (constraints && constraints.audio) {
+                        if (!window.localCapturedStreams.includes(stream)) {
+                            window.localCapturedStreams.push(stream);
+                        }
+                        if (window.isMicMuted) {
+                            stream.getAudioTracks().forEach(t => { t.enabled = false; });
+                        }
+                    }
+                    return stream;
+                };
+            }
+        }
+
+        // Interceptor 2: WebSocket audio frame suppressor & binary zeroer
+        (function() {
+            if (typeof WebSocket !== 'undefined' && !WebSocket.prototype._originalSendMuteShield) {
+                WebSocket.prototype._originalSendMuteShield = WebSocket.prototype.send;
+                WebSocket.prototype.send = function(data) {
+                    if (window.isMicMuted) {
+                        if (typeof data === 'string') {
+                            if (data.includes('user_audio_chunk') || data.includes('user_audio')) {
+                                console.log("[Mute Shield] Suppressed user_audio_chunk JSON WebSocket frame.");
+                                return;
+                            }
+                        } else if (data instanceof ArrayBuffer || ArrayBuffer.isView(data)) {
+                            console.log("[Mute Shield] Zeroed out binary audio WebSocket frame.");
+                            const view = new Uint8Array(data.buffer || data);
+                            view.fill(0);
+                        }
+                    }
+                    return WebSocket.prototype._originalSendMuteShield.apply(this, arguments);
+                };
+            }
+        })();
+
+        // Interceptor 3: RTCPeerConnection audio track muter
+        (function() {
+            if (typeof RTCPeerConnection !== 'undefined' && RTCPeerConnection.prototype.addTrack && !RTCPeerConnection.prototype._originalAddTrackMuteShield) {
+                RTCPeerConnection.prototype._originalAddTrackMuteShield = RTCPeerConnection.prototype.addTrack;
+                RTCPeerConnection.prototype.addTrack = function(track, ...streams) {
+                    if (track && track.kind === 'audio' && window.isMicMuted) {
+                        track.enabled = false;
+                    }
+                    return RTCPeerConnection.prototype._originalAddTrackMuteShield.apply(this, [track, ...streams]);
+                };
+            }
+        })();
+
+        // Interceptor 4: AudioContext createMediaStreamSource tracker
+        (function() {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (AudioCtx && AudioCtx.prototype.createMediaStreamSource && !AudioCtx.prototype._originalCreateMediaStreamSourceMuteShield) {
+                AudioCtx.prototype._originalCreateMediaStreamSourceMuteShield = AudioCtx.prototype.createMediaStreamSource;
+                AudioCtx.prototype.createMediaStreamSource = function(stream) {
+                    if (stream && typeof stream.getAudioTracks === 'function') {
+                        if (!window.localCapturedStreams.includes(stream)) {
+                            window.localCapturedStreams.push(stream);
+                        }
+                        if (window.isMicMuted) {
+                            stream.getAudioTracks().forEach(t => { t.enabled = false; });
+                        }
+                    }
+                    return AudioCtx.prototype._originalCreateMediaStreamSourceMuteShield.apply(this, arguments);
+                };
+            }
+        })();
+
         let isMicMuted = false;
+        window.isMicMuted = isMicMuted;
         window.activeMicStream = null;
 
         window.playMicTone = function(muted) {
@@ -2535,7 +2612,17 @@
             isMicMuted = !isMicMuted;
             window.isMicMuted = isMicMuted;
 
-            // 1. Mute/Unmute local microphone MediaStream audio tracks
+            // 1. Mute/Unmute ALL hardware captured streams (including ElevenLabs internal WebRTC mic stream)
+            if (window.localCapturedStreams && Array.isArray(window.localCapturedStreams)) {
+                window.localCapturedStreams.forEach(stream => {
+                    if (stream && typeof stream.getAudioTracks === 'function') {
+                        stream.getAudioTracks().forEach(track => {
+                            track.enabled = !isMicMuted;
+                        });
+                    }
+                });
+            }
+
             if (window.activeMicStream) {
                 window.activeMicStream.getAudioTracks().forEach(track => {
                     track.enabled = !isMicMuted;
