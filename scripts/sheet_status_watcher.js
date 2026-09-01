@@ -173,6 +173,30 @@ async function checkStatusChangesOnce() {
           console.error(`[Sheet Status Watcher] ❌ Email dispatch error for ${appId}:`, emailErr.message);
         }
 
+        // 2. Direct Cellular SMS Dispatch for Final Decisions (Approved / Rejected) - Rule 10 Enforcement
+        const sLower = currentStatus.toLowerCase();
+        const isFinalDecision = sLower.includes('approv') || sLower.includes('reject') || sLower.includes('قبول') || sLower.includes('اعتماد') || sLower.includes('رفض');
+
+        if (isFinalDecision && whatsapp) {
+          const statusTextAr = (sLower.includes('approv') || sLower.includes('قبول') || sLower.includes('اعتماد')) ? 'مقبول والمعاملة مكتملة' : 'مرفوض';
+          const trackingUrl = `${baseUrl}/track?id=${appId}`;
+          const smsMsgText = `مرحباً ${firstName || 'عزيزنا المتعامل'}! تم تحديث حالة طلبك رقم (${appId}) لخدمة (${serviceName || 'الدفاع المدني'}) إلى (${statusTextAr}).\nيمكنك متابعة تفاصيل المعاملة مباشرة عبر الرابط التالي:\n${trackingUrl}`;
+
+          try {
+            const { sendDualChannelNotification } = require('../server.js');
+            sendDualChannelNotification({
+              phone: whatsapp,
+              appId: `${appId}_${currentStatus}_${Date.now()}`,
+              trackingLink: trackingUrl,
+              clientName: `${firstName || ''} ${lastName || ''}`.trim() || 'عزيزنا المتعامل',
+              messageText: smsMsgText
+            }).then(res => console.log(`[Sheet Status Watcher] 📱 Final Decision SMS sent for ${appId} (${currentStatus}):`, res))
+              .catch(err => console.error(`[Sheet Status Watcher] ❌ Final Decision SMS error for ${appId}:`, err.message));
+          } catch (smsErr) {
+            console.error(`[Sheet Status Watcher] ❌ SMS Exception for ${appId}:`, smsErr.message);
+          }
+        }
+
         // 3. Queue update to Google Sheets to mark Alert Sent = 'Yes'
         updatesToSheet.push({
           range: `${sheetName}!O${rowNumber}`,

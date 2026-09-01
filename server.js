@@ -1562,7 +1562,8 @@ async function executeAdminQuickAction(appId, action, reason) {
   // 1) Application creation
   // 2) Final decision taken (approve / reject)
   // Intermediate status (request_modification) is sent ONLY via Email.
-  const isFinalDecision = (action === 'approve' || action === 'reject');
+  const actLower = String(action || '').toLowerCase();
+  const isFinalDecision = actLower.includes('approve') || actLower.includes('approv') || actLower.includes('reject');
 
   if (isFinalDecision) {
     console.log(`[Admin Action] Notification Policy: Final decision '${action}' reached. Triggering Cellular SMS notification for ${appId}...`);
@@ -3341,6 +3342,72 @@ const server = http.createServer(async (req, res) => {
         res.end(JSON.stringify({ error: err.message }));
       }
     });
+  } else if ((pathname === '/webhook/leads' || pathname === '/api/save-lead') && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', async () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const params = payload.parameters || payload.body || payload;
+        const clientName = params.clientName || params.name || 'غير محدد';
+        const phoneNumber = params.phoneNumber || params.phone || params.mobile || '';
+        let clientEmail = params.clientEmail || params.email || '';
+        if (clientEmail.includes('[at]')) {
+          clientEmail = clientEmail.replace(/\s*\[at\]\s*/gi, '@');
+        }
+        const conversationId = params.conversationId || payload.conversationId || '';
+
+        console.log(`[Webhook Leads Endpoint] Captured Lead Data - Name: ${clientName}, Phone: ${phoneNumber}, Email: ${clientEmail}`);
+
+        // Append to Google Sheets Sheet1
+        const spreadsheetId = "1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8";
+        const jwt = generateGoogleAccessToken(globalClientEmail, globalPrivateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
+        const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({
+            grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+            assertion: jwt
+          })
+        });
+        if (tokenRes.ok) {
+          const tokenData = await tokenRes.json();
+          const accessToken = tokenData.access_token;
+          const timestamp = new Date().toISOString();
+          const rowValues = [
+            timestamp,
+            clientName,
+            phoneNumber,
+            clientEmail,
+            conversationId,
+            "New Lead (Captured)"
+          ];
+          await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Sheet1!A:F:append?valueInputOption=USER_ENTERED`, {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${accessToken}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ values: [rowValues] })
+          });
+          console.log(`[Webhook Leads Endpoint] Lead successfully saved to Google Sheets (Sheet1)!`);
+        }
+
+        // Forward to local n8n engine if active
+        fetch('http://127.0.0.1:5678/webhook/leads', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: body
+        }).catch(() => {});
+
+        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ status: "success", message: "Lead saved successfully." }));
+      } catch (e) {
+        console.error("[Webhook Leads Endpoint] Error:", e);
+        res.writeHead(500, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ error: e.message }));
+      }
+    });
   } else if (pathname === '/admin/quick-action' && req.method === 'GET') {
     const appId = parsedUrl.searchParams.get('id');
     const authKey = parsedUrl.searchParams.get('key') || req.headers['x-admin-key'] || '';
@@ -3834,15 +3901,19 @@ setInterval(() => {
   }
 }, TWENTY_FOUR_HOURS).unref();
 
-server.listen(3000, () => {
-  console.log('Test server running at http://localhost:3000');
-  
-  // Real-Time Google Sheets Status Change Monitor & Immediate Customer Email Dispatcher
-  try {
-    const { startSheetStatusWatcher } = require('./scripts/sheet_status_watcher');
-    startSheetStatusWatcher(10000); // Check sheet every 10 seconds for Column M changes
-  } catch (err) {
-    console.error('[Server] Failed to initialize Real-Time Sheet Status Watcher:', err);
-  }
-});
+if (require.main === module) {
+  server.listen(3000, () => {
+    console.log('Test server running at http://localhost:3000');
+    
+    // Real-Time Google Sheets Status Change Monitor & Immediate Customer Email Dispatcher
+    try {
+      const { startSheetStatusWatcher } = require('./scripts/sheet_status_watcher');
+      startSheetStatusWatcher(10000); // Check sheet every 10 seconds for Column M changes
+    } catch (err) {
+      console.error('[Server] Failed to initialize Real-Time Sheet Status Watcher:', err);
+    }
+  });
+}
+
+module.exports = { sendDualChannelNotification };
 

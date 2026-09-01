@@ -143,9 +143,12 @@ async function patchAgent() {
           first_message: "مرحبا بكم في مركز خدمات الدفاع المدني الذكي. يرجى تزويدي بالإسم ورقم الهاتف للبدء."
         },
         turn: {
-          turn_timeout: 2,
-          silence_end_call_timeout: 30,
-          turn_eagerness: "eager"
+          turn_timeout: 10,
+          silence_end_call_timeout: -1,
+          turn_eagerness: "patient",
+          soft_timeout_config: {
+            timeout_seconds: -1
+          }
         },
         tts: {
           text_normalisation_type: "elevenlabs",

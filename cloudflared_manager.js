@@ -295,9 +295,12 @@ async function patchElevenLabs(baseUrl) {
         first_message: "مرحبا بكم في مركز خدمات الدفاع المدني الذكي. يرجى تزويدي بالإسم ورقم الهاتف للبدء."
       },
       turn: {
-        turn_timeout: 2,
-        silence_end_call_timeout: 30,
-        turn_eagerness: "eager"
+        turn_timeout: 10,
+        silence_end_call_timeout: -1,
+        turn_eagerness: "patient",
+        soft_timeout_config: {
+          timeout_seconds: -1
+        }
       },
       tts: {
         text_normalisation_type: "elevenlabs",
@@ -378,7 +381,7 @@ function startCloudflareTunnel() {
   // Use spawn on Windows. Since cloudflared.exe is directly executable, no shell is required.
   const cf = spawn('.\\cloudflared.exe', [
     'tunnel',
-    '--url', 'http://localhost:5678'
+    '--url', 'http://localhost:3000'
   ]);
   
   let urlDetected = false;

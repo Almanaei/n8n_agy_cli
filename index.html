@@ -547,6 +547,46 @@
         .controls-row {
             display: flex;
             justify-content: center;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .btn-mic-toggle {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+            border: 1px solid var(--glass-border);
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition-apple);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            white-space: nowrap;
+            backdrop-filter: blur(8px);
+            flex-shrink: 0;
+        }
+
+        .btn-mic-toggle.unmuted {
+            background: rgba(48, 209, 88, 0.15);
+            border-color: rgba(48, 209, 88, 0.35);
+            color: #30D158;
+            box-shadow: 0 4px 12px rgba(48, 209, 88, 0.15);
+        }
+
+        .btn-mic-toggle.muted {
+            background: rgba(255, 159, 10, 0.2);
+            border-color: rgba(255, 159, 10, 0.45);
+            color: #F59E0B;
+            box-shadow: 0 4px 12px rgba(255, 159, 10, 0.2);
+        }
+
+        .btn-mic-toggle:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
         }
 
         /* Redesigned Button Call styled for Apple sleek aesthetic */
@@ -934,7 +974,54 @@
 
         .chat-input-area {
             display: flex;
-            gap: 12px;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-inline-mic {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: var(--transition-apple);
+            flex-shrink: 0;
+            backdrop-filter: blur(8px);
+            position: relative;
+        }
+
+        .btn-inline-mic.unmuted {
+            background: rgba(48, 209, 88, 0.15);
+            border-color: rgba(48, 209, 88, 0.35);
+            color: #30D158;
+            box-shadow: 0 2px 10px rgba(48, 209, 88, 0.15);
+        }
+
+        .btn-inline-mic.muted {
+            background: rgba(255, 159, 10, 0.2);
+            border-color: rgba(255, 159, 10, 0.45);
+            color: #F59E0B;
+            box-shadow: 0 2px 10px rgba(255, 159, 10, 0.2);
+        }
+
+        .btn-inline-mic:hover {
+            transform: scale(1.06);
+        }
+
+        .hotkey-badge {
+            font-size: 0.68rem;
+            padding: 2px 5px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.85);
+            margin-right: 4px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
         }
 
         .chat-input {
@@ -1973,11 +2060,12 @@
                         </button>
                     </div>
 
-
-
                     <div class="chat-input-area">
-                        <input type="text" id="chat-input" class="chat-input" placeholder="اكتب رسالتك باللغة العربية هنا..." onkeypress="handleKeyPress(event)" disabled>
-                        <button id="send-btn" class="btn-send" onclick="sendMessage()" disabled>إرسال</button>
+                        <button id="inline-mic-btn" class="btn-inline-mic unmuted" onclick="toggleMicrophone()" title="كتم / تشغيل الميكروفون (Ctrl+M)">
+                            <span id="inline-mic-icon">🎤</span>
+                        </button>
+                        <input type="text" id="chat-input" class="chat-input" placeholder="اكتب استفسارك هنا (أو تحدث صوتياً مباشرة)..." onkeypress="handleKeyPress(event)">
+                        <button id="send-btn" class="btn-send" onclick="sendMessage()">إرسال</button>
                     </div>
                 </div>
             </div>
@@ -2337,7 +2425,9 @@
 
                 // 1. Calculate target volume amplitude based on speaker
                 let targetVol = 0.08;
-                if (this.activeMode === 'speaking') {
+                if (window.isMicMuted && this.activeMode === 'listening') {
+                    targetVol = 0.02; // Flat muted line — zero mic input
+                } else if (this.activeMode === 'speaking') {
                     targetVol = 0.45 + 0.3 * Math.sin(Date.now() * 0.009) * Math.cos(Date.now() * 0.004);
                 } else if (this.activeMode === 'listening' && this.analyser && this.dataArray) {
                     this.analyser.getByteFrequencyData(this.dataArray);
@@ -2408,6 +2498,115 @@
 
         // Note: window.renderApplyNowButton is defined after window.servicesList at line 2805
 
+        let isMicMuted = false;
+        window.activeMicStream = null;
+
+        window.playMicTone = function(muted) {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const ctx = window.globalAudioCtx || new AudioCtx();
+                if (ctx.state === 'suspended') {
+                    ctx.resume().catch(() => {});
+                }
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                const now = ctx.currentTime;
+                if (muted) {
+                    osc.frequency.setValueAtTime(360, now);
+                    osc.frequency.exponentialRampToValueAtTime(200, now + 0.12);
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+                } else {
+                    osc.frequency.setValueAtTime(440, now);
+                    osc.frequency.exponentialRampToValueAtTime(680, now + 0.12);
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+                }
+                osc.start(now);
+                osc.stop(now + 0.13);
+            } catch (e) {}
+        };
+
+        window.toggleMicrophone = function() {
+            isMicMuted = !isMicMuted;
+            window.isMicMuted = isMicMuted;
+
+            // 1. Mute/Unmute local microphone MediaStream audio tracks
+            if (window.activeMicStream) {
+                window.activeMicStream.getAudioTracks().forEach(track => {
+                    track.enabled = !isMicMuted;
+                });
+            }
+
+            // 2. Mute/Unmute WebRTC RTCPeerConnection audio senders
+            if (conversation && conversation.peerConnection) {
+                try {
+                    conversation.peerConnection.getSenders().forEach(sender => {
+                        if (sender.track && sender.track.kind === 'audio') {
+                            sender.track.enabled = !isMicMuted;
+                        }
+                    });
+                } catch (e) {
+                    console.warn("[WebRTC Audio] PeerConnection track mute sync note:", e);
+                }
+            }
+
+            // 3. Mute/Unmute audio visualizer stream if initialized
+            if (waveformVisualizer && waveformVisualizer.microphoneStream) {
+                try {
+                    waveformVisualizer.microphoneStream.getAudioTracks().forEach(track => {
+                        track.enabled = !isMicMuted;
+                    });
+                } catch (e) {}
+            }
+
+            // Play subtle Web Audio chime tone
+            window.playMicTone(isMicMuted);
+
+            window.updateMicUiState();
+        };
+
+        window.updateMicUiState = function() {
+            const inlineBtn = document.getElementById('inline-mic-btn');
+            const inlineIcon = document.getElementById('inline-mic-icon');
+
+            const currentLang = localStorage.getItem('civil_defense_lang') || 'ar';
+
+            if (isMicMuted) {
+                if (inlineBtn) inlineBtn.className = 'btn-inline-mic muted';
+                if (inlineIcon) inlineIcon.innerText = '🔇';
+
+                if (waveformVisualizer && waveformVisualizer.statusLabel) {
+                    waveformVisualizer.statusLabel.innerText = currentLang === 'en' 
+                        ? "🔇 Mic Muted (Ctrl+M) — You can type & send messages below" 
+                        : "🔇 الميكروفون مكتوم (Ctrl+M) — بإمكانك الكتابة وإرسال الرسائل بالأسفل";
+                    waveformVisualizer.statusLabel.style.color = "#F59E0B";
+                }
+            } else {
+                if (inlineBtn) inlineBtn.className = 'btn-inline-mic unmuted';
+                if (inlineIcon) inlineIcon.innerText = '🎤';
+
+                if (waveformVisualizer && waveformVisualizer.statusLabel) {
+                    waveformVisualizer.statusLabel.innerText = currentLang === 'en'
+                        ? "AI Assistant is listening..."
+                        : "المساعد يستمع إليك... تفضل بالتحدث";
+                    waveformVisualizer.statusLabel.style.color = "#30D158";
+                }
+            }
+        };
+
+        // Global Keyboard Shortcut Listener (Ctrl+M / Alt+M)
+        document.addEventListener('keydown', function(event) {
+            if ((event.ctrlKey || event.altKey) && (event.key === 'm' || event.key === 'M' || event.key === 'م')) {
+                event.preventDefault();
+                window.toggleMicrophone();
+            }
+        });
+
         window.triggerCallFromHero = function() {
             callButton.click();
         }
@@ -2460,6 +2659,13 @@
                         channelCount: 1
                     }
                 });
+
+                window.activeMicStream = micStream;
+                if (isMicMuted && window.activeMicStream) {
+                    window.activeMicStream.getAudioTracks().forEach(track => {
+                        track.enabled = false;
+                    });
+                }
 
                 if (window.globalAudioCtx) {
                     waveformVisualizer.initMicrophone(micStream, window.globalAudioCtx);
@@ -2544,9 +2750,11 @@
                                     }
                                 }
 
-                                // 4. Safe Phrase Boosters: Match context tokens across input & user transcript
+                                 // 4. Safe Phrase Boosters: Match context tokens across input & full transcript history
                                 if (!resolvedServiceId) {
-                                    const combined = ((serviceName || '') + ' ' + (window.lastUserMessageText || '')).toLowerCase();
+                                    const allUserBubbles = Array.from(document.querySelectorAll('.message.user, [data-sender="user"]'))
+                                        .map(b => b.innerText || b.textContent || '').join(' ');
+                                    const combined = ((serviceName || '') + ' ' + (window.lastUserMessageText || '') + ' ' + allUserBubbles).toLowerCase();
                                     const normalizeAr = (str) => str ? str.toLowerCase()
                                         .replace(/[أإآ]/g, 'ا')
                                         .replace(/ة/g, 'ه')
@@ -2555,6 +2763,8 @@
                                         .replace(/\s+/g, ' ').trim() : '';
                                     const normCombined = normalizeAr(combined);
 
+                                    const isHazmatTransport = (normCombined.includes('نقل') || normCombined.includes('سيارات') || normCombined.includes('شاحنات') || normCombined.includes('مركبات')) && (normCombined.includes('مواد خطره') || normCombined.includes('مواد خطرة') || normCombined.includes('كيميائية') || normCombined.includes('كيمياويه') || normCombined.includes('hazmat') || normCombined.includes('hazardous'));
+                                    const isHazardousStorage = (normCombined.includes('تخزين') || normCombined.includes('عدم ممانعه') || normCombined.includes('عدم ممانعة')) && (normCombined.includes('مواد خطره') || normCombined.includes('مواد خطرة') || normCombined.includes('مواد كيميائية') || normCombined.includes('كيميائيه') || normCombined.includes('hazmat') || normCombined.includes('chemical storage'));
                                     const isBakery = normCombined.includes('مخبز') || normCombined.includes('مخابز') || normCombined.includes('فرن') || normCombined.includes('افران') || normCombined.includes('أفران') || normCombined.includes('خبز') || normCombined.includes('bakery') || normCombined.includes('bakeries');
                                     const isGasStation = normCombined.includes('محطة وقود') || normCombined.includes('محطات وقود') || normCombined.includes('تزويد الوقود') || normCombined.includes('gas station') || normCombined.includes('fuel station');
                                     const isGasShop = normCombined.includes('محل غاز') || normCombined.includes('محلات غاز') || normCombined.includes('بيع الغاز') || normCombined.includes('سلندر') || normCombined.includes('سلندرات') || normCombined.includes('gas shop') || normCombined.includes('gas cylinder');
@@ -2562,7 +2772,9 @@
                                     const isTrainee = normCombined.includes('تسجيل متدرب') || normCombined.includes('تسجيل متدربين') || normCombined.includes('مراكز التدريب') || normCombined.includes('معاهد التدريب') || normCombined.includes('ترخيص معاهد') || normCombined.includes('trainee registration') || normCombined.includes('training institutes');
                                     const isInspection = normCombined.includes('شهادة فحص') || normCombined.includes('تقرير فحص') || normCombined.includes('فحص المنشات') || normCombined.includes('فحص المنشآت') || normCombined.includes('طلب تفتيش') || normCombined.includes('inspection certificate');
 
-                                    if (isBakery) resolvedServiceId = 'bakery_license';
+                                    if (isHazmatTransport) resolvedServiceId = 'chemical_transport_license';
+                                    else if (isHazardousStorage) resolvedServiceId = 'hazardous_material_permit';
+                                    else if (isBakery) resolvedServiceId = 'bakery_license';
                                     else if (isGasStation) resolvedServiceId = 'gas_station_license';
                                     else if (isGasShop) resolvedServiceId = 'gas_selling_shops_license';
                                     else if (isGold) resolvedServiceId = 'gold_shop_license';
@@ -2664,6 +2876,8 @@
                         chatInput.disabled = false;
                         sendButton.disabled = false;
 
+                        window.updateMicUiState();
+
                         // Enable suggestion chips
                         window.elevenLabsSessionActive = true;
 
@@ -2718,18 +2932,24 @@
                         // Check if a message bubble with this eventId already exists
                         const existingMsg = document.querySelector(`[data-event-id="${eventId}"]`);
                         if (existingMsg) {
-                            existingMsg.innerText = message.message;
+                            // Preserve longest full text so agent message is never truncated on user reply
+                            const currentText = (existingMsg.innerText || "").trim();
+                            const newText = (message.message || "").trim();
+                            if (newText.length >= currentText.length) {
+                                existingMsg.innerText = message.message;
+                            }
                             messagesContainer.scrollTop = messagesContainer.scrollHeight;
                             return;
                         }
 
                         // If it's a user message, check if there is a pending typed message that matches the text
                         if (sender === 'user') {
-                            const pendingBubbles = Array.from(document.querySelectorAll('.message.user.pending-sync'));
+                            const pendingBubbles = Array.from(document.querySelectorAll('.message.user.pending-sync, [data-pending="true"]'));
                             const matchingBubble = pendingBubbles.find(b => b.innerText.trim() === message.message.trim());
                             if (matchingBubble) {
                                 matchingBubble.setAttribute('data-event-id', eventId);
                                 matchingBubble.classList.remove('pending-sync');
+                                matchingBubble.removeAttribute('data-pending');
                                 return;
                             }
                         }
@@ -2740,7 +2960,7 @@
                         const bubble = document.createElement('div');
                         bubble.className = `message ${sender}`;
                         bubble.innerText = message.message;
-                        bubble.setAttribute('data-event-id', eventId);
+                        if (eventId) bubble.setAttribute('data-event-id', eventId);
 
                         wrapper.appendChild(bubble);
                         messagesContainer.appendChild(wrapper);
@@ -2751,7 +2971,12 @@
                         const eventId = correction.event_id;
                         const existingMsg = document.querySelector(`[data-event-id="${eventId}"]`);
                         if (existingMsg) {
-                            existingMsg.innerText = correction.corrected_agent_response;
+                            // Prevent truncating full agent message on user reply/interruption
+                            const currentText = (existingMsg.innerText || "").trim();
+                            const correctedText = (correction.corrected_agent_response || "").trim();
+                            if (correctedText.length > currentText.length) {
+                                existingMsg.innerText = correction.corrected_agent_response;
+                            }
                             messagesContainer.scrollTop = messagesContainer.scrollHeight;
                         }
                     },
@@ -2817,6 +3042,16 @@
             chatInput.disabled = true;
             sendButton.disabled = true;
 
+            // Clean up microphone stream and state
+            isMicMuted = false;
+            if (window.activeMicStream) {
+                try {
+                    window.activeMicStream.getTracks().forEach(track => track.stop());
+                } catch (e) {}
+                window.activeMicStream = null;
+            }
+            window.updateMicUiState();
+
             // Disable session status
             window.elevenLabsSessionActive = false;
             
@@ -2842,30 +3077,55 @@
         }
 
         window.sendMessage = async function() {
-            console.log("conversation in sendMessage:", conversation);
-            console.log("typeof sendUserMessage:", typeof conversation?.sendUserMessage);
             const text = chatInput.value.trim();
-            if (!text || !conversation) return;
+            if (!text) return;
 
+            chatInput.value = "";
             window.lastUserMessageText = text;
 
-            // Append with a pending status for local echo
+            // Append message bubble with pending sync flags
             const msgEl = appendMessage('user', text);
+            msgEl.classList.add('pending-sync');
             msgEl.setAttribute('data-pending', 'true');
-            
+
+            // Auto-connect if call is not active
+            if (!conversation) {
+                try {
+                    console.log("[Text Messaging] Conversation not active. Auto-initiating WebRTC session...");
+                    await startCall();
+                    let attempts = 0;
+                    while (!conversation && attempts < 25) {
+                        await new Promise(r => setTimeout(r, 200));
+                        attempts++;
+                    }
+                } catch (connErr) {
+                    console.error("[Text Messaging] Auto-connect failed:", connErr);
+                    msgEl.remove();
+                    return;
+                }
+            }
+
+            if (!conversation) {
+                msgEl.remove();
+                alert("تعذر الاتصال بالمساعد الذكي لإرسال الرسالة. يرجى محاولة بدء المكالمة مجدداً.");
+                return;
+            }
+
             try {
-                // Send text message directly via SDK WebRTC session
+                console.log("[Text Messaging] Dispatching user text message to ElevenLabs SDK:", text);
                 await conversation.sendUserMessage(text);
             } catch (err) {
-                console.error("Failed to send message:", err);
-                alert("Failed to send message: " + err.message + "\nStack: " + err.stack);
-                msgEl.remove(); // Remove the pending user message since it failed
-                appendMessage('agent', "عذراً، يبدو أن الاتصال قد انقطع. يرجى إعادة بدء المحادثة الصوتية.");
-                handleDisconnect();
+                console.error("[Text Messaging] Failed to send message via SDK:", err);
+                try {
+                    await new Promise(r => setTimeout(r, 400));
+                    await conversation.sendUserMessage(text);
+                } catch (retryErr) {
+                    console.error("[Text Messaging] Retry failed:", retryErr);
+                    msgEl.remove();
+                    appendMessage('agent', "عذراً، حدث خطأ في إرسال الرسالة النصية. يرجى المحاولة مجدداً.");
+                }
             }
-            
-            chatInput.value = "";
-        }
+        };
 
         window.handleKeyPress = function(event) {
             if (event.key === 'Enter') {
@@ -2943,7 +3203,17 @@
                 name: "إصدار ترخيص عدم ممانعة لتخزين مواد كيميائية أو المتفجرات، وتجديد الترخيص",
                 fee: "مجاناً",
                 keywordsEn: ["hazardous material", "hazardous material permit", "chemical storage", "chemical permit", "hazmat permit"],
-                keywordsAr: ["تخزين مواد خطرة", "مواد كيميائية", "تخزين مواد كيميائية", "تخزين مواد", "مادة خطرة", "ترخيص مواد كيميائية"]
+                keywordsAr: ["تخزين مواد خطرة", "مواد كيميائية", "تخزين مواد كيميائية", "تخزين مواد", "مادة خطرة", "ترخيص مواد كيميائية", "مواد خطرة", "المواد الخطرة", "ترخيص المواد الخطرة", "تخزين مواد خطره"]
+            },
+            {
+                id: "chemical_transport_license",
+                legacyId: "إصدار ترخيص الموافقة على سيارات نقل المواد الكيميائية والخطرة، وتجديد الترخيص",
+                nameEn: "Chemical & Hazardous Material Transport Vehicles License",
+                nameAr: "إصدار ترخيص الموافقة على سيارات نقل المواد الكيميائية والخطرة، وتجديد الترخيص",
+                name: "إصدار ترخيص الموافقة على سيارات نقل المواد الكيميائية والخطرة، وتجديد الترخيص",
+                fee: "10 دينار بحريني فقط",
+                keywordsEn: ["chemical transport license", "hazardous material transport", "hazmat transport", "chemical transport vehicle", "hazmat vehicle", "hazardous materials transport"],
+                keywordsAr: ["نقل المواد الخطرة", "سيارات نقل المواد الكيميائية والخطرة", "نقل مواد خطرة", "ترخيص نقل المواد الخطرة", "نقل مواد كيميائية", "مركبات نقل المواد الخطرة", "شاحنات نقل المواد الخطرة", "نقل المواد الكيميائية", "ترخيص نقل مواد خطرة", "شاحنة مواد خطرة", "شاحنات مواد خطرة", "نقل كيميائيات", "نقل مواد خطره"]
             },
             {
                 id: "factories_hotels_malls_inspection_certificate",
@@ -3292,6 +3562,13 @@
             
             const cleanText = normalizeAr(text);
             if (!cleanText) return null;
+
+            // Quick Guard: Ignore generic affirmative phrases without service keywords so caller can inspect previous transcript turns
+            const genericPhrases = ['نعم', 'نعم ابي', 'نعم اقدم', 'نعم اقدم عليها', 'نعم ابي اقدم عليها الحين', 'نعم ابي اقدم الحين', 'نعم اريد التقديم الان', 'نعم اريد التقديم', 'ابي اقدم', 'ابي اقدم عليها', 'اقدم الحين', 'قدّم الآن', 'قدّم', 'ارغب بالتقديم', 'سجل لي', 'اريد التسجيل', 'موافق', 'اوكي', 'تمام', 'yes', 'apply now', 'yes please'];
+            const containsServiceKey = ['مخبز', 'غاز', 'ذهب', 'وقود', 'بترول', 'مبنى', 'خرائط', 'فحص', 'تدريب', 'متدرب', 'مواد', 'خطرة', 'خطره', 'تفتيش', 'كهرباء', 'حريق', 'اطفاء', 'إطفاء', 'معاهد', 'خيام', 'العاب نارية', 'متفجرات', 'ديزل', 'سيارات', 'شاحنات', 'نقل', 'كيميائية', 'كيميائيه', 'استشاري', 'تقرير'].some(k => cleanText.includes(k));
+            if (!containsServiceKey && genericPhrases.some(p => cleanText === p || (cleanText.includes(p) && cleanText.length < 35))) {
+                return null;
+            }
 
             const stopWords = new Set([
                 'علي', 'على', 'في', 'من', 'عن', 'مع', 'الى', 'إلى', 'حق', 'ابي', 'اريد', 'بدي',
@@ -4706,6 +4983,9 @@
 
             // Re-populate services dropdown in target language
             window.populateServiceDropdown();
+            if (typeof window.updateMicUiState === 'function') {
+                window.updateMicUiState();
+            }
         };
 
         window.togglePortalLanguage = function() {
