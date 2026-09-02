@@ -19,9 +19,21 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
-        // Safely patch WebSocket.prototype.send to prevent console flooding
-        // when ElevenLabs tries to send microphone frames after the socket closes.
+        // Intercept third-party extension requests (e.g. CSSPeeper maxmind.com) to eliminate console CORS errors
         (function() {
+            var origFetch = window.fetch;
+            if (origFetch) {
+                window.fetch = function(resource, init) {
+                    var url = (typeof resource === 'string') ? resource : (resource && resource.url ? resource.url : '');
+                    if (url && (url.indexOf('maxmind.com') !== -1 || url.indexOf('geoip') !== -1)) {
+                        return Promise.resolve(new Response(JSON.stringify({ country: { iso_code: 'BH' }, continent: { code: 'AS' } }), {
+                            status: 200,
+                            headers: { 'Content-Type': 'application/json' }
+                        }));
+                    }
+                    return origFetch.apply(this, arguments);
+                };
+            }
             const originalSend = WebSocket.prototype.send;
             WebSocket.prototype.send = function(data) {
                 if (this.readyState === WebSocket.OPEN) {

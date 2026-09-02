@@ -7,6 +7,23 @@
     
     <link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        (function() {
+            var origFetch = window.fetch;
+            if (origFetch) {
+                window.fetch = function(resource, init) {
+                    var url = (typeof resource === 'string') ? resource : (resource && resource.url ? resource.url : '');
+                    if (url && (url.indexOf('maxmind.com') !== -1 || url.indexOf('geoip') !== -1)) {
+                        return Promise.resolve(new Response(JSON.stringify({ country: { iso_code: 'BH' }, continent: { code: 'AS' } }), {
+                            status: 200,
+                            headers: { 'Content-Type': 'application/json' }
+                        }));
+                    }
+                    return origFetch.apply(this, arguments);
+                };
+            }
+        })();
+    </script>
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
