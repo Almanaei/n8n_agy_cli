@@ -115,11 +115,7 @@ async function checkStatusChangesOnce() {
       const lastName = row[4] || '';
       const whatsapp = row[5] || '';
       const rawLink = row[9] || '';
-      let baseUrl = (process.env.PUBLIC_URL || "https://bhcdai.com").trim();
-      let trackingLink = (rawLink && !rawLink.includes('localhost')) ? rawLink : `${baseUrl}/track?id=${appId}`;
-      if (trackingLink.includes('http://') || trackingLink.includes('///')) {
-        trackingLink = `https://bhcdai.com/track?id=${appId}`;
-      }
+      let trackingLink = `https://bhcdai.com/track?id=${appId}`;
       const currentStatus = (row[12] || '').trim(); // Column M
       const notes = row[13] || '';
       const alertSent = (row[14] || '').trim(); // Column O
