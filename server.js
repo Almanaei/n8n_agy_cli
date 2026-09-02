@@ -3379,17 +3379,26 @@ const server = http.createServer(async (req, res) => {
           return '';
         }
 
-        const clientName = extractVal(payload, ['clientName', 'client_name', 'name', 'userName', 'user_name', 'fullName', 'full_name', 'الاسم', 'اسم']) || 'غير محدد';
-        const phoneNumber = extractVal(payload, ['phoneNumber', 'phone_number', 'phone', 'mobile', 'userPhone', 'user_phone', 'telephone', 'الهاتف', 'الجوال', 'رقم']) || '';
-        let clientEmail = extractVal(payload, ['clientEmail', 'client_email', 'email', 'userEmail', 'user_email', 'mail', 'البريد']) || '';
-        if (clientEmail.includes('[at]')) {
-          clientEmail = clientEmail.replace(/\s*\[at\]\s*/gi, '@');
-        }
         const conversationId = extractVal(payload, ['conversationId', 'conversation_id', 'id']) || '';
+
+        // Check memory cache for previous lead data attached to this conversation
+        let prevLead = (conversationId && capturedLeadsMap.get(conversationId)) || capturedLeadsMap.get('latest') || {};
+
+        let rawName = extractVal(payload, ['clientName', 'client_name', 'name', 'userName', 'user_name', 'fullName', 'full_name', 'first_name', 'last_name', 'الاسم', 'اسم']);
+        let rawPhone = extractVal(payload, ['phoneNumber', 'phone_number', 'phone', 'mobile', 'userPhone', 'user_phone', 'telephone', 'caller_phone', 'user_id', 'الهاتف', 'الجوال', 'رقم']);
+        let rawEmail = extractVal(payload, ['clientEmail', 'client_email', 'email', 'userEmail', 'user_email', 'mail', 'البريد']);
+
+        if (rawEmail && rawEmail.includes('[at]')) {
+          rawEmail = rawEmail.replace(/\s*\[at\]\s*/gi, '@');
+        }
+
+        const clientName = (rawName && rawName !== 'غير محدد') ? rawName : (prevLead.clientName || 'متعامل الدفاع المدني');
+        const phoneNumber = rawPhone || prevLead.phoneNumber || 'غير مسجل';
+        const clientEmail = rawEmail || prevLead.clientEmail || '';
 
         console.log(`[Webhook Leads Endpoint] Captured Lead Data - Name: ${clientName}, Phone: ${phoneNumber}, Email: ${clientEmail}, ConvID: ${conversationId}`);
 
-        // Store lead data in memory for Post-Call Transcript Email matching
+        // Store merged lead data in memory for Post-Call Transcript Email matching
         const leadObj = { clientName, phoneNumber, clientEmail, conversationId, timestamp: Date.now() };
         if (conversationId) {
           capturedLeadsMap.set(conversationId, leadObj);
