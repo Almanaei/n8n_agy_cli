@@ -1595,10 +1595,9 @@ async function executeAdminQuickAction(appId, action, reason) {
   });
   if (!updateRes.ok) throw new Error("Failed to execute admin action");
 
-  // Instant multi-channel user notification (WhatsApp + SMS fallback + n8n Email)
-  const baseUrl = process.env.PUBLIC_URL || "http://localhost:3000";
+  const publicUrl = getSanitizedPublicUrl(req);
   const newStatus = action === 'approve' ? 'Approved' : (action === 'reject' ? 'Rejected' : 'Modification Requested');
-  const trackingUrl = `${baseUrl}/track?id=${appId}`;
+  const trackingUrl = sanitizeTrackingLink(`${publicUrl}/track?id=${appId}`, appId);
 
   const statusTextAr = action === 'approve' ? 'مقبول والمعاملة مكتملة' : (action === 'reject' ? 'مرفوض' : 'مطلوب تعديل مستندات');
   const modNotice = reason ? `\nملاحظات الإدارة للتعديل: ${reason}` : '';

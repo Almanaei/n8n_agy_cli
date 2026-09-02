@@ -114,8 +114,12 @@ async function checkStatusChangesOnce() {
       const firstName = row[3] || '';
       const lastName = row[4] || '';
       const whatsapp = row[5] || '';
-      const customerEmail = (row[6] || '').trim();
-      const trackingLink = row[9] || `http://localhost:3000/track?id=${appId}`;
+      const rawLink = row[9] || '';
+      let baseUrl = (process.env.PUBLIC_URL || "https://bhcdai.com").trim();
+      let trackingLink = (rawLink && !rawLink.includes('localhost')) ? rawLink : `${baseUrl}/track?id=${appId}`;
+      if (trackingLink.includes('http://') || trackingLink.includes('///')) {
+        trackingLink = `https://bhcdai.com/track?id=${appId}`;
+      }
       const currentStatus = (row[12] || '').trim(); // Column M
       const notes = row[13] || '';
       const alertSent = (row[14] || '').trim(); // Column O

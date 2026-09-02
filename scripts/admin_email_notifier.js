@@ -20,6 +20,32 @@ function createEmailTransporter() {
   });
 }
 
+function cleanUrl(inputUrl, appId, pathType = 'track') {
+  let domain = (process.env.PUBLIC_URL || 'https://bhcdai.com').trim();
+  domain = domain.replace(/^(https?:\/\/)+/i, '').replace(/\/+$/, '');
+  if (!domain || domain.includes('localhost') || domain.includes('127.0.0.1')) {
+    domain = 'bhcdai.com';
+  }
+  
+  if (!inputUrl || typeof inputUrl !== 'string' || inputUrl.includes('localhost') || inputUrl.includes('127.0.0.1')) {
+    if (pathType === 'receipt') return `https://${domain}/receipt?id=${appId}`;
+    if (pathType === 'quick-action') return `https://${domain}/admin/quick-action?id=${appId}&key=${process.env.ADMIN_SECRET_KEY || 'cd_admin_secret_key_2026'}`;
+    return `https://${domain}/track?id=${appId}`;
+  }
+
+  let clean = inputUrl.trim();
+  if (clean.includes('http://https') || clean.includes('https://https') || clean.includes('///')) {
+    clean = clean.replace(/^(https?:\/*)+/i, 'https://');
+  }
+  if (clean.startsWith('http://')) {
+    clean = clean.replace('http://', 'https://');
+  }
+  if (!clean.startsWith('https://')) {
+    clean = 'https://' + clean.replace(/^\/+/, '');
+  }
+  return clean;
+}
+
 /**
  * Dispatches an official Admin Alert Email for any Application Lifecycle Status.
  * 
@@ -37,10 +63,10 @@ async function sendAdminApplicationNotification(appData) {
   const clientName = `${appData.firstName || ''} ${appData.lastName || ''}`.trim() || appData.clientName || 'عزيزنا المتعامل';
   const phone = appData.whatsapp || appData.phone || 'غير متوفر';
   const applicantEmail = appData.email || 'غير متوفر';
-  const trackingLink = appData.trackingLink || `http://localhost:3000/track?id=${appId}`;
+  const trackingLink = cleanUrl(appData.trackingLink, appId, 'track');
   const attachmentLink = appData.attachmentLink || '';
-  const certificateLink = appData.certificateLink || `http://localhost:3000/receipt?id=${appId}`;
-  const quickActionLink = appData.quickActionLink || `http://localhost:3000/admin/quick-action?id=${appId}&key=${process.env.ADMIN_SECRET_KEY || 'cd_admin_secret_key_2026'}`;
+  const certificateLink = cleanUrl(appData.certificateLink, appId, 'receipt');
+  const quickActionLink = cleanUrl(appData.quickActionLink, appId, 'quick-action');
   
   // Status normalization
   let status = appData.status || (appData.isNewApplication ? 'Submitted' : 'Modification Resubmitted');
@@ -251,8 +277,8 @@ async function sendUserApplicationStatusEmail(appData) {
   const appId = appData.appId || 'APP-UNKNOWN';
   const serviceName = appData.serviceName || 'خدمة الدفاع المدني';
   const clientName = `${appData.firstName || ''} ${appData.lastName || ''}`.trim() || appData.clientName || 'عزيزنا المتعامل';
-  const trackingLink = appData.trackingLink || `http://localhost:3000/track?id=${appId}`;
-  const certificateLink = appData.certificateLink || `http://localhost:3000/receipt?id=${appId}`;
+  const trackingLink = cleanUrl(appData.trackingLink, appId, 'track');
+  const certificateLink = cleanUrl(appData.certificateLink, appId, 'receipt');
   const status = appData.status || 'Modification Requested';
   const reason = appData.reason || appData.modificationDetails || '';
 
