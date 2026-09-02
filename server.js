@@ -3529,6 +3529,22 @@ const server = http.createServer(async (req, res) => {
           body: body
         }).catch(() => {});
 
+        // If clientEmail is provided mid-call, immediately dispatch confirmation & transcript email
+        if (clientEmail && clientEmail.includes('@')) {
+          try {
+            const { sendUserTranscriptEmail } = require('./scripts/admin_email_notifier');
+            sendUserTranscriptEmail({
+              clientName: clientName || 'عزيزنا المتعامل',
+              userEmail: clientEmail,
+              phoneNumber: phoneNumber || 'غير مسجل',
+              transcriptText: `تم توثيق وتأكيد بريدكم الإلكتروني (${clientEmail}) بنجاح لدى مركز خدمات الإدارة العامة للدفاع المدني بمملكة البحرين.`
+            }).then(r => console.log(`[Webhook Leads Email] ✅ Dispatched mid-call transcript confirmation email to <${clientEmail}>:`, r.status))
+              .catch(err => console.error("[Webhook Leads Email] ❌ Mid-call transcript email error:", err));
+          } catch (emailErr) {
+            console.error("[Webhook Leads Email] Exception:", emailErr);
+          }
+        }
+
         const resultSummary = `تم حفظ بيانات المتعامل ${clientName} برقم الهاتف ${phoneNumber} بنجاح لدى الإدارة العامة للدفاع المدني.`;
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
         res.end(JSON.stringify({
