@@ -113,6 +113,53 @@ function escapeHtml(str) {
     .replace(/'/g, '&#039;');
 }
 
+function getSanitizedPublicUrl(req) {
+  if (process.env.PUBLIC_URL && process.env.PUBLIC_URL.trim()) {
+    let clean = process.env.PUBLIC_URL.trim();
+    if (!clean.startsWith('http://') && !clean.startsWith('https://')) {
+      clean = 'https://' + clean;
+    }
+    return clean.replace(/\/+$/, '').replace(/^http:\/\//, 'https://');
+  }
+
+  let host = req && req.headers ? (req.headers.host || '') : '';
+  host = host.replace(/^(https?:\/\/)+/i, '').replace(/^\/+/, '');
+
+  let proto = 'https';
+  if (req && req.headers && req.headers['x-forwarded-proto']) {
+    proto = req.headers['x-forwarded-proto'].split(',')[0].trim();
+  }
+
+  if (host.includes('bhcdai.com') || host.includes('2.28.126.154')) {
+    proto = 'https';
+  }
+
+  if (!host) {
+    return 'https://bhcdai.com';
+  }
+
+  let domain = `${proto}://${host}`;
+  if (domain.includes('http://https') || domain.includes('https://https')) {
+    domain = 'https://' + domain.replace(/^https?:\/*(https?:\/*)?/i, '');
+  }
+  return domain.replace(/\/+$/, '');
+}
+
+function sanitizeTrackingLink(rawUrl, appId) {
+  if (!rawUrl || typeof rawUrl !== 'string' || !rawUrl.trim()) {
+    return `https://bhcdai.com/track?id=${appId || 'APP-UNKNOWN'}`;
+  }
+  let clean = rawUrl.trim();
+  if (clean.includes('http://https') || clean.includes('https://https') || clean.includes('///')) {
+    clean = clean.replace(/^(https?:\/*)+/i, 'https://');
+    clean = clean.replace('https:///', 'https://');
+  }
+  if (!clean.startsWith('http://') && !clean.startsWith('https://')) {
+    clean = 'https://' + clean.replace(/^\/+/, '');
+  }
+  return clean;
+}
+
 // ----------------------------------------------------
 // Production Security: Client IP Extraction & Rate Limiter
 // ----------------------------------------------------
@@ -2712,8 +2759,8 @@ const server = http.createServer(async (req, res) => {
         const randomHex = crypto.randomBytes(2).toString('hex').toUpperCase();
         const appId = `APP-${dateStr}-${randomHex}`;
 
-        const publicUrl = (req.headers['x-forwarded-proto'] || 'http') + '://' + req.headers.host;
-        const trackingLink = `${publicUrl}/track?id=${appId}`;
+        const publicUrl = getSanitizedPublicUrl(req);
+        const trackingLink = sanitizeTrackingLink(`${publicUrl}/track?id=${appId}`, appId);
 
         const officialServiceName = resolveOfficialServiceName(appData.serviceName);
 
@@ -3620,8 +3667,8 @@ const server = http.createServer(async (req, res) => {
       }
 
       const { generateApplicationPdfBuffer } = require('./scripts/pdf_receipt_generator');
-      const publicUrl = (req.headers['x-forwarded-proto'] || 'http') + '://' + req.headers.host;
-      const trackingUrl = `${publicUrl}/track?id=${appId}`;
+      const publicUrl = getSanitizedPublicUrl(req);
+      const trackingUrl = sanitizeTrackingLink(`${publicUrl}/track?id=${appId}`, appId);
 
       const pdfBuffer = await generateApplicationPdfBuffer(app, trackingUrl);
 

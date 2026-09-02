@@ -151,7 +151,10 @@ async function checkStatusChangesOnce() {
           ? customerEmail 
           : (process.env.ADMIN_EMAIL || 'gdcdvirtual@gmail.com');
 
-        const baseUrl = process.env.PUBLIC_URL || "http://localhost:3000";
+        let baseUrl = (process.env.PUBLIC_URL || "https://bhcdai.com").trim();
+        if (baseUrl.includes('http://https') || baseUrl.includes('https://https')) {
+          baseUrl = 'https://bhcdai.com';
+        }
 
         // 1. Direct High-Priority Email to Customer
         try {
