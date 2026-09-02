@@ -41,7 +41,7 @@
     },
     {
       "parameters": {
-        "fromEmail": "mnaaaei@gmail.com",
+        "fromEmail": "gdcdvirtual@gmail.com",
         "toEmail": "={{ $json.body.email }}",
         "subject": "نسخة وتأكيد طلب الخدمة - الدفاع المدني بمملكة البحرين",
         "emailFormat": "html",
@@ -167,7 +167,7 @@
     },
     {
       "parameters": {
-        "fromEmail": "mnaaaei@gmail.com",
+        "fromEmail": "gdcdvirtual@gmail.com",
         "toEmail": "={{ $json.email }}",
         "subject": "تحديث حالة طلب الخدمة - الدفاع المدني للبحرين",
         "emailFormat": "html",
@@ -308,8 +308,8 @@
     },
     {
       "parameters": {
-        "fromEmail": "mnaaaei@gmail.com",
-        "toEmail": "mnaaaei@gmail.com",
+        "fromEmail": "gdcdvirtual@gmail.com",
+        "toEmail": "gdcdvirtual@gmail.com",
         "subject": "={{ $json.body.isNewApplication ? '⚡ طلب خدمة جديد: ' + $json.body.appId : '⚠️ تنبيه للإدارة: طلب تعديل بيانات جديد (' + $json.body.appId + ')' }}",
         "emailFormat": "html",
         "html": "=<div dir=\"rtl\" style=\"font-family: Arial, sans-serif; text-align: right; background-color: #0f172a; color: #f8fafc; padding: 24px; border-radius: 12px; max-width: 600px; margin: 0 auto; border: 1px solid rgba(56, 189, 248, 0.3);\"><h2 style=\"color: #38bdf8; margin-top: 0; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px; font-size: 1.25rem;\">{{ $json.body.isNewApplication ? '⚡ إشعار للإدارة: طلب خدمة جديد' : '⚠️ إشعار للإدارة: رد وتحديث بيانات من المتعامل' }}</h2><table style=\"width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 0.95rem;\"><tr><td style=\"padding: 6px 0; color: #94a3b8; width: 140px;\">اسم المتعامل:</td><td style=\"padding: 6px 0; font-weight: bold; color: #ffffff;\">{{ $json.body.clientName }}</td></tr><tr><td style=\"padding: 6px 0; color: #94a3b8;\">رقم المعاملة:</td><td style=\"padding: 6px 0; font-weight: bold; color: #38bdf8;\">{{ $json.body.appId }}</td></tr><tr><td style=\"padding: 6px 0; color: #94a3b8;\">الخدمة المطلوبة:</td><td style=\"padding: 6px 0; color: #ffffff;\">{{ $json.body.serviceName }}</td></tr>{{ $json.body.paymentMethod ? '<tr><td style=\"padding: 6px 0; color: #94a3b8;\">طريقة الدفع:</td><td style=\"padding: 6px 0; color: #ffffff;\">' + $json.body.paymentMethod + '</td></tr>' : '' }}{{ $json.body.dynamicFields ? '<tr><td style=\"padding: 6px 0; color: #94a3b8;\">بيانات إضافية:</td><td style=\"padding: 6px 0; color: #ffffff;\">' + $json.body.dynamicFields + '</td></tr>' : '' }}<tr><td style=\"padding: 6px 0; color: #94a3b8;\">البريد الإلكتروني:</td><td style=\"padding: 6px 0; color: #ffffff;\">{{ $json.body.email }}</td></tr><tr><td style=\"padding: 6px 0; color: #94a3b8;\">رقم الواتساب:</td><td style=\"padding: 6px 0; color: #ffffff;\">{{ $json.body.whatsapp }}</td></tr></table><div style=\"background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.08); padding: 14px; border-radius: 8px; margin-top: 16px;\"><strong style=\"color: #38bdf8;\">التفاصيل وملاحظات المتعامل:</strong><p style=\"margin: 6px 0 0 0; color: #e2e8f0; line-height: 1.5;\">{{ $json.body.modificationDetails }}</p></div>{{ $json.body.attachmentLink ? '<div style=\"margin-top: 16px;\"><a href=\"' + $json.body.attachmentLink + '\" target=\"_blank\" style=\"background: #0284c7; color: #ffffff; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: bold; display: inline-block;\">📄 معاينة وتنزيل المستند المرفوع (PDF)</a></div>' : '' }}{{ $json.body.quickActionLink ? '<div style=\"margin-top: 20px; text-align: center;\"><a href=\"' + $json.body.quickActionLink + '\" style=\"background: #2563eb; color: #ffffff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 1rem; display: inline-block; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);\">⚡ فتح صفحة الإجراء السريع للمسؤول</a></div>' : '' }}<hr style=\"border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 24px;\"/><p style=\"font-size: 0.8rem; color: #64748b; margin: 0; text-align: center;\">إشعار آلي داخلي للإدارة العامة للدفاع المدني - مملكة البحرين</p></div>",
@@ -550,7 +550,7 @@
       },
       {
         "parameters": {
-          "fromEmail": "mnaaaei@gmail.com",
+          "fromEmail": "gdcdvirtual@gmail.com",
           "toEmail": "={{ $json.body.email }}",
           "subject": "نسخة وتأكيد طلب الخدمة - الدفاع المدني بمملكة البحرين",
           "emailFormat": "html",
@@ -676,7 +676,7 @@
       },
       {
         "parameters": {
-          "fromEmail": "mnaaaei@gmail.com",
+          "fromEmail": "gdcdvirtual@gmail.com",
           "toEmail": "={{ $json.email }}",
           "subject": "تحديث حالة طلب الخدمة - الدفاع المدني للبحرين",
           "emailFormat": "html",
@@ -817,7 +817,7 @@
       },
       {
         "parameters": {
-          "fromEmail": "mnaaaei@gmail.com",
+          "fromEmail": "gdcdvirtual@gmail.com",
           "toEmail": "almannaei90@gmail.com",
           "subject": "⚠️ تنبيه للإدارة: طلب تعديل بيانات جديد",
           "emailFormat": "html",

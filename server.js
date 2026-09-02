@@ -41,6 +41,7 @@ const globalClientEmail = process.env.GOOGLE_CLIENT_EMAIL || "n8n-sheets-tracker
 const adminSecretKey = process.env.ADMIN_SECRET || "cd_admin_secure_pass_2026";
 const apiKey = process.env.ELEVENLABS_API_KEY || "896c43093392d23879dc8d578e7840b4a0b27af2ecf38803e985386b494c427c";
 const agentId = process.env.ELEVENLABS_AGENT_ID || "agent_1601kv6ytcwwfh1sfk46qqhrrq3j";
+const capturedLeadsMap = new Map();
 
 const masterServiceCatalogMap = {
   "safety_certificate_renewal": "إصدار شهادة استيفاء شروط واحتياجات الحماية والوقاية من الحريق وتجديدها",
@@ -1584,7 +1585,7 @@ async function executeAdminQuickAction(appId, action, reason) {
     const { sendAdminApplicationNotification, sendUserApplicationStatusEmail } = require('./scripts/admin_email_notifier');
     
     // 1. Direct Email Dispatch to Citizen / Applicant
-    const applicantEmail = targetRow[6] || process.env.ADMIN_EMAIL || 'mnaaaei@gmail.com';
+    const applicantEmail = targetRow[6] || process.env.ADMIN_EMAIL || 'gdcdvirtual@gmail.com';
     sendUserApplicationStatusEmail({
       appId,
       status: newStatus,
@@ -2803,7 +2804,7 @@ const server = http.createServer(async (req, res) => {
             clientName: `${appData.firstName || ''} ${appData.lastName || ''}`.trim(),
             email: appData.email || '',
             whatsapp: appData.whatsapp || '',
-            adminEmail: process.env.ADMIN_EMAIL || 'mnaaaei@gmail.com',
+            adminEmail: process.env.ADMIN_EMAIL || 'gdcdvirtual@gmail.com',
             modificationDetails: `طلب جديد تم تقديمه للتو لخدمة (${officialServiceName})`,
             quickActionLink: `${publicUrl}/admin/quick-action?id=${appId}&key=${adminSecretKey}`,
             attachmentLink: attachmentLink || '',
@@ -2963,7 +2964,7 @@ const server = http.createServer(async (req, res) => {
               ...updatedFields,
               appId,
               clientName: `${modData.firstName || ''} ${modData.lastName || ''}`.trim() || 'عزيزنا المتعامل',
-              adminEmail: process.env.ADMIN_EMAIL || 'mnaaaei@gmail.com',
+              adminEmail: process.env.ADMIN_EMAIL || 'gdcdvirtual@gmail.com',
               trackingLink: appDetails.trackingLink,
               quickActionLink: `${publicUrl}/admin/quick-action?id=${appId}&key=${adminSecretKey}`,
               isNewApplication: false,
@@ -3020,7 +3021,7 @@ const server = http.createServer(async (req, res) => {
               lastName: appDetails.lastName || '',
               email: appDetails.email || '',
               whatsapp: appDetails.whatsapp || '',
-              adminEmail: process.env.ADMIN_EMAIL || 'mnaaaei@gmail.com',
+              adminEmail: process.env.ADMIN_EMAIL || 'gdcdvirtual@gmail.com',
               quickActionLink: `${publicUrl}/admin/quick-action?id=${appId}&key=${adminSecretKey}`,
               attachmentLink: appDetails.attachmentLink || '',
               paymentMethod: appDetails.paymentMethod || '',
@@ -3103,7 +3104,8 @@ const server = http.createServer(async (req, res) => {
     req.on('end', async () => {
       try {
         const data = JSON.parse(body || '{}');
-        console.log(`[Post-Call Webhook] Received ElevenLabs post-call payload for conversation: ${data.conversation_id || 'unknown'}`);
+        const convId = data.conversation_id || data.conversationId || '';
+        console.log(`[Post-Call Webhook] Received ElevenLabs post-call payload for conversation: ${convId || 'unknown'}`);
         
         const summaryText = data.analysis?.transcript_summary || data.transcript_summary || 'تم إجراء مكالمة صوتية وتوثيق الاستفسار مع المساعد الذكي.';
         const userPhone = data.user_id || data.caller_phone || data.conversation_config?.user?.phone || '';
@@ -3116,9 +3118,89 @@ const server = http.createServer(async (req, res) => {
             duration: data.call_duration_secs ? `${Math.round(data.call_duration_secs)}s` : '1m 15s'
           });
         }
-        
+
+        // --- FULL CONVERSATION TRANSCRIPT EMAIL DISPATCH ---
+        const transcript = data.transcript || data.data?.transcript || data.conversation?.transcript || [];
+        let lead = (convId && capturedLeadsMap.get(convId)) || capturedLeadsMap.get('latest');
+
+        // If no memory match, attempt Google Sheets lookup for recent lead with email
+        if (!lead || !lead.clientEmail) {
+          try {
+            const spreadsheetId = "1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8";
+            const jwt = generateGoogleAccessToken(globalClientEmail, globalPrivateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
+            const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
+              method: "POST",
+              headers: { "Content-Type": "application/x-www-form-urlencoded" },
+              body: new URLSearchParams({ grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer", assertion: jwt })
+            });
+            if (tokenRes.ok) {
+              const { access_token } = await tokenRes.json();
+              const sheetRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Sheet1!A2:F100`, {
+                headers: { Authorization: `Bearer ${access_token}` }
+              });
+              if (sheetRes.ok) {
+                const sheetData = await sheetRes.json();
+                const rows = (sheetData.values || []).reverse();
+                const foundRow = rows.find(r => r[3] && r[3].includes('@'));
+                if (foundRow) {
+                  lead = { clientName: foundRow[1] || 'عزيزنا المتعامل', phoneNumber: foundRow[2] || '', clientEmail: foundRow[3] };
+                }
+              }
+            }
+          } catch (e) {
+            console.error("[Post-Call Webhook] Sheet lookup error:", e);
+          }
+        }
+
+        if (lead && lead.clientEmail && lead.clientEmail.includes('@')) {
+          function escapeHtml(text) {
+            if (!text) return '';
+            return String(text)
+              .replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;')
+              .replace(/"/g, '&quot;')
+              .replace(/'/g, '&#039;');
+          }
+
+          let bubblesHtml = '';
+          if (transcript && transcript.length > 0) {
+            bubblesHtml = transcript
+              .filter(t => t.message || t.original_message || t.text)
+              .map(t => {
+                const isUser = t.role === 'user' || t.source === 'user' || t.sender === 'user';
+                const rawText = t.original_message || t.message || t.text || '';
+                const text = escapeHtml(rawText).replace(/\n/g, '<br/>');
+                const name = isUser ? (lead.clientName || 'العميل') : 'المساعد الذكي للدفاع المدني';
+                const roleColor = isUser ? '#D4AF37' : '#38BDF8';
+                const bgStyle = isUser ? 'background: rgba(212, 175, 55, 0.08); border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 2px 14px 14px 14px;' : 'background: rgba(30, 41, 59, 0.95); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 14px 2px 14px 14px;';
+                const icon = isUser ? '👤 ' : '🤖 ';
+
+                return `<div style="margin-bottom: 14px; text-align: right;"><div style="font-size: 11px; font-weight: 700; color: ${roleColor}; margin-bottom: 4px; padding-right: 4px;">${icon}${escapeHtml(name)}</div><div style="${bgStyle} padding: 12px 16px; font-size: 13px; line-height: 1.6; color: #FFFFFF; box-shadow: 0 2px 8px rgba(0,0,0,0.25);">${text}</div></div>`;
+              }).join('');
+          } else if (summaryText) {
+            bubblesHtml = `<div style="background: rgba(30, 41, 59, 0.95); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 12px; padding: 16px; color: #F1F5F9; font-size: 13.5px; line-height: 1.6;"><strong style="color: #38BDF8;">ملخص واستفسارات الجلسة:</strong><p style="margin: 8px 0 0 0;">${escapeHtml(summaryText)}</p></div>`;
+          }
+
+          const { sendUserTranscriptEmail } = require('./scripts/admin_email_notifier');
+          sendUserTranscriptEmail({
+            clientName: lead.clientName,
+            userEmail: lead.clientEmail,
+            phoneNumber: lead.phoneNumber,
+            transcriptHtml: bubblesHtml
+          }).then(r => console.log(`[Post-Call Email] Dispatched FULL conversation transcript email to ${lead.clientEmail}:`, r.status))
+            .catch(err => console.error("[Post-Call Email] Error dispatching transcript email:", err));
+        }
+
+        // Forward to n8n
+        fetch('http://127.0.0.1:5678/webhook/post-call', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: body
+        }).catch(() => {});
+
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ status: 'received', conversation_id: data.conversation_id }));
+        res.end(JSON.stringify({ status: 'received', conversation_id: convId }));
       } catch (err) {
         console.error("Error handling post-call webhook:", err);
         res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -3358,6 +3440,13 @@ const server = http.createServer(async (req, res) => {
         const conversationId = params.conversationId || payload.conversationId || '';
 
         console.log(`[Webhook Leads Endpoint] Captured Lead Data - Name: ${clientName}, Phone: ${phoneNumber}, Email: ${clientEmail}`);
+
+        // Store lead data in memory for Post-Call Transcript Email matching
+        const leadObj = { clientName, phoneNumber, clientEmail, conversationId, timestamp: Date.now() };
+        if (conversationId) {
+          capturedLeadsMap.set(conversationId, leadObj);
+        }
+        capturedLeadsMap.set('latest', leadObj);
 
         // Append to Google Sheets Sheet1
         const spreadsheetId = "1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8";

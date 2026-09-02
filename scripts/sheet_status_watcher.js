@@ -149,7 +149,7 @@ async function checkStatusChangesOnce() {
 
         const recipientEmail = (customerEmail && customerEmail.includes('@')) 
           ? customerEmail 
-          : (process.env.ADMIN_EMAIL || 'mnaaaei@gmail.com');
+          : (process.env.ADMIN_EMAIL || 'gdcdvirtual@gmail.com');
 
         const baseUrl = process.env.PUBLIC_URL || "http://localhost:3000";
 

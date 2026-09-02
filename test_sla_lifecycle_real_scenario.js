@@ -263,7 +263,7 @@ async function runRealScenarioTest() {
     firstName: "خالد",
     lastName: "المناعي",
     whatsapp: "97335555563", // Compliance with Rule 12 standard test phone number
-    email: "mnaaaei@gmail.com",
+    email: "gdcdvirtual@gmail.com",
     referenceNumber: `REF-BAKERY-${testIdNum}`,
     attachmentLink: "http://localhost:3000/uploads/test_doc.pdf",
     trackingLink: `http://localhost:3000/track?id=${appId}`,

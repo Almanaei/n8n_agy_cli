@@ -265,7 +265,7 @@
     },
     {
       "parameters": {
-        "fromEmail": "mnaaaei@gmail.com",
+        "fromEmail": "gdcdvirtual@gmail.com",
         "toEmail": "={{ $json['Client Email'] }}",
         "subject": "📋 توثيق وسجل محادثتك مع المساعد الذكي - الإدارة العامة للدفاع المدني",
         "emailFormat": "html",
@@ -763,7 +763,7 @@
       },
       {
         "parameters": {
-          "fromEmail": "mnaaaei@gmail.com",
+          "fromEmail": "gdcdvirtual@gmail.com",
           "toEmail": "={{ $json['Client Email'] }}",
           "subject": "نسخة من محادثتك مع المساعد الذكي",
           "emailFormat": "html",

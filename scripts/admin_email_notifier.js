@@ -34,7 +34,7 @@ function createEmailTransporter() {
  * - 'Rejected'
  */
 async function sendAdminApplicationNotification(appData) {
-  const adminEmail = process.env.ADMIN_EMAIL || 'mnaaaei@gmail.com';
+  const adminEmail = process.env.ADMIN_EMAIL || 'gdcdvirtual@gmail.com';
   const appId = appData.appId || 'APP-UNKNOWN';
   const serviceName = appData.serviceName || 'خدمة الدفاع المدني';
   const clientName = `${appData.firstName || ''} ${appData.lastName || ''}`.trim() || appData.clientName || 'عزيزنا المتعامل';
@@ -250,7 +250,7 @@ async function sendAdminApplicationNotification(appData) {
  * status changes (specifically 'Modification Requested', 'Approved', 'Rejected').
  */
 async function sendUserApplicationStatusEmail(appData) {
-  const userEmail = appData.email || appData.userEmail || process.env.ADMIN_EMAIL || 'mnaaaei@gmail.com';
+  const userEmail = appData.email || appData.userEmail || process.env.ADMIN_EMAIL || 'gdcdvirtual@gmail.com';
   const appId = appData.appId || 'APP-UNKNOWN';
   const serviceName = appData.serviceName || 'خدمة الدفاع المدني';
   const clientName = `${appData.firstName || ''} ${appData.lastName || ''}`.trim() || appData.clientName || 'عزيزنا المتعامل';
@@ -581,8 +581,91 @@ async function sendUserApplicationStatusEmail(appData) {
   }
 }
 
+/**
+ * Dispatches an official Voice/Text AI Chat Transcript Email to the user when requested.
+ */
+async function sendUserTranscriptEmail({ clientName, userEmail, phoneNumber, transcriptText, transcriptHtml }) {
+  const recipient = userEmail || process.env.ADMIN_EMAIL || 'gdcdvirtual@gmail.com';
+  const name = clientName || 'عزيزنا المتعامل';
+  const phone = phoneNumber || 'غير مسجل';
+  const timestamp = new Date().toLocaleString('ar-BH', { timeZone: 'Asia/Bahrain' });
+
+  const subject = `📋 توثيق وسجل محادثتك مع المساعد الذكي - الإدارة العامة للدفاع المدني`;
+
+  const bodyHtml = transcriptHtml || `
+    <div dir="rtl" style="font-family: 'Cairo', 'Segoe UI', Tahoma, Arial, sans-serif; text-align: right; background-color: #0A0F1D; color: #F8FAFC; padding: 32px 24px; border-radius: 14px; max-width: 620px; margin: 0 auto; border: 1.5px solid #D4AF37; box-shadow: 0 12px 35px rgba(0,0,0,0.55);">
+      <div style="text-align: center; border-bottom: 2px solid #D4AF37; padding-bottom: 18px; margin-bottom: 22px;">
+        <h1 style="color: #FFFFFF; margin: 0 0 6px 0; font-size: 20px; font-weight: 700;">مملكة البحرين - وزارة الداخلية</h1>
+        <h2 style="color: #D4AF37; margin: 0 0 12px 0; font-size: 17px; font-weight: 600;">الإدارة العامة للدفاع المدني</h2>
+        <div style="display: inline-block; background: rgba(212, 175, 55, 0.12); border: 1px solid #D4AF37; border-radius: 30px; padding: 6px 20px;">
+          <span style="color: #F6E05E; font-size: 13px; font-weight: 700;">📋 توثيق المحادثة وسجل الاستفسارات الرسمية</span>
+        </div>
+      </div>
+
+      <p style="font-size: 16px; color: #FFFFFF; font-weight: 700; margin-bottom: 12px;">مرحباً بك <span style="color: #F6E05E;">${name}</span>،</p>
+      <p style="font-size: 14px; color: #CBD5E1; line-height: 1.6; margin-bottom: 20px;">نشكر تواصلك مع مركز خدمات الإدارة العامة للدفاع المدني بمملكة البحرين. بناءً على طلبك، نرفق لك التوثيق الكامل لسجل الحوار مع المساعد الذكي:</p>
+      
+      <div style="background: rgba(10, 16, 32, 0.8); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 14px 18px; margin-bottom: 20px; font-size: 13px;">
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr>
+            <td style="color: #94A3B8; padding: 4px 0; width: 130px;">👤 اسم المتعامل:</td>
+            <td style="color: #FFFFFF; font-weight: bold;">${name}</td>
+          </tr>
+          <tr>
+            <td style="color: #94A3B8; padding: 4px 0;">📞 رقم الهاتف:</td>
+            <td style="color: #FFFFFF; font-weight: bold;">${phone}</td>
+          </tr>
+          <tr>
+            <td style="color: #94A3B8; padding: 4px 0;">📅 التاريخ والتوقيت:</td>
+            <td style="color: #E2E8F0;">${timestamp}</td>
+          </tr>
+        </table>
+      </div>
+
+      <div style="background: #080D1A; border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 14px; padding: 20px; margin-bottom: 24px; font-size: 13.5px; line-height: 1.7; color: #F1F5F9; white-space: pre-wrap;">${transcriptText || 'تم توثيق بياناتك وتفاصيل محادثتك مع المساعد الذكي بنجاح.'}</div>
+
+      <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 24px 0 16px 0;" />
+      <div style="text-align: center; font-size: 0.8rem; color: #64748B; line-height: 1.6;">
+        <p style="margin: 0 0 4px 0; color: #94A3B8;">مركز خدمات الدفاع المدني الموحد: 17461100 • الطوارئ: 999</p>
+        <p style="margin: 0;">© 2026 الإدارة العامة للدفاع المدني - وزارة الداخلية - مملكة البحرين. جميع الحقوق محفوظة.</p>
+      </div>
+    </div>
+  `;
+
+  const plainTextSummary = `مملكة البحرين - وزارة الداخلية\nالإدارة العامة للدفاع المدني\n\nتأكيد وتوثيق المحادثة لـ: ${name}\nرقم الهاتف: ${phone}\nالتاريخ والتوقيت: ${timestamp}\n\nشكراً لتواصلك مع مركز خدمات الدفاع المدني. بناءً على طلبك، تم إرفاق توثيق المحادثة.\n\nمركز الخدمات الموحد: 17461100 • الطوارئ: 999`;
+
+  const transporter = createEmailTransporter();
+
+  if (!transporter) {
+    console.log(`[Transcript Email Engine] ℹ️ Outbound SMTP not configured. Transcript notification prepared for <${recipient}>.`);
+    return { status: 'simulated_or_unconfigured', recipient };
+  }
+
+  try {
+    const info = await transporter.sendMail({
+      from: `"Bahrain Civil Defense" <${process.env.SMTP_USER}>`,
+      to: recipient,
+      replyTo: process.env.SMTP_USER || 'gdcdvirtual@gmail.com',
+      subject,
+      text: plainTextSummary,
+      html: bodyHtml,
+      headers: {
+        'X-Auto-Response-Suppress': 'OOF, AutoReply',
+        'X-Report-Abuse-To': process.env.SMTP_USER || 'gdcdvirtual@gmail.com'
+      }
+    });
+
+    console.log(`[Transcript Email Engine] ✉️ Direct Transcript Email successfully delivered to <${recipient}> (MessageId: ${info.messageId}) ✅`);
+    return { status: 'sent', messageId: info.messageId, recipient, subject };
+  } catch (err) {
+    console.error(`[Transcript Email Engine] ❌ SMTP Transcript Email delivery failed for <${recipient}>:`, err.message);
+    return { status: 'failed', error: err.message, recipient };
+  }
+}
+
 module.exports = { 
   sendAdminApplicationNotification, 
   sendUserApplicationStatusEmail,
+  sendUserTranscriptEmail,
   createEmailTransporter 
 };
