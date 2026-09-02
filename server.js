@@ -1190,7 +1190,7 @@ async function appendServiceApplication(appData) {
   // Format dynamic fields cleanly without leaving unformatted JSON
   const dynamicFieldsStr = formatDynamicFields(appData.serviceName, appData.dynamicFields);
 
-  const baseUrl = appData.trackingLink ? appData.trackingLink.split('/track')[0] : 'http://localhost:3000';
+  const baseUrl = (process.env.PUBLIC_URL && !process.env.PUBLIC_URL.includes('localhost')) ? process.env.PUBLIC_URL.trim() : 'https://bhcdai.com';
 
   const rowValues = [
     appData.appId,

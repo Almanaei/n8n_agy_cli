@@ -30,7 +30,10 @@ function getBrowserExecutable() {
 async function generateApplicationPdfBuffer(appData, trackingUrl) {
   const isApproved = (appData.status || '').toLowerCase().includes('approved') || appData.status === 'Approved' || appData.status === 'معتمد';
   const appId = appData.appId || 'APP-20260828-0000';
-  const targetTrackingUrl = trackingUrl || `http://localhost:3000/track?id=${appId}`;
+  let targetTrackingUrl = trackingUrl || `https://bhcdai.com/track?id=${appId}`;
+  if (targetTrackingUrl.includes('localhost') || targetTrackingUrl.includes('127.0.0.1')) {
+    targetTrackingUrl = `https://bhcdai.com/track?id=${appId}`;
+  }
 
   // Generate QR Code data URL
   const qrDataUrl = await QRCode.toDataURL(targetTrackingUrl, {
