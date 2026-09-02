@@ -3120,9 +3120,28 @@ const server = http.createServer(async (req, res) => {
         }
 
         // --- FULL CONVERSATION TRANSCRIPT EMAIL DISPATCH ---
-        const transcript = data.transcript || data.data?.transcript || data.conversation?.transcript || [];
+        let transcript = data.transcript || data.data?.transcript || data.conversation?.transcript || [];
         let lead = (convId && capturedLeadsMap.get(convId)) || capturedLeadsMap.get('latest') || {};
         let targetEmail = lead.clientEmail || '';
+
+        // If payload transcript array is empty, fetch full transcript directly from ElevenLabs API
+        if ((!transcript || transcript.length === 0) && convId) {
+          try {
+            console.log(`[Post-Call Webhook] Fetching full transcript from ElevenLabs API for convId: ${convId}...`);
+            const apiRes = await fetch(`https://api.elevenlabs.io/v1/convai/conversations/${convId}`, {
+              headers: { "xi-api-key": apiKey }
+            });
+            if (apiRes.ok) {
+              const apiData = await apiRes.json();
+              if (apiData.transcript && apiData.transcript.length > 0) {
+                transcript = apiData.transcript;
+                console.log(`[Post-Call Webhook] ✅ Successfully fetched ${transcript.length} transcript turns from ElevenLabs API!`);
+              }
+            }
+          } catch (apiErr) {
+            console.error("[Post-Call Webhook] Exception fetching transcript from ElevenLabs API:", apiErr);
+          }
+        }
 
         // Extract email via regex from full payload if empty
         if (!targetEmail || !targetEmail.includes('@')) {
@@ -3183,19 +3202,23 @@ const server = http.createServer(async (req, res) => {
           let bubblesHtml = '';
           if (transcript && transcript.length > 0) {
             bubblesHtml = transcript
-              .filter(t => t.message || t.original_message || t.text)
               .map(t => {
-                const isUser = t.role === 'user' || t.source === 'user' || t.sender === 'user';
-                const rawText = t.original_message || t.message || t.text || '';
-                const text = escapeHtml(rawText).replace(/\n/g, '<br/>');
+                const role = (t.role || t.source || t.sender || '').toLowerCase();
+                const isUser = role === 'user';
+                const rawText = t.message || t.original_message || t.text || t.content || t.user_transcript || t.agent_response || t.statement || '';
+                if (!rawText || !rawText.trim()) return '';
+
+                const text = escapeHtml(rawText.trim()).replace(/\n/g, '<br/>');
                 const name = isUser ? (lead.clientName || 'العميل') : 'المساعد الذكي للدفاع المدني';
                 const roleColor = isUser ? '#D4AF37' : '#38BDF8';
                 const bgStyle = isUser ? 'background: rgba(212, 175, 55, 0.08); border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 2px 14px 14px 14px;' : 'background: rgba(30, 41, 59, 0.95); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 14px 2px 14px 14px;';
                 const icon = isUser ? '👤 ' : '🤖 ';
 
                 return `<div style="margin-bottom: 14px; text-align: right;"><div style="font-size: 11px; font-weight: 700; color: ${roleColor}; margin-bottom: 4px; padding-right: 4px;">${icon}${escapeHtml(name)}</div><div style="${bgStyle} padding: 12px 16px; font-size: 13px; line-height: 1.6; color: #FFFFFF; box-shadow: 0 2px 8px rgba(0,0,0,0.25);">${text}</div></div>`;
-              }).join('');
-          } else if (summaryText) {
+              }).filter(Boolean).join('');
+          }
+          
+          if (!bubblesHtml && summaryText) {
             bubblesHtml = `<div style="background: rgba(30, 41, 59, 0.95); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 12px; padding: 16px; color: #F1F5F9; font-size: 13.5px; line-height: 1.6;"><strong style="color: #38BDF8;">ملخص واستفسارات الجلسة:</strong><p style="margin: 8px 0 0 0;">${escapeHtml(summaryText)}</p></div>`;
           }
 
@@ -3316,134 +3339,25 @@ const server = http.createServer(async (req, res) => {
           };
         };
 
-        if (matchedRows.length === 1 || appId) {
-          const rec = formatRowRecord(matchedRows[0]);
-          let modGuidanceAr = rec.status === 'Modification Requested' ? " لمراجعة التفاصيل المطلوبة والتعديل، يُرجى مراجعة صفحة التتبع." : "";
-          let modGuidanceEn = rec.status === 'Modification Requested' ? " For detailed modification requests, please refer to your tracking page." : "";
-
-          let timingAr = "";
-          let timingEn = "";
-          if (rec.status === 'Approved' && rec.decisionDate) {
-            timingAr = `، وتم اعتماد الطلب رسمياً بتاريخ ${rec.decisionDate}`;
-            timingEn = `, officially approved on ${rec.decisionDate}`;
-            if (rec.slaCompletionTime) {
-              timingAr += ` واستغرقت مدة الإنجاز الفعلي ${rec.slaCompletionTime}`;
-              timingEn += ` with net SLA processing time of ${rec.slaCompletionTime}`;
-            }
-          }
-
-          const record = {
-            found: true,
-            multiple: false,
-            count: 1,
-            ...rec,
-            spokenSummaryAr: `أهلاً بك ${rec.clientName}! يوجد لديك طلب نشط لخدمة (${rec.serviceName}) وحالته الحالية هي (${rec.statusAr})${timingAr}.${modGuidanceAr} تم إرسال رقم الطلب ورابط التتبع مباشرة إلى رقم الواتساب الخاص بك.`,
-            spokenSummaryEn: `Welcome back ${rec.clientName}! You have an active application for ${rec.serviceName} currently (${rec.status})${timingEn}.${modGuidanceEn} Your Application ID and tracking link have been sent directly to your WhatsApp number.`
-          };
-
-          res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
-          res.end(JSON.stringify(record));
-          return;
-        }
-
-        // Multiple active applications (>1)
-        const appsList = matchedRows.map((r, idx) => ({ index: idx + 1, ...formatRowRecord(r) }));
-        const clientName = appsList[0].clientName;
-
-        const servicesListAr = appsList.map(a => `${a.index}) ${a.serviceName}`).join("، و");
-        const servicesListEn = appsList.map(a => `${a.index}) ${a.serviceName}`).join(", and ");
-
-        const spokenSummaryAr = `أهلاً بك ${clientName}! يوجد لديك ${appsList.length} طلبات نشطة: ${servicesListAr}. عن أي منهما تود الاستفسار؟ تم إرسال رقم الطلب ورابط التتبع مباشرة إلى رقم الواتساب الخاص بك.`;
-        const spokenSummaryEn = `Welcome back ${clientName}! I see you have ${appsList.length} active applications: ${servicesListEn}. Which one would you like to check? Your Application ID and tracking link have been sent directly to your WhatsApp number.`;
+        const records = matchedRows.map(formatRowRecord);
+        const primaryRecord = records[0];
 
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
         res.end(JSON.stringify({
           found: true,
-          multiple: true,
-          count: appsList.length,
-          clientName,
-          applications: appsList,
-          spokenSummaryAr,
-          spokenSummaryEn
+          count: records.length,
+          record: primaryRecord,
+          records: records
         }));
       } catch (err) {
-        console.error("Error looking up application:", err);
-        res.writeHead(500, { 'Content-Type': 'application/json; charset=utf-8' });
+        console.error("Error performing voice lookup:", err);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: err.message }));
       }
     });
-  } else if (pathname === '/api/voice/send-tracking-link' && (req.method === 'POST' || req.method === 'GET')) {
+  } else if (pathname === '/webhook/leads' && req.method === 'POST') {
     let body = '';
     req.on('data', chunk => { body += chunk.toString(); });
-    req.on('end', async () => {
-      try {
-        let params = {};
-        if (req.method === 'GET') {
-          const p = parsedUrl.searchParams.get('phone');
-          const a = parsedUrl.searchParams.get('appId');
-          params = { phone: p, appId: a };
-        } else {
-          try { params = JSON.parse(body); } catch (e) { params = {}; }
-        }
-
-        const phone = params.phone || params.whatsapp || '';
-        const appId = params.appId || params.app_id || '';
-
-        console.log(`[Voice Send Tracking Link] Dispatched link for phone: "${phone}", appId: "${appId}"...`);
-
-        let targetPhone = phone;
-        let trackingUrl = `http://localhost:3000/track?id=${appId || 'APP-UNKNOWN'}`;
-        let clientName = "عزيزنا المتعامل";
-
-        if (appId) {
-          const app = await getServiceApplication(appId);
-          if (app) {
-            if (app.trackingLink) trackingUrl = app.trackingLink;
-            if (app.whatsapp) targetPhone = app.whatsapp;
-            if (app.firstName) clientName = `${app.firstName} ${app.lastName || ''}`.trim();
-          }
-        }
-
-        // Execute Dual-Channel Notification Engine (WhatsApp Primary + SMS Fallback)
-        const dispatchResult = await sendDualChannelNotification({
-          phone: targetPhone,
-          appId,
-          trackingLink: trackingUrl,
-          clientName
-        });
-
-        // Forward to n8n workflow as backup
-        const isTest = targetPhone.includes('000000') || targetPhone.includes('35555563');
-        if (!isTest && targetPhone) {
-          fetch('http://127.0.0.1:5678/webhook/service-application', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              appId: appId,
-              whatsapp: targetPhone,
-              trackingLink: trackingUrl,
-              action: "send_tracking_link"
-            })
-          }).catch(err => console.error("Failed to forward tracking link to n8n:", err));
-        }
-
-        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
-        res.end(JSON.stringify({
-          success: true,
-          sent: true,
-          channel: dispatchResult.channel,
-          messageAr: "تم إرسال رابط التتبع بنجاح إلى رقم الواتساب الخاص بك.",
-          messageEn: "The tracking link has been successfully sent to your WhatsApp number."
-        }));
-      } catch (err) {
-        console.error("Error sending tracking link:", err);
-        res.writeHead(500, { 'Content-Type': 'application/json; charset=utf-8' });
-        res.end(JSON.stringify({ error: err.message }));
-      }
-    });
-  } else if ((pathname === '/webhook/leads' || pathname === '/api/save-lead') && req.method === 'POST') {
-    let body = '';
-    req.on('data', chunk => body += chunk);
     req.on('end', async () => {
       try {
         const payload = JSON.parse(body || '{}');
@@ -3528,22 +3442,6 @@ const server = http.createServer(async (req, res) => {
           headers: { 'Content-Type': 'application/json' },
           body: body
         }).catch(() => {});
-
-        // If clientEmail is provided mid-call, immediately dispatch confirmation & transcript email
-        if (clientEmail && clientEmail.includes('@')) {
-          try {
-            const { sendUserTranscriptEmail } = require('./scripts/admin_email_notifier');
-            sendUserTranscriptEmail({
-              clientName: clientName || 'عزيزنا المتعامل',
-              userEmail: clientEmail,
-              phoneNumber: phoneNumber || 'غير مسجل',
-              transcriptText: `تم توثيق وتأكيد بريدكم الإلكتروني (${clientEmail}) بنجاح لدى مركز خدمات الإدارة العامة للدفاع المدني بمملكة البحرين.`
-            }).then(r => console.log(`[Webhook Leads Email] ✅ Dispatched mid-call transcript confirmation email to <${clientEmail}>:`, r.status))
-              .catch(err => console.error("[Webhook Leads Email] ❌ Mid-call transcript email error:", err));
-          } catch (emailErr) {
-            console.error("[Webhook Leads Email] Exception:", emailErr);
-          }
-        }
 
         const resultSummary = `تم حفظ بيانات المتعامل ${clientName} برقم الهاتف ${phoneNumber} بنجاح لدى الإدارة العامة للدفاع المدني.`;
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
