@@ -4,18 +4,15 @@ const nodemailer = require('nodemailer');
 function createEmailTransporter() {
   const user = process.env.SMTP_USER || process.env.EMAIL_USER;
   const pass = process.env.SMTP_PASS || process.env.EMAIL_PASS;
-  const host = process.env.SMTP_HOST || 'smtp.gmail.com';
-  const port = parseInt(process.env.SMTP_PORT || '465', 10);
-  const secure = port === 465;
 
   if (!user || !pass) {
     return null;
   }
 
   return nodemailer.createTransport({
-    host,
-    port,
-    secure,
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
     auth: { user, pass },
     tls: {
       rejectUnauthorized: false

@@ -3121,10 +3121,20 @@ const server = http.createServer(async (req, res) => {
 
         // --- FULL CONVERSATION TRANSCRIPT EMAIL DISPATCH ---
         const transcript = data.transcript || data.data?.transcript || data.conversation?.transcript || [];
-        let lead = (convId && capturedLeadsMap.get(convId)) || capturedLeadsMap.get('latest');
+        let lead = (convId && capturedLeadsMap.get(convId)) || capturedLeadsMap.get('latest') || {};
+        let targetEmail = lead.clientEmail || '';
 
-        // If no memory match, attempt Google Sheets lookup for recent lead with email
-        if (!lead || !lead.clientEmail) {
+        // Extract email via regex from full payload if empty
+        if (!targetEmail || !targetEmail.includes('@')) {
+          const payloadStr = JSON.stringify(data);
+          const emailMatches = payloadStr.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g);
+          if (emailMatches && emailMatches.length > 0) {
+            targetEmail = emailMatches[0];
+          }
+        }
+
+        // If no memory/payload match, attempt Google Sheets lookup for recent lead with email
+        if (!targetEmail || !targetEmail.includes('@')) {
           try {
             const spreadsheetId = "1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8";
             const jwt = generateGoogleAccessToken(globalClientEmail, globalPrivateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
@@ -3143,7 +3153,9 @@ const server = http.createServer(async (req, res) => {
                 const rows = (sheetData.values || []).reverse();
                 const foundRow = rows.find(r => r[3] && r[3].includes('@'));
                 if (foundRow) {
-                  lead = { clientName: foundRow[1] || 'عزيزنا المتعامل', phoneNumber: foundRow[2] || '', clientEmail: foundRow[3] };
+                  targetEmail = foundRow[3];
+                  if (!lead.clientName) lead.clientName = foundRow[1] || 'عزيزنا المتعامل';
+                  if (!lead.phoneNumber) lead.phoneNumber = foundRow[2] || '';
                 }
               }
             }
@@ -3152,7 +3164,12 @@ const server = http.createServer(async (req, res) => {
           }
         }
 
-        if (lead && lead.clientEmail && lead.clientEmail.includes('@')) {
+        // Fallback to ADMIN_EMAIL if transcript was generated but no specific user email was captured
+        if (!targetEmail || !targetEmail.includes('@')) {
+          targetEmail = process.env.ADMIN_EMAIL || 'gdcdvirtual@gmail.com';
+        }
+
+        if (targetEmail && targetEmail.includes('@')) {
           function escapeHtml(text) {
             if (!text) return '';
             return String(text)
@@ -3184,12 +3201,12 @@ const server = http.createServer(async (req, res) => {
 
           const { sendUserTranscriptEmail } = require('./scripts/admin_email_notifier');
           sendUserTranscriptEmail({
-            clientName: lead.clientName,
-            userEmail: lead.clientEmail,
-            phoneNumber: lead.phoneNumber,
+            clientName: lead.clientName || 'عزيزنا المتعامل',
+            userEmail: targetEmail,
+            phoneNumber: lead.phoneNumber || 'غير مسجل',
             transcriptHtml: bubblesHtml
-          }).then(r => console.log(`[Post-Call Email] Dispatched FULL conversation transcript email to ${lead.clientEmail}:`, r.status))
-            .catch(err => console.error("[Post-Call Email] Error dispatching transcript email:", err));
+          }).then(r => console.log(`[Post-Call Email] ✅ Dispatched FULL conversation transcript email to <${targetEmail}>:`, r.status))
+            .catch(err => console.error("[Post-Call Email] ❌ Error dispatching transcript email:", err));
         }
 
         // Forward to n8n
