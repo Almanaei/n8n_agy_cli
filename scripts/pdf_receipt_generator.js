@@ -12,13 +12,17 @@ function getBrowserExecutable() {
   const edgePath = 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
   const chromePath = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
   const chromePath64 = 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe';
+  const linuxChromeStable = '/usr/bin/google-chrome-stable';
   const linuxChrome = '/usr/bin/google-chrome';
+  const linuxChromeOpt = '/opt/google/chrome/google-chrome';
   const linuxChromium = '/usr/bin/chromium-browser';
 
   if (fs.existsSync(edgePath)) return edgePath;
   if (fs.existsSync(chromePath)) return chromePath;
   if (fs.existsSync(chromePath64)) return chromePath64;
+  if (fs.existsSync(linuxChromeStable)) return linuxChromeStable;
   if (fs.existsSync(linuxChrome)) return linuxChrome;
+  if (fs.existsSync(linuxChromeOpt)) return linuxChromeOpt;
   if (fs.existsSync(linuxChromium)) return linuxChromium;
   return null;
 }
@@ -530,6 +534,8 @@ async function generateApplicationPdfBuffer(appData, trackingUrl) {
   return new Promise((resolve, reject) => {
     const args = [
       '--headless',
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
       '--disable-gpu',
       '--run-all-compositor-stages-before-draw',
       '--no-pdf-header-footer',
