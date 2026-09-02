@@ -44,10 +44,10 @@ async function sendAdminApplicationNotification(appData) {
   const clientName = `${appData.firstName || ''} ${appData.lastName || ''}`.trim() || appData.clientName || 'عزيزنا المتعامل';
   const phone = appData.whatsapp || appData.phone || 'غير متوفر';
   const applicantEmail = appData.email || 'غير متوفر';
-  const trackingLink = cleanUrl(appData.trackingLink, appId, 'track');
+  const trackingLink = `https://bhcdai.com/track?id=${appId}`;
   const attachmentLink = appData.attachmentLink || '';
-  const certificateLink = cleanUrl(appData.certificateLink, appId, 'receipt');
-  const quickActionLink = cleanUrl(appData.quickActionLink, appId, 'quick-action');
+  const certificateLink = `https://bhcdai.com/receipt?id=${appId}`;
+  const quickActionLink = `https://bhcdai.com/admin/quick-action?id=${appId}&key=${process.env.ADMIN_SECRET_KEY || 'cd_admin_secure_pass_2026'}`;
   
   // Status normalization
   let status = appData.status || (appData.isNewApplication ? 'Submitted' : 'Modification Resubmitted');
@@ -258,8 +258,8 @@ async function sendUserApplicationStatusEmail(appData) {
   const appId = appData.appId || 'APP-UNKNOWN';
   const serviceName = appData.serviceName || 'خدمة الدفاع المدني';
   const clientName = `${appData.firstName || ''} ${appData.lastName || ''}`.trim() || appData.clientName || 'عزيزنا المتعامل';
-  const trackingLink = cleanUrl(appData.trackingLink, appId, 'track');
-  const certificateLink = cleanUrl(appData.certificateLink, appId, 'receipt');
+  const trackingLink = `https://bhcdai.com/track?id=${appId}`;
+  const certificateLink = `https://bhcdai.com/receipt?id=${appId}`;
   const status = appData.status || 'Modification Requested';
   const reason = appData.reason || appData.modificationDetails || '';
 

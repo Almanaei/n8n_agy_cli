@@ -116,33 +116,33 @@ function escapeHtml(str) {
 function getSanitizedPublicUrl(req) {
   if (process.env.PUBLIC_URL && process.env.PUBLIC_URL.trim()) {
     let clean = process.env.PUBLIC_URL.trim();
-    if (!clean.startsWith('http://') && !clean.startsWith('https://')) {
-      clean = 'https://' + clean;
+    if (!clean.includes('localhost') && !clean.includes('127.0.0.1')) {
+      if (!clean.startsWith('http://') && !clean.startsWith('https://')) {
+        clean = 'https://' + clean;
+      }
+      return clean.replace(/\/+$/, '').replace(/^http:\/\//, 'https://');
     }
-    return clean.replace(/\/+$/, '').replace(/^http:\/\//, 'https://');
   }
 
   let host = req && req.headers ? (req.headers.host || '') : '';
   host = host.replace(/^(https?:\/\/)+/i, '').replace(/^\/+/, '');
 
-  let proto = 'https';
-  if (req && req.headers && req.headers['x-forwarded-proto']) {
-    proto = req.headers['x-forwarded-proto'].split(',')[0].trim();
+  if (host && !host.includes('localhost') && !host.includes('127.0.0.1')) {
+    let proto = 'https';
+    if (req && req.headers && req.headers['x-forwarded-proto']) {
+      proto = req.headers['x-forwarded-proto'].split(',')[0].trim();
+    }
+    if (host.includes('bhcdai.com') || host.includes('2.28.126.154')) {
+      proto = 'https';
+    }
+    let domain = `${proto}://${host}`;
+    if (domain.includes('http://https') || domain.includes('https://https')) {
+      domain = 'https://' + domain.replace(/^https?:\/*(https?:\/*)?/i, '');
+    }
+    return domain.replace(/\/+$/, '');
   }
 
-  if (host.includes('bhcdai.com') || host.includes('2.28.126.154')) {
-    proto = 'https';
-  }
-
-  if (!host) {
-    return 'https://bhcdai.com';
-  }
-
-  let domain = `${proto}://${host}`;
-  if (domain.includes('http://https') || domain.includes('https://https')) {
-    domain = 'https://' + domain.replace(/^https?:\/*(https?:\/*)?/i, '');
-  }
-  return domain.replace(/\/+$/, '');
+  return 'https://bhcdai.com';
 }
 
 function sanitizeTrackingLink(rawUrl, appId) {
@@ -1643,7 +1643,7 @@ async function executeAdminQuickAction(appId, action, reason) {
       reason: reason || '',
       modificationDetails: reason || '',
       trackingLink: trackingUrl,
-      certificateLink: `${baseUrl}/receipt?id=${appId}`
+      certificateLink: `${publicUrl}/receipt?id=${appId}`
     }).then(res => console.log(`[User Email Direct] Dispatched user status change email (${newStatus}) to <${applicantEmail}> for ${appId}:`, res.status))
       .catch(err => console.error(`[User Email Direct] User status change email error for ${appId}:`, err));
 
@@ -1659,8 +1659,8 @@ async function executeAdminQuickAction(appId, action, reason) {
       reason: reason || '',
       modificationDetails: reason || '',
       trackingLink: trackingUrl,
-      certificateLink: `${baseUrl}/receipt?id=${appId}`,
-      quickActionLink: `${baseUrl}/admin/quick-action?id=${appId}&key=${adminSecretKey}`
+      certificateLink: `${publicUrl}/receipt?id=${appId}`,
+      quickActionLink: `${publicUrl}/admin/quick-action?id=${appId}&key=${adminSecretKey}`
     }).then(res => console.log(`[Admin Email Direct] Dispatched admin status change email (${newStatus}) for ${appId}:`, res.status))
       .catch(err => console.error(`[Admin Email Direct] Status change email error for ${appId}:`, err));
   } catch (notifierErr) {
