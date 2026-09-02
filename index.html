@@ -4804,31 +4804,45 @@
             const targetItem = window.getServiceItem(serviceName);
             const key = targetItem ? targetItem.id : serviceName;
 
-            const firstName = document.getElementById('app-first-name').value.trim();
-            const lastName = document.getElementById('app-last-name').value.trim();
+            const firstNameEl = document.getElementById('app-first-name');
+            const lastNameEl = document.getElementById('app-last-name');
+            const whatsappEl = document.getElementById('app-whatsapp');
+            const emailEl = document.getElementById('app-email');
+            const refEl = document.getElementById('app-ref-number');
+            const paymentEl = document.getElementById('app-payment-method');
+            const notesEl = document.getElementById('app-notes');
+
+            const firstName = firstNameEl ? firstNameEl.value.trim() : '';
+            const lastName = lastNameEl ? lastNameEl.value.trim() : '';
             const countryCodeSelect = document.getElementById('app-country-code');
             const countryCode = countryCodeSelect ? countryCodeSelect.value : '';
-            const whatsapp = countryCode + document.getElementById('app-whatsapp').value.trim().replace(/\s+/g, '');
-            const email = document.getElementById('app-email').value.trim();
-            const referenceNumber = document.getElementById('app-ref-number').value.trim();
-            const paymentMethod = document.getElementById('app-payment-method').value;
-            const notes = document.getElementById('app-notes').value.trim();
+            const whatsapp = countryCode + (whatsappEl ? whatsappEl.value.trim().replace(/\s+/g, '') : '');
+            const email = emailEl ? emailEl.value.trim() : '';
+            const referenceNumber = refEl ? refEl.value.trim() : '';
+            const paymentMethod = paymentEl ? paymentEl.value : 'benefit_pay';
+            const notes = notesEl ? notesEl.value.trim() : '';
 
             let dynamicFields = {};
             if (['trainee_registration', 'trainee_registration_1day', 'trainee_registration_1week', 'heavy_fire_vehicle_driving_training', 'trainee_registration_16weeks', 'Trainee Registration'].includes(key)) {
                 dynamicFields.trainees = Array.from(document.querySelectorAll('.trainee-name-input')).map(i => i.value.trim());
             } else if (['safety_certificate_renewal', 'Safety Certificate Renewal'].includes(key)) {
-                dynamicFields.inspectionArea = parseInt(document.getElementById('app-inspection-area').value, 10);
+                const el = document.getElementById('app-inspection-area');
+                dynamicFields.inspectionArea = el ? parseInt(el.value || '0', 10) : 0;
             } else if (['hazardous_material_permit', 'Hazardous Material Permit'].includes(key)) {
-                dynamicFields.chemicalType = document.getElementById('app-chemical-type').value;
+                const el = document.getElementById('app-chemical-type');
+                dynamicFields.chemicalType = el ? el.value : '';
             } else if (['gas_selling_shops_license', 'Gas Selling Shops License'].includes(key)) {
-                dynamicFields.gasMinistryLetter = document.getElementById('app-gas-ministry-letter').value.trim();
+                const el = document.getElementById('app-gas-ministry-letter');
+                dynamicFields.gasMinistryLetter = el ? el.value.trim() : '';
             } else if (['bakery_license', 'Bakery License'].includes(key)) {
-                dynamicFields.bakeryDrawings = document.getElementById('app-bakery-drawings').value.trim();
+                const el = document.getElementById('app-bakery-drawings');
+                dynamicFields.bakeryDrawings = el ? el.value.trim() : '';
             } else if (['gold_shop_license', 'Gold Shop License'].includes(key)) {
-                dynamicFields.goldAlarmDetails = document.getElementById('app-gold-alarm-details').value.trim();
+                const el = document.getElementById('app-gold-alarm-details');
+                dynamicFields.goldAlarmDetails = el ? el.value.trim() : '';
             } else if (['gas_station_license', 'Gas Station License'].includes(key)) {
-                dynamicFields.stationCapacity = parseInt(document.getElementById('app-station-capacity').value, 10);
+                const el = document.getElementById('app-station-capacity');
+                dynamicFields.stationCapacity = el ? parseInt(el.value || '0', 10) : 0;
             } else {
                 const genericInput = document.getElementById('app-generic-details');
                 if (genericInput) {
