@@ -3431,15 +3431,32 @@ const server = http.createServer(async (req, res) => {
       try {
         const payload = JSON.parse(body || '{}');
         const params = payload.parameters || payload.body || payload;
-        const clientName = params.clientName || params.name || 'غير محدد';
-        const phoneNumber = params.phoneNumber || params.phone || params.mobile || '';
-        let clientEmail = params.clientEmail || params.email || '';
+        
+        function extractVal(obj, keys) {
+          if (!obj || typeof obj !== 'object') return '';
+          for (const k of keys) {
+            if (obj[k] !== undefined && obj[k] !== null && String(obj[k]).trim()) {
+              return String(obj[k]).trim();
+            }
+          }
+          for (const key in obj) {
+            if (typeof obj[key] === 'object' && obj[key] !== null) {
+              const res = extractVal(obj[key], keys);
+              if (res) return res;
+            }
+          }
+          return '';
+        }
+
+        const clientName = extractVal(payload, ['clientName', 'client_name', 'name', 'userName', 'user_name', 'fullName', 'full_name', 'الاسم', 'اسم']) || 'غير محدد';
+        const phoneNumber = extractVal(payload, ['phoneNumber', 'phone_number', 'phone', 'mobile', 'userPhone', 'user_phone', 'telephone', 'الهاتف', 'الجوال', 'رقم']) || '';
+        let clientEmail = extractVal(payload, ['clientEmail', 'client_email', 'email', 'userEmail', 'user_email', 'mail', 'البريد']) || '';
         if (clientEmail.includes('[at]')) {
           clientEmail = clientEmail.replace(/\s*\[at\]\s*/gi, '@');
         }
-        const conversationId = params.conversationId || payload.conversationId || '';
+        const conversationId = extractVal(payload, ['conversationId', 'conversation_id', 'id']) || '';
 
-        console.log(`[Webhook Leads Endpoint] Captured Lead Data - Name: ${clientName}, Phone: ${phoneNumber}, Email: ${clientEmail}`);
+        console.log(`[Webhook Leads Endpoint] Captured Lead Data - Name: ${clientName}, Phone: ${phoneNumber}, Email: ${clientEmail}, ConvID: ${conversationId}`);
 
         // Store lead data in memory for Post-Call Transcript Email matching
         const leadObj = { clientName, phoneNumber, clientEmail, conversationId, timestamp: Date.now() };
@@ -3471,7 +3488,7 @@ const server = http.createServer(async (req, res) => {
             conversationId,
             "New Lead (Captured)"
           ];
-          await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Sheet1!A:F:append?valueInputOption=USER_ENTERED`, {
+          const sheetRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Sheet1!A:F:append?valueInputOption=USER_ENTERED`, {
             method: "POST",
             headers: {
               "Authorization": `Bearer ${accessToken}`,
@@ -3479,7 +3496,13 @@ const server = http.createServer(async (req, res) => {
             },
             body: JSON.stringify({ values: [rowValues] })
           });
-          console.log(`[Webhook Leads Endpoint] Lead successfully saved to Google Sheets (Sheet1)!`);
+          if (sheetRes.ok) {
+            console.log(`[Webhook Leads Endpoint] ✅ Lead successfully saved to Google Sheets (Sheet1)!`);
+          } else {
+            console.error(`[Webhook Leads Endpoint] ❌ Google Sheets append error:`, await sheetRes.text());
+          }
+        } else {
+          console.error(`[Webhook Leads Endpoint] ❌ Google OAuth Token failed:`, await tokenRes.text());
         }
 
         // Forward to local n8n engine if active
@@ -3489,12 +3512,20 @@ const server = http.createServer(async (req, res) => {
           body: body
         }).catch(() => {});
 
+        const resultSummary = `تم حفظ بيانات المتعامل ${clientName} برقم الهاتف ${phoneNumber} بنجاح لدى الإدارة العامة للدفاع المدني.`;
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
-        res.end(JSON.stringify({ status: "success", message: "Lead saved successfully." }));
+        res.end(JSON.stringify({
+          result: resultSummary,
+          status: "success",
+          message: resultSummary,
+          clientName,
+          phoneNumber,
+          clientEmail
+        }));
       } catch (e) {
         console.error("[Webhook Leads Endpoint] Error:", e);
         res.writeHead(500, { 'Content-Type': 'application/json; charset=utf-8' });
-        res.end(JSON.stringify({ error: e.message }));
+        res.end(JSON.stringify({ error: e.message, result: "حدث خطأ أثناء حفظ البيانات." }));
       }
     });
   } else if (pathname === '/admin/quick-action' && req.method === 'GET') {

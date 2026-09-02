@@ -115,7 +115,7 @@ async function patchElevenLabs(baseUrl) {
         },
         request_body_schema: {
           type: "object",
-          required: ["conversationId"],
+          required: [],
           properties: {
             clientName: {
               type: "string",
