@@ -35,7 +35,7 @@ async function patchElevenLabs(baseUrl) {
   console.log(`[ElevenLabs] Starting patch flow with new URL: ${baseUrl}`);
   
   let activeWebhookId = null;
-  const targetUrl = `${baseUrl}/webhook/post-call`;
+  const targetUrl = process.env.PRODUCTION_WEBHOOK_URL || "https://bhcdai.com/webhook/post-call";
 
   // 1. Manage Webhooks dynamically
   try {
