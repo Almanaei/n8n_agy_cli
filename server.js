@@ -146,7 +146,7 @@ function getSanitizedPublicUrl(req) {
 }
 
 function sanitizeTrackingLink(rawUrl, appId) {
-  if (!rawUrl || typeof rawUrl !== 'string' || !rawUrl.trim()) {
+  if (!rawUrl || typeof rawUrl !== 'string' || !rawUrl.trim() || rawUrl.includes('localhost') || rawUrl.includes('127.0.0.1')) {
     return `https://bhcdai.com/track?id=${appId || 'APP-UNKNOWN'}`;
   }
   let clean = rawUrl.trim();

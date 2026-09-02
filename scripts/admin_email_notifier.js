@@ -21,29 +21,10 @@ function createEmailTransporter() {
 }
 
 function cleanUrl(inputUrl, appId, pathType = 'track') {
-  let domain = (process.env.PUBLIC_URL || 'https://bhcdai.com').trim();
-  domain = domain.replace(/^(https?:\/\/)+/i, '').replace(/\/+$/, '');
-  if (!domain || domain.includes('localhost') || domain.includes('127.0.0.1')) {
-    domain = 'bhcdai.com';
-  }
-  
-  if (!inputUrl || typeof inputUrl !== 'string' || inputUrl.includes('localhost') || inputUrl.includes('127.0.0.1')) {
-    if (pathType === 'receipt') return `https://${domain}/receipt?id=${appId}`;
-    if (pathType === 'quick-action') return `https://${domain}/admin/quick-action?id=${appId}&key=${process.env.ADMIN_SECRET_KEY || 'cd_admin_secret_key_2026'}`;
-    return `https://${domain}/track?id=${appId}`;
-  }
-
-  let clean = inputUrl.trim();
-  if (clean.includes('http://https') || clean.includes('https://https') || clean.includes('///')) {
-    clean = clean.replace(/^(https?:\/*)+/i, 'https://');
-  }
-  if (clean.startsWith('http://')) {
-    clean = clean.replace('http://', 'https://');
-  }
-  if (!clean.startsWith('https://')) {
-    clean = 'https://' + clean.replace(/^\/+/, '');
-  }
-  return clean;
+  const domain = 'bhcdai.com';
+  if (pathType === 'receipt') return `https://${domain}/receipt?id=${appId || ''}`;
+  if (pathType === 'quick-action') return `https://${domain}/admin/quick-action?id=${appId || ''}&key=${process.env.ADMIN_SECRET_KEY || 'cd_admin_secure_pass_2026'}`;
+  return `https://${domain}/track?id=${appId || ''}`;
 }
 
 /**
