@@ -592,9 +592,12 @@ async function sendUserTranscriptEmail({ clientName, userEmail, phoneNumber, tra
 
   const subject = `📋 توثيق وسجل محادثتك مع المساعد الذكي - الإدارة العامة للدفاع المدني`;
 
-  const bodyHtml = transcriptHtml || `
+  const bodyHtml = `
     <div dir="rtl" style="font-family: 'Cairo', 'Segoe UI', Tahoma, Arial, sans-serif; text-align: right; background-color: #0A0F1D; color: #F8FAFC; padding: 32px 24px; border-radius: 14px; max-width: 620px; margin: 0 auto; border: 1.5px solid #D4AF37; box-shadow: 0 12px 35px rgba(0,0,0,0.55);">
       <div style="text-align: center; border-bottom: 2px solid #D4AF37; padding-bottom: 18px; margin-bottom: 22px;">
+        <div style="margin-bottom: 14px; text-align: center;">
+          <img src="cid:civil_defense_logo" alt="شعار الإدارة العامة للدفاع المدني" width="90" style="display: block; margin: 0 auto 10px auto;" />
+        </div>
         <h1 style="color: #FFFFFF; margin: 0 0 6px 0; font-size: 20px; font-weight: 700;">مملكة البحرين - وزارة الداخلية</h1>
         <h2 style="color: #D4AF37; margin: 0 0 12px 0; font-size: 17px; font-weight: 600;">الإدارة العامة للدفاع المدني</h2>
         <div style="display: inline-block; background: rgba(212, 175, 55, 0.12); border: 1px solid #D4AF37; border-radius: 30px; padding: 6px 20px;">
@@ -622,7 +625,7 @@ async function sendUserTranscriptEmail({ clientName, userEmail, phoneNumber, tra
         </table>
       </div>
 
-      <div style="background: #080D1A; border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 14px; padding: 20px; margin-bottom: 24px; font-size: 13.5px; line-height: 1.7; color: #F1F5F9; white-space: pre-wrap;">${transcriptText || 'تم توثيق بياناتك وتفاصيل محادثتك مع المساعد الذكي بنجاح.'}</div>
+      ${transcriptHtml || `<div style="background: #080D1A; border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 14px; padding: 20px; margin-bottom: 24px; font-size: 13.5px; line-height: 1.7; color: #F1F5F9; white-space: pre-wrap;">${transcriptText || 'تم توثيق بياناتك وتفاصيل محادثتك مع المساعد الذكي بنجاح.'}</div>`}
 
       <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 24px 0 16px 0;" />
       <div style="text-align: center; font-size: 0.8rem; color: #64748B; line-height: 1.6;">
@@ -642,6 +645,7 @@ async function sendUserTranscriptEmail({ clientName, userEmail, phoneNumber, tra
   }
 
   try {
+    const path = require('path');
     const info = await transporter.sendMail({
       from: `"Bahrain Civil Defense" <${process.env.SMTP_USER}>`,
       to: recipient,
@@ -649,6 +653,13 @@ async function sendUserTranscriptEmail({ clientName, userEmail, phoneNumber, tra
       subject,
       text: plainTextSummary,
       html: bodyHtml,
+      attachments: [
+        {
+          filename: 'civil_defense_official_logo.png',
+          path: path.join(__dirname, '..', 'icons', 'civil_defense_official_logo.png'),
+          cid: 'civil_defense_logo'
+        }
+      ],
       headers: {
         'X-Auto-Response-Suppress': 'OOF, AutoReply',
         'X-Report-Abuse-To': process.env.SMTP_USER || 'gdcdvirtual@gmail.com'
