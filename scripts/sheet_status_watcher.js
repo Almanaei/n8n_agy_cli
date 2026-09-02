@@ -114,6 +114,7 @@ async function checkStatusChangesOnce() {
       const firstName = row[3] || '';
       const lastName = row[4] || '';
       const whatsapp = row[5] || '';
+      const customerEmail = row[6] || '';
       const rawLink = row[9] || '';
       let trackingLink = `https://bhcdai.com/track?id=${appId}`;
       const currentStatus = (row[12] || '').trim(); // Column M
