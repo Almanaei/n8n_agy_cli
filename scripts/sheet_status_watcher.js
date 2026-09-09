@@ -103,6 +103,7 @@ async function checkStatusChangesOnce() {
     }
 
     const updatesToSheet = [];
+    const now = Date.now();
 
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
@@ -110,37 +111,58 @@ async function checkStatusChangesOnce() {
       if (!appId) continue;
 
       const rowNumber = i + 1;
+      const timestampStr = row[1] || '';
       const serviceName = row[2] || 'خدمة الدفاع المدني';
       const firstName = row[3] || '';
       const lastName = row[4] || '';
       const whatsapp = row[5] || '';
       const customerEmail = row[6] || '';
-      const rawLink = row[9] || '';
-      let trackingLink = `https://bhcdai.com/track?id=${appId}`;
       const currentStatus = (row[12] || '').trim(); // Column M
-      const notes = row[13] || '';
+      const notes = row[13] || ''; // Column N
       const alertSent = (row[14] || '').trim(); // Column O
       const adminModRequest = row[15] || ''; // Column P
 
       const isInitialState = !currentStatus || 
-        currentStatus === 'Pending' || 
-        currentStatus === 'Submitted' ||
+        currentStatus.toLowerCase() === 'pending' || 
+        currentStatus.toLowerCase() === 'submitted' ||
         currentStatus === 'قيد الانتظار' ||
         currentStatus === 'جديد';
 
       const prev = statusTracker.get(appId);
-      
       let shouldNotify = false;
 
-      if (prev) {
-        // If status changed from previous in-memory state, ALWAYS notify!
-        if (prev.status !== currentStatus) {
+      if (!isInitialized) {
+        // Startup scan:
+        // 1. If alertSent matches currentStatus, it was already notified
+        if (alertSent && alertSent.toLowerCase() === currentStatus.toLowerCase()) {
+          shouldNotify = false;
+        } else if (alertSent === 'Yes') {
+          // Legacy row marked 'Yes': notify if created within the last 24 hours and non-initial
+          const rowTime = Date.parse(timestampStr);
+          const isRecent = !isNaN(rowTime) && (now - rowTime < 24 * 60 * 60 * 1000);
+          if (isRecent && !isInitialState) {
+            shouldNotify = true;
+          } else {
+            shouldNotify = false;
+          }
+        } else if (!isInitialState && alertSent.toLowerCase() !== currentStatus.toLowerCase()) {
+          // Status differs from Column O and not initial
           shouldNotify = true;
         }
       } else {
-        // On initial startup scan: notify if Column O was never marked 'Yes' and not default initial
-        if (alertSent !== 'Yes' && !isInitialState) {
-          shouldNotify = true;
+        // Live polling scan (subsequent passes):
+        if (prev) {
+          if (prev.status.toLowerCase() !== currentStatus.toLowerCase()) {
+            shouldNotify = true;
+          } else if (alertSent.toLowerCase() !== currentStatus.toLowerCase() && !isInitialState) {
+            // Sheet was updated externally
+            shouldNotify = true;
+          }
+        } else {
+          // New row detected while server running
+          if (!isInitialState && alertSent.toLowerCase() !== currentStatus.toLowerCase()) {
+            shouldNotify = true;
+          }
         }
       }
 
@@ -210,10 +232,10 @@ async function checkStatusChangesOnce() {
           }
         }
 
-        // 3. Queue update to Google Sheets to mark Alert Sent = 'Yes'
+        // 3. Queue update to Google Sheets to mark Alert Sent = currentStatus
         updatesToSheet.push({
           range: `${sheetName}!O${rowNumber}`,
-          values: [["Yes"]]
+          values: [[currentStatus]]
         });
 
         dispatchedAlerts.push({
@@ -226,7 +248,7 @@ async function checkStatusChangesOnce() {
         // Update in-memory tracker
         statusTracker.set(appId, {
           status: currentStatus,
-          alertSent: 'Yes',
+          alertSent: currentStatus,
           lastNotified: Date.now()
         });
       } else {
@@ -254,7 +276,7 @@ async function checkStatusChangesOnce() {
       });
 
       if (updateRes.ok) {
-        console.log(`[Sheet Status Watcher] ✅ Marked Alert Sent = 'Yes' for ${updatesToSheet.length} rows in Google Sheets.`);
+        console.log(`[Sheet Status Watcher] ✅ Recorded Alert Sent status for ${updatesToSheet.length} rows in Google Sheets.`);
       }
     }
 
@@ -301,7 +323,7 @@ if (require.main === module) {
 function markStatusAlertSent(appId, status) {
   statusTracker.set(appId, {
     status: status,
-    alertSent: 'Yes',
+    alertSent: status,
     lastNotified: Date.now()
   });
 }

@@ -149,7 +149,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\nconst output = [];\n\nfor (let i = 0; i < items.length; i++) {\n  const row = items[i].json;\n  const appId = row[\"Application ID\"];\n  const status = (row[\"Status\"] || '').trim();\n  const alertSent = (row[\"Alert Sent\"] || '').trim();\n  \n  // Ignore initial/default submission statuses (Pending, Submitted, جديد). Status changes like 'Under Review' or 'In Progress' MUST trigger alerts!\n  const isInitialStatus = !status || status === \"Pending\" || status === \"Submitted\" || status === \"جديد\" || status === \"قيد الانتظار\";\n  \n  if (appId && !isInitialStatus && alertSent !== \"Yes\") {\n    output.push({\n      json: {\n        rowNumber: i + 2, // Row index 0 is line 2\n        appId,\n        \"Application ID\": appId,\n        serviceName: row[\"Service Name\"],\n        firstName: row[\"User First Name\"],\n        lastName: row[\"User Last Name\"],\n        whatsapp: row[\"User WhatsApp Number\"],\n        email: row[\"User Email\"],\n        status,\n        modificationDetails: row[\"Admin Modification Request\"] || row[\"Modification Details\"] || \"\",\n        trackingLink: row[\"Tracking Link\"] || \"\"\n      }\n    });\n  }\n}\nreturn output;"
+        "jsCode": "const items = $input.all();\nconst output = [];\n\nfor (let i = 0; i < items.length; i++) {\n  const row = items[i].json;\n  const appId = row[\"Application ID\"];\n  const status = (row[\"Status\"] || '').trim();\n  const alertSent = (row[\"Alert Sent\"] || '').trim();\n  \n  // Ignore initial/default submission statuses (Pending, Submitted, جديد). Status changes like 'Under Review' or 'In Progress' MUST trigger alerts!\n  const isInitialStatus = !status || status.toLowerCase() === \"pending\" || status.toLowerCase() === \"submitted\" || status === \"جديد\" || status === \"قيد الانتظار\";\n  \n  if (appId && !isInitialStatus && alertSent.toLowerCase() !== status.toLowerCase()) {\n    output.push({\n      json: {\n        rowNumber: i + 2, // Row index 0 is line 2\n        appId,\n        \"Application ID\": appId,\n        serviceName: row[\"Service Name\"],\n        firstName: row[\"User First Name\"],\n        lastName: row[\"User Last Name\"],\n        whatsapp: row[\"User WhatsApp Number\"],\n        email: row[\"User Email\"],\n        status,\n        modificationDetails: row[\"Admin Modification Request\"] || row[\"Modification Details\"] || \"\",\n        trackingLink: row[\"Tracking Link\"] || \"\"\n      }\n    });\n  }\n}\nreturn output;"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -180,7 +180,7 @@
       "disabled": true,
       "credentials": {
         "smtp": {
-          "id": "GKD2HE4TOKeoXDkO",
+          "id": "Z5Yc1m5wGcq84bU8",
           "name": "SMTP account"
         }
       }

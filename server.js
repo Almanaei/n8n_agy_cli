@@ -1208,7 +1208,7 @@ async function appendServiceApplication(appData) {
     appData.paymentMethod,
     appData.status || "Submitted", // Status (Initial application status is Submitted)
     appData.notes || "",
-    "Yes", // Alert Sent (Initial confirmation already sent on submit)
+    appData.status || "Submitted", // Alert Sent (Col O: Records the exact status that was alerted)
     "", // Admin Modification Request (Col P)
     "", // User Modification Response (Col Q)
     `=HYPERLINK("${baseUrl}/admin/quick-action?id=${appData.appId}&key=${adminSecretKey}", "⚡ Quick Action")`, // Quick Admin Action (Col R)
