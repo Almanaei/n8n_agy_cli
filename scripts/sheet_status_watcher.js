@@ -122,31 +122,45 @@ async function checkStatusChangesOnce() {
       const alertSent = (row[14] || '').trim(); // Column O
       const adminModRequest = row[15] || ''; // Column P
 
-      const isDefaultInitial = !currentStatus || 
+      const isInitialState = !currentStatus || 
         currentStatus === 'Pending' || 
         currentStatus === 'Submitted' ||
         currentStatus === 'قيد الانتظار' ||
         currentStatus === 'جديد';
 
       const prev = statusTracker.get(appId);
-      const isStatusChanged = prev ? (prev.status !== currentStatus) : true;
-      const isAlertUnsent = alertSent !== 'Yes' && (!prev || prev.alertSent !== 'Yes' || prev.status !== currentStatus);
+      
+      let shouldNotify = false;
 
-      // Dispatch ONLY IF status has changed (or unsent) AND alert has NOT been marked 'Yes' yet!
-      const shouldNotify = !isDefaultInitial && isStatusChanged && isAlertUnsent;
+      if (prev) {
+        // If status changed from previous in-memory state, ALWAYS notify!
+        if (prev.status !== currentStatus) {
+          shouldNotify = true;
+        }
+      } else {
+        // On initial startup scan: notify if Column O was never marked 'Yes' and not default initial
+        if (alertSent !== 'Yes' && !isInitialState) {
+          shouldNotify = true;
+        }
+      }
 
       if (shouldNotify) {
         const isModReq = currentStatus.toLowerCase().includes('modification') && !currentStatus.toLowerCase().includes('resubmit');
         const effectiveReason = isModReq ? (adminModRequest || notes || '') : (notes || '');
 
+        let cleanCustomerEmail = (customerEmail || '').trim();
+        if (cleanCustomerEmail.includes('[at]')) {
+          cleanCustomerEmail = cleanCustomerEmail.replace(/\s*\[at\]\s*/gi, '@');
+        }
+
         console.log(`[Sheet Status Watcher] 🔔 DETECTED STATUS CHANGE for ${appId}:`);
         console.log(`   - Previous Status : '${prev ? prev.status : 'None'}'`);
         console.log(`   - Current Status  : '${currentStatus}' (Column M)`);
-        console.log(`   - Customer Email  : <${customerEmail || 'No email'}>`);
+        console.log(`   - Customer Email  : <${cleanCustomerEmail || 'No email'}>`);
         console.log(`   - Reason/Notes    : '${effectiveReason || 'N/A'}'`);
 
-        const recipientEmail = (customerEmail && customerEmail.includes('@')) 
-          ? customerEmail 
+        const recipientEmail = (cleanCustomerEmail && cleanCustomerEmail.includes('@')) 
+          ? cleanCustomerEmail 
           : (process.env.ADMIN_EMAIL || 'support@bhcdai.com');
 
         const envBase = (process.env.APP_URL || process.env.BASE_URL || process.env.PUBLIC_URL || 'https://bhcdai.com').trim().replace(/\/+$/, '');
