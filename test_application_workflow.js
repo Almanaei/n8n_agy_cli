@@ -70,8 +70,10 @@ async function runTest() {
     notes: "هذا الطلب تم إرساله آلياً عبر نظام الفحص البرمجي التلقائي."
   };
 
+  const baseUrl = process.env.PUBLIC_URL || 'https://bhcdai.com';
+
   console.log("\n1. Simulating Form Submission (POST /api/applications)...");
-  const submitRes = await fetch("http://localhost:3000/api/applications", {
+  const submitRes = await fetch(`${baseUrl}/api/applications`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(appPayload)
@@ -120,7 +122,7 @@ async function runTest() {
   }
 
   console.log("\n4. Fetching the Tracking page (GET /track)...");
-  const trackRes = await fetch(`http://localhost:3000/track?id=${appId}`);
+  const trackRes = await fetch(`${baseUrl}/track?id=${appId}`);
   if (!trackRes.ok) {
     throw new Error(`Tracking page failed to load: ${trackRes.status}`);
   }
@@ -169,7 +171,7 @@ async function runTest() {
     appId,
     modificationDetails: "أرجو تصحيح اسم المتدرب الثاني ليكون 'حسين بن حسن' بدلاً من 'حسين حسن'."
   };
-  const modifyRes = await fetch("http://localhost:3000/api/applications/modify", {
+  const modifyRes = await fetch(`${baseUrl}/api/applications/modify`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(modifyPayload)

@@ -50,6 +50,7 @@
         -10
       ],
       "id": "email-submit-app-id",
+      "disabled": true,
       "name": "Send Submit Email",
       "credentials": {
         "smtp": {
@@ -176,6 +177,7 @@
       ],
       "id": "email-alert-id",
       "name": "Send Alert Email",
+      "disabled": true,
       "credentials": {
         "smtp": {
           "id": "GKD2HE4TOKeoXDkO",
@@ -349,6 +351,7 @@
       ],
       "id": "email-admin-notify-id",
       "name": "Send Email to Admin",
+      "disabled": true,
       "credentials": {
         "smtp": {
           "id": "GKD2HE4TOKeoXDkO",

@@ -1,6 +1,7 @@
 const WebSocket = require('ws');
 
-const wsUrl = "ws://localhost:3000/stream";
+const wsHost = process.env.PUBLIC_URL ? process.env.PUBLIC_URL.replace(/^http/, 'ws') : "wss://bhcdai.com";
+const wsUrl = `${wsHost}/stream`;
 console.log(`[Simulator] Starting knowledge base integration simulation...`);
 
 const ws = new WebSocket(wsUrl);

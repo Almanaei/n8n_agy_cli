@@ -1,5 +1,27 @@
 // scripts/admin_email_notifier.js - Bahrain Civil Defense Multi-Status Admin Email Engine
 const nodemailer = require('nodemailer');
+const path = require('path');
+const fs = require('fs');
+
+try {
+  const envPath = path.resolve(__dirname, '../.env');
+  if (fs.existsSync(envPath)) {
+    const envContent = fs.readFileSync(envPath, 'utf8');
+    envContent.split(/\r?\n/).forEach(line => {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) return;
+      const index = trimmed.indexOf('=');
+      if (index > 0) {
+        const key = trimmed.substring(0, index).trim();
+        let value = trimmed.substring(index + 1).trim();
+        if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+          value = value.substring(1, value.length - 1);
+        }
+        process.env[key] = value;
+      }
+    });
+  }
+} catch (e) {}
 
 function createEmailTransporter() {
   const user = process.env.SMTP_USER || process.env.EMAIL_USER;
@@ -9,15 +31,73 @@ function createEmailTransporter() {
     return null;
   }
 
+  const host = process.env.SMTP_HOST || 'smtp.gmail.com';
+  const port = 587;
+  const secure = false;
+
   return nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
+    host: host,
+    port: port,
+    secure: secure,
     auth: { user, pass },
     tls: {
       rejectUnauthorized: false
     }
   });
+}
+
+async function sendBrevoEmail({ to, subject, htmlContent, senderName, senderEmail, attachments }) {
+  const brevoApiKey = process.env.BREVO_API_KEY;
+  const fromEmail = senderEmail || process.env.SENDER_EMAIL || "support@bhcdai.com";
+  const replyEmail = process.env.REPLY_EMAIL || "support@bhcdai.com";
+  const fromName = senderName || "Bahrain Civil Defense Support";
+
+  try {
+    const payload = {
+      sender: { name: fromName, email: fromEmail },
+      to: Array.isArray(to) ? to.map(e => (typeof e === 'string' ? { email: e } : e)) : [{ email: to }],
+      replyTo: { name: "Bahrain Civil Defense Support", email: replyEmail },
+      subject: subject,
+      htmlContent: htmlContent
+    };
+
+    if (attachments && attachments.length > 0) {
+      payload.attachment = attachments.map(att => {
+        if (att.content && att.filename) {
+          return { content: att.content, name: att.filename };
+        } else if (att.path && att.filename) {
+          try {
+            const fileData = fs.readFileSync(att.path);
+            return { content: fileData.toString('base64'), name: att.filename };
+          } catch (e) {
+            return null;
+          }
+        }
+        return null;
+      }).filter(Boolean);
+    }
+
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        "accept": "application/json",
+        "api-key": brevoApiKey,
+        "content-type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const resJson = await response.json();
+    if (response.ok) {
+      return { status: 'sent', messageId: resJson.messageId, recipient: to, subject };
+    } else {
+      console.error("[Brevo API Error]", resJson);
+      return { status: 'failed', error: resJson.message || JSON.stringify(resJson), recipient: to };
+    }
+  } catch (err) {
+    console.error("[Brevo API Exception]", err.message);
+    return { status: 'failed', error: err.message, recipient: to };
+  }
 }
 
 function cleanUrl(inputUrl, appId, pathType = 'track') {
@@ -38,16 +118,18 @@ function cleanUrl(inputUrl, appId, pathType = 'track') {
  * - 'Rejected'
  */
 async function sendAdminApplicationNotification(appData) {
-  const adminEmail = process.env.ADMIN_EMAIL || 'gdcdvirtual@gmail.com';
+  const envBase = (process.env.APP_URL || process.env.BASE_URL || process.env.PUBLIC_URL || 'https://bhcdai.com').trim().replace(/\/+$/, '');
+  const baseUrl = (!envBase.includes('localhost') && !envBase.includes('127.0.0.1')) ? envBase : 'https://bhcdai.com';
+  const adminEmail = appData.adminEmail || process.env.ADMIN_EMAIL || 'support@bhcdai.com';
   const appId = appData.appId || 'APP-UNKNOWN';
   const serviceName = appData.serviceName || 'خدمة الدفاع المدني';
   const clientName = `${appData.firstName || ''} ${appData.lastName || ''}`.trim() || appData.clientName || 'عزيزنا المتعامل';
   const phone = appData.whatsapp || appData.phone || 'غير متوفر';
   const applicantEmail = appData.email || 'غير متوفر';
-  const trackingLink = `https://bhcdai.com/track?id=${appId}`;
+  const trackingLink = `${baseUrl}/track?id=${appId}`;
   const attachmentLink = appData.attachmentLink || '';
-  const certificateLink = `https://bhcdai.com/receipt?id=${appId}`;
-  const quickActionLink = `https://bhcdai.com/admin/quick-action?id=${appId}&key=${process.env.ADMIN_SECRET_KEY || 'cd_admin_secure_pass_2026'}`;
+  const certificateLink = `${baseUrl}/receipt?id=${appId}`;
+  const quickActionLink = `${baseUrl}/admin/quick-action?id=${appId}&key=${process.env.ADMIN_SECRET_KEY || 'cd_admin_secure_pass_2026'}`;
   
   // Status normalization
   let status = appData.status || (appData.isNewApplication ? 'Submitted' : 'Modification Resubmitted');
@@ -220,6 +302,23 @@ async function sendAdminApplicationNotification(appData) {
     </div>
   `;
 
+  // Primary Brevo API Dispatch
+  try {
+    const brevoRes = await sendBrevoEmail({
+      to: adminEmail,
+      subject,
+      htmlContent: htmlBody,
+      senderName: "Bahrain Civil Defense Support",
+      senderEmail: process.env.SENDER_EMAIL || "support@bhcdai.com"
+    });
+    if (brevoRes.status === 'sent') {
+      console.log(`[Admin Email Engine] ✉️ Direct Admin Notification Email delivered via Brevo API to ${adminEmail} for status (${status}) (MessageId: ${brevoRes.messageId}) ✅`);
+      return { status: 'sent', messageId: brevoRes.messageId, recipient: adminEmail, appStatus: status, subject };
+    }
+  } catch (brevoErr) {
+    console.warn(`[Admin Email Engine] Brevo API fallback to SMTP:`, brevoErr.message);
+  }
+
   const transporter = createEmailTransporter();
 
   if (!transporter) {
@@ -235,7 +334,7 @@ async function sendAdminApplicationNotification(appData) {
 
   try {
     const info = await transporter.sendMail({
-      from: `"Civil Defense Alerts" <${process.env.SMTP_USER}>`,
+      from: `"Bahrain Civil Defense Support" <${process.env.SENDER_EMAIL || process.env.SMTP_USER || 'support@bhcdai.com'}>`,
       to: adminEmail,
       subject,
       html: htmlBody
@@ -254,12 +353,14 @@ async function sendAdminApplicationNotification(appData) {
  * status changes (specifically 'Modification Requested', 'Approved', 'Rejected').
  */
 async function sendUserApplicationStatusEmail(appData) {
-  const userEmail = appData.email || appData.userEmail || process.env.ADMIN_EMAIL || 'gdcdvirtual@gmail.com';
+  const envBase = (process.env.APP_URL || process.env.BASE_URL || process.env.PUBLIC_URL || 'https://bhcdai.com').trim().replace(/\/+$/, '');
+  const baseUrl = (!envBase.includes('localhost') && !envBase.includes('127.0.0.1')) ? envBase : 'https://bhcdai.com';
+  const userEmail = appData.email || appData.userEmail || process.env.ADMIN_EMAIL || 'support@bhcdai.com';
   const appId = appData.appId || 'APP-UNKNOWN';
   const serviceName = appData.serviceName || 'خدمة الدفاع المدني';
   const clientName = `${appData.firstName || ''} ${appData.lastName || ''}`.trim() || appData.clientName || 'عزيزنا المتعامل';
-  const trackingLink = `https://bhcdai.com/track?id=${appId}`;
-  const certificateLink = `https://bhcdai.com/receipt?id=${appId}`;
+  const trackingLink = `${baseUrl}/track?id=${appId}`;
+  const certificateLink = `${baseUrl}/receipt?id=${appId}`;
   const status = appData.status || 'Modification Requested';
   const reason = appData.reason || appData.modificationDetails || '';
 
@@ -556,6 +657,23 @@ async function sendUserApplicationStatusEmail(appData) {
     </div>
   `;
 
+  // Primary Brevo API Dispatch
+  try {
+    const brevoRes = await sendBrevoEmail({
+      to: userEmail,
+      subject,
+      htmlContent: htmlBody,
+      senderName: "Bahrain Civil Defense Support",
+      senderEmail: process.env.SENDER_EMAIL || "support@bhcdai.com"
+    });
+    if (brevoRes.status === 'sent') {
+      console.log(`[User Email Engine] ✉️ Direct User Status Notification Email (${status}) delivered via Brevo API to <${userEmail}> (MessageId: ${brevoRes.messageId}) ✅`);
+      return { status: 'sent', messageId: brevoRes.messageId, recipient: userEmail, appStatus: status, subject };
+    }
+  } catch (brevoErr) {
+    console.warn(`[User Email Engine] Brevo API fallback to SMTP:`, brevoErr.message);
+  }
+
   const transporter = createEmailTransporter();
 
   if (!transporter) {
@@ -571,7 +689,8 @@ async function sendUserApplicationStatusEmail(appData) {
 
   try {
     const info = await transporter.sendMail({
-      from: `"Bahrain Civil Defense" <${process.env.SMTP_USER}>`,
+      from: `"Bahrain Civil Defense Support" <${process.env.SENDER_EMAIL || process.env.SMTP_USER || 'support@bhcdai.com'}>`,
+      replyTo: process.env.SENDER_EMAIL || process.env.SMTP_USER || 'support@bhcdai.com',
       to: userEmail,
       subject,
       html: htmlBody
@@ -588,8 +707,8 @@ async function sendUserApplicationStatusEmail(appData) {
 /**
  * Dispatches an official Voice/Text AI Chat Transcript Email to the user when requested.
  */
-async function sendUserTranscriptEmail({ clientName, userEmail, phoneNumber, transcriptText, transcriptHtml }) {
-  const recipient = userEmail || process.env.ADMIN_EMAIL || 'gdcdvirtual@gmail.com';
+async function sendUserTranscriptEmail({ clientName, userEmail, email, phoneNumber, transcriptText, transcriptHtml }) {
+  const recipient = userEmail || email || process.env.ADMIN_EMAIL || 'support@bhcdai.com';
   const name = clientName || 'عزيزنا المتعامل';
   const phone = phoneNumber || 'غير مسجل';
   const timestamp = new Date().toLocaleString('ar-BH', { timeZone: 'Asia/Bahrain' });
@@ -641,6 +760,23 @@ async function sendUserTranscriptEmail({ clientName, userEmail, phoneNumber, tra
 
   const plainTextSummary = `مملكة البحرين - وزارة الداخلية\nالإدارة العامة للدفاع المدني\n\nتأكيد وتوثيق المحادثة لـ: ${name}\nرقم الهاتف: ${phone}\nالتاريخ والتوقيت: ${timestamp}\n\nشكراً لتواصلك مع مركز خدمات الدفاع المدني. بناءً على طلبك، تم إرفاق توثيق المحادثة.\n\nمركز الخدمات الموحد: 17461100 • الطوارئ: 999`;
 
+  // Primary Brevo API Dispatch
+  try {
+    const brevoRes = await sendBrevoEmail({
+      to: recipient,
+      subject,
+      htmlContent: bodyHtml,
+      senderName: "Bahrain Civil Defense Support",
+      senderEmail: process.env.SENDER_EMAIL || "support@bhcdai.com"
+    });
+    if (brevoRes.status === 'sent') {
+      console.log(`[Transcript Email Engine] ✉️ Direct Transcript Email delivered via Brevo API to <${recipient}> (MessageId: ${brevoRes.messageId}) ✅`);
+      return { status: 'sent', messageId: brevoRes.messageId, recipient, subject };
+    }
+  } catch (brevoErr) {
+    console.warn(`[Transcript Email Engine] Brevo API fallback to SMTP:`, brevoErr.message);
+  }
+
   const transporter = createEmailTransporter();
 
   if (!transporter) {
@@ -651,9 +787,9 @@ async function sendUserTranscriptEmail({ clientName, userEmail, phoneNumber, tra
   try {
     const path = require('path');
     const info = await transporter.sendMail({
-      from: `"Bahrain Civil Defense" <${process.env.SMTP_USER}>`,
+      from: `"Bahrain Civil Defense Support" <${process.env.SENDER_EMAIL || process.env.SMTP_USER || 'support@bhcdai.com'}>`,
       to: recipient,
-      replyTo: process.env.SMTP_USER || 'gdcdvirtual@gmail.com',
+      replyTo: process.env.SENDER_EMAIL || process.env.SMTP_USER || 'support@bhcdai.com',
       subject,
       text: plainTextSummary,
       html: bodyHtml,
@@ -666,7 +802,7 @@ async function sendUserTranscriptEmail({ clientName, userEmail, phoneNumber, tra
       ],
       headers: {
         'X-Auto-Response-Suppress': 'OOF, AutoReply',
-        'X-Report-Abuse-To': process.env.SMTP_USER || 'gdcdvirtual@gmail.com'
+        'X-Report-Abuse-To': process.env.SENDER_EMAIL || process.env.SMTP_USER || 'support@bhcdai.com'
       }
     });
 

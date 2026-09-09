@@ -114,8 +114,9 @@ function escapeHtml(str) {
 }
 
 function getSanitizedPublicUrl(req) {
-  if (process.env.PUBLIC_URL && process.env.PUBLIC_URL.trim()) {
-    let clean = process.env.PUBLIC_URL.trim();
+  const envUrl = process.env.APP_URL || process.env.BASE_URL || process.env.PUBLIC_URL;
+  if (envUrl && typeof envUrl === 'string' && envUrl.trim()) {
+    let clean = envUrl.trim();
     if (!clean.includes('localhost') && !clean.includes('127.0.0.1')) {
       if (!clean.startsWith('http://') && !clean.startsWith('https://')) {
         clean = 'https://' + clean;
@@ -1531,7 +1532,7 @@ async function executeAdminQuickAction(appId, action, reason) {
     valueInputOption: "USER_ENTERED",
     data: [
       { range: `${sheetName}!M${rowNum}`, values: [[statusValue]] },
-      { range: `${sheetName}!O${rowNum}`, values: [[""]] }
+      { range: `${sheetName}!O${rowNum}`, values: [["Yes"]] }
     ]
   };
 
@@ -1595,7 +1596,7 @@ async function executeAdminQuickAction(appId, action, reason) {
   });
   if (!updateRes.ok) throw new Error("Failed to execute admin action");
 
-  const publicUrl = getSanitizedPublicUrl(req);
+  const publicUrl = getSanitizedPublicUrl();
   const newStatus = action === 'approve' ? 'Approved' : (action === 'reject' ? 'Rejected' : 'Modification Requested');
   const trackingUrl = sanitizeTrackingLink(`${publicUrl}/track?id=${appId}`, appId);
 
@@ -1629,9 +1630,13 @@ async function executeAdminQuickAction(appId, action, reason) {
   // Direct Multi-Target Status Email Notifications (Applicant/User + Admin)
   try {
     const { sendAdminApplicationNotification, sendUserApplicationStatusEmail } = require('./scripts/admin_email_notifier');
+    const { markStatusAlertSent } = require('./scripts/sheet_status_watcher');
+    
+    // Mark status alert sent in watcher memory map immediately so poller skips duplicate execution
+    markStatusAlertSent(appId, newStatus);
     
     // 1. Direct Email Dispatch to Citizen / Applicant
-    const applicantEmail = targetRow[6] || process.env.ADMIN_EMAIL || 'gdcdvirtual@gmail.com';
+    const applicantEmail = targetRow[6] || process.env.ADMIN_EMAIL || 'support@bhcdai.com';
     sendUserApplicationStatusEmail({
       appId,
       status: newStatus,
@@ -2834,33 +2839,7 @@ const server = http.createServer(async (req, res) => {
         }).then(res => console.log(`[Application Created] Single Cellular SMS dispatched for ${appId}:`, res))
           .catch(err => console.error(`[Application Created] Failed to send SMS for ${appId}:`, err));
 
-        // Forward to n8n with skipSms: true to prevent duplicate secondary SMS dispatch
-        fetch('http://127.0.0.1:5678/webhook/service-application', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...fullAppData, trackingLink, skipSms: true })
-        }).catch(err => console.error("Failed to forward app to n8n webhook:", err));
-
-        fetch('http://127.0.0.1:5678/webhook/admin-notification', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            appId,
-            serviceName: officialServiceName,
-            clientName: `${appData.firstName || ''} ${appData.lastName || ''}`.trim(),
-            email: appData.email || '',
-            whatsapp: appData.whatsapp || '',
-            adminEmail: process.env.ADMIN_EMAIL || 'gdcdvirtual@gmail.com',
-            modificationDetails: `طلب جديد تم تقديمه للتو لخدمة (${officialServiceName})`,
-            quickActionLink: `${publicUrl}/admin/quick-action?id=${appId}&key=${adminSecretKey}`,
-            attachmentLink: attachmentLink || '',
-            paymentMethod: appData.paymentMethod || '',
-            dynamicFields: appData.dynamicFields || '',
-            notes: appData.notes || '',
-            isNewApplication: true
-          })
-        }).then(r => console.log(`[Admin Notification] Forwarded new application alert (${appId}) to n8n admin webhook: HTTP ${r.status}`))
-          .catch(err => console.error("Failed to forward new app alert to n8n admin webhook:", err));
+        // Express Server is the single authoritative email engine. Skipping duplicate n8n webhook forwarding.
 
         // Direct Admin Email Alert via Nodemailer Engine
         try {
@@ -3010,7 +2989,7 @@ const server = http.createServer(async (req, res) => {
               ...updatedFields,
               appId,
               clientName: `${modData.firstName || ''} ${modData.lastName || ''}`.trim() || 'عزيزنا المتعامل',
-              adminEmail: process.env.ADMIN_EMAIL || 'gdcdvirtual@gmail.com',
+              adminEmail: process.env.ADMIN_EMAIL || 'support@bhcdai.com',
               trackingLink: appDetails.trackingLink,
               quickActionLink: `${publicUrl}/admin/quick-action?id=${appId}&key=${adminSecretKey}`,
               isNewApplication: false,
@@ -3067,7 +3046,7 @@ const server = http.createServer(async (req, res) => {
               lastName: appDetails.lastName || '',
               email: appDetails.email || '',
               whatsapp: appDetails.whatsapp || '',
-              adminEmail: process.env.ADMIN_EMAIL || 'gdcdvirtual@gmail.com',
+              adminEmail: process.env.ADMIN_EMAIL || 'support@bhcdai.com',
               quickActionLink: `${publicUrl}/admin/quick-action?id=${appId}&key=${adminSecretKey}`,
               attachmentLink: appDetails.attachmentLink || '',
               paymentMethod: appDetails.paymentMethod || '',
@@ -3174,8 +3153,9 @@ const server = http.createServer(async (req, res) => {
         if ((!transcript || transcript.length === 0) && convId) {
           try {
             console.log(`[Post-Call Webhook] Fetching full transcript from ElevenLabs API for convId: ${convId}...`);
+            const elApiKey = process.env.ELEVENLABS_API_KEY || '';
             const apiRes = await fetch(`https://api.elevenlabs.io/v1/convai/conversations/${convId}`, {
-              headers: { "xi-api-key": apiKey }
+              headers: { "xi-api-key": elApiKey }
             });
             if (apiRes.ok) {
               const apiData = await apiRes.json();
@@ -3231,7 +3211,7 @@ const server = http.createServer(async (req, res) => {
 
         // Fallback to ADMIN_EMAIL if transcript was generated but no specific user email was captured
         if (!targetEmail || !targetEmail.includes('@')) {
-          targetEmail = process.env.ADMIN_EMAIL || 'gdcdvirtual@gmail.com';
+          targetEmail = process.env.ADMIN_EMAIL || 'support@bhcdai.com';
         }
 
         if (targetEmail && targetEmail.includes('@')) {
@@ -3291,6 +3271,35 @@ const server = http.createServer(async (req, res) => {
         console.error("Error handling post-call webhook:", err);
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ status: 'error', error: err.message }));
+      }
+    });
+  } else if (pathname === '/api/send-transcript' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk.toString(); });
+    req.on('end', async () => {
+      try {
+        const { email, clientName, phoneNumber, transcriptHtml, transcriptText } = JSON.parse(body);
+        if (!email || !email.includes('@')) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Valid email address is required' }));
+          return;
+        }
+
+        const { sendUserTranscriptEmail } = require('./scripts/admin_email_notifier');
+        const result = await sendUserTranscriptEmail({
+          clientName: clientName || 'عزيزنا المتعامل',
+          userEmail: email,
+          phoneNumber: phoneNumber || 'غير مسجل',
+          transcriptHtml: transcriptHtml || '',
+          transcriptText: transcriptText || ''
+        });
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(result));
+      } catch (err) {
+        console.error("Error processing /api/send-transcript:", err);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
       }
     });
   } else if ((pathname === '/api/voice/lookup-application' || pathname === '/api/track' || pathname === '/api/applications/status') && (req.method === 'POST' || req.method === 'GET')) {
@@ -4021,5 +4030,5 @@ if (require.main === module) {
   });
 }
 
-module.exports = { sendDualChannelNotification };
+module.exports = { sendDualChannelNotification, executeAdminQuickAction };
 

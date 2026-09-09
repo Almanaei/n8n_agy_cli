@@ -90,7 +90,7 @@ async function getRowByAppId(accessToken, appId) {
 }
 
 async function appendTestApplication(accessToken, appData) {
-  const baseUrl = "http://localhost:3000";
+  const baseUrl = process.env.PUBLIC_URL || "https://bhcdai.com";
   const rowValues = [
     appData.appId,
     appData.timestamp,
@@ -265,8 +265,8 @@ async function runRealScenarioTest() {
     whatsapp: "97335555563", // Compliance with Rule 12 standard test phone number
     email: "gdcdvirtual@gmail.com",
     referenceNumber: `REF-BAKERY-${testIdNum}`,
-    attachmentLink: "http://localhost:3000/uploads/test_doc.pdf",
-    trackingLink: `http://localhost:3000/track?id=${appId}`,
+    attachmentLink: `${process.env.PUBLIC_URL || 'https://bhcdai.com'}/uploads/test_doc.pdf`,
+    trackingLink: `${process.env.PUBLIC_URL || 'https://bhcdai.com'}/track?id=${appId}`,
     dynamicFields: "نوع المخبز: أوتوماتيكي كامل",
     paymentMethod: "Payment Link",
     notes: "طلب اختبار برمجي آلي لدورة حياة المعاملة كاملة مع احتساب إيقاف الوقت"

@@ -129,14 +129,11 @@ async function checkStatusChangesOnce() {
         currentStatus === 'جديد';
 
       const prev = statusTracker.get(appId);
-      const isStatusChanged = prev && prev.status !== currentStatus;
-      const isAlertUnsent = alertSent !== 'Yes';
+      const isStatusChanged = prev ? (prev.status !== currentStatus) : true;
+      const isAlertUnsent = alertSent !== 'Yes' && (!prev || prev.alertSent !== 'Yes' || prev.status !== currentStatus);
 
-      // Check if we need to dispatch an immediate notification to the customer:
-      // 1. Status changed from previous state (e.g. Pending -> Under Review, Under Review -> Approved, etc.)
-      // 2. Alert is unsent on non-initial status
-      const shouldNotify = (isStatusChanged && !isDefaultInitial) || 
-                           (!isDefaultInitial && isAlertUnsent);
+      // Dispatch ONLY IF status has changed (or unsent) AND alert has NOT been marked 'Yes' yet!
+      const shouldNotify = !isDefaultInitial && isStatusChanged && isAlertUnsent;
 
       if (shouldNotify) {
         const isModReq = currentStatus.toLowerCase().includes('modification') && !currentStatus.toLowerCase().includes('resubmit');
@@ -150,9 +147,10 @@ async function checkStatusChangesOnce() {
 
         const recipientEmail = (customerEmail && customerEmail.includes('@')) 
           ? customerEmail 
-          : (process.env.ADMIN_EMAIL || 'gdcdvirtual@gmail.com');
+          : (process.env.ADMIN_EMAIL || 'support@bhcdai.com');
 
-        const baseUrl = 'https://bhcdai.com';
+        const envBase = (process.env.APP_URL || process.env.BASE_URL || process.env.PUBLIC_URL || 'https://bhcdai.com').trim().replace(/\/+$/, '');
+        const baseUrl = (!envBase.includes('localhost') && !envBase.includes('127.0.0.1')) ? envBase : 'https://bhcdai.com';
 
         // 1. Direct High-Priority Email to Customer
         try {
@@ -286,9 +284,18 @@ if (require.main === module) {
   startSheetStatusWatcher(10000);
 }
 
+function markStatusAlertSent(appId, status) {
+  statusTracker.set(appId, {
+    status: status,
+    alertSent: 'Yes',
+    lastNotified: Date.now()
+  });
+}
+
 module.exports = {
   checkStatusChangesOnce,
   startSheetStatusWatcher,
   stopSheetStatusWatcher,
+  markStatusAlertSent,
   statusTracker
 };

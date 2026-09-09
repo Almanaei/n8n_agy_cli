@@ -57,7 +57,8 @@ async function runScenario() {
 
   // Step 1: Obtain a signed URL from local backend
   console.log("Step 1: Fetching signed conversation session URL from backend...");
-  const urlRes = await fetch("http://localhost:3000/get-signed-url");
+  const baseUrl = process.env.PUBLIC_URL || 'https://bhcdai.com';
+  const urlRes = await fetch(`${baseUrl}/get-signed-url`);
   if (!urlRes.ok) {
     throw new Error(`Failed to fetch signed URL: ${urlRes.status} ${await urlRes.text()}`);
   }
@@ -171,7 +172,7 @@ async function runScenario() {
   };
 
   console.log(`Submitting application ${appId} for service: ${payload.serviceName}...`);
-  const submitRes = await fetch("http://localhost:3000/api/applications", {
+  const submitRes = await fetch(`${baseUrl}/api/applications`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)

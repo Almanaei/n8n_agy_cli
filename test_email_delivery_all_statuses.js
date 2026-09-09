@@ -29,7 +29,7 @@ async function runEmailDeliveryTests() {
   const targetEmail = "almannaei90@gmail.com";
   const appId = "APP-EMAIL-AUDIT-9730";
   const serviceName = "تصريح رخصة مخبز وتفتيش منشأة";
-  const baseUrl = process.env.PUBLIC_URL || "http://localhost:3000";
+  const baseUrl = process.env.PUBLIC_URL || "https://bhcdai.com";
 
   const statusesToTest = [
     {

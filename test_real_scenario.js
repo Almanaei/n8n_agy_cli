@@ -1,6 +1,8 @@
 const WebSocket = require('ws');
 
-const wsUrl = "ws://localhost:3000/stream";
+const baseUrl = process.env.PUBLIC_URL || "https://bhcdai.com";
+const wsHost = baseUrl.replace(/^http/, 'ws');
+const wsUrl = `${wsHost}/stream`;
 console.log(`[Simulator] Starting real client simulation scenario...`);
 console.log(`[Simulator] Connecting to standalone voice agent at ${wsUrl}...`);
 
@@ -87,7 +89,7 @@ ws.on('close', async () => {
     
     console.log(`[Simulator] Submitting feedback and comment for ${conversationId}...`);
     try {
-      const response = await fetch("http://localhost:3000/submit-feedback", {
+      const response = await fetch(`${baseUrl}/submit-feedback`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(feedbackPayload)

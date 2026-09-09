@@ -20,8 +20,9 @@ async function runSmsDeliveryTest() {
   };
 
   try {
-    console.log('[Step 1] Submitting new application to http://localhost:3000/api/applications...');
-    const res = await fetch('http://localhost:3000/api/applications', {
+    const baseUrl = process.env.PUBLIC_URL || 'https://bhcdai.com';
+    console.log(`[Step 1] Submitting new application to ${baseUrl}/api/applications...`);
+    const res = await fetch(`${baseUrl}/api/applications`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)

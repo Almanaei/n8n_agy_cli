@@ -13,7 +13,7 @@ async function testN8nEmailPipeline() {
   const targetEmail = "almannaei90@gmail.com";
   const appId = "APP-EMAIL-AUDIT-9730";
   const serviceName = "تصريح رخصة مخبز وتفتيش منشأة";
-  const baseUrl = "http://localhost:3000";
+  const baseUrl = process.env.PUBLIC_URL || "https://bhcdai.com";
 
   const statuses = [
     { status: "Submitted", desc: "1. Submitted (تقديم جديد)" },

@@ -3,8 +3,9 @@ const WebSocket = require('ws');
 async function run() {
   console.log("[Simulator] Fetching signed URL from Express server...");
   let signedUrl;
+  const baseUrl = process.env.PUBLIC_URL || "https://bhcdai.com";
   try {
-    const res = await fetch("http://localhost:3000/get-signed-url");
+    const res = await fetch(`${baseUrl}/get-signed-url`);
     if (!res.ok) {
       throw new Error(`Failed to fetch signed URL: ${res.status} ${await res.text()}`);
     }
@@ -70,7 +71,7 @@ async function run() {
       
       console.log(`[Simulator] Submitting feedback for ${conversationId}...`);
       try {
-        const response = await fetch("http://localhost:3000/submit-feedback", {
+        const response = await fetch(`${baseUrl}/submit-feedback`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(feedbackPayload)
