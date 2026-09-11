@@ -926,6 +926,18 @@ function formatDynamicFields(serviceInput, dynamicFields) {
 
     case 'safety_certificate_renewal':
     case 'Safety Certificate Renewal':
+      if (dynamicFields.fireInspectionReport) {
+        const rep = typeof dynamicFields.fireInspectionReport === 'object'
+          ? (dynamicFields.fireInspectionReport.name || dynamicFields.fireInspectionReport.url || 'مرفق تقرير الفحص')
+          : dynamicFields.fireInspectionReport;
+        parts.push(`تقرير فحص أنظمة الإطفاء والإنذار: ${rep}`);
+      }
+      if (dynamicFields.maintenanceContract) {
+        const con = typeof dynamicFields.maintenanceContract === 'object'
+          ? (dynamicFields.maintenanceContract.name || dynamicFields.maintenanceContract.url || 'مرفق عقد الصيانة')
+          : dynamicFields.maintenanceContract;
+        parts.push(`نسخة من عقد الصيانة: ${con}`);
+      }
       if (dynamicFields.inspectionArea) {
         parts.push(`مساحة التفتيش: ${dynamicFields.inspectionArea} متر مربع`);
       }
@@ -2803,6 +2815,40 @@ const server = http.createServer(async (req, res) => {
               uploadedAt: nowFormatted,
               label: "الإصدار الأول (الطلب الأصلي)"
             });
+          }
+        }
+
+        // Process dynamic file attachments if present (e.g. fireInspectionReport, maintenanceContract)
+        if (appData.dynamicFields && typeof appData.dynamicFields === 'object') {
+          const dynamicAttConfigs = [
+            { key: 'fireInspectionReport', label: 'تقرير فحص أنظمة الإطفاء والإنذار (الطلب الأصلي)', defaultName: 'Fire-Inspection-Report.pdf' },
+            { key: 'maintenanceContract', label: 'نسخة من عقد الصيانة (الطلب الأصلي)', defaultName: 'Maintenance-Contract.pdf' }
+          ];
+
+          for (const conf of dynamicAttConfigs) {
+            const fieldVal = appData.dynamicFields[conf.key];
+            if (fieldVal && typeof fieldVal === 'object' && fieldVal.base64) {
+              const validation = validateAndSanitizePdfBase64(fieldVal.base64, fieldVal.name || conf.defaultName);
+              if (validation.valid) {
+                const timestampMs = Date.now();
+                const safeName = `${appId}-${conf.key}-${timestampMs}.pdf`;
+                fs.writeFileSync(path.join(uploadsDir, safeName), validation.buffer);
+                const fileUrl = `${publicUrl}/uploads/${safeName}`;
+                attachmentLinks.push(fileUrl);
+                documentAuditHistory.push({
+                  version: 1,
+                  fileName: validation.sanitizedName || conf.defaultName,
+                  fileUrl: fileUrl,
+                  fileSizeBytes: validation.sizeBytes,
+                  uploadedAt: nowFormatted,
+                  label: conf.label
+                });
+                appData.dynamicFields[conf.key] = {
+                  name: validation.sanitizedName || conf.defaultName,
+                  url: fileUrl
+                };
+              }
+            }
           }
         }
 

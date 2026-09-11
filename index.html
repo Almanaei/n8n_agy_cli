@@ -4334,6 +4334,7 @@
             fileBase64 = '';
             fileName = '';
             attachmentsList = [];
+            window.dynamicPdfFiles = {};
             const attachContainer = document.getElementById('attachments-list-container');
             if (attachContainer) {
                 attachContainer.innerHTML = `
@@ -4481,9 +4482,15 @@
                 `;
             } else if (['safety_certificate_renewal', 'Safety Certificate Renewal'].includes(key)) {
                 container.innerHTML = `
-                    <div class="form-group">
-                        <label class="form-label" for="app-inspection-area">مساحة المنشأة الإجمالية الخاضعة للتفتيش (بالمتر المربع)</label>
-                        <input type="number" id="app-inspection-area" class="form-input" min="1" placeholder="مثال: 150" required>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-fire-inspection-report">تقرير فحص أنظمة الإطفاء والإنذار (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-fire-inspection-report" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'fireInspectionReport')" required>
+                        <div id="fire-inspection-report-error" class="form-error" style="display: none;">يرجى رفع تقرير فحص أنظمة الإطفاء والإنذار بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-maintenance-contract">نسخة من عقد الصيانة (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-maintenance-contract" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'maintenanceContract')" required>
+                        <div id="maintenance-contract-error" class="form-error" style="display: none;">يرجى رفع نسخة من عقد الصيانة بصيغة PDF.</div>
                     </div>
                 `;
             } else if (['hazardous_material_permit', 'Hazardous Material Permit'].includes(key)) {
@@ -4547,6 +4554,47 @@
             `;
             container.appendChild(row);
         }
+
+        window.dynamicPdfFiles = {};
+        window.handleDynamicPdfSelect = function(e, fieldKey) {
+            const file = e.target.files[0];
+            const errorEl = document.getElementById(fieldKey === 'fireInspectionReport' ? 'fire-inspection-report-error' : 'maintenance-contract-error');
+            if (errorEl) errorEl.style.display = 'none';
+
+            if (!file) {
+                delete window.dynamicPdfFiles[fieldKey];
+                return;
+            }
+
+            if (file.type !== 'application/pdf') {
+                if (errorEl) {
+                    errorEl.style.display = 'block';
+                    errorEl.innerText = "الملف المرفوع يجب أن يكون بصيغة PDF فقط.";
+                }
+                e.target.value = '';
+                delete window.dynamicPdfFiles[fieldKey];
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                if (errorEl) {
+                    errorEl.style.display = 'block';
+                    errorEl.innerText = "حجم الملف كبير جداً. الحد الأقصى المسموح به هو 5 ميجابايت.";
+                }
+                e.target.value = '';
+                delete window.dynamicPdfFiles[fieldKey];
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                window.dynamicPdfFiles[fieldKey] = {
+                    name: file.name,
+                    base64: evt.target.result
+                };
+            };
+            reader.readAsDataURL(file);
+        };
 
         window.handleMultiFileSelect = function(e, index) {
             const file = e.target.files[0];
@@ -4680,13 +4728,33 @@
                     }
                 });
             } else if (['safety_certificate_renewal', 'Safety Certificate Renewal'].includes(key)) {
-                const areaInput = document.getElementById('app-inspection-area');
-                if (areaInput) {
-                    areaInput.classList.remove('invalid');
-                    if (!areaInput.value || parseInt(areaInput.value, 10) <= 0) {
-                        areaInput.classList.add('invalid');
-                        isValid = false;
+                const fireFileEl = document.getElementById('app-fire-inspection-report');
+                const maintFileEl = document.getElementById('app-maintenance-contract');
+                const fireErr = document.getElementById('fire-inspection-report-error');
+                const maintErr = document.getElementById('maintenance-contract-error');
+
+                if (!window.dynamicPdfFiles.fireInspectionReport || !window.dynamicPdfFiles.fireInspectionReport.base64) {
+                    if (fireFileEl) fireFileEl.classList.add('invalid');
+                    if (fireErr) {
+                        fireErr.style.display = 'block';
+                        fireErr.innerText = "يرجى رفع تقرير فحص أنظمة الإطفاء والإنذار بصيغة PDF.";
                     }
+                    isValid = false;
+                } else {
+                    if (fireFileEl) fireFileEl.classList.remove('invalid');
+                    if (fireErr) fireErr.style.display = 'none';
+                }
+
+                if (!window.dynamicPdfFiles.maintenanceContract || !window.dynamicPdfFiles.maintenanceContract.base64) {
+                    if (maintFileEl) maintFileEl.classList.add('invalid');
+                    if (maintErr) {
+                        maintErr.style.display = 'block';
+                        maintErr.innerText = "يرجى رفع نسخة من عقد الصيانة بصيغة PDF.";
+                    }
+                    isValid = false;
+                } else {
+                    if (maintFileEl) maintFileEl.classList.remove('invalid');
+                    if (maintErr) maintErr.style.display = 'none';
                 }
             } else if (['hazardous_material_permit', 'Hazardous Material Permit'].includes(key)) {
                 const chemicalSelect = document.getElementById('app-chemical-type');
@@ -4743,8 +4811,9 @@
                 const traineeNames = Array.from(document.querySelectorAll('.trainee-name-input')).map(i => i.value.trim());
                 dynamicSummary = `أسماء المتدربين: ${traineeNames.join(', ')}`;
             } else if (['safety_certificate_renewal', 'Safety Certificate Renewal'].includes(key)) {
-                const area = document.getElementById('app-inspection-area').value;
-                dynamicSummary = `المساحة الخاضعة للتفتيش: ${area} متر مربع`;
+                const fireName = window.dynamicPdfFiles.fireInspectionReport ? window.dynamicPdfFiles.fireInspectionReport.name : '';
+                const contractName = window.dynamicPdfFiles.maintenanceContract ? window.dynamicPdfFiles.maintenanceContract.name : '';
+                dynamicSummary = `تقرير فحص أنظمة الإطفاء والإنذار: 📄 ${fireName} | نسخة من عقد الصيانة: 📄 ${contractName}`;
             } else if (['hazardous_material_permit', 'Hazardous Material Permit'].includes(key)) {
                 const chemical = document.getElementById('app-chemical-type').value;
                 dynamicSummary = `نوع المادة الكيميائية: ${chemical}`;
@@ -4779,10 +4848,10 @@
                 <div class="summary-value">${emailInput.value.trim()}</div>
                 <div class="summary-label">الرقم المرجعي</div>
                 <div class="summary-value">${document.getElementById('app-ref-number').value.trim() || 'لا يوجد'}</div>
-                <div class="summary-label">بيانات الخدمة الإضافية</div>
+                <div class="summary-label">بيانات ومرفقات الخدمة</div>
                 <div class="summary-value">${dynamicSummary || 'لا يوجد'}</div>
-                <div class="summary-label">اسم الملف المرفق</div>
-                <div class="summary-value">📄 ${fileName}</div>
+                <div class="summary-label">اسم الملف المرفق الإضافي</div>
+                <div class="summary-value">📄 ${fileName || 'تم إرفاق المستندات المطلوبة'}</div>
                 <div class="summary-label">طريقة الدفع</div>
                 <div class="summary-value">${document.getElementById('app-payment-method').value}</div>
                 <div class="summary-label">ملاحظات</div>
@@ -4826,8 +4895,14 @@
             if (['trainee_registration', 'trainee_registration_1day', 'trainee_registration_1week', 'heavy_fire_vehicle_driving_training', 'trainee_registration_16weeks', 'Trainee Registration'].includes(key)) {
                 dynamicFields.trainees = Array.from(document.querySelectorAll('.trainee-name-input')).map(i => i.value.trim());
             } else if (['safety_certificate_renewal', 'Safety Certificate Renewal'].includes(key)) {
-                const el = document.getElementById('app-inspection-area');
-                dynamicFields.inspectionArea = el ? parseInt(el.value || '0', 10) : 0;
+                dynamicFields.fireInspectionReport = window.dynamicPdfFiles.fireInspectionReport ? {
+                    name: window.dynamicPdfFiles.fireInspectionReport.name,
+                    base64: window.dynamicPdfFiles.fireInspectionReport.base64
+                } : null;
+                dynamicFields.maintenanceContract = window.dynamicPdfFiles.maintenanceContract ? {
+                    name: window.dynamicPdfFiles.maintenanceContract.name,
+                    base64: window.dynamicPdfFiles.maintenanceContract.base64
+                } : null;
             } else if (['hazardous_material_permit', 'Hazardous Material Permit'].includes(key)) {
                 const el = document.getElementById('app-chemical-type');
                 dynamicFields.chemicalType = el ? el.value : '';
