@@ -916,7 +916,23 @@ function formatDynamicFields(serviceInput, dynamicFields) {
 
   switch (svcId) {
     case 'trainee_registration':
+    case 'trainee_registration_1day':
+    case 'trainee_registration_1week':
+    case 'heavy_fire_vehicle_driving_training':
+    case 'trainee_registration_16weeks':
     case 'Trainee Registration':
+      if (dynamicFields.trainingOfficialLetter) {
+        const doc = typeof dynamicFields.trainingOfficialLetter === 'object'
+          ? (dynamicFields.trainingOfficialLetter.name || dynamicFields.trainingOfficialLetter.url || 'مرفق الخطاب الرسمي')
+          : dynamicFields.trainingOfficialLetter;
+        parts.push(`خطاب رسمي: ${doc}`);
+      }
+      if (dynamicFields.trainingAccreditations) {
+        const doc = typeof dynamicFields.trainingAccreditations === 'object'
+          ? (dynamicFields.trainingAccreditations.name || dynamicFields.trainingAccreditations.url || 'مرفق الموافقات/الاعتمادات')
+          : dynamicFields.trainingAccreditations;
+        parts.push(`الموافقات/الاعتمادات: ${doc}`);
+      }
       if (Array.isArray(dynamicFields.trainees)) {
         parts.push(`المتدربون: ${dynamicFields.trainees.join(', ')}`);
       } else if (dynamicFields.trainees) {
@@ -1127,6 +1143,8 @@ function formatDynamicFields(serviceInput, dynamicFields) {
     bakeryDrawings: 'موافقات المخططات المعمارية',
     goldAlarmContract: 'نسخة من عقد الصيانة لأجهزة الإنذار والإطفاء',
     goldAlarmDetails: 'عقد صيانة نظام الإنذار',
+    trainingOfficialLetter: 'خطاب رسمي',
+    trainingAccreditations: 'الموافقات/الاعتمادات',
     stationCapacity: 'سعة خزانات الوقود',
     trainees: 'المتدربون',
     blueprintNumber: 'رقم المخطط',
@@ -2859,7 +2877,9 @@ const server = http.createServer(async (req, res) => {
             { key: 'bakeryCrCopy', label: 'نسخة من السجل التجاري (الطلب الأصلي)', defaultName: 'Bakery-CR-Copy.pdf' },
             { key: 'bakerySitePhotos', label: 'صور للموقع (الطلب الأصلي)', defaultName: 'Bakery-Site-Photos.pdf' },
             { key: 'bakeryDrawingsApproval', label: 'موافقات المخططات المعمارية والكهربائية والميكانيكية (الطلب الأصلي)', defaultName: 'Bakery-Drawings-Approval.pdf' },
-            { key: 'goldAlarmContract', label: 'نسخة من عقد الصيانة لأجهزة الإنذار والإطفاء (الطلب الأصلي)', defaultName: 'Gold-Alarm-Maintenance-Contract.pdf' }
+            { key: 'goldAlarmContract', label: 'نسخة من عقد الصيانة لأجهزة الإنذار والإطفاء (الطلب الأصلي)', defaultName: 'Gold-Alarm-Maintenance-Contract.pdf' },
+            { key: 'trainingOfficialLetter', label: 'خطاب رسمي (الطلب الأصلي)', defaultName: 'Training-Official-Letter.pdf' },
+            { key: 'trainingAccreditations', label: 'الموافقات والاعتمادات (الطلب الأصلي)', defaultName: 'Training-Accreditations.pdf' }
           ];
 
           for (const conf of dynamicAttConfigs) {

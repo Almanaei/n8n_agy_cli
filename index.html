@@ -4470,14 +4470,15 @@
 
             if (['trainee_registration', 'trainee_registration_1day', 'trainee_registration_1week', 'heavy_fire_vehicle_driving_training', 'trainee_registration_16weeks', 'Trainee Registration'].includes(key)) {
                 container.innerHTML = `
-                    <div class="form-group">
-                        <label class="form-label">أسماء المتدربين / Trainee Names</label>
-                        <div id="trainee-list-container">
-                            <div class="dynamic-field-row">
-                                <input type="text" class="form-input trainee-name-input" placeholder="اسم المتدرب الأول" required>
-                                <button type="button" class="btn-add-dynamic" onclick="addTraineeRow()">+</button>
-                            </div>
-                        </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-training-official-letter">خطاب رسمي (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-training-official-letter" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'trainingOfficialLetter')" required>
+                        <div id="training-official-letter-error" class="form-error" style="display: none;">يرجى رفع الخطاب الرسمي بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-training-accreditations">الموافقات/الاعتمادات (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-training-accreditations" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'trainingAccreditations')" required>
+                        <div id="training-accreditations-error" class="form-error" style="display: none;">يرجى رفع الموافقات/الاعتمادات بصيغة PDF.</div>
                     </div>
                 `;
             } else if (['safety_certificate_renewal', 'Safety Certificate Renewal'].includes(key)) {
@@ -4579,6 +4580,8 @@
                 fieldKey === 'bakerySitePhotos' ? 'bakery-site-photos-error' :
                 fieldKey === 'bakeryDrawingsApproval' ? 'bakery-drawings-error' :
                 fieldKey === 'goldAlarmContract' ? 'gold-alarm-contract-error' :
+                fieldKey === 'trainingOfficialLetter' ? 'training-official-letter-error' :
+                fieldKey === 'trainingAccreditations' ? 'training-accreditations-error' :
                 `${fieldKey}-error`
             );
             if (errorEl) errorEl.style.display = 'none';
@@ -4741,14 +4744,30 @@
             const key = targetItem ? targetItem.id : service;
 
             if (['trainee_registration', 'trainee_registration_1day', 'trainee_registration_1week', 'heavy_fire_vehicle_driving_training', 'trainee_registration_16weeks', 'Trainee Registration'].includes(key)) {
-                const traineeInputs = document.querySelectorAll('.trainee-name-input');
-                traineeInputs.forEach(input => {
-                    input.classList.remove('invalid');
-                    if (!input.value.trim()) {
-                        input.classList.add('invalid');
-                        isValid = false;
-                    }
-                });
+                const letterFile = window.dynamicPdfFiles.trainingOfficialLetter;
+                const accredFile = window.dynamicPdfFiles.trainingAccreditations;
+                const letterEl = document.getElementById('app-training-official-letter');
+                const accredEl = document.getElementById('app-training-accreditations');
+                const letterErr = document.getElementById('training-official-letter-error');
+                const accredErr = document.getElementById('training-accreditations-error');
+
+                if (!letterFile || !letterFile.base64) {
+                    if (letterEl) letterEl.classList.add('invalid');
+                    if (letterErr) { letterErr.style.display = 'block'; letterErr.innerText = "يرجى رفع الخطاب الرسمي بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (letterEl) letterEl.classList.remove('invalid');
+                    if (letterErr) letterErr.style.display = 'none';
+                }
+
+                if (!accredFile || !accredFile.base64) {
+                    if (accredEl) accredEl.classList.add('invalid');
+                    if (accredErr) { accredErr.style.display = 'block'; accredErr.innerText = "يرجى رفع الموافقات/الاعتمادات بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (accredEl) accredEl.classList.remove('invalid');
+                    if (accredErr) accredErr.style.display = 'none';
+                }
             } else if (['safety_certificate_renewal', 'Safety Certificate Renewal'].includes(key)) {
                 const fireFileEl = document.getElementById('app-fire-inspection-report');
                 const maintFileEl = document.getElementById('app-maintenance-contract');
@@ -4874,8 +4893,9 @@
             const summaryGrid = document.getElementById('summary-grid-el');
             let dynamicSummary = '';
             if (['trainee_registration', 'trainee_registration_1day', 'trainee_registration_1week', 'heavy_fire_vehicle_driving_training', 'trainee_registration_16weeks', 'Trainee Registration'].includes(key)) {
-                const traineeNames = Array.from(document.querySelectorAll('.trainee-name-input')).map(i => i.value.trim());
-                dynamicSummary = `أسماء المتدربين: ${traineeNames.join(', ')}`;
+                const letterName = window.dynamicPdfFiles.trainingOfficialLetter ? window.dynamicPdfFiles.trainingOfficialLetter.name : '';
+                const accredName = window.dynamicPdfFiles.trainingAccreditations ? window.dynamicPdfFiles.trainingAccreditations.name : '';
+                dynamicSummary = `خطاب رسمي: 📄 ${letterName} | الموافقات/الاعتمادات: 📄 ${accredName}`;
             } else if (['safety_certificate_renewal', 'Safety Certificate Renewal'].includes(key)) {
                 const fireName = window.dynamicPdfFiles.fireInspectionReport ? window.dynamicPdfFiles.fireInspectionReport.name : '';
                 const contractName = window.dynamicPdfFiles.maintenanceContract ? window.dynamicPdfFiles.maintenanceContract.name : '';
@@ -4961,7 +4981,14 @@
 
             let dynamicFields = {};
             if (['trainee_registration', 'trainee_registration_1day', 'trainee_registration_1week', 'heavy_fire_vehicle_driving_training', 'trainee_registration_16weeks', 'Trainee Registration'].includes(key)) {
-                dynamicFields.trainees = Array.from(document.querySelectorAll('.trainee-name-input')).map(i => i.value.trim());
+                dynamicFields.trainingOfficialLetter = window.dynamicPdfFiles.trainingOfficialLetter ? {
+                    name: window.dynamicPdfFiles.trainingOfficialLetter.name,
+                    base64: window.dynamicPdfFiles.trainingOfficialLetter.base64
+                } : null;
+                dynamicFields.trainingAccreditations = window.dynamicPdfFiles.trainingAccreditations ? {
+                    name: window.dynamicPdfFiles.trainingAccreditations.name,
+                    base64: window.dynamicPdfFiles.trainingAccreditations.base64
+                } : null;
             } else if (['safety_certificate_renewal', 'Safety Certificate Renewal'].includes(key)) {
                 dynamicFields.fireInspectionReport = window.dynamicPdfFiles.fireInspectionReport ? {
                     name: window.dynamicPdfFiles.fireInspectionReport.name,
