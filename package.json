@@ -20,6 +20,7 @@
     "dotenv": "^17.4.2",
     "localtunnel": "^2.0.2",
     "nodemailer": "^9.0.6",
+    "ssh2": "^1.17.0",
     "ws": "^8.21.0"
   },
   "devDependencies": {

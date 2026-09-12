@@ -1016,7 +1016,18 @@ function formatDynamicFields(serviceInput, dynamicFields) {
 
     case 'gas_station_license':
     case 'Gas Station License':
-      if (dynamicFields.stationCapacity) {
+      if (dynamicFields.gasStationGovApprovals) {
+        const doc = typeof dynamicFields.gasStationGovApprovals === 'object'
+          ? (dynamicFields.gasStationGovApprovals.name || dynamicFields.gasStationGovApprovals.url || 'مرفق موافقات الجهات الحكومية')
+          : dynamicFields.gasStationGovApprovals;
+        parts.push(`موافقات الجهات الحكومية: ${doc}`);
+      }
+      if (dynamicFields.gasStationApplicantLetter) {
+        const doc = typeof dynamicFields.gasStationApplicantLetter === 'object'
+          ? (dynamicFields.gasStationApplicantLetter.name || dynamicFields.gasStationApplicantLetter.url || 'مرفق رسالة رسمية باسم مقدم الطلب')
+          : dynamicFields.gasStationApplicantLetter;
+        parts.push(`رسالة رسمية باسم مقدم الطلب: ${doc}`);
+      } else if (dynamicFields.stationCapacity) {
         parts.push(`سعة خزانات الوقود: ${dynamicFields.stationCapacity} لتر`);
       }
       break;
@@ -1145,6 +1156,8 @@ function formatDynamicFields(serviceInput, dynamicFields) {
     goldAlarmDetails: 'عقد صيانة نظام الإنذار',
     trainingOfficialLetter: 'خطاب رسمي',
     trainingAccreditations: 'الموافقات/الاعتمادات',
+    gasStationGovApprovals: 'موافقات من الجهات الحكومية',
+    gasStationApplicantLetter: 'رسالة رسمية باسم مقدم الطلب',
     stationCapacity: 'سعة خزانات الوقود',
     trainees: 'المتدربون',
     blueprintNumber: 'رقم المخطط',
@@ -2879,7 +2892,9 @@ const server = http.createServer(async (req, res) => {
             { key: 'bakeryDrawingsApproval', label: 'موافقات المخططات المعمارية والكهربائية والميكانيكية (الطلب الأصلي)', defaultName: 'Bakery-Drawings-Approval.pdf' },
             { key: 'goldAlarmContract', label: 'نسخة من عقد الصيانة لأجهزة الإنذار والإطفاء (الطلب الأصلي)', defaultName: 'Gold-Alarm-Maintenance-Contract.pdf' },
             { key: 'trainingOfficialLetter', label: 'خطاب رسمي (الطلب الأصلي)', defaultName: 'Training-Official-Letter.pdf' },
-            { key: 'trainingAccreditations', label: 'الموافقات والاعتمادات (الطلب الأصلي)', defaultName: 'Training-Accreditations.pdf' }
+            { key: 'trainingAccreditations', label: 'الموافقات والاعتمادات (الطلب الأصلي)', defaultName: 'Training-Accreditations.pdf' },
+            { key: 'gasStationGovApprovals', label: 'موافقات من الجهات الحكومية (الطلب الأصلي)', defaultName: 'Gas-Station-Gov-Approvals.pdf' },
+            { key: 'gasStationApplicantLetter', label: 'رسالة رسمية باسم مقدم الطلب (الطلب الأصلي)', defaultName: 'Gas-Station-Applicant-Letter.pdf' }
           ];
 
           for (const conf of dynamicAttConfigs) {

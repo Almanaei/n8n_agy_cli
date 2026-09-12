@@ -4543,9 +4543,15 @@
                 `;
             } else if (['gas_station_license', 'Gas Station License'].includes(key)) {
                 container.innerHTML = `
-                    <div class="form-group">
-                        <label class="form-label" for="app-station-capacity">إجمالي سعة خزانات الوقود (باللتر)</label>
-                        <input type="number" id="app-station-capacity" class="form-input" min="1" placeholder="مثال: 50000" required>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-station-gov-approvals">موافقات من الجهات الحكومية (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-station-gov-approvals" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'gasStationGovApprovals')" required>
+                        <div id="station-gov-approvals-error" class="form-error" style="display: none;">يرجى رفع موافقات الجهات الحكومية بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-station-applicant-letter">رسالة رسمية باسم مقدم الطلب (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-station-applicant-letter" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'gasStationApplicantLetter')" required>
+                        <div id="station-applicant-letter-error" class="form-error" style="display: none;">يرجى رفع الرسالة الرسمية باسم مقدم الطلب بصيغة PDF.</div>
                     </div>
                 `;
             } else if (service) {
@@ -4582,6 +4588,8 @@
                 fieldKey === 'goldAlarmContract' ? 'gold-alarm-contract-error' :
                 fieldKey === 'trainingOfficialLetter' ? 'training-official-letter-error' :
                 fieldKey === 'trainingAccreditations' ? 'training-accreditations-error' :
+                fieldKey === 'gasStationGovApprovals' ? 'station-gov-approvals-error' :
+                fieldKey === 'gasStationApplicantLetter' ? 'station-applicant-letter-error' :
                 `${fieldKey}-error`
             );
             if (errorEl) errorEl.style.display = 'none';
@@ -4878,13 +4886,31 @@
                     if (drawingsErr) drawingsErr.style.display = 'none';
                 }
             } else if (['gas_station_license', 'Gas Station License'].includes(key)) {
-                const capacityInput = document.getElementById('app-station-capacity');
-                if (capacityInput) {
-                    capacityInput.classList.remove('invalid');
-                    if (!capacityInput.value || parseInt(capacityInput.value, 10) <= 0) {
-                        capacityInput.classList.add('invalid');
-                        isValid = false;
-                    }
+                const govFile = window.dynamicPdfFiles.gasStationGovApprovals;
+                const letterFile = window.dynamicPdfFiles.gasStationApplicantLetter;
+
+                const govEl = document.getElementById('app-station-gov-approvals');
+                const letterEl = document.getElementById('app-station-applicant-letter');
+
+                const govErr = document.getElementById('station-gov-approvals-error');
+                const letterErr = document.getElementById('station-applicant-letter-error');
+
+                if (!govFile || !govFile.base64) {
+                    if (govEl) govEl.classList.add('invalid');
+                    if (govErr) { govErr.style.display = 'block'; govErr.innerText = "يرجى رفع موافقات الجهات الحكومية بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (govEl) govEl.classList.remove('invalid');
+                    if (govErr) govErr.style.display = 'none';
+                }
+
+                if (!letterFile || !letterFile.base64) {
+                    if (letterEl) letterEl.classList.add('invalid');
+                    if (letterErr) { letterErr.style.display = 'block'; letterErr.innerText = "يرجى رفع الرسالة الرسمية باسم مقدم الطلب بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (letterEl) letterEl.classList.remove('invalid');
+                    if (letterErr) letterErr.style.display = 'none';
                 }
             }
 
@@ -4915,8 +4941,9 @@
                 const alarmName = window.dynamicPdfFiles.goldAlarmContract ? window.dynamicPdfFiles.goldAlarmContract.name : '';
                 dynamicSummary = `عقد صيانة أجهزة الإنذار والإطفاء: 📄 ${alarmName}`;
             } else if (['gas_station_license', 'Gas Station License'].includes(key)) {
-                const capacity = document.getElementById('app-station-capacity').value;
-                dynamicSummary = `سعة خزانات الوقود: ${capacity} لتر`;
+                const govName = window.dynamicPdfFiles.gasStationGovApprovals ? window.dynamicPdfFiles.gasStationGovApprovals.name : '';
+                const letterName = window.dynamicPdfFiles.gasStationApplicantLetter ? window.dynamicPdfFiles.gasStationApplicantLetter.name : '';
+                dynamicSummary = `موافقات الجهات الحكومية: 📄 ${govName} | رسالة باسم مقدم الطلب: 📄 ${letterName}`;
             } else {
                 const genericInput = document.getElementById('app-generic-details');
                 if (genericInput) {
@@ -5025,8 +5052,14 @@
                     base64: window.dynamicPdfFiles.goldAlarmContract.base64
                 } : null;
             } else if (['gas_station_license', 'Gas Station License'].includes(key)) {
-                const el = document.getElementById('app-station-capacity');
-                dynamicFields.stationCapacity = el ? parseInt(el.value || '0', 10) : 0;
+                dynamicFields.gasStationGovApprovals = window.dynamicPdfFiles.gasStationGovApprovals ? {
+                    name: window.dynamicPdfFiles.gasStationGovApprovals.name,
+                    base64: window.dynamicPdfFiles.gasStationGovApprovals.base64
+                } : null;
+                dynamicFields.gasStationApplicantLetter = window.dynamicPdfFiles.gasStationApplicantLetter ? {
+                    name: window.dynamicPdfFiles.gasStationApplicantLetter.name,
+                    base64: window.dynamicPdfFiles.gasStationApplicantLetter.base64
+                } : null;
             } else {
                 const genericInput = document.getElementById('app-generic-details');
                 if (genericInput) {
