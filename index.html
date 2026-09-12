@@ -4515,9 +4515,10 @@
                 `;
             } else if (['gas_selling_shops_license', 'Gas Selling Shops License'].includes(key)) {
                 container.innerHTML = `
-                    <div class="form-group">
-                        <label class="form-label" for="app-gas-ministry-letter">تفاصيل خطاب وزارة الصناعة والتجارة والسياحة</label>
-                        <input type="text" id="app-gas-ministry-letter" class="form-input" placeholder="مثال: رسالة رقم 10234 بتاريخ 2026/05/12" required>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-gas-ministry-letter">رسالة من وزارة الصناعة والتجارة والسياحة (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-gas-ministry-letter" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'moicLetter')" required>
+                        <div id="gas-ministry-letter-error" class="form-error" style="display: none;">يرجى رفع رسالة وزارة الصناعة والتجارة والسياحة بصيغة PDF.</div>
                     </div>
                 `;
             } else if (['bakery_license', 'Bakery License'].includes(key)) {
@@ -4558,7 +4559,12 @@
         window.dynamicPdfFiles = {};
         window.handleDynamicPdfSelect = function(e, fieldKey) {
             const file = e.target.files[0];
-            const errorEl = document.getElementById(fieldKey === 'fireInspectionReport' ? 'fire-inspection-report-error' : 'maintenance-contract-error');
+            const errorEl = document.getElementById(
+                fieldKey === 'fireInspectionReport' ? 'fire-inspection-report-error' :
+                fieldKey === 'maintenanceContract' ? 'maintenance-contract-error' :
+                fieldKey === 'moicLetter' ? 'gas-ministry-letter-error' :
+                `${fieldKey}-error`
+            );
             if (errorEl) errorEl.style.display = 'none';
 
             if (!file) {
@@ -4775,13 +4781,20 @@
                     }
                 }
             } else if (['gas_selling_shops_license', 'Gas Selling Shops License'].includes(key)) {
-                const gasLetterInput = document.getElementById('app-gas-ministry-letter');
-                if (gasLetterInput) {
-                    gasLetterInput.classList.remove('invalid');
-                    if (!gasLetterInput.value.trim()) {
-                        gasLetterInput.classList.add('invalid');
-                        isValid = false;
+                const gasLetterFile = window.dynamicPdfFiles.moicLetter;
+                const gasFileEl = document.getElementById('app-gas-ministry-letter');
+                const gasErr = document.getElementById('gas-ministry-letter-error');
+
+                if (!gasLetterFile || !gasLetterFile.base64) {
+                    if (gasFileEl) gasFileEl.classList.add('invalid');
+                    if (gasErr) {
+                        gasErr.style.display = 'block';
+                        gasErr.innerText = "يرجى رفع رسالة وزارة الصناعة والتجارة والسياحة بصيغة PDF.";
                     }
+                    isValid = false;
+                } else {
+                    if (gasFileEl) gasFileEl.classList.remove('invalid');
+                    if (gasErr) gasErr.style.display = 'none';
                 }
             } else if (['bakery_license', 'Bakery License'].includes(key)) {
                 const bakeryDrawingsInput = document.getElementById('app-bakery-drawings');
@@ -4818,8 +4831,8 @@
                 const chemical = document.getElementById('app-chemical-type').value;
                 dynamicSummary = `نوع المادة الكيميائية: ${chemical}`;
             } else if (['gas_selling_shops_license', 'Gas Selling Shops License'].includes(key)) {
-                const gasLetter = document.getElementById('app-gas-ministry-letter').value.trim();
-                dynamicSummary = `تفاصيل خطاب وزارة الصناعة: ${gasLetter}`;
+                const gasLetterName = window.dynamicPdfFiles.moicLetter ? window.dynamicPdfFiles.moicLetter.name : '';
+                dynamicSummary = `رسالة من وزارة الصناعة والتجارة والسياحة: 📄 ${gasLetterName}`;
             } else if (['bakery_license', 'Bakery License'].includes(key)) {
                 const bakeryDrawings = document.getElementById('app-bakery-drawings').value.trim();
                 dynamicSummary = `موافقات المخططات المعمارية: ${bakeryDrawings}`;
@@ -4907,8 +4920,10 @@
                 const el = document.getElementById('app-chemical-type');
                 dynamicFields.chemicalType = el ? el.value : '';
             } else if (['gas_selling_shops_license', 'Gas Selling Shops License'].includes(key)) {
-                const el = document.getElementById('app-gas-ministry-letter');
-                dynamicFields.gasMinistryLetter = el ? el.value.trim() : '';
+                dynamicFields.moicLetter = window.dynamicPdfFiles.moicLetter ? {
+                    name: window.dynamicPdfFiles.moicLetter.name,
+                    base64: window.dynamicPdfFiles.moicLetter.base64
+                } : null;
             } else if (['bakery_license', 'Bakery License'].includes(key)) {
                 const el = document.getElementById('app-bakery-drawings');
                 dynamicFields.bakeryDrawings = el ? el.value.trim() : '';

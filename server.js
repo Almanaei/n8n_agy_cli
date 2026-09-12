@@ -952,8 +952,13 @@ function formatDynamicFields(serviceInput, dynamicFields) {
 
     case 'gas_selling_shops_license':
     case 'Gas Selling Shops License':
-      if (dynamicFields.gasMinistryLetter) {
-        parts.push(`تفاصيل خطاب وزارة الصناعة: ${dynamicFields.gasMinistryLetter}`);
+      if (dynamicFields.moicLetter) {
+        const letter = typeof dynamicFields.moicLetter === 'object'
+          ? (dynamicFields.moicLetter.name || dynamicFields.moicLetter.url || 'مرفق رسالة وزارة الصناعة والتجارة والسياحة')
+          : dynamicFields.moicLetter;
+        parts.push(`رسالة من وزارة الصناعة والتجارة والسياحة: ${letter}`);
+      } else if (dynamicFields.gasMinistryLetter) {
+        parts.push(`رسالة من وزارة الصناعة والتجارة والسياحة: ${dynamicFields.gasMinistryLetter}`);
       }
       break;
 
@@ -1092,6 +1097,7 @@ function formatDynamicFields(serviceInput, dynamicFields) {
   const fieldLabels = {
     inspectionArea: 'مساحة التفتيش',
     chemicalType: 'نوع المادة الكيميائية',
+    moicLetter: 'رسالة من وزارة الصناعة والتجارة والسياحة',
     gasMinistryLetter: 'تفاصيل خطاب وزارة الصناعة',
     bakeryDrawings: 'موافقات المخططات المعمارية',
     goldAlarmDetails: 'عقد صيانة نظام الإنذار',
@@ -2822,7 +2828,8 @@ const server = http.createServer(async (req, res) => {
         if (appData.dynamicFields && typeof appData.dynamicFields === 'object') {
           const dynamicAttConfigs = [
             { key: 'fireInspectionReport', label: 'تقرير فحص أنظمة الإطفاء والإنذار (الطلب الأصلي)', defaultName: 'Fire-Inspection-Report.pdf' },
-            { key: 'maintenanceContract', label: 'نسخة من عقد الصيانة (الطلب الأصلي)', defaultName: 'Maintenance-Contract.pdf' }
+            { key: 'maintenanceContract', label: 'نسخة من عقد الصيانة (الطلب الأصلي)', defaultName: 'Maintenance-Contract.pdf' },
+            { key: 'moicLetter', label: 'رسالة من وزارة الصناعة والتجارة والسياحة (الطلب الأصلي)', defaultName: 'MOIC-Letter.pdf' }
           ];
 
           for (const conf of dynamicAttConfigs) {
