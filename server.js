@@ -988,7 +988,12 @@ function formatDynamicFields(serviceInput, dynamicFields) {
 
     case 'gold_shop_license':
     case 'Gold Shop License':
-      if (dynamicFields.goldAlarmDetails) {
+      if (dynamicFields.goldAlarmContract) {
+        const doc = typeof dynamicFields.goldAlarmContract === 'object'
+          ? (dynamicFields.goldAlarmContract.name || dynamicFields.goldAlarmContract.url || 'مرفق عقد الصيانة لأجهزة الإنذار والإطفاء')
+          : dynamicFields.goldAlarmContract;
+        parts.push(`عقد صيانة أجهزة الإنذار والإطفاء: ${doc}`);
+      } else if (dynamicFields.goldAlarmDetails) {
         parts.push(`عقد صيانة نظام الإنذار: ${dynamicFields.goldAlarmDetails}`);
       }
       break;
@@ -1120,6 +1125,7 @@ function formatDynamicFields(serviceInput, dynamicFields) {
     bakerySitePhotos: 'صور للموقع',
     bakeryDrawingsApproval: 'موافقات المخططات المعمارية والكهربائية والميكانيكية',
     bakeryDrawings: 'موافقات المخططات المعمارية',
+    goldAlarmContract: 'نسخة من عقد الصيانة لأجهزة الإنذار والإطفاء',
     goldAlarmDetails: 'عقد صيانة نظام الإنذار',
     stationCapacity: 'سعة خزانات الوقود',
     trainees: 'المتدربون',
@@ -2852,7 +2858,8 @@ const server = http.createServer(async (req, res) => {
             { key: 'moicLetter', label: 'رسالة من وزارة الصناعة والتجارة والسياحة (الطلب الأصلي)', defaultName: 'MOIC-Letter.pdf' },
             { key: 'bakeryCrCopy', label: 'نسخة من السجل التجاري (الطلب الأصلي)', defaultName: 'Bakery-CR-Copy.pdf' },
             { key: 'bakerySitePhotos', label: 'صور للموقع (الطلب الأصلي)', defaultName: 'Bakery-Site-Photos.pdf' },
-            { key: 'bakeryDrawingsApproval', label: 'موافقات المخططات المعمارية والكهربائية والميكانيكية (الطلب الأصلي)', defaultName: 'Bakery-Drawings-Approval.pdf' }
+            { key: 'bakeryDrawingsApproval', label: 'موافقات المخططات المعمارية والكهربائية والميكانيكية (الطلب الأصلي)', defaultName: 'Bakery-Drawings-Approval.pdf' },
+            { key: 'goldAlarmContract', label: 'نسخة من عقد الصيانة لأجهزة الإنذار والإطفاء (الطلب الأصلي)', defaultName: 'Gold-Alarm-Maintenance-Contract.pdf' }
           ];
 
           for (const conf of dynamicAttConfigs) {

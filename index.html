@@ -4508,9 +4508,10 @@
                 `;
             } else if (['gold_shop_license', 'Gold Shop License'].includes(key)) {
                 container.innerHTML = `
-                    <div class="form-group">
-                        <label class="form-label" for="app-gold-alarm-details">تفاصيل عقد صيانة نظام الإنذار والإطفاء</label>
-                        <input type="text" id="app-gold-alarm-details" class="form-input" placeholder="مثال: عقد صيانة صالحة، شركة السلامة" required>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-gold-alarm-contract">نسخة من عقد الصيانة لأجهزة الإنذار والإطفاء (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-gold-alarm-contract" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'goldAlarmContract')" required>
+                        <div id="gold-alarm-contract-error" class="form-error" style="display: none;">يرجى رفع نسخة من عقد الصيانة لأجهزة الإنذار والإطفاء بصيغة PDF.</div>
                     </div>
                 `;
             } else if (['gas_selling_shops_license', 'Gas Selling Shops License'].includes(key)) {
@@ -4577,6 +4578,7 @@
                 fieldKey === 'bakeryCrCopy' ? 'bakery-cr-error' :
                 fieldKey === 'bakerySitePhotos' ? 'bakery-site-photos-error' :
                 fieldKey === 'bakeryDrawingsApproval' ? 'bakery-drawings-error' :
+                fieldKey === 'goldAlarmContract' ? 'gold-alarm-contract-error' :
                 `${fieldKey}-error`
             );
             if (errorEl) errorEl.style.display = 'none';
@@ -4786,13 +4788,20 @@
                     }
                 }
             } else if (['gold_shop_license', 'Gold Shop License'].includes(key)) {
-                const alarmInput = document.getElementById('app-gold-alarm-details');
-                if (alarmInput) {
-                    alarmInput.classList.remove('invalid');
-                    if (!alarmInput.value.trim()) {
-                        alarmInput.classList.add('invalid');
-                        isValid = false;
+                const alarmFile = window.dynamicPdfFiles.goldAlarmContract;
+                const alarmFileEl = document.getElementById('app-gold-alarm-contract');
+                const alarmErr = document.getElementById('gold-alarm-contract-error');
+
+                if (!alarmFile || !alarmFile.base64) {
+                    if (alarmFileEl) alarmFileEl.classList.add('invalid');
+                    if (alarmErr) {
+                        alarmErr.style.display = 'block';
+                        alarmErr.innerText = "يرجى رفع نسخة من عقد الصيانة لأجهزة الإنذار والإطفاء بصيغة PDF.";
                     }
+                    isValid = false;
+                } else {
+                    if (alarmFileEl) alarmFileEl.classList.remove('invalid');
+                    if (alarmErr) alarmErr.style.display = 'none';
                 }
             } else if (['gas_selling_shops_license', 'Gas Selling Shops License'].includes(key)) {
                 const gasLetterFile = window.dynamicPdfFiles.moicLetter;
@@ -4883,8 +4892,8 @@
                 const drawingsName = window.dynamicPdfFiles.bakeryDrawingsApproval ? window.dynamicPdfFiles.bakeryDrawingsApproval.name : '';
                 dynamicSummary = `السجل التجاري: 📄 ${crName} | صور الموقع: 📄 ${siteName} | موافقات المخططات: 📄 ${drawingsName}`;
             } else if (['gold_shop_license', 'Gold Shop License'].includes(key)) {
-                const alarm = document.getElementById('app-gold-alarm-details').value.trim();
-                dynamicSummary = `عقد صيانة نظام الإنذار: ${alarm}`;
+                const alarmName = window.dynamicPdfFiles.goldAlarmContract ? window.dynamicPdfFiles.goldAlarmContract.name : '';
+                dynamicSummary = `عقد صيانة أجهزة الإنذار والإطفاء: 📄 ${alarmName}`;
             } else if (['gas_station_license', 'Gas Station License'].includes(key)) {
                 const capacity = document.getElementById('app-station-capacity').value;
                 dynamicSummary = `سعة خزانات الوقود: ${capacity} لتر`;
@@ -4984,8 +4993,10 @@
                     base64: window.dynamicPdfFiles.bakeryDrawingsApproval.base64
                 } : null;
             } else if (['gold_shop_license', 'Gold Shop License'].includes(key)) {
-                const el = document.getElementById('app-gold-alarm-details');
-                dynamicFields.goldAlarmDetails = el ? el.value.trim() : '';
+                dynamicFields.goldAlarmContract = window.dynamicPdfFiles.goldAlarmContract ? {
+                    name: window.dynamicPdfFiles.goldAlarmContract.name,
+                    base64: window.dynamicPdfFiles.goldAlarmContract.base64
+                } : null;
             } else if (['gas_station_license', 'Gas Station License'].includes(key)) {
                 const el = document.getElementById('app-station-capacity');
                 dynamicFields.stationCapacity = el ? parseInt(el.value || '0', 10) : 0;
