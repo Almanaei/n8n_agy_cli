@@ -4523,9 +4523,20 @@
                 `;
             } else if (['bakery_license', 'Bakery License'].includes(key)) {
                 container.innerHTML = `
-                    <div class="form-group">
-                        <label class="form-label" for="app-bakery-drawings">أرقام موافقات المخططات المعمارية والكهربائية</label>
-                        <input type="text" id="app-bakery-drawings" class="form-input" placeholder="مثال: موافقة رقم MC-90234" required>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-bakery-cr">نسخة من السجل التجاري (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-bakery-cr" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'bakeryCrCopy')" required>
+                        <div id="bakery-cr-error" class="form-error" style="display: none;">يرجى رفع نسخة من السجل التجاري بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-bakery-site-photos">صور للموقع (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-bakery-site-photos" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'bakerySitePhotos')" required>
+                        <div id="bakery-site-photos-error" class="form-error" style="display: none;">يرجى رفع صور للموقع بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-bakery-drawings">موافقات المخططات المعمارية والكهربائية والميكانيكية (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-bakery-drawings" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'bakeryDrawingsApproval')" required>
+                        <div id="bakery-drawings-error" class="form-error" style="display: none;">يرجى رفع موافقات المخططات المعمارية والكهربائية والميكانيكية بصيغة PDF.</div>
                     </div>
                 `;
             } else if (['gas_station_license', 'Gas Station License'].includes(key)) {
@@ -4563,6 +4574,9 @@
                 fieldKey === 'fireInspectionReport' ? 'fire-inspection-report-error' :
                 fieldKey === 'maintenanceContract' ? 'maintenance-contract-error' :
                 fieldKey === 'moicLetter' ? 'gas-ministry-letter-error' :
+                fieldKey === 'bakeryCrCopy' ? 'bakery-cr-error' :
+                fieldKey === 'bakerySitePhotos' ? 'bakery-site-photos-error' :
+                fieldKey === 'bakeryDrawingsApproval' ? 'bakery-drawings-error' :
                 `${fieldKey}-error`
             );
             if (errorEl) errorEl.style.display = 'none';
@@ -4797,13 +4811,43 @@
                     if (gasErr) gasErr.style.display = 'none';
                 }
             } else if (['bakery_license', 'Bakery License'].includes(key)) {
-                const bakeryDrawingsInput = document.getElementById('app-bakery-drawings');
-                if (bakeryDrawingsInput) {
-                    bakeryDrawingsInput.classList.remove('invalid');
-                    if (!bakeryDrawingsInput.value.trim()) {
-                        bakeryDrawingsInput.classList.add('invalid');
-                        isValid = false;
-                    }
+                const crFile = window.dynamicPdfFiles.bakeryCrCopy;
+                const siteFile = window.dynamicPdfFiles.bakerySitePhotos;
+                const drawingsFile = window.dynamicPdfFiles.bakeryDrawingsApproval;
+
+                const crEl = document.getElementById('app-bakery-cr');
+                const siteEl = document.getElementById('app-bakery-site-photos');
+                const drawingsEl = document.getElementById('app-bakery-drawings');
+
+                const crErr = document.getElementById('bakery-cr-error');
+                const siteErr = document.getElementById('bakery-site-photos-error');
+                const drawingsErr = document.getElementById('bakery-drawings-error');
+
+                if (!crFile || !crFile.base64) {
+                    if (crEl) crEl.classList.add('invalid');
+                    if (crErr) { crErr.style.display = 'block'; crErr.innerText = "يرجى رفع نسخة من السجل التجاري بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (crEl) crEl.classList.remove('invalid');
+                    if (crErr) crErr.style.display = 'none';
+                }
+
+                if (!siteFile || !siteFile.base64) {
+                    if (siteEl) siteEl.classList.add('invalid');
+                    if (siteErr) { siteErr.style.display = 'block'; siteErr.innerText = "يرجى رفع صور للموقع بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (siteEl) siteEl.classList.remove('invalid');
+                    if (siteErr) siteErr.style.display = 'none';
+                }
+
+                if (!drawingsFile || !drawingsFile.base64) {
+                    if (drawingsEl) drawingsEl.classList.add('invalid');
+                    if (drawingsErr) { drawingsErr.style.display = 'block'; drawingsErr.innerText = "يرجى رفع موافقات المخططات المعمارية والكهربائية والميكانيكية بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (drawingsEl) drawingsEl.classList.remove('invalid');
+                    if (drawingsErr) drawingsErr.style.display = 'none';
                 }
             } else if (['gas_station_license', 'Gas Station License'].includes(key)) {
                 const capacityInput = document.getElementById('app-station-capacity');
@@ -4834,8 +4878,10 @@
                 const gasLetterName = window.dynamicPdfFiles.moicLetter ? window.dynamicPdfFiles.moicLetter.name : '';
                 dynamicSummary = `رسالة من وزارة الصناعة والتجارة والسياحة: 📄 ${gasLetterName}`;
             } else if (['bakery_license', 'Bakery License'].includes(key)) {
-                const bakeryDrawings = document.getElementById('app-bakery-drawings').value.trim();
-                dynamicSummary = `موافقات المخططات المعمارية: ${bakeryDrawings}`;
+                const crName = window.dynamicPdfFiles.bakeryCrCopy ? window.dynamicPdfFiles.bakeryCrCopy.name : '';
+                const siteName = window.dynamicPdfFiles.bakerySitePhotos ? window.dynamicPdfFiles.bakerySitePhotos.name : '';
+                const drawingsName = window.dynamicPdfFiles.bakeryDrawingsApproval ? window.dynamicPdfFiles.bakeryDrawingsApproval.name : '';
+                dynamicSummary = `السجل التجاري: 📄 ${crName} | صور الموقع: 📄 ${siteName} | موافقات المخططات: 📄 ${drawingsName}`;
             } else if (['gold_shop_license', 'Gold Shop License'].includes(key)) {
                 const alarm = document.getElementById('app-gold-alarm-details').value.trim();
                 dynamicSummary = `عقد صيانة نظام الإنذار: ${alarm}`;
@@ -4925,8 +4971,18 @@
                     base64: window.dynamicPdfFiles.moicLetter.base64
                 } : null;
             } else if (['bakery_license', 'Bakery License'].includes(key)) {
-                const el = document.getElementById('app-bakery-drawings');
-                dynamicFields.bakeryDrawings = el ? el.value.trim() : '';
+                dynamicFields.bakeryCrCopy = window.dynamicPdfFiles.bakeryCrCopy ? {
+                    name: window.dynamicPdfFiles.bakeryCrCopy.name,
+                    base64: window.dynamicPdfFiles.bakeryCrCopy.base64
+                } : null;
+                dynamicFields.bakerySitePhotos = window.dynamicPdfFiles.bakerySitePhotos ? {
+                    name: window.dynamicPdfFiles.bakerySitePhotos.name,
+                    base64: window.dynamicPdfFiles.bakerySitePhotos.base64
+                } : null;
+                dynamicFields.bakeryDrawingsApproval = window.dynamicPdfFiles.bakeryDrawingsApproval ? {
+                    name: window.dynamicPdfFiles.bakeryDrawingsApproval.name,
+                    base64: window.dynamicPdfFiles.bakeryDrawingsApproval.base64
+                } : null;
             } else if (['gold_shop_license', 'Gold Shop License'].includes(key)) {
                 const el = document.getElementById('app-gold-alarm-details');
                 dynamicFields.goldAlarmDetails = el ? el.value.trim() : '';

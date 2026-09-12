@@ -964,7 +964,24 @@ function formatDynamicFields(serviceInput, dynamicFields) {
 
     case 'bakery_license':
     case 'Bakery License':
-      if (dynamicFields.bakeryDrawings) {
+      if (dynamicFields.bakeryCrCopy) {
+        const doc = typeof dynamicFields.bakeryCrCopy === 'object'
+          ? (dynamicFields.bakeryCrCopy.name || dynamicFields.bakeryCrCopy.url || 'مرفق السجل التجاري')
+          : dynamicFields.bakeryCrCopy;
+        parts.push(`السجل التجاري: ${doc}`);
+      }
+      if (dynamicFields.bakerySitePhotos) {
+        const doc = typeof dynamicFields.bakerySitePhotos === 'object'
+          ? (dynamicFields.bakerySitePhotos.name || dynamicFields.bakerySitePhotos.url || 'مرفق صور الموقع')
+          : dynamicFields.bakerySitePhotos;
+        parts.push(`صور الموقع: ${doc}`);
+      }
+      if (dynamicFields.bakeryDrawingsApproval) {
+        const doc = typeof dynamicFields.bakeryDrawingsApproval === 'object'
+          ? (dynamicFields.bakeryDrawingsApproval.name || dynamicFields.bakeryDrawingsApproval.url || 'مرفق موافقات المخططات')
+          : dynamicFields.bakeryDrawingsApproval;
+        parts.push(`موافقات المخططات المعمارية والكهربائية والميكانيكية: ${doc}`);
+      } else if (dynamicFields.bakeryDrawings) {
         parts.push(`موافقات المخططات المعمارية: ${dynamicFields.bakeryDrawings}`);
       }
       break;
@@ -1099,6 +1116,9 @@ function formatDynamicFields(serviceInput, dynamicFields) {
     chemicalType: 'نوع المادة الكيميائية',
     moicLetter: 'رسالة من وزارة الصناعة والتجارة والسياحة',
     gasMinistryLetter: 'تفاصيل خطاب وزارة الصناعة',
+    bakeryCrCopy: 'نسخة من السجل التجاري',
+    bakerySitePhotos: 'صور للموقع',
+    bakeryDrawingsApproval: 'موافقات المخططات المعمارية والكهربائية والميكانيكية',
     bakeryDrawings: 'موافقات المخططات المعمارية',
     goldAlarmDetails: 'عقد صيانة نظام الإنذار',
     stationCapacity: 'سعة خزانات الوقود',
@@ -2829,7 +2849,10 @@ const server = http.createServer(async (req, res) => {
           const dynamicAttConfigs = [
             { key: 'fireInspectionReport', label: 'تقرير فحص أنظمة الإطفاء والإنذار (الطلب الأصلي)', defaultName: 'Fire-Inspection-Report.pdf' },
             { key: 'maintenanceContract', label: 'نسخة من عقد الصيانة (الطلب الأصلي)', defaultName: 'Maintenance-Contract.pdf' },
-            { key: 'moicLetter', label: 'رسالة من وزارة الصناعة والتجارة والسياحة (الطلب الأصلي)', defaultName: 'MOIC-Letter.pdf' }
+            { key: 'moicLetter', label: 'رسالة من وزارة الصناعة والتجارة والسياحة (الطلب الأصلي)', defaultName: 'MOIC-Letter.pdf' },
+            { key: 'bakeryCrCopy', label: 'نسخة من السجل التجاري (الطلب الأصلي)', defaultName: 'Bakery-CR-Copy.pdf' },
+            { key: 'bakerySitePhotos', label: 'صور للموقع (الطلب الأصلي)', defaultName: 'Bakery-Site-Photos.pdf' },
+            { key: 'bakeryDrawingsApproval', label: 'موافقات المخططات المعمارية والكهربائية والميكانيكية (الطلب الأصلي)', defaultName: 'Bakery-Drawings-Approval.pdf' }
           ];
 
           for (const conf of dynamicAttConfigs) {
