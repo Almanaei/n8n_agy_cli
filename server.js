@@ -1639,7 +1639,34 @@ function formatDynamicFields(serviceInput, dynamicFields) {
       if (dynamicFields.transportDate) parts.push(`تاريخ النقل: ${dynamicFields.transportDate}`);
       break;
 
+    case 'diesel_gas_tanks_installation_license':
     case 'diesel_gas_tanks_installation_approval':
+    case 'Final Approval License for Installing Diesel & Gas Tanks':
+    case 'إصدار ترخيص الموافقة النهائية على تركيب خزانات الديزل والغاز، وتجديد الترخيص':
+      if (dynamicFields.officialLetter) {
+        const doc = typeof dynamicFields.officialLetter === 'object'
+          ? (dynamicFields.officialLetter.name || dynamicFields.officialLetter.url || 'مرفق رسالة رسمية')
+          : dynamicFields.officialLetter;
+        parts.push(`رسالة رسمية: ${doc}`);
+      }
+      if (dynamicFields.validMaintenanceCertificate) {
+        const doc = typeof dynamicFields.validMaintenanceCertificate === 'object'
+          ? (dynamicFields.validMaintenanceCertificate.name || dynamicFields.validMaintenanceCertificate.url || 'مرفق شهادة صيانة سارية')
+          : dynamicFields.validMaintenanceCertificate;
+        parts.push(`شهادة صيانة سارية: ${doc}`);
+      }
+      if (dynamicFields.hazmatBranchPreviousApproval) {
+        const doc = typeof dynamicFields.hazmatBranchPreviousApproval === 'object'
+          ? (dynamicFields.hazmatBranchPreviousApproval.name || dynamicFields.hazmatBranchPreviousApproval.url || 'مرفق الموافقة السابقة من فرع المواد الخطرة')
+          : dynamicFields.hazmatBranchPreviousApproval;
+        parts.push(`الموافقة السابقة من فرع المواد الخطرة: ${doc}`);
+      }
+      if (dynamicFields.allPreviousApprovals) {
+        const doc = typeof dynamicFields.allPreviousApprovals === 'object'
+          ? (dynamicFields.allPreviousApprovals.name || dynamicFields.allPreviousApprovals.url || 'مرفق جميع الموافقات السابقة')
+          : dynamicFields.allPreviousApprovals;
+        parts.push(`جميع الموافقات السابقة: ${doc}`);
+      }
       if (dynamicFields.tankCapacity) parts.push(`سعة الخزان: ${dynamicFields.tankCapacity}`);
       if (dynamicFields.fuelType) parts.push(`نوع الوقود: ${dynamicFields.fuelType}`);
       break;
@@ -1723,6 +1750,9 @@ function formatDynamicFields(serviceInput, dynamicFields) {
     transportDate: 'تاريخ النقل',
     tankCapacity: 'سعة الخزان',
     fuelType: 'نوع الوقود',
+    validMaintenanceCertificate: 'شهادة صيانة سارية',
+    hazmatBranchPreviousApproval: 'الموافقة السابقة من فرع المواد الخطرة',
+    allPreviousApprovals: 'جميع الموافقات السابقة',
     activityType: 'نوع النشاط',
     engineerLicense: 'ترخيص المهندس'
   };

@@ -4890,6 +4890,29 @@
                         <div id="chem-trans-tech-specs-error" class="form-error" style="display: none;">يرجى رفع المواصفات الفنية بصيغة PDF.</div>
                     </div>
                 `;
+            } else if (['diesel_gas_tanks_installation_license', 'diesel_gas_tanks_installation_approval', 'Final Approval License for Installing Diesel & Gas Tanks', 'إصدار ترخيص الموافقة النهائية على تركيب خزانات الديزل والغاز، وتجديد الترخيص'].includes(key)) {
+                container.innerHTML = `
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-tanks-official-letter">رسالة رسمية (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-tanks-official-letter" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'officialLetter')" required>
+                        <div id="tanks-official-letter-error" class="form-error" style="display: none;">يرجى رفع الرسالة الرسمية بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-tanks-maint-cert">شهادة صيانة سارية (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-tanks-maint-cert" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'validMaintenanceCertificate')" required>
+                        <div id="tanks-maint-cert-error" class="form-error" style="display: none;">يرجى رفع شهادة صيانة سارية بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-tanks-hazmat-approval">الموافقة السابقة من فرع المواد الخطرة (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-tanks-hazmat-approval" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'hazmatBranchPreviousApproval')" required>
+                        <div id="tanks-hazmat-approval-error" class="form-error" style="display: none;">يرجى رفع الموافقة السابقة من فرع المواد الخطرة بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-tanks-all-approvals">جميع الموافقات السابقة (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-tanks-all-approvals" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'allPreviousApprovals')" required>
+                        <div id="tanks-all-approvals-error" class="form-error" style="display: none;">يرجى رفع جميع الموافقات السابقة بصيغة PDF.</div>
+                    </div>
+                `;
             } else if (service) {
                 container.innerHTML = `
                     <div class="form-group">
@@ -4941,6 +4964,10 @@
                 fieldKey === 'otherEntitiesApprovals' ? 'gas-maps-other-approvals-error' :
                 fieldKey === 'approvedProjectMaps' ? 'gas-maps-approved-maps-error' :
                 fieldKey === 'electricalMechanicalPlans' ? 'elec-plans-mep-plans-error' :
+                fieldKey === 'officialLetter' ? (document.getElementById('tanks-official-letter-error') ? 'tanks-official-letter-error' : 'chem-trans-official-letter-error') :
+                fieldKey === 'validMaintenanceCertificate' ? 'tanks-maint-cert-error' :
+                fieldKey === 'hazmatBranchPreviousApproval' ? 'tanks-hazmat-approval-error' :
+                fieldKey === 'allPreviousApprovals' ? 'tanks-all-approvals-error' :
                 `${fieldKey}-error`
             );
             if (errorEl) errorEl.style.display = 'none';
@@ -6030,6 +6057,57 @@
                     if (techSpecsEl) techSpecsEl.classList.remove('invalid');
                     if (techSpecsErr) techSpecsErr.style.display = 'none';
                 }
+            } else if (['diesel_gas_tanks_installation_license', 'diesel_gas_tanks_installation_approval', 'Final Approval License for Installing Diesel & Gas Tanks', 'إصدار ترخيص الموافقة النهائية على تركيب خزانات الديزل والغاز، وتجديد الترخيص'].includes(key)) {
+                const offLetterFile = window.dynamicPdfFiles.officialLetter;
+                const maintCertFile = window.dynamicPdfFiles.validMaintenanceCertificate;
+                const hazmatApprFile = window.dynamicPdfFiles.hazmatBranchPreviousApproval;
+                const allApprsFile = window.dynamicPdfFiles.allPreviousApprovals;
+
+                const offLetterEl = document.getElementById('app-tanks-official-letter');
+                const maintCertEl = document.getElementById('app-tanks-maint-cert');
+                const hazmatApprEl = document.getElementById('app-tanks-hazmat-approval');
+                const allApprsEl = document.getElementById('app-tanks-all-approvals');
+
+                const offLetterErr = document.getElementById('tanks-official-letter-error');
+                const maintCertErr = document.getElementById('tanks-maint-cert-error');
+                const hazmatApprErr = document.getElementById('tanks-hazmat-approval-error');
+                const allApprsErr = document.getElementById('tanks-all-approvals-error');
+
+                if (!offLetterFile || !offLetterFile.base64) {
+                    if (offLetterEl) offLetterEl.classList.add('invalid');
+                    if (offLetterErr) { offLetterErr.style.display = 'block'; offLetterErr.innerText = "يرجى رفع الرسالة الرسمية بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (offLetterEl) offLetterEl.classList.remove('invalid');
+                    if (offLetterErr) offLetterErr.style.display = 'none';
+                }
+
+                if (!maintCertFile || !maintCertFile.base64) {
+                    if (maintCertEl) maintCertEl.classList.add('invalid');
+                    if (maintCertErr) { maintCertErr.style.display = 'block'; maintCertErr.innerText = "يرجى رفع شهادة صيانة سارية بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (maintCertEl) maintCertEl.classList.remove('invalid');
+                    if (maintCertErr) maintCertErr.style.display = 'none';
+                }
+
+                if (!hazmatApprFile || !hazmatApprFile.base64) {
+                    if (hazmatApprEl) hazmatApprEl.classList.add('invalid');
+                    if (hazmatApprErr) { hazmatApprErr.style.display = 'block'; hazmatApprErr.innerText = "يرجى رفع الموافقة السابقة من فرع المواد الخطرة بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (hazmatApprEl) hazmatApprEl.classList.remove('invalid');
+                    if (hazmatApprErr) hazmatApprErr.style.display = 'none';
+                }
+
+                if (!allApprsFile || !allApprsFile.base64) {
+                    if (allApprsEl) allApprsEl.classList.add('invalid');
+                    if (allApprsErr) { allApprsErr.style.display = 'block'; allApprsErr.innerText = "يرجى رفع جميع الموافقات السابقة بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (allApprsEl) allApprsEl.classList.remove('invalid');
+                    if (allApprsErr) allApprsErr.style.display = 'none';
+                }
             }
 
             if (!isValid) return;
@@ -6158,6 +6236,12 @@
                 const emergListName = window.dynamicPdfFiles.emergencyRespondersList ? window.dynamicPdfFiles.emergencyRespondersList.name : '';
                 const techSpecsName = window.dynamicPdfFiles.technicalSpecificationsDoc ? window.dynamicPdfFiles.technicalSpecificationsDoc.name : '';
                 dynamicSummary = `رسالة رسمية: 📄 ${offLetterName} | شهادة فنية: 📄 ${techCertName} | تصريح استيراد: 📄 ${importPermitName} | ملكية المركبة: 📄 ${vehicleOwnerName} | صحيفة السلامة: 📄 ${msdsName} | تعليمات قائد المركبة: 📄 ${driverInstName} | شهادة إطفاء السائق: 📄 ${driverFireCertName} | قائمة مسؤولي الطوارئ: 📄 ${emergListName} | المواصفات الفنية: 📄 ${techSpecsName}`;
+            } else if (['diesel_gas_tanks_installation_license', 'diesel_gas_tanks_installation_approval', 'Final Approval License for Installing Diesel & Gas Tanks', 'إصدار ترخيص الموافقة النهائية على تركيب خزانات الديزل والغاز، وتجديد الترخيص'].includes(key)) {
+                const offLetterName = window.dynamicPdfFiles.officialLetter ? window.dynamicPdfFiles.officialLetter.name : '';
+                const maintCertName = window.dynamicPdfFiles.validMaintenanceCertificate ? window.dynamicPdfFiles.validMaintenanceCertificate.name : '';
+                const hazmatApprName = window.dynamicPdfFiles.hazmatBranchPreviousApproval ? window.dynamicPdfFiles.hazmatBranchPreviousApproval.name : '';
+                const allApprsName = window.dynamicPdfFiles.allPreviousApprovals ? window.dynamicPdfFiles.allPreviousApprovals.name : '';
+                dynamicSummary = `رسالة رسمية: 📄 ${offLetterName} | شهادة صيانة سارية: 📄 ${maintCertName} | الموافقة السابقة من فرع المواد الخطرة: 📄 ${hazmatApprName} | جميع الموافقات السابقة: 📄 ${allApprsName}`;
             } else {
                 const genericInput = document.getElementById('app-generic-details');
                 if (genericInput) {
@@ -6531,6 +6615,23 @@
                 dynamicFields.technicalSpecificationsDoc = window.dynamicPdfFiles.technicalSpecificationsDoc ? {
                     name: window.dynamicPdfFiles.technicalSpecificationsDoc.name,
                     base64: window.dynamicPdfFiles.technicalSpecificationsDoc.base64
+                } : null;
+            } else if (['diesel_gas_tanks_installation_license', 'diesel_gas_tanks_installation_approval', 'Final Approval License for Installing Diesel & Gas Tanks', 'إصدار ترخيص الموافقة النهائية على تركيب خزانات الديزل والغاز، وتجديد الترخيص'].includes(key)) {
+                dynamicFields.officialLetter = window.dynamicPdfFiles.officialLetter ? {
+                    name: window.dynamicPdfFiles.officialLetter.name,
+                    base64: window.dynamicPdfFiles.officialLetter.base64
+                } : null;
+                dynamicFields.validMaintenanceCertificate = window.dynamicPdfFiles.validMaintenanceCertificate ? {
+                    name: window.dynamicPdfFiles.validMaintenanceCertificate.name,
+                    base64: window.dynamicPdfFiles.validMaintenanceCertificate.base64
+                } : null;
+                dynamicFields.hazmatBranchPreviousApproval = window.dynamicPdfFiles.hazmatBranchPreviousApproval ? {
+                    name: window.dynamicPdfFiles.hazmatBranchPreviousApproval.name,
+                    base64: window.dynamicPdfFiles.hazmatBranchPreviousApproval.base64
+                } : null;
+                dynamicFields.allPreviousApprovals = window.dynamicPdfFiles.allPreviousApprovals ? {
+                    name: window.dynamicPdfFiles.allPreviousApprovals.name,
+                    base64: window.dynamicPdfFiles.allPreviousApprovals.base64
                 } : null;
             } else {
                 const genericInput = document.getElementById('app-generic-details');
