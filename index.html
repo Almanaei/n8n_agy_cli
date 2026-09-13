@@ -4702,6 +4702,24 @@
                         <div id="elec-plans-mep-plans-error" class="form-error" style="display: none;">يرجى رفع المخططات الكهربائية والميكانيكية بصيغة PDF.</div>
                     </div>
                 `;
+            } else if (['fire_safety_equipment_license', 'Fire Safety & Protection Equipment License', 'Fire Safety and Protection Equipment License', 'إصدار الترخيص لمعدات الحريق والسلامة، وتجديد الترخيص'].includes(key)) {
+                container.innerHTML = `
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-fire-equip-product-accreditations">شهادات اعتماد المنتج (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-fire-equip-product-accreditations" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'productAccreditationCertificates')" required>
+                        <div id="fire-equip-product-accreditations-error" class="form-error" style="display: none;">يرجى رفع شهادات اعتماد المنتج بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-fire-equip-cr-copy">سجل تجاري (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-fire-equip-cr-copy" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'commercialRegisterCopy')" required>
+                        <div id="fire-equip-cr-copy-error" class="form-error" style="display: none;">يرجى رفع السجل التجاري بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-fire-equip-company-profile">بيان مفصل للشركة (للشركات الجديدة) (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-fire-equip-company-profile" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'companyDetailedProfile')" required>
+                        <div id="fire-equip-company-profile-error" class="form-error" style="display: none;">يرجى رفع بيان مفصل للشركة بصيغة PDF.</div>
+                    </div>
+                `;
             } else if (service) {
                 container.innerHTML = `
                     <div class="form-group">
@@ -5376,6 +5394,45 @@
                     if (mepPlansEl) mepPlansEl.classList.remove('invalid');
                     if (mepPlansErr) mepPlansErr.style.display = 'none';
                 }
+            } else if (['fire_safety_equipment_license', 'Fire Safety & Protection Equipment License', 'Fire Safety and Protection Equipment License', 'إصدار الترخيص لمعدات الحريق والسلامة، وتجديد الترخيص'].includes(key)) {
+                const accredFile = window.dynamicPdfFiles.productAccreditationCertificates;
+                const crFile = window.dynamicPdfFiles.commercialRegisterCopy;
+                const profileFile = window.dynamicPdfFiles.companyDetailedProfile;
+
+                const accredEl = document.getElementById('app-fire-equip-product-accreditations');
+                const crEl = document.getElementById('app-fire-equip-cr-copy');
+                const profileEl = document.getElementById('app-fire-equip-company-profile');
+
+                const accredErr = document.getElementById('fire-equip-product-accreditations-error');
+                const crErr = document.getElementById('fire-equip-cr-copy-error');
+                const profileErr = document.getElementById('fire-equip-company-profile-error');
+
+                if (!accredFile || !accredFile.base64) {
+                    if (accredEl) accredEl.classList.add('invalid');
+                    if (accredErr) { accredErr.style.display = 'block'; accredErr.innerText = "يرجى رفع شهادات اعتماد المنتج بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (accredEl) accredEl.classList.remove('invalid');
+                    if (accredErr) accredErr.style.display = 'none';
+                }
+
+                if (!crFile || !crFile.base64) {
+                    if (crEl) crEl.classList.add('invalid');
+                    if (crErr) { crErr.style.display = 'block'; crErr.innerText = "يرجى رفع السجل التجاري بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (crEl) crEl.classList.remove('invalid');
+                    if (crErr) crErr.style.display = 'none';
+                }
+
+                if (!profileFile || !profileFile.base64) {
+                    if (profileEl) profileEl.classList.add('invalid');
+                    if (profileErr) { profileErr.style.display = 'block'; profileErr.innerText = "يرجى رفع بيان مفصل للشركة بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (profileEl) profileEl.classList.remove('invalid');
+                    if (profileErr) profileErr.style.display = 'none';
+                }
             }
 
             if (!isValid) return;
@@ -5456,6 +5513,11 @@
                 const archName = window.dynamicPdfFiles.architecturalPlans ? window.dynamicPdfFiles.architecturalPlans.name : '';
                 const mepName = window.dynamicPdfFiles.electricalMechanicalPlans ? window.dynamicPdfFiles.electricalMechanicalPlans.name : '';
                 dynamicSummary = `رسالة من الجهة المعنية: 📄 ${letterName} | المخططات المعمارية: 📄 ${archName} | المخططات الكهربائية والميكانيكية: 📄 ${mepName}`;
+            } else if (['fire_safety_equipment_license', 'Fire Safety & Protection Equipment License', 'Fire Safety and Protection Equipment License', 'إصدار الترخيص لمعدات الحريق والسلامة، وتجديد الترخيص'].includes(key)) {
+                const accredName = window.dynamicPdfFiles.productAccreditationCertificates ? window.dynamicPdfFiles.productAccreditationCertificates.name : '';
+                const crName = window.dynamicPdfFiles.commercialRegisterCopy ? window.dynamicPdfFiles.commercialRegisterCopy.name : '';
+                const profileName = window.dynamicPdfFiles.companyDetailedProfile ? window.dynamicPdfFiles.companyDetailedProfile.name : '';
+                dynamicSummary = `شهادات اعتماد المنتج: 📄 ${accredName} | سجل تجاري: 📄 ${crName} | بيان مفصل للشركة: 📄 ${profileName}`;
             } else {
                 const genericInput = document.getElementById('app-generic-details');
                 if (genericInput) {
@@ -5677,6 +5739,19 @@
                 dynamicFields.electricalMechanicalPlans = window.dynamicPdfFiles.electricalMechanicalPlans ? {
                     name: window.dynamicPdfFiles.electricalMechanicalPlans.name,
                     base64: window.dynamicPdfFiles.electricalMechanicalPlans.base64
+                } : null;
+            } else if (['fire_safety_equipment_license', 'Fire Safety & Protection Equipment License', 'Fire Safety and Protection Equipment License', 'إصدار الترخيص لمعدات الحريق والسلامة، وتجديد الترخيص'].includes(key)) {
+                dynamicFields.productAccreditationCertificates = window.dynamicPdfFiles.productAccreditationCertificates ? {
+                    name: window.dynamicPdfFiles.productAccreditationCertificates.name,
+                    base64: window.dynamicPdfFiles.productAccreditationCertificates.base64
+                } : null;
+                dynamicFields.commercialRegisterCopy = window.dynamicPdfFiles.commercialRegisterCopy ? {
+                    name: window.dynamicPdfFiles.commercialRegisterCopy.name,
+                    base64: window.dynamicPdfFiles.commercialRegisterCopy.base64
+                } : null;
+                dynamicFields.companyDetailedProfile = window.dynamicPdfFiles.companyDetailedProfile ? {
+                    name: window.dynamicPdfFiles.companyDetailedProfile.name,
+                    base64: window.dynamicPdfFiles.companyDetailedProfile.base64
                 } : null;
             } else {
                 const genericInput = document.getElementById('app-generic-details');

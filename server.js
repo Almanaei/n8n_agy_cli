@@ -1359,6 +1359,31 @@ function formatDynamicFields(serviceInput, dynamicFields) {
       break;
 
     case 'fire_safety_equipment_license':
+    case 'Fire Safety & Protection Equipment License':
+    case 'Fire Safety and Protection Equipment License':
+    case 'إصدار الترخيص لمعدات الحريق والسلامة، وتجديد الترخيص':
+      if (dynamicFields.productAccreditationCertificates) {
+        const doc = typeof dynamicFields.productAccreditationCertificates === 'object'
+          ? (dynamicFields.productAccreditationCertificates.name || dynamicFields.productAccreditationCertificates.url || 'مرفق شهادات اعتماد المنتج')
+          : dynamicFields.productAccreditationCertificates;
+        parts.push(`شهادات اعتماد المنتج: ${doc}`);
+      }
+      if (dynamicFields.commercialRegisterCopy) {
+        const doc = typeof dynamicFields.commercialRegisterCopy === 'object'
+          ? (dynamicFields.commercialRegisterCopy.name || dynamicFields.commercialRegisterCopy.url || 'مرفق السجل التجاري')
+          : dynamicFields.commercialRegisterCopy;
+        parts.push(`سجل تجاري: ${doc}`);
+      }
+      if (dynamicFields.companyDetailedProfile) {
+        const doc = typeof dynamicFields.companyDetailedProfile === 'object'
+          ? (dynamicFields.companyDetailedProfile.name || dynamicFields.companyDetailedProfile.url || 'مرفق بيان مفصل للشركة')
+          : dynamicFields.companyDetailedProfile;
+        parts.push(`بيان مفصل للشركة (للشركات الجديدة): ${doc}`);
+      }
+      if (dynamicFields.equipmentType) parts.push(`نوع المعدات: ${dynamicFields.equipmentType}`);
+      if (dynamicFields.brandName) parts.push(`العلامة التجارية: ${dynamicFields.brandName}`);
+      break;
+
     case 'fire_safety_equipment_noc':
     case 'local_fire_equipment_factory_license':
       if (dynamicFields.equipmentType) parts.push(`نوع المعدات: ${dynamicFields.equipmentType}`);
