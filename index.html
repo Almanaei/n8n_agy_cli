@@ -4748,6 +4748,34 @@
                         <div id="noc-maintenance-cert-error" class="form-error" style="display: none;">يرجى رفع شهادة الصيانة بصيغة PDF.</div>
                     </div>
                 `;
+            } else if (['local_fire_equipment_factory_license', 'License for Local Firefighting Equipment Factory', 'Local Fire Equipment Factory License', 'إصدار الترخيص لمصنع محلي لمعدات الإطفاء والوقاية من الحريق، وتجديد الترخيص'].includes(key)) {
+                container.innerHTML = `
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-factory-cr-copy">السجل التجاري (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-factory-cr-copy" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'commercialRegisterCopy')" required>
+                        <div id="factory-cr-copy-error" class="form-error" style="display: none;">يرجى رفع السجل التجاري بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-factory-company-profile">بيان مفصل للشركة والأعمال (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-factory-company-profile" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'companyOperationsProfile')" required>
+                        <div id="factory-company-profile-error" class="form-error" style="display: none;">يرجى رفع بيان مفصل للشركة والأعمال بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-factory-tech-equipment">التجهيزات الفنية في المصنع (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-factory-tech-equipment" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'factoryTechnicalEquipment')" required>
+                        <div id="factory-tech-equipment-error" class="form-error" style="display: none;">يرجى رفع التجهيزات الفنية في المصنع بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-factory-moic-approval">موافقة وزارة الصناعة والتجارة (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-factory-moic-approval" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'moicApproval')" required>
+                        <div id="factory-moic-approval-error" class="form-error" style="display: none;">يرجى رفع موافقة وزارة الصناعة والتجارة بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-factory-engineering-maps">الخرائط الهندسية (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-factory-engineering-maps" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'engineeringMaps')" required>
+                        <div id="factory-engineering-maps-error" class="form-error" style="display: none;">يرجى رفع الخرائط الهندسية بصيغة PDF.</div>
+                    </div>
+                `;
             } else if (service) {
                 container.innerHTML = `
                     <div class="form-group">
@@ -5523,6 +5551,69 @@
                     if (maintCertEl) maintCertEl.classList.remove('invalid');
                     if (maintCertErr) maintCertErr.style.display = 'none';
                 }
+            } else if (['local_fire_equipment_factory_license', 'License for Local Firefighting Equipment Factory', 'Local Fire Equipment Factory License', 'إصدار الترخيص لمصنع محلي لمعدات الإطفاء والوقاية من الحريق، وتجديد الترخيص'].includes(key)) {
+                const crFile = window.dynamicPdfFiles.commercialRegisterCopy;
+                const profileFile = window.dynamicPdfFiles.companyOperationsProfile;
+                const techFile = window.dynamicPdfFiles.factoryTechnicalEquipment;
+                const moicFile = window.dynamicPdfFiles.moicApproval;
+                const mapsFile = window.dynamicPdfFiles.engineeringMaps;
+
+                const crEl = document.getElementById('app-factory-cr-copy');
+                const profileEl = document.getElementById('app-factory-company-profile');
+                const techEl = document.getElementById('app-factory-tech-equipment');
+                const moicEl = document.getElementById('app-factory-moic-approval');
+                const mapsEl = document.getElementById('app-factory-engineering-maps');
+
+                const crErr = document.getElementById('factory-cr-copy-error');
+                const profileErr = document.getElementById('factory-company-profile-error');
+                const techErr = document.getElementById('factory-tech-equipment-error');
+                const moicErr = document.getElementById('factory-moic-approval-error');
+                const mapsErr = document.getElementById('factory-engineering-maps-error');
+
+                if (!crFile || !crFile.base64) {
+                    if (crEl) crEl.classList.add('invalid');
+                    if (crErr) { crErr.style.display = 'block'; crErr.innerText = "يرجى رفع السجل التجاري بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (crEl) crEl.classList.remove('invalid');
+                    if (crErr) crErr.style.display = 'none';
+                }
+
+                if (!profileFile || !profileFile.base64) {
+                    if (profileEl) profileEl.classList.add('invalid');
+                    if (profileErr) { profileErr.style.display = 'block'; profileErr.innerText = "يرجى رفع بيان مفصل للشركة والأعمال بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (profileEl) profileEl.classList.remove('invalid');
+                    if (profileErr) profileErr.style.display = 'none';
+                }
+
+                if (!techFile || !techFile.base64) {
+                    if (techEl) techEl.classList.add('invalid');
+                    if (techErr) { techErr.style.display = 'block'; techErr.innerText = "يرجى رفع التجهيزات الفنية في المصنع بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (techEl) techEl.classList.remove('invalid');
+                    if (techErr) techErr.style.display = 'none';
+                }
+
+                if (!moicFile || !moicFile.base64) {
+                    if (moicEl) moicEl.classList.add('invalid');
+                    if (moicErr) { moicErr.style.display = 'block'; moicErr.innerText = "يرجى رفع موافقة وزارة الصناعة والتجارة بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (moicEl) moicEl.classList.remove('invalid');
+                    if (moicErr) moicErr.style.display = 'none';
+                }
+
+                if (!mapsFile || !mapsFile.base64) {
+                    if (mapsEl) mapsEl.classList.add('invalid');
+                    if (mapsErr) { mapsErr.style.display = 'block'; mapsErr.innerText = "يرجى رفع الخرائط الهندسية بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (mapsEl) mapsEl.classList.remove('invalid');
+                    if (mapsErr) mapsErr.style.display = 'none';
+                }
             }
 
             if (!isValid) return;
@@ -5615,6 +5706,13 @@
                 const alarmPlansName = window.dynamicPdfFiles.alarmFirefightingPlans ? window.dynamicPdfFiles.alarmFirefightingPlans.name : '';
                 const maintCertName = window.dynamicPdfFiles.maintenanceCertificate ? window.dynamicPdfFiles.maintenanceCertificate.name : '';
                 dynamicSummary = `الاسم العلمي للمواد: ${matName} | جدول الكميات: 📄 ${hazmatTableName} | صحيفة السلامة: 📄 ${msdsName} | مخططات الإنذار والإطفاء: 📄 ${alarmPlansName} | شهادة الصيانة: 📄 ${maintCertName}`;
+            } else if (['local_fire_equipment_factory_license', 'License for Local Firefighting Equipment Factory', 'Local Fire Equipment Factory License', 'إصدار الترخيص لمصنع محلي لمعدات الإطفاء والوقاية من الحريق، وتجديد الترخيص'].includes(key)) {
+                const crName = window.dynamicPdfFiles.commercialRegisterCopy ? window.dynamicPdfFiles.commercialRegisterCopy.name : '';
+                const profileName = window.dynamicPdfFiles.companyOperationsProfile ? window.dynamicPdfFiles.companyOperationsProfile.name : '';
+                const techName = window.dynamicPdfFiles.factoryTechnicalEquipment ? window.dynamicPdfFiles.factoryTechnicalEquipment.name : '';
+                const moicName = window.dynamicPdfFiles.moicApproval ? window.dynamicPdfFiles.moicApproval.name : '';
+                const mapsName = window.dynamicPdfFiles.engineeringMaps ? window.dynamicPdfFiles.engineeringMaps.name : '';
+                dynamicSummary = `السجل التجاري: 📄 ${crName} | بيان مفصل للشركة: 📄 ${profileName} | التجهيزات الفنية: 📄 ${techName} | موافقة وزارة الصناعة: 📄 ${moicName} | الخرائط الهندسية: 📄 ${mapsName}`;
             } else {
                 const genericInput = document.getElementById('app-generic-details');
                 if (genericInput) {
@@ -5868,6 +5966,27 @@
                 dynamicFields.maintenanceCertificate = window.dynamicPdfFiles.maintenanceCertificate ? {
                     name: window.dynamicPdfFiles.maintenanceCertificate.name,
                     base64: window.dynamicPdfFiles.maintenanceCertificate.base64
+                } : null;
+            } else if (['local_fire_equipment_factory_license', 'License for Local Firefighting Equipment Factory', 'Local Fire Equipment Factory License', 'إصدار الترخيص لمصنع محلي لمعدات الإطفاء والوقاية من الحريق، وتجديد الترخيص'].includes(key)) {
+                dynamicFields.commercialRegisterCopy = window.dynamicPdfFiles.commercialRegisterCopy ? {
+                    name: window.dynamicPdfFiles.commercialRegisterCopy.name,
+                    base64: window.dynamicPdfFiles.commercialRegisterCopy.base64
+                } : null;
+                dynamicFields.companyOperationsProfile = window.dynamicPdfFiles.companyOperationsProfile ? {
+                    name: window.dynamicPdfFiles.companyOperationsProfile.name,
+                    base64: window.dynamicPdfFiles.companyOperationsProfile.base64
+                } : null;
+                dynamicFields.factoryTechnicalEquipment = window.dynamicPdfFiles.factoryTechnicalEquipment ? {
+                    name: window.dynamicPdfFiles.factoryTechnicalEquipment.name,
+                    base64: window.dynamicPdfFiles.factoryTechnicalEquipment.base64
+                } : null;
+                dynamicFields.moicApproval = window.dynamicPdfFiles.moicApproval ? {
+                    name: window.dynamicPdfFiles.moicApproval.name,
+                    base64: window.dynamicPdfFiles.moicApproval.base64
+                } : null;
+                dynamicFields.engineeringMaps = window.dynamicPdfFiles.engineeringMaps ? {
+                    name: window.dynamicPdfFiles.engineeringMaps.name,
+                    base64: window.dynamicPdfFiles.engineeringMaps.base64
                 } : null;
             } else {
                 const genericInput = document.getElementById('app-generic-details');

@@ -1419,6 +1419,39 @@ function formatDynamicFields(serviceInput, dynamicFields) {
       break;
 
     case 'local_fire_equipment_factory_license':
+    case 'License for Local Firefighting Equipment Factory':
+    case 'Local Fire Equipment Factory License':
+    case 'إصدار الترخيص لمصنع محلي لمعدات الإطفاء والوقاية من الحريق، وتجديد الترخيص':
+      if (dynamicFields.commercialRegisterCopy) {
+        const doc = typeof dynamicFields.commercialRegisterCopy === 'object'
+          ? (dynamicFields.commercialRegisterCopy.name || dynamicFields.commercialRegisterCopy.url || 'مرفق السجل التجاري')
+          : dynamicFields.commercialRegisterCopy;
+        parts.push(`السجل التجاري: ${doc}`);
+      }
+      if (dynamicFields.companyOperationsProfile) {
+        const doc = typeof dynamicFields.companyOperationsProfile === 'object'
+          ? (dynamicFields.companyOperationsProfile.name || dynamicFields.companyOperationsProfile.url || 'مرفق بيان مفصل للشركة والأعمال')
+          : dynamicFields.companyOperationsProfile;
+        parts.push(`بيان مفصل للشركة والأعمال: ${doc}`);
+      }
+      if (dynamicFields.factoryTechnicalEquipment) {
+        const doc = typeof dynamicFields.factoryTechnicalEquipment === 'object'
+          ? (dynamicFields.factoryTechnicalEquipment.name || dynamicFields.factoryTechnicalEquipment.url || 'مرفق التجهيزات الفنية في المصنع')
+          : dynamicFields.factoryTechnicalEquipment;
+        parts.push(`التجهيزات الفنية في المصنع: ${doc}`);
+      }
+      if (dynamicFields.moicApproval) {
+        const doc = typeof dynamicFields.moicApproval === 'object'
+          ? (dynamicFields.moicApproval.name || dynamicFields.moicApproval.url || 'مرفق موافقة وزارة الصناعة والتجارة')
+          : dynamicFields.moicApproval;
+        parts.push(`موافقة وزارة الصناعة والتجارة: ${doc}`);
+      }
+      if (dynamicFields.engineeringMaps) {
+        const doc = typeof dynamicFields.engineeringMaps === 'object'
+          ? (dynamicFields.engineeringMaps.name || dynamicFields.engineeringMaps.url || 'مرفق الخرائط الهندسية')
+          : dynamicFields.engineeringMaps;
+        parts.push(`الخرائط الهندسية: ${doc}`);
+      }
       if (dynamicFields.equipmentType) parts.push(`نوع المعدات: ${dynamicFields.equipmentType}`);
       if (dynamicFields.brandName) parts.push(`العلامة التجارية: ${dynamicFields.brandName}`);
       break;
