@@ -1197,7 +1197,25 @@ function formatDynamicFields(serviceInput, dynamicFields) {
       if (dynamicFields.electricityAccount) parts.push(`حساب الكهرباء: ${dynamicFields.electricityAccount}`);
       break;
 
+    case 'worship_courts_museums_maps_review':
+    case 'public_worship_courts_museums_plans_review':
+    case 'Review of Maps for Places of Worship, Courts, & Museums':
+    case 'Review of Engineering Plans for Places of Worship, Courts, and Museums':
+    case 'Places of Worship, Courts, and Museums Engineering Plans Review':
+    case 'دراسة مخططات دور العبادة والمحاكم والمتاحف':
     case 'worship_court_museum_plans_study':
+      if (dynamicFields.entityLetter) {
+        const doc = typeof dynamicFields.entityLetter === 'object'
+          ? (dynamicFields.entityLetter.name || dynamicFields.entityLetter.url || 'مرفق خطاب من الجهة')
+          : dynamicFields.entityLetter;
+        parts.push(`خطاب من الجهة: ${doc}`);
+      }
+      if (dynamicFields.architecturalPlans) {
+        const doc = typeof dynamicFields.architecturalPlans === 'object'
+          ? (dynamicFields.architecturalPlans.name || dynamicFields.architecturalPlans.url || 'مرفق المخططات المعمارية')
+          : dynamicFields.architecturalPlans;
+        parts.push(`المخططات المعمارية: ${doc}`);
+      }
       if (dynamicFields.buildingType) parts.push(`نوع المبنى: ${dynamicFields.buildingType}`);
       if (dynamicFields.projectTitle) parts.push(`اسم المشروع: ${dynamicFields.projectTitle}`);
       break;
@@ -1294,6 +1312,8 @@ function formatDynamicFields(serviceInput, dynamicFields) {
     municipalityFormProof: 'استمارة البلدية (أو ما يثبت)',
     engineeringOfficeLetter: 'رسالة المكتب الهندسي',
     projectEngineeringDrawings: 'الرسومات الهندسية للمشروع',
+    entityLetter: 'خطاب من الجهة',
+    architecturalPlans: 'المخططات المعمارية',
     stationCapacity: 'سعة خزانات الوقود',
     trainees: 'المتدربون',
     blueprintNumber: 'رقم المخطط',
@@ -3039,7 +3059,9 @@ const server = http.createServer(async (req, res) => {
             { key: 'tenantLeaseContract', label: 'عقد الإيجار للمستأجر (الطلب الأصلي)', defaultName: 'Tenant-Lease-Contract.pdf' },
             { key: 'municipalityFormProof', label: 'استمارة البلدية أو ما يثبت (الطلب الأصلي)', defaultName: 'Municipality-Form-Proof.pdf' },
             { key: 'engineeringOfficeLetter', label: 'رسالة المكتب الهندسي (الطلب الأصلي)', defaultName: 'Engineering-Office-Letter.pdf' },
-            { key: 'projectEngineeringDrawings', label: 'الرسومات الهندسية للمشروع (الطلب الأصلي)', defaultName: 'Project-Engineering-Drawings.pdf' }
+            { key: 'projectEngineeringDrawings', label: 'الرسومات الهندسية للمشروع (الطلب الأصلي)', defaultName: 'Project-Engineering-Drawings.pdf' },
+            { key: 'entityLetter', label: 'خطاب من الجهة (الطلب الأصلي)', defaultName: 'Entity-Official-Letter.pdf' },
+            { key: 'architecturalPlans', label: 'المخططات المعمارية (الطلب الأصلي)', defaultName: 'Architectural-Plans.pdf' }
           ];
 
           for (const conf of dynamicAttConfigs) {

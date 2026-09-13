@@ -4629,6 +4629,19 @@
                         <div id="factory-eng-drawings-error" class="form-error" style="display: none;">يرجى رفع الرسومات الهندسية للمشروع بصيغة PDF.</div>
                     </div>
                 `;
+            } else if (['worship_courts_museums_maps_review', 'public_worship_courts_museums_plans_review', 'Review of Maps for Places of Worship, Courts, & Museums', 'Review of Engineering Plans for Places of Worship, Courts, and Museums', 'Places of Worship, Courts, and Museums Engineering Plans Review', 'دراسة مخططات دور العبادة والمحاكم والمتاحف'].includes(key)) {
+                container.innerHTML = `
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-worship-entity-letter">خطاب من الجهة (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-worship-entity-letter" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'entityLetter')" required>
+                        <div id="worship-entity-letter-error" class="form-error" style="display: none;">يرجى رفع خطاب من الجهة بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-worship-arch-plans">المخططات المعمارية (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-worship-arch-plans" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'architecturalPlans')" required>
+                        <div id="worship-arch-plans-error" class="form-error" style="display: none;">يرجى رفع المخططات المعمارية بصيغة PDF.</div>
+                    </div>
+                `;
             } else if (service) {
                 container.innerHTML = `
                     <div class="form-group">
@@ -4674,6 +4687,8 @@
                 fieldKey === 'municipalityFormProof' ? 'elec-municipality-form-error' :
                 fieldKey === 'engineeringOfficeLetter' ? 'factory-eng-letter-error' :
                 fieldKey === 'projectEngineeringDrawings' ? 'factory-eng-drawings-error' :
+                fieldKey === 'entityLetter' ? 'worship-entity-letter-error' :
+                fieldKey === 'architecturalPlans' ? 'worship-arch-plans-error' :
                 `${fieldKey}-error`
             );
             if (errorEl) errorEl.style.display = 'none';
@@ -5153,6 +5168,33 @@
                     if (drawingsEl) drawingsEl.classList.remove('invalid');
                     if (drawingsErr) drawingsErr.style.display = 'none';
                 }
+            } else if (['worship_courts_museums_maps_review', 'public_worship_courts_museums_plans_review', 'Review of Maps for Places of Worship, Courts, & Museums', 'Review of Engineering Plans for Places of Worship, Courts, and Museums', 'Places of Worship, Courts, and Museums Engineering Plans Review', 'دراسة مخططات دور العبادة والمحاكم والمتاحف'].includes(key)) {
+                const entityLetterFile = window.dynamicPdfFiles.entityLetter;
+                const archPlansFile = window.dynamicPdfFiles.architecturalPlans;
+
+                const entityLetterEl = document.getElementById('app-worship-entity-letter');
+                const archPlansEl = document.getElementById('app-worship-arch-plans');
+
+                const entityLetterErr = document.getElementById('worship-entity-letter-error');
+                const archPlansErr = document.getElementById('worship-arch-plans-error');
+
+                if (!entityLetterFile || !entityLetterFile.base64) {
+                    if (entityLetterEl) entityLetterEl.classList.add('invalid');
+                    if (entityLetterErr) { entityLetterErr.style.display = 'block'; entityLetterErr.innerText = "يرجى رفع خطاب من الجهة بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (entityLetterEl) entityLetterEl.classList.remove('invalid');
+                    if (entityLetterErr) entityLetterErr.style.display = 'none';
+                }
+
+                if (!archPlansFile || !archPlansFile.base64) {
+                    if (archPlansEl) archPlansEl.classList.add('invalid');
+                    if (archPlansErr) { archPlansErr.style.display = 'block'; archPlansErr.innerText = "يرجى رفع المخططات المعمارية بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (archPlansEl) archPlansEl.classList.remove('invalid');
+                    if (archPlansErr) archPlansErr.style.display = 'none';
+                }
             }
 
             if (!isValid) return;
@@ -5207,6 +5249,10 @@
                 const letterName = window.dynamicPdfFiles.engineeringOfficeLetter ? window.dynamicPdfFiles.engineeringOfficeLetter.name : '';
                 const drawingsName = window.dynamicPdfFiles.projectEngineeringDrawings ? window.dynamicPdfFiles.projectEngineeringDrawings.name : '';
                 dynamicSummary = `رسالة المكتب الهندسي: 📄 ${letterName} | الرسومات الهندسية للمشروع: 📄 ${drawingsName}`;
+            } else if (['worship_courts_museums_maps_review', 'public_worship_courts_museums_plans_review', 'Review of Maps for Places of Worship, Courts, & Museums', 'Review of Engineering Plans for Places of Worship, Courts, and Museums', 'Places of Worship, Courts, and Museums Engineering Plans Review', 'دراسة مخططات دور العبادة والمحاكم والمتاحف'].includes(key)) {
+                const letterName = window.dynamicPdfFiles.entityLetter ? window.dynamicPdfFiles.entityLetter.name : '';
+                const plansName = window.dynamicPdfFiles.architecturalPlans ? window.dynamicPdfFiles.architecturalPlans.name : '';
+                dynamicSummary = `خطاب من الجهة: 📄 ${letterName} | المخططات المعمارية: 📄 ${plansName}`;
             } else {
                 const genericInput = document.getElementById('app-generic-details');
                 if (genericInput) {
@@ -5375,6 +5421,15 @@
                 dynamicFields.projectEngineeringDrawings = window.dynamicPdfFiles.projectEngineeringDrawings ? {
                     name: window.dynamicPdfFiles.projectEngineeringDrawings.name,
                     base64: window.dynamicPdfFiles.projectEngineeringDrawings.base64
+                } : null;
+            } else if (['worship_courts_museums_maps_review', 'public_worship_courts_museums_plans_review', 'Review of Maps for Places of Worship, Courts, & Museums', 'Review of Engineering Plans for Places of Worship, Courts, and Museums', 'Places of Worship, Courts, and Museums Engineering Plans Review', 'دراسة مخططات دور العبادة والمحاكم والمتاحف'].includes(key)) {
+                dynamicFields.entityLetter = window.dynamicPdfFiles.entityLetter ? {
+                    name: window.dynamicPdfFiles.entityLetter.name,
+                    base64: window.dynamicPdfFiles.entityLetter.base64
+                } : null;
+                dynamicFields.architecturalPlans = window.dynamicPdfFiles.architecturalPlans ? {
+                    name: window.dynamicPdfFiles.architecturalPlans.name,
+                    base64: window.dynamicPdfFiles.architecturalPlans.base64
                 } : null;
             } else {
                 const genericInput = document.getElementById('app-generic-details');
