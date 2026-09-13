@@ -4720,6 +4720,34 @@
                         <div id="fire-equip-company-profile-error" class="form-error" style="display: none;">يرجى رفع بيان مفصل للشركة بصيغة PDF.</div>
                     </div>
                 `;
+            } else if (['fire_safety_equipment_noc', 'noc_fire_safety_equipment_license', 'No-Objection Certificate (NOC) for Fire Safety Equipment', 'Fire Safety Equipment NOC License', 'إصدار ترخيص عدم الممانعة لمعدات الحريق والسلامة، وتجديد الترخيص'].includes(key)) {
+                container.innerHTML = `
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-noc-materials-name">الاسم العلمي للمواد <span style="color: #ef4444;">*</span></label>
+                        <input type="text" id="app-noc-materials-name" class="form-input" placeholder="أدخل الاسم العلمي للمواد..." required>
+                        <div id="noc-materials-name-error" class="form-error" style="display: none;">يرجى كتابة الاسم العلمي للمواد.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-noc-hazmat-table">جدول كميات المواد الخطرة (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-noc-hazmat-table" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'hazmatQuantitiesTable')" required>
+                        <div id="noc-hazmat-table-error" class="form-error" style="display: none;">يرجى رفع جدول كميات المواد الخطرة بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-noc-msds-sheet">صحيفة السلامة (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-noc-msds-sheet" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'safetyDataSheetMSDS')" required>
+                        <div id="noc-msds-sheet-error" class="form-error" style="display: none;">يرجى رفع صحيفة السلامة بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-noc-alarm-fire-plans">مخططات الإنذار والإطفاء (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-noc-alarm-fire-plans" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'alarmFirefightingPlans')" required>
+                        <div id="noc-alarm-fire-plans-error" class="form-error" style="display: none;">يرجى رفع مخططات الإنذار والإطفاء بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-noc-maintenance-cert">شهادة الصيانة (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-noc-maintenance-cert" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'maintenanceCertificate')" required>
+                        <div id="noc-maintenance-cert-error" class="form-error" style="display: none;">يرجى رفع شهادة الصيانة بصيغة PDF.</div>
+                    </div>
+                `;
             } else if (service) {
                 container.innerHTML = `
                     <div class="form-group">
@@ -5433,6 +5461,68 @@
                     if (profileEl) profileEl.classList.remove('invalid');
                     if (profileErr) profileErr.style.display = 'none';
                 }
+            } else if (['fire_safety_equipment_noc', 'noc_fire_safety_equipment_license', 'No-Objection Certificate (NOC) for Fire Safety Equipment', 'Fire Safety Equipment NOC License', 'إصدار ترخيص عدم الممانعة لمعدات الحريق والسلامة، وتجديد الترخيص'].includes(key)) {
+                const matNameEl = document.getElementById('app-noc-materials-name');
+                const matNameErr = document.getElementById('noc-materials-name-error');
+                if (!matNameEl || !matNameEl.value.trim()) {
+                    if (matNameEl) matNameEl.classList.add('invalid');
+                    if (matNameErr) matNameErr.style.display = 'block';
+                    isValid = false;
+                } else {
+                    if (matNameEl) matNameEl.classList.remove('invalid');
+                    if (matNameErr) matNameErr.style.display = 'none';
+                }
+
+                const hazmatTableFile = window.dynamicPdfFiles.hazmatQuantitiesTable;
+                const msdsFile = window.dynamicPdfFiles.safetyDataSheetMSDS;
+                const alarmPlansFile = window.dynamicPdfFiles.alarmFirefightingPlans;
+                const maintCertFile = window.dynamicPdfFiles.maintenanceCertificate;
+
+                const hazmatTableEl = document.getElementById('app-noc-hazmat-table');
+                const msdsEl = document.getElementById('app-noc-msds-sheet');
+                const alarmPlansEl = document.getElementById('app-noc-alarm-fire-plans');
+                const maintCertEl = document.getElementById('app-noc-maintenance-cert');
+
+                const hazmatTableErr = document.getElementById('noc-hazmat-table-error');
+                const msdsErr = document.getElementById('noc-msds-sheet-error');
+                const alarmPlansErr = document.getElementById('noc-alarm-fire-plans-error');
+                const maintCertErr = document.getElementById('noc-maintenance-cert-error');
+
+                if (!hazmatTableFile || !hazmatTableFile.base64) {
+                    if (hazmatTableEl) hazmatTableEl.classList.add('invalid');
+                    if (hazmatTableErr) { hazmatTableErr.style.display = 'block'; hazmatTableErr.innerText = "يرجى رفع جدول كميات المواد الخطرة بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (hazmatTableEl) hazmatTableEl.classList.remove('invalid');
+                    if (hazmatTableErr) hazmatTableErr.style.display = 'none';
+                }
+
+                if (!msdsFile || !msdsFile.base64) {
+                    if (msdsEl) msdsEl.classList.add('invalid');
+                    if (msdsErr) { msdsErr.style.display = 'block'; msdsErr.innerText = "يرجى رفع صحيفة السلامة بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (msdsEl) msdsEl.classList.remove('invalid');
+                    if (msdsErr) msdsErr.style.display = 'none';
+                }
+
+                if (!alarmPlansFile || !alarmPlansFile.base64) {
+                    if (alarmPlansEl) alarmPlansEl.classList.add('invalid');
+                    if (alarmPlansErr) { alarmPlansErr.style.display = 'block'; alarmPlansErr.innerText = "يرجى رفع مخططات الإنذار والإطفاء بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (alarmPlansEl) alarmPlansEl.classList.remove('invalid');
+                    if (alarmPlansErr) alarmPlansErr.style.display = 'none';
+                }
+
+                if (!maintCertFile || !maintCertFile.base64) {
+                    if (maintCertEl) maintCertEl.classList.add('invalid');
+                    if (maintCertErr) { maintCertErr.style.display = 'block'; maintCertErr.innerText = "يرجى رفع شهادة الصيانة بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (maintCertEl) maintCertEl.classList.remove('invalid');
+                    if (maintCertErr) maintCertErr.style.display = 'none';
+                }
             }
 
             if (!isValid) return;
@@ -5518,6 +5608,13 @@
                 const crName = window.dynamicPdfFiles.commercialRegisterCopy ? window.dynamicPdfFiles.commercialRegisterCopy.name : '';
                 const profileName = window.dynamicPdfFiles.companyDetailedProfile ? window.dynamicPdfFiles.companyDetailedProfile.name : '';
                 dynamicSummary = `شهادات اعتماد المنتج: 📄 ${accredName} | سجل تجاري: 📄 ${crName} | بيان مفصل للشركة: 📄 ${profileName}`;
+            } else if (['fire_safety_equipment_noc', 'noc_fire_safety_equipment_license', 'No-Objection Certificate (NOC) for Fire Safety Equipment', 'Fire Safety Equipment NOC License', 'إصدار ترخيص عدم الممانعة لمعدات الحريق والسلامة، وتجديد الترخيص'].includes(key)) {
+                const matName = document.getElementById('app-noc-materials-name') ? document.getElementById('app-noc-materials-name').value.trim() : '';
+                const hazmatTableName = window.dynamicPdfFiles.hazmatQuantitiesTable ? window.dynamicPdfFiles.hazmatQuantitiesTable.name : '';
+                const msdsName = window.dynamicPdfFiles.safetyDataSheetMSDS ? window.dynamicPdfFiles.safetyDataSheetMSDS.name : '';
+                const alarmPlansName = window.dynamicPdfFiles.alarmFirefightingPlans ? window.dynamicPdfFiles.alarmFirefightingPlans.name : '';
+                const maintCertName = window.dynamicPdfFiles.maintenanceCertificate ? window.dynamicPdfFiles.maintenanceCertificate.name : '';
+                dynamicSummary = `الاسم العلمي للمواد: ${matName} | جدول الكميات: 📄 ${hazmatTableName} | صحيفة السلامة: 📄 ${msdsName} | مخططات الإنذار والإطفاء: 📄 ${alarmPlansName} | شهادة الصيانة: 📄 ${maintCertName}`;
             } else {
                 const genericInput = document.getElementById('app-generic-details');
                 if (genericInput) {
@@ -5752,6 +5849,25 @@
                 dynamicFields.companyDetailedProfile = window.dynamicPdfFiles.companyDetailedProfile ? {
                     name: window.dynamicPdfFiles.companyDetailedProfile.name,
                     base64: window.dynamicPdfFiles.companyDetailedProfile.base64
+                } : null;
+            } else if (['fire_safety_equipment_noc', 'noc_fire_safety_equipment_license', 'No-Objection Certificate (NOC) for Fire Safety Equipment', 'Fire Safety Equipment NOC License', 'إصدار ترخيص عدم الممانعة لمعدات الحريق والسلامة، وتجديد الترخيص'].includes(key)) {
+                const matNameEl = document.getElementById('app-noc-materials-name');
+                dynamicFields.materialsScientificName = matNameEl ? matNameEl.value.trim() : '';
+                dynamicFields.hazmatQuantitiesTable = window.dynamicPdfFiles.hazmatQuantitiesTable ? {
+                    name: window.dynamicPdfFiles.hazmatQuantitiesTable.name,
+                    base64: window.dynamicPdfFiles.hazmatQuantitiesTable.base64
+                } : null;
+                dynamicFields.safetyDataSheetMSDS = window.dynamicPdfFiles.safetyDataSheetMSDS ? {
+                    name: window.dynamicPdfFiles.safetyDataSheetMSDS.name,
+                    base64: window.dynamicPdfFiles.safetyDataSheetMSDS.base64
+                } : null;
+                dynamicFields.alarmFirefightingPlans = window.dynamicPdfFiles.alarmFirefightingPlans ? {
+                    name: window.dynamicPdfFiles.alarmFirefightingPlans.name,
+                    base64: window.dynamicPdfFiles.alarmFirefightingPlans.base64
+                } : null;
+                dynamicFields.maintenanceCertificate = window.dynamicPdfFiles.maintenanceCertificate ? {
+                    name: window.dynamicPdfFiles.maintenanceCertificate.name,
+                    base64: window.dynamicPdfFiles.maintenanceCertificate.base64
                 } : null;
             } else {
                 const genericInput = document.getElementById('app-generic-details');

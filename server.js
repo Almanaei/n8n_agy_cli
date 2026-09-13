@@ -1385,6 +1385,39 @@ function formatDynamicFields(serviceInput, dynamicFields) {
       break;
 
     case 'fire_safety_equipment_noc':
+    case 'noc_fire_safety_equipment_license':
+    case 'No-Objection Certificate (NOC) for Fire Safety Equipment':
+    case 'Fire Safety Equipment NOC License':
+    case 'إصدار ترخيص عدم الممانعة لمعدات الحريق والسلامة، وتجديد الترخيص':
+      if (dynamicFields.materialsScientificName) parts.push(`الاسم العلمي للمواد: ${dynamicFields.materialsScientificName}`);
+      if (dynamicFields.hazmatQuantitiesTable) {
+        const doc = typeof dynamicFields.hazmatQuantitiesTable === 'object'
+          ? (dynamicFields.hazmatQuantitiesTable.name || dynamicFields.hazmatQuantitiesTable.url || 'مرفق جدول كميات المواد الخطرة')
+          : dynamicFields.hazmatQuantitiesTable;
+        parts.push(`جدول كميات المواد الخطرة: ${doc}`);
+      }
+      if (dynamicFields.safetyDataSheetMSDS) {
+        const doc = typeof dynamicFields.safetyDataSheetMSDS === 'object'
+          ? (dynamicFields.safetyDataSheetMSDS.name || dynamicFields.safetyDataSheetMSDS.url || 'مرفق صحيفة السلامة')
+          : dynamicFields.safetyDataSheetMSDS;
+        parts.push(`صحيفة السلامة: ${doc}`);
+      }
+      if (dynamicFields.alarmFirefightingPlans) {
+        const doc = typeof dynamicFields.alarmFirefightingPlans === 'object'
+          ? (dynamicFields.alarmFirefightingPlans.name || dynamicFields.alarmFirefightingPlans.url || 'مرفق مخططات الإنذار والإطفاء')
+          : dynamicFields.alarmFirefightingPlans;
+        parts.push(`مخططات الإنذار والإطفاء: ${doc}`);
+      }
+      if (dynamicFields.maintenanceCertificate) {
+        const doc = typeof dynamicFields.maintenanceCertificate === 'object'
+          ? (dynamicFields.maintenanceCertificate.name || dynamicFields.maintenanceCertificate.url || 'مرفق شهادة الصيانة')
+          : dynamicFields.maintenanceCertificate;
+        parts.push(`شهادة الصيانة: ${doc}`);
+      }
+      if (dynamicFields.equipmentType) parts.push(`نوع المعدات: ${dynamicFields.equipmentType}`);
+      if (dynamicFields.brandName) parts.push(`العلامة التجارية: ${dynamicFields.brandName}`);
+      break;
+
     case 'local_fire_equipment_factory_license':
       if (dynamicFields.equipmentType) parts.push(`نوع المعدات: ${dynamicFields.equipmentType}`);
       if (dynamicFields.brandName) parts.push(`العلامة التجارية: ${dynamicFields.brandName}`);
