@@ -4468,7 +4468,7 @@
             const targetItem = window.getServiceItem(service);
             const key = targetItem ? targetItem.id : service;
 
-            if (['trainee_registration_1day', 'trainee_registration_1week', 'Civil Defense Training Certificate (1 Day)', 'Civil Defense Training Certificate (1 Week)', 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة يوم واحد', 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة اسبوع', 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة  اسبوع'].includes(key)) {
+            if (['trainee_registration_1day', 'trainee_registration_1week', 'trainee_registration_16weeks', 'Civil Defense Training Certificate (1 Day)', 'Civil Defense Training Certificate (1 Week)', 'Civil Defense Individual Training Certificate (16 Weeks)', 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة يوم واحد', 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة اسبوع', 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة  اسبوع', 'إصدار شهادة تدريب الفرد على أعمال الدفاع المدني لمدة ستة عشر أسبوعًا.', 'إصدار شهادة تدريب الفرد على أعمال الدفاع المدني لمدة ستة عشر أسبوعا.'].includes(key)) {
                 container.innerHTML = `
                     <div class="form-group" style="margin-bottom: 14px;">
                         <label class="form-label" for="app-training-request-letter">كتاب رسمي من الجهة الطالبة للدورة التدريبية (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
@@ -4484,7 +4484,7 @@
                         <div id="heavy-driving-course-letter-error" class="form-error" style="display: none;">يرجى رفع رسالة تتضمن تفاصيل الدورة بصيغة PDF.</div>
                     </div>
                 `;
-            } else if (['trainee_registration', 'trainee_registration_16weeks', 'Trainee Registration'].includes(key)) {
+            } else if (['trainee_registration', 'Trainee Registration'].includes(key)) {
                 container.innerHTML = `
                     <div class="form-group" style="margin-bottom: 14px;">
                         <label class="form-label" for="app-training-official-letter">خطاب رسمي (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
@@ -4906,7 +4906,7 @@
             const targetItem = window.getServiceItem(service);
             const key = targetItem ? targetItem.id : service;
 
-            if (['trainee_registration_1day', 'trainee_registration_1week', 'Civil Defense Training Certificate (1 Day)', 'Civil Defense Training Certificate (1 Week)', 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة يوم واحد', 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة اسبوع', 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة  اسبوع'].includes(key)) {
+            if (['trainee_registration_1day', 'trainee_registration_1week', 'trainee_registration_16weeks', 'Civil Defense Training Certificate (1 Day)', 'Civil Defense Training Certificate (1 Week)', 'Civil Defense Individual Training Certificate (16 Weeks)', 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة يوم واحد', 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة اسبوع', 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة  اسبوع', 'إصدار شهادة تدريب الفرد على أعمال الدفاع المدني لمدة ستة عشر أسبوعًا.', 'إصدار شهادة تدريب الفرد على أعمال الدفاع المدني لمدة ستة عشر أسبوعا.'].includes(key)) {
                 const reqLetterFile = window.dynamicPdfFiles.requestingEntityLetter || window.dynamicPdfFiles.trainingOfficialLetter;
                 const reqLetterEl = document.getElementById('app-training-request-letter');
                 const reqLetterErr = document.getElementById('training-request-letter-error');
@@ -4932,7 +4932,7 @@
                     if (courseLetterEl) courseLetterEl.classList.remove('invalid');
                     if (courseLetterErr) courseLetterErr.style.display = 'none';
                 }
-            } else if (['trainee_registration', 'trainee_registration_16weeks', 'Trainee Registration'].includes(key)) {
+            } else if (['trainee_registration', 'Trainee Registration'].includes(key)) {
                 const letterFile = window.dynamicPdfFiles.trainingOfficialLetter;
                 const accredFile = window.dynamicPdfFiles.trainingAccreditations;
                 const letterEl = document.getElementById('app-training-official-letter');
@@ -5361,7 +5361,7 @@
 
             const summaryGrid = document.getElementById('summary-grid-el');
             let dynamicSummary = '';
-            if (['trainee_registration_1day', 'trainee_registration_1week', 'Civil Defense Training Certificate (1 Day)', 'Civil Defense Training Certificate (1 Week)', 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة يوم واحد', 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة اسبوع', 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة  اسبوع'].includes(key)) {
+            if (['trainee_registration_1day', 'trainee_registration_1week', 'trainee_registration_16weeks', 'Civil Defense Training Certificate (1 Day)', 'Civil Defense Training Certificate (1 Week)', 'Civil Defense Individual Training Certificate (16 Weeks)', 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة يوم واحد', 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة اسبوع', 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة  اسبوع', 'إصدار شهادة تدريب الفرد على أعمال الدفاع المدني لمدة ستة عشر أسبوعًا.', 'إصدار شهادة تدريب الفرد على أعمال الدفاع المدني لمدة ستة عشر أسبوعا.'].includes(key)) {
                 const reqLetter = window.dynamicPdfFiles.requestingEntityLetter || window.dynamicPdfFiles.trainingOfficialLetter;
                 const letterName = reqLetter ? reqLetter.name : '';
                 dynamicSummary = `كتاب رسمي من الجهة الطالبة للدورة التدريبية: 📄 ${letterName}`;
@@ -5369,7 +5369,7 @@
                 const courseLetter = window.dynamicPdfFiles.courseDetailsLetter || window.dynamicPdfFiles.trainingOfficialLetter;
                 const letterName = courseLetter ? courseLetter.name : '';
                 dynamicSummary = `رسالة تفاصيل الدورة (النوع، اللغة، المدة، عدد المشاركين): 📄 ${letterName}`;
-            } else if (['trainee_registration', 'trainee_registration_16weeks', 'Trainee Registration'].includes(key)) {
+            } else if (['trainee_registration', 'Trainee Registration'].includes(key)) {
                 const letterName = window.dynamicPdfFiles.trainingOfficialLetter ? window.dynamicPdfFiles.trainingOfficialLetter.name : '';
                 const accredName = window.dynamicPdfFiles.trainingAccreditations ? window.dynamicPdfFiles.trainingAccreditations.name : '';
                 dynamicSummary = `خطاب رسمي: 📄 ${letterName} | الموافقات/الاعتمادات: 📄 ${accredName}`;
@@ -5494,7 +5494,7 @@
             const notes = notesEl ? notesEl.value.trim() : '';
 
             let dynamicFields = {};
-            if (['trainee_registration_1day', 'trainee_registration_1week', 'Civil Defense Training Certificate (1 Day)', 'Civil Defense Training Certificate (1 Week)', 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة يوم واحد', 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة اسبوع', 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة  اسبوع'].includes(key)) {
+            if (['trainee_registration_1day', 'trainee_registration_1week', 'trainee_registration_16weeks', 'Civil Defense Training Certificate (1 Day)', 'Civil Defense Training Certificate (1 Week)', 'Civil Defense Individual Training Certificate (16 Weeks)', 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة يوم واحد', 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة اسبوع', 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة  اسبوع', 'إصدار شهادة تدريب الفرد على أعمال الدفاع المدني لمدة ستة عشر أسبوعًا.', 'إصدار شهادة تدريب الفرد على أعمال الدفاع المدني لمدة ستة عشر أسبوعا.'].includes(key)) {
                 const reqFile = window.dynamicPdfFiles.requestingEntityLetter || window.dynamicPdfFiles.trainingOfficialLetter;
                 dynamicFields.requestingEntityLetter = reqFile ? {
                     name: reqFile.name,
@@ -5506,7 +5506,7 @@
                     name: fileObj.name,
                     base64: fileObj.base64
                 } : null;
-            } else if (['trainee_registration', 'trainee_registration_16weeks', 'Trainee Registration'].includes(key)) {
+            } else if (['trainee_registration', 'Trainee Registration'].includes(key)) {
                 dynamicFields.trainingOfficialLetter = window.dynamicPdfFiles.trainingOfficialLetter ? {
                     name: window.dynamicPdfFiles.trainingOfficialLetter.name,
                     base64: window.dynamicPdfFiles.trainingOfficialLetter.base64

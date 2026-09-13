@@ -917,11 +917,15 @@ function formatDynamicFields(serviceInput, dynamicFields) {
   switch (svcId) {
     case 'trainee_registration_1day':
     case 'trainee_registration_1week':
+    case 'trainee_registration_16weeks':
     case 'Civil Defense Training Certificate (1 Day)':
     case 'Civil Defense Training Certificate (1 Week)':
+    case 'Civil Defense Individual Training Certificate (16 Weeks)':
     case 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة يوم واحد':
     case 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة اسبوع':
     case 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة  اسبوع':
+    case 'إصدار شهادة تدريب الفرد على أعمال الدفاع المدني لمدة ستة عشر أسبوعًا.':
+    case 'إصدار شهادة تدريب الفرد على أعمال الدفاع المدني لمدة ستة عشر أسبوعا.':
       if (dynamicFields.requestingEntityLetter || dynamicFields.trainingOfficialLetter) {
         const fileObj = dynamicFields.requestingEntityLetter || dynamicFields.trainingOfficialLetter;
         const doc = typeof fileObj === 'object'
@@ -955,7 +959,6 @@ function formatDynamicFields(serviceInput, dynamicFields) {
       break;
 
     case 'trainee_registration':
-    case 'trainee_registration_16weeks':
     case 'Trainee Registration':
       if (dynamicFields.trainingOfficialLetter) {
         const doc = typeof dynamicFields.trainingOfficialLetter === 'object'
