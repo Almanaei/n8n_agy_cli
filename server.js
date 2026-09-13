@@ -1524,7 +1524,47 @@ function formatDynamicFields(serviceInput, dynamicFields) {
       if (dynamicFields.commercialCR) parts.push(`رقم السجل التجاري: ${dynamicFields.commercialCR}`);
       break;
 
+    case 'consulting_offices_gas_fuel_hazmat_license':
     case 'gas_fuel_hazmat_consulting_offices_license':
+    case 'License for Technical & Consulting Offices (Gas, Fuel, & Hazmat)':
+    case 'Technical & Consulting Offices (Gas, Fuel, & Hazmat) License':
+    case 'إصدار الترخيص للمكاتب الفنية والاستشارية المختصة بالغاز والوقود والمواد الخطرة، وتجديد الترخيص':
+      if (dynamicFields.commercialRegisterCertificate || dynamicFields.commercialRegisterCopy) {
+        const fileObj = dynamicFields.commercialRegisterCertificate || dynamicFields.commercialRegisterCopy;
+        const doc = typeof fileObj === 'object'
+          ? (fileObj.name || fileObj.url || 'مرفق شهادة السجل التجاري')
+          : fileObj;
+        parts.push(`شهادة السجل التجاري: ${doc}`);
+      }
+      if (dynamicFields.officeDetailedProfile) {
+        const doc = typeof dynamicFields.officeDetailedProfile === 'object'
+          ? (dynamicFields.officeDetailedProfile.name || dynamicFields.officeDetailedProfile.url || 'مرفق بيان مفصل للمكتب')
+          : dynamicFields.officeDetailedProfile;
+        parts.push(`بيان مفصل للمكتب: ${doc}`);
+      }
+      if (dynamicFields.engineersListDoc) {
+        const doc = typeof dynamicFields.engineersListDoc === 'object'
+          ? (dynamicFields.engineersListDoc.name || dynamicFields.engineersListDoc.url || 'مرفق كشف بأسماء المهندسين')
+          : dynamicFields.engineersListDoc;
+        parts.push(`كشف بأسماء المهندسين: ${doc}`);
+      }
+      if (dynamicFields.engineeringPracticeLicenses) {
+        const doc = typeof dynamicFields.engineeringPracticeLicenses === 'object'
+          ? (dynamicFields.engineeringPracticeLicenses.name || dynamicFields.engineeringPracticeLicenses.url || 'مرفق رخص مزاولة المهن الهندسية')
+          : dynamicFields.engineeringPracticeLicenses;
+        parts.push(`رخص مزاولة المهن الهندسية: ${doc}`);
+      }
+      if (dynamicFields.engineersIdCardsAndResumes || dynamicFields.idCardsAndResumes) {
+        const fileObj = dynamicFields.engineersIdCardsAndResumes || dynamicFields.idCardsAndResumes;
+        const doc = typeof fileObj === 'object'
+          ? (fileObj.name || fileObj.url || 'مرفق بطاقات الهوية والسيرة الذاتية للمهندسين')
+          : fileObj;
+        parts.push(`بطاقات الهوية والسيرة الذاتية للمهندسين: ${doc}`);
+      }
+      if (dynamicFields.officeName) parts.push(`اسم المكتب: ${dynamicFields.officeName}`);
+      if (dynamicFields.commercialCR) parts.push(`رقم السجل التجاري: ${dynamicFields.commercialCR}`);
+      break;
+
     case 'engineering_offices_fire_safety_design':
       if (dynamicFields.officeName) parts.push(`اسم المكتب: ${dynamicFields.officeName}`);
       if (dynamicFields.commercialCR) parts.push(`رقم السجل التجاري: ${dynamicFields.commercialCR}`);
@@ -1753,6 +1793,8 @@ function formatDynamicFields(serviceInput, dynamicFields) {
     validMaintenanceCertificate: 'شهادة صيانة سارية',
     hazmatBranchPreviousApproval: 'الموافقة السابقة من فرع المواد الخطرة',
     allPreviousApprovals: 'جميع الموافقات السابقة',
+    commercialRegisterCertificate: 'شهادة السجل التجاري',
+    engineersIdCardsAndResumes: 'بطاقات الهوية والسيرة الذاتية للمهندسين',
     activityType: 'نوع النشاط',
     engineerLicense: 'ترخيص المهندس'
   };

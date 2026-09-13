@@ -4913,6 +4913,34 @@
                         <div id="tanks-all-approvals-error" class="form-error" style="display: none;">يرجى رفع جميع الموافقات السابقة بصيغة PDF.</div>
                     </div>
                 `;
+            } else if (['consulting_offices_gas_fuel_hazmat_license', 'gas_fuel_hazmat_consulting_offices_license', 'License for Technical & Consulting Offices (Gas, Fuel, & Hazmat)', 'Technical & Consulting Offices (Gas, Fuel, & Hazmat) License', 'إصدار الترخيص للمكاتب الفنية والاستشارية المختصة بالغاز والوقود والمواد الخطرة، وتجديد الترخيص'].includes(key)) {
+                container.innerHTML = `
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-gas-consult-cr">شهادة السجل التجاري (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-gas-consult-cr" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'commercialRegisterCertificate')" required>
+                        <div id="gas-consult-cr-error" class="form-error" style="display: none;">يرجى رفع شهادة السجل التجاري بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-gas-consult-profile">بيان مفصل للمكتب (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-gas-consult-profile" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'officeDetailedProfile')" required>
+                        <div id="gas-consult-profile-error" class="form-error" style="display: none;">يرجى رفع بيان مفصل للمكتب بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-gas-consult-engineers-list">كشف بأسماء المهندسين (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-gas-consult-engineers-list" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'engineersListDoc')" required>
+                        <div id="gas-consult-engineers-list-error" class="form-error" style="display: none;">يرجى رفع كشف بأسماء المهندسين بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-gas-consult-practice-licenses">رخص مزاولة المهن الهندسية (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-gas-consult-practice-licenses" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'engineeringPracticeLicenses')" required>
+                        <div id="gas-consult-practice-licenses-error" class="form-error" style="display: none;">يرجى رفع رخص مزاولة المهن الهندسية بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-gas-consult-ids-resumes">بطاقات الهوية والسيرة الذاتية للمهندسين (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-gas-consult-ids-resumes" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'engineersIdCardsAndResumes')" required>
+                        <div id="gas-consult-ids-resumes-error" class="form-error" style="display: none;">يرجى رفع بطاقات الهوية والسيرة الذاتية للمهندسين بصيغة PDF.</div>
+                    </div>
+                `;
             } else if (service) {
                 container.innerHTML = `
                     <div class="form-group">
@@ -4968,6 +4996,11 @@
                 fieldKey === 'validMaintenanceCertificate' ? 'tanks-maint-cert-error' :
                 fieldKey === 'hazmatBranchPreviousApproval' ? 'tanks-hazmat-approval-error' :
                 fieldKey === 'allPreviousApprovals' ? 'tanks-all-approvals-error' :
+                fieldKey === 'commercialRegisterCertificate' ? 'gas-consult-cr-error' :
+                fieldKey === 'officeDetailedProfile' ? (document.getElementById('gas-consult-profile-error') ? 'gas-consult-profile-error' : 'maint-office-profile-error') :
+                fieldKey === 'engineersListDoc' ? (document.getElementById('gas-consult-engineers-list-error') ? 'gas-consult-engineers-list-error' : 'maint-office-engineers-list-error') :
+                fieldKey === 'engineeringPracticeLicenses' ? (document.getElementById('gas-consult-practice-licenses-error') ? 'gas-consult-practice-licenses-error' : 'maint-office-practice-licenses-error') :
+                fieldKey === 'engineersIdCardsAndResumes' ? 'gas-consult-ids-resumes-error' :
                 `${fieldKey}-error`
             );
             if (errorEl) errorEl.style.display = 'none';
@@ -6108,6 +6141,69 @@
                     if (allApprsEl) allApprsEl.classList.remove('invalid');
                     if (allApprsErr) allApprsErr.style.display = 'none';
                 }
+            } else if (['consulting_offices_gas_fuel_hazmat_license', 'gas_fuel_hazmat_consulting_offices_license', 'License for Technical & Consulting Offices (Gas, Fuel, & Hazmat)', 'Technical & Consulting Offices (Gas, Fuel, & Hazmat) License', 'إصدار الترخيص للمكاتب الفنية والاستشارية المختصة بالغاز والوقود والمواد الخطرة، وتجديد الترخيص'].includes(key)) {
+                const crFile = window.dynamicPdfFiles.commercialRegisterCertificate || window.dynamicPdfFiles.commercialRegisterCopy;
+                const profileFile = window.dynamicPdfFiles.officeDetailedProfile;
+                const engListFile = window.dynamicPdfFiles.engineersListDoc;
+                const licensesFile = window.dynamicPdfFiles.engineeringPracticeLicenses;
+                const idsResumesFile = window.dynamicPdfFiles.engineersIdCardsAndResumes || window.dynamicPdfFiles.idCardsAndResumes;
+
+                const crEl = document.getElementById('app-gas-consult-cr');
+                const profileEl = document.getElementById('app-gas-consult-profile');
+                const engListEl = document.getElementById('app-gas-consult-engineers-list');
+                const licensesEl = document.getElementById('app-gas-consult-practice-licenses');
+                const idsResumesEl = document.getElementById('app-gas-consult-ids-resumes');
+
+                const crErr = document.getElementById('gas-consult-cr-error');
+                const profileErr = document.getElementById('gas-consult-profile-error');
+                const engListErr = document.getElementById('gas-consult-engineers-list-error');
+                const licensesErr = document.getElementById('gas-consult-practice-licenses-error');
+                const idsResumesErr = document.getElementById('gas-consult-ids-resumes-error');
+
+                if (!crFile || !crFile.base64) {
+                    if (crEl) crEl.classList.add('invalid');
+                    if (crErr) { crErr.style.display = 'block'; crErr.innerText = "يرجى رفع شهادة السجل التجاري بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (crEl) crEl.classList.remove('invalid');
+                    if (crErr) crErr.style.display = 'none';
+                }
+
+                if (!profileFile || !profileFile.base64) {
+                    if (profileEl) profileEl.classList.add('invalid');
+                    if (profileErr) { profileErr.style.display = 'block'; profileErr.innerText = "يرجى رفع بيان مفصل للمكتب بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (profileEl) profileEl.classList.remove('invalid');
+                    if (profileErr) profileErr.style.display = 'none';
+                }
+
+                if (!engListFile || !engListFile.base64) {
+                    if (engListEl) engListEl.classList.add('invalid');
+                    if (engListErr) { engListErr.style.display = 'block'; engListErr.innerText = "يرجى رفع كشف بأسماء المهندسين بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (engListEl) engListEl.classList.remove('invalid');
+                    if (engListErr) engListErr.style.display = 'none';
+                }
+
+                if (!licensesFile || !licensesFile.base64) {
+                    if (licensesEl) licensesEl.classList.add('invalid');
+                    if (licensesErr) { licensesErr.style.display = 'block'; licensesErr.innerText = "يرجى رفع رخص مزاولة المهن الهندسية بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (licensesEl) licensesEl.classList.remove('invalid');
+                    if (licensesErr) licensesErr.style.display = 'none';
+                }
+
+                if (!idsResumesFile || !idsResumesFile.base64) {
+                    if (idsResumesEl) idsResumesEl.classList.add('invalid');
+                    if (idsResumesErr) { idsResumesErr.style.display = 'block'; idsResumesErr.innerText = "يرجى رفع بطاقات الهوية والسيرة الذاتية للمهندسين بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (idsResumesEl) idsResumesEl.classList.remove('invalid');
+                    if (idsResumesErr) idsResumesErr.style.display = 'none';
+                }
             }
 
             if (!isValid) return;
@@ -6242,6 +6338,13 @@
                 const hazmatApprName = window.dynamicPdfFiles.hazmatBranchPreviousApproval ? window.dynamicPdfFiles.hazmatBranchPreviousApproval.name : '';
                 const allApprsName = window.dynamicPdfFiles.allPreviousApprovals ? window.dynamicPdfFiles.allPreviousApprovals.name : '';
                 dynamicSummary = `رسالة رسمية: 📄 ${offLetterName} | شهادة صيانة سارية: 📄 ${maintCertName} | الموافقة السابقة من فرع المواد الخطرة: 📄 ${hazmatApprName} | جميع الموافقات السابقة: 📄 ${allApprsName}`;
+            } else if (['consulting_offices_gas_fuel_hazmat_license', 'gas_fuel_hazmat_consulting_offices_license', 'License for Technical & Consulting Offices (Gas, Fuel, & Hazmat)', 'Technical & Consulting Offices (Gas, Fuel, & Hazmat) License', 'إصدار الترخيص للمكاتب الفنية والاستشارية المختصة بالغاز والوقود والمواد الخطرة، وتجديد الترخيص'].includes(key)) {
+                const crName = (window.dynamicPdfFiles.commercialRegisterCertificate || window.dynamicPdfFiles.commercialRegisterCopy) ? (window.dynamicPdfFiles.commercialRegisterCertificate || window.dynamicPdfFiles.commercialRegisterCopy).name : '';
+                const profileName = window.dynamicPdfFiles.officeDetailedProfile ? window.dynamicPdfFiles.officeDetailedProfile.name : '';
+                const engListName = window.dynamicPdfFiles.engineersListDoc ? window.dynamicPdfFiles.engineersListDoc.name : '';
+                const licensesName = window.dynamicPdfFiles.engineeringPracticeLicenses ? window.dynamicPdfFiles.engineeringPracticeLicenses.name : '';
+                const idsResumesName = (window.dynamicPdfFiles.engineersIdCardsAndResumes || window.dynamicPdfFiles.idCardsAndResumes) ? (window.dynamicPdfFiles.engineersIdCardsAndResumes || window.dynamicPdfFiles.idCardsAndResumes).name : '';
+                dynamicSummary = `شهادة السجل التجاري: 📄 ${crName} | بيان مفصل للمكتب: 📄 ${profileName} | كشف بأسماء المهندسين: 📄 ${engListName} | رخص مزاولة المهن الهندسية: 📄 ${licensesName} | بطاقات الهوية والسيرة الذاتية للمهندسين: 📄 ${idsResumesName}`;
             } else {
                 const genericInput = document.getElementById('app-generic-details');
                 if (genericInput) {
@@ -6632,6 +6735,29 @@
                 dynamicFields.allPreviousApprovals = window.dynamicPdfFiles.allPreviousApprovals ? {
                     name: window.dynamicPdfFiles.allPreviousApprovals.name,
                     base64: window.dynamicPdfFiles.allPreviousApprovals.base64
+                } : null;
+            } else if (['consulting_offices_gas_fuel_hazmat_license', 'gas_fuel_hazmat_consulting_offices_license', 'License for Technical & Consulting Offices (Gas, Fuel, & Hazmat)', 'Technical & Consulting Offices (Gas, Fuel, & Hazmat) License', 'إصدار الترخيص للمكاتب الفنية والاستشارية المختصة بالغاز والوقود والمواد الخطرة، وتجديد الترخيص'].includes(key)) {
+                const crFile = window.dynamicPdfFiles.commercialRegisterCertificate || window.dynamicPdfFiles.commercialRegisterCopy;
+                dynamicFields.commercialRegisterCertificate = crFile ? {
+                    name: crFile.name,
+                    base64: crFile.base64
+                } : null;
+                dynamicFields.officeDetailedProfile = window.dynamicPdfFiles.officeDetailedProfile ? {
+                    name: window.dynamicPdfFiles.officeDetailedProfile.name,
+                    base64: window.dynamicPdfFiles.officeDetailedProfile.base64
+                } : null;
+                dynamicFields.engineersListDoc = window.dynamicPdfFiles.engineersListDoc ? {
+                    name: window.dynamicPdfFiles.engineersListDoc.name,
+                    base64: window.dynamicPdfFiles.engineersListDoc.base64
+                } : null;
+                dynamicFields.engineeringPracticeLicenses = window.dynamicPdfFiles.engineeringPracticeLicenses ? {
+                    name: window.dynamicPdfFiles.engineeringPracticeLicenses.name,
+                    base64: window.dynamicPdfFiles.engineeringPracticeLicenses.base64
+                } : null;
+                const idsFile = window.dynamicPdfFiles.engineersIdCardsAndResumes || window.dynamicPdfFiles.idCardsAndResumes;
+                dynamicFields.engineersIdCardsAndResumes = idsFile ? {
+                    name: idsFile.name,
+                    base64: idsFile.base64
                 } : null;
             } else {
                 const genericInput = document.getElementById('app-generic-details');
