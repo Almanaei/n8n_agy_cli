@@ -1715,6 +1715,29 @@ function formatDynamicFields(serviceInput, dynamicFields) {
       break;
 
     case 'small_facilities_inspection_certificate':
+    case 'Small Facilities Inspection Certificate Renewal':
+    case 'small_facility_inspection_certificate':
+    case 'إصدار شهادة فحص المنشآت الصغيرة، وتجديد الشهادة':
+      if (dynamicFields.leaseContractCopy) {
+        const doc = typeof dynamicFields.leaseContractCopy === 'object'
+          ? (dynamicFields.leaseContractCopy.name || dynamicFields.leaseContractCopy.url || 'مرفق نسخة من عقد الإيجار')
+          : dynamicFields.leaseContractCopy;
+        parts.push(`نسخة من عقد الإيجار: ${doc}`);
+      }
+      if (dynamicFields.detailedSitePlans || dynamicFields.sitePlans) {
+        const fileObj = dynamicFields.detailedSitePlans || dynamicFields.sitePlans;
+        const doc = typeof fileObj === 'object'
+          ? (fileObj.name || fileObj.url || 'مرفق مخططات تفصيلية للموقع')
+          : fileObj;
+        parts.push(`مخططات تفصيلية للموقع: ${doc}`);
+      }
+      if (dynamicFields.approvedMaintenanceContract || dynamicFields.maintenanceContract) {
+        const fileObj = dynamicFields.approvedMaintenanceContract || dynamicFields.maintenanceContract;
+        const doc = typeof fileObj === 'object'
+          ? (fileObj.name || fileObj.url || 'مرفق عقد صيانة من شركة معتمدة')
+          : fileObj;
+        parts.push(`عقد صيانة من شركة معتمدة: ${doc}`);
+      }
       if (dynamicFields.inspectionArea) parts.push(`مساحة المنشأة: ${dynamicFields.inspectionArea} متر مربع`);
       break;
   }
@@ -1798,6 +1821,8 @@ function formatDynamicFields(serviceInput, dynamicFields) {
     allPreviousApprovals: 'جميع الموافقات السابقة',
     commercialRegisterCertificate: 'شهادة السجل التجاري',
     engineersIdCardsAndResumes: 'بطاقات الهوية والسيرة الذاتية للمهندسين',
+    detailedSitePlans: 'مخططات تفصيلية للموقع',
+    approvedMaintenanceContract: 'عقد صيانة من شركة معتمدة',
     activityType: 'نوع النشاط',
     engineerLicense: 'ترخيص المهندس'
   };

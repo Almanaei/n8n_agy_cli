@@ -4936,6 +4936,24 @@
                         <div id="gas-consult-ids-resumes-error" class="form-error" style="display: none;">يرجى رفع بطاقات الهوية والسيرة الذاتية للمهندسين بصيغة PDF.</div>
                     </div>
                 `;
+            } else if (['small_facilities_inspection_certificate', 'Small Facilities Inspection Certificate Renewal', 'إصدار شهادة فحص المنشآت الصغيرة، وتجديد الشهادة', 'small_facility_inspection_certificate'].includes(key)) {
+                container.innerHTML = `
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-small-fac-lease">نسخة من عقد الإيجار (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-small-fac-lease" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'leaseContractCopy')" required>
+                        <div id="small-fac-lease-error" class="form-error" style="display: none;">يرجى رفع نسخة من عقد الإيجار بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-small-fac-site-plans">مخططات تفصيلية للموقع (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-small-fac-site-plans" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'detailedSitePlans')" required>
+                        <div id="small-fac-site-plans-error" class="form-error" style="display: none;">يرجى رفع مخططات تفصيلية للموقع بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-small-fac-maint-contract">عقد صيانة من شركة معتمدة (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-small-fac-maint-contract" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'approvedMaintenanceContract')" required>
+                        <div id="small-fac-maint-contract-error" class="form-error" style="display: none;">يرجى رفع عقد صيانة من شركة معتمدة بصيغة PDF.</div>
+                    </div>
+                `;
             } else if (service) {
                 container.innerHTML = `
                     <div class="form-group">
@@ -4975,9 +4993,11 @@
                 fieldKey === 'idCardCopy' ? (document.getElementById('small-incident-id-card-error') ? 'small-incident-id-card-error' : 'large-incident-id-card-error') :
                 fieldKey === 'propertyDeed' ? (document.getElementById('small-incident-property-deed-error') ? 'small-incident-property-deed-error' : 'large-incident-property-deed-error') :
                 fieldKey === 'commercialRegisterCopy' ? 'large-incident-cr-copy-error' :
-                fieldKey === 'leaseContractCopy' ? (document.getElementById('large-incident-lease-contract-error') ? 'large-incident-lease-contract-error' : 'under-const-lease-contract-error') :
+                fieldKey === 'leaseContractCopy' ? (document.getElementById('small-fac-lease-error') ? 'small-fac-lease-error' : (document.getElementById('large-incident-lease-contract-error') ? 'large-incident-lease-contract-error' : 'under-const-lease-contract-error')) :
                 fieldKey === 'tenantLeaseContract' ? 'small-incident-tenant-lease-error' :
                 fieldKey === 'sitePlans' ? 'under-const-site-plans-error' :
+                fieldKey === 'detailedSitePlans' ? 'small-fac-site-plans-error' :
+                fieldKey === 'approvedMaintenanceContract' ? 'small-fac-maint-contract-error' :
                 fieldKey === 'municipalityFormProof' ? 'elec-municipality-form-error' :
                 fieldKey === 'engineeringOfficeLetter' ? 'factory-eng-letter-error' :
                 fieldKey === 'projectEngineeringDrawings' ? 'factory-eng-drawings-error' :
@@ -6185,6 +6205,45 @@
                     if (idsResumesEl) idsResumesEl.classList.remove('invalid');
                     if (idsResumesErr) idsResumesErr.style.display = 'none';
                 }
+            } else if (['small_facilities_inspection_certificate', 'Small Facilities Inspection Certificate Renewal', 'إصدار شهادة فحص المنشآت الصغيرة، وتجديد الشهادة', 'small_facility_inspection_certificate'].includes(key)) {
+                const leaseFile = window.dynamicPdfFiles.leaseContractCopy;
+                const plansFile = window.dynamicPdfFiles.detailedSitePlans || window.dynamicPdfFiles.sitePlans;
+                const maintContractFile = window.dynamicPdfFiles.approvedMaintenanceContract || window.dynamicPdfFiles.maintenanceContract;
+
+                const leaseEl = document.getElementById('app-small-fac-lease');
+                const plansEl = document.getElementById('app-small-fac-site-plans');
+                const maintContractEl = document.getElementById('app-small-fac-maint-contract');
+
+                const leaseErr = document.getElementById('small-fac-lease-error');
+                const plansErr = document.getElementById('small-fac-site-plans-error');
+                const maintContractErr = document.getElementById('small-fac-maint-contract-error');
+
+                if (!leaseFile || !leaseFile.base64) {
+                    if (leaseEl) leaseEl.classList.add('invalid');
+                    if (leaseErr) { leaseErr.style.display = 'block'; leaseErr.innerText = "يرجى رفع نسخة من عقد الإيجار بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (leaseEl) leaseEl.classList.remove('invalid');
+                    if (leaseErr) leaseErr.style.display = 'none';
+                }
+
+                if (!plansFile || !plansFile.base64) {
+                    if (plansEl) plansEl.classList.add('invalid');
+                    if (plansErr) { plansErr.style.display = 'block'; plansErr.innerText = "يرجى رفع مخططات تفصيلية للموقع بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (plansEl) plansEl.classList.remove('invalid');
+                    if (plansErr) plansErr.style.display = 'none';
+                }
+
+                if (!maintContractFile || !maintContractFile.base64) {
+                    if (maintContractEl) maintContractEl.classList.add('invalid');
+                    if (maintContractErr) { maintContractErr.style.display = 'block'; maintContractErr.innerText = "يرجى رفع عقد صيانة من شركة معتمدة بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (maintContractEl) maintContractEl.classList.remove('invalid');
+                    if (maintContractErr) maintContractErr.style.display = 'none';
+                }
             }
 
             if (!isValid) return;
@@ -6325,6 +6384,11 @@
                 const licensesName = window.dynamicPdfFiles.engineeringPracticeLicenses ? window.dynamicPdfFiles.engineeringPracticeLicenses.name : '';
                 const idsResumesName = (window.dynamicPdfFiles.engineersIdCardsAndResumes || window.dynamicPdfFiles.idCardsAndResumes) ? (window.dynamicPdfFiles.engineersIdCardsAndResumes || window.dynamicPdfFiles.idCardsAndResumes).name : '';
                 dynamicSummary = `شهادة السجل التجاري: 📄 ${crName} | بيان مفصل للمكتب: 📄 ${profileName} | كشف بأسماء المهندسين: 📄 ${engListName} | رخص مزاولة المهن الهندسية: 📄 ${licensesName} | بطاقات الهوية والسيرة الذاتية للمهندسين: 📄 ${idsResumesName}`;
+            } else if (['small_facilities_inspection_certificate', 'Small Facilities Inspection Certificate Renewal', 'إصدار شهادة فحص المنشآت الصغيرة، وتجديد الشهادة', 'small_facility_inspection_certificate'].includes(key)) {
+                const leaseName = window.dynamicPdfFiles.leaseContractCopy ? window.dynamicPdfFiles.leaseContractCopy.name : '';
+                const plansName = (window.dynamicPdfFiles.detailedSitePlans || window.dynamicPdfFiles.sitePlans) ? (window.dynamicPdfFiles.detailedSitePlans || window.dynamicPdfFiles.sitePlans).name : '';
+                const maintName = (window.dynamicPdfFiles.approvedMaintenanceContract || window.dynamicPdfFiles.maintenanceContract) ? (window.dynamicPdfFiles.approvedMaintenanceContract || window.dynamicPdfFiles.maintenanceContract).name : '';
+                dynamicSummary = `نسخة من عقد الإيجار: 📄 ${leaseName} | مخططات تفصيلية للموقع: 📄 ${plansName} | عقد صيانة من شركة معتمدة: 📄 ${maintName}`;
             } else {
                 const genericInput = document.getElementById('app-generic-details');
                 if (genericInput) {
@@ -6734,6 +6798,21 @@
                 dynamicFields.engineersIdCardsAndResumes = idsFile ? {
                     name: idsFile.name,
                     base64: idsFile.base64
+                } : null;
+            } else if (['small_facilities_inspection_certificate', 'Small Facilities Inspection Certificate Renewal', 'إصدار شهادة فحص المنشآت الصغيرة، وتجديد الشهادة', 'small_facility_inspection_certificate'].includes(key)) {
+                dynamicFields.leaseContractCopy = window.dynamicPdfFiles.leaseContractCopy ? {
+                    name: window.dynamicPdfFiles.leaseContractCopy.name,
+                    base64: window.dynamicPdfFiles.leaseContractCopy.base64
+                } : null;
+                const plansFile = window.dynamicPdfFiles.detailedSitePlans || window.dynamicPdfFiles.sitePlans;
+                dynamicFields.detailedSitePlans = plansFile ? {
+                    name: plansFile.name,
+                    base64: plansFile.base64
+                } : null;
+                const maintFile = window.dynamicPdfFiles.approvedMaintenanceContract || window.dynamicPdfFiles.maintenanceContract;
+                dynamicFields.approvedMaintenanceContract = maintFile ? {
+                    name: maintFile.name,
+                    base64: maintFile.base64
                 } : null;
             } else {
                 const genericInput = document.getElementById('app-generic-details');
