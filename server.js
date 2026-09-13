@@ -1133,8 +1133,25 @@ function formatDynamicFields(serviceInput, dynamicFields) {
       if (dynamicFields.warehouseType || dynamicFields.facilityType) parts.push(`نوع المنشأة: ${dynamicFields.warehouseType || dynamicFields.facilityType}`);
       break;
 
+    case 'commercial_centers_high_rise_maps_license':
     case 'commercial_centers_highrise_maps_license':
+    case 'commercial_centers_highrise_plans_license':
+    case 'Commercial Centers & High-Rise Buildings Maps License':
     case 'Commercial Centers & High-rise Blueprint License':
+    case 'Commercial Centers and High-Rise Building Plans Permit':
+    case 'إصدار ترخيص خرائط المراكز التجارية والمباني العالية':
+      if (dynamicFields.engineeringOfficeLetter) {
+        const doc = typeof dynamicFields.engineeringOfficeLetter === 'object'
+          ? (dynamicFields.engineeringOfficeLetter.name || dynamicFields.engineeringOfficeLetter.url || 'مرفق رسالة المكتب الهندسي')
+          : dynamicFields.engineeringOfficeLetter;
+        parts.push(`رسالة المكتب الهندسي: ${doc}`);
+      }
+      if (dynamicFields.projectEngineeringDrawings) {
+        const doc = typeof dynamicFields.projectEngineeringDrawings === 'object'
+          ? (dynamicFields.projectEngineeringDrawings.name || dynamicFields.projectEngineeringDrawings.url || 'مرفق الرسومات الهندسية للمشروع')
+          : dynamicFields.projectEngineeringDrawings;
+        parts.push(`الرسومات الهندسية للمشروع: ${doc}`);
+      }
       if (dynamicFields.blueprintNumber) parts.push(`رقم المخطط: ${dynamicFields.blueprintNumber}`);
       if (dynamicFields.buildingHeight || dynamicFields.floorsCount || dynamicFields.floors) parts.push(`عدد الطوابق/الارتفاع: ${dynamicFields.buildingHeight || dynamicFields.floorsCount || dynamicFields.floors}`);
       if (dynamicFields.centerName || dynamicFields.buildingName) parts.push(`اسم المبنى/المركز: ${dynamicFields.centerName || dynamicFields.buildingName}`);
