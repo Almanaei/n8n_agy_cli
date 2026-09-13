@@ -1296,23 +1296,24 @@
                 if (docContainer && Array.isArray(rawAuditHistory) && rawAuditHistory.length > 0) {
                     let html = '<div style="display: flex; flex-direction: column; gap: 10px;">';
                     rawAuditHistory.forEach((item, index) => {
-                        const isLatest = index === rawAuditHistory.length - 1;
-                        const badgeColor = isLatest ? '#10b981' : '#64748b';
-                        const badgeBg = isLatest ? 'rgba(16, 185, 129, 0.15)' : 'rgba(100, 116, 139, 0.15)';
-                        const borderStyle = isLatest ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid rgba(100, 116, 139, 0.2)';
-                        
+                        const rawLabel = item.label || 'مستند مرفق';
+                        const cleanLabel = rawLabel.replace(/\s*\(الطلب الأصلي\)\s*/g, '').replace(/\s*\(تحديث بناءً على طلب الإدارة\)\s*/g, '').trim() || 'المستند المرفوع';
+                        const displayLabel = item.version && item.version > 1 ? `${cleanLabel} (تحديث v${item.version})` : cleanLabel;
+
                         html += `
-                            <div style="background: rgba(15, 23, 42, 0.6); border: ${borderStyle}; border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <span style="font-size: 1.2rem;">📄</span>
-                                    <div style="display: flex; flex-direction: column; gap: 2px;">
-                                        <span style="font-weight: 700; color: #ffffff; font-size: 0.9rem;">${item.fileName || 'المستند المرفوع'}</span>
-                                        <span style="font-size: 0.8rem; color: #94a3b8;">${item.label || 'إصدار مستند'} • تم الرفع: ${item.uploadedAt || ''}</span>
-                                    </div>
+                            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+                                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                                    <span style="background: #059669; color: #ffffff; padding: 4px 12px; border-radius: 14px; font-size: 0.8rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                                        🟢 ${displayLabel}
+                                    </span>
+                                    <a href="${item.fileUrl}" target="_blank" style="font-weight: 700; color: #60a5fa; font-size: 0.9rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+                                        <span>📄</span>
+                                        <span>${item.fileName || 'المستند المرفوع (PDF)'}</span>
+                                    </a>
+                                    ${item.uploadedAt ? `<span style="font-size: 0.78rem; color: #94a3b8;">(${item.uploadedAt})</span>` : ''}
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 10px;">
-                                    <span style="background: ${badgeBg}; color: ${badgeColor}; border: 1px solid ${badgeColor}; padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">${isLatest ? '🟢 الإصدار الحالي المعتمد' : '⚪ نسخة أرشفة سابقاً'}</span>
-                                    <a href="${item.fileUrl}" target="_blank" style="background: #2563eb; color: #ffffff; padding: 6px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; text-decoration: none;">معاينة / تحميل</a>
+                                    <a href="${item.fileUrl}" target="_blank" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; padding: 6px 14px; border-radius: 8px; font-size: 0.82rem; font-weight: 700; text-decoration: none;">معاينة / تحميل ↗</a>
                                 </div>
                             </div>
                         `;
