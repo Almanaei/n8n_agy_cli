@@ -4819,6 +4819,39 @@
                         <div id="maint-office-ids-resumes-error" class="form-error" style="display: none;">يرجى رفع بطاقات الهوية والسير الذاتية بصيغة PDF.</div>
                     </div>
                 `;
+            } else if (['hazardous_materials_1day_transport', 'hazardous_materials_transport_1day', 'One-Day Permit for Transporting Hazardous Material Shipments', 'One-Day Hazardous Material Shipment Transport Permit', 'ترخيص بالموافقة على نقل شحنات المواد الخطرة ليوم واحد'].includes(key)) {
+                container.innerHTML = `
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-haz-trans-applicant-letter">رسالة من مقدم الطلب (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-haz-trans-applicant-letter" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'applicantRequestLetter')" required>
+                        <div id="haz-trans-applicant-letter-error" class="form-error" style="display: none;">يرجى رفع رسالة من مقدم الطلب بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-haz-trans-materials-list">قائمة بالمواد المنقولة (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-haz-trans-materials-list" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'transportedMaterialsList')" required>
+                        <div id="haz-trans-materials-list-error" class="form-error" style="display: none;">يرجى رفع قائمة بالمواد المنقولة بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-haz-trans-msds">صحيفة السلامة للمواد (MSDS) (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-haz-trans-msds" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'materialsSafetyDataSheet')" required>
+                        <div id="haz-trans-msds-error" class="form-error" style="display: none;">يرجى رفع صحيفة السلامة للمواد (MSDS) بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-haz-trans-traffic-doc">وثيقة من المرور (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-haz-trans-traffic-doc" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'trafficDocument')" required>
+                        <div id="haz-trans-traffic-doc-error" class="form-error" style="display: none;">يرجى رفع وثيقة من المرور بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-haz-trans-inspection-cert">شهادة فحص السيارة (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-haz-trans-inspection-cert" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'vehicleInspectionCertificate')" required>
+                        <div id="haz-trans-inspection-cert-error" class="form-error" style="display: none;">يرجى رفع شهادة فحص السيارة بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-haz-trans-vehicle-ownership">ملكية المركبة (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-haz-trans-vehicle-ownership" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'vehicleOwnershipCard')" required>
+                        <div id="haz-trans-vehicle-ownership-error" class="form-error" style="display: none;">يرجى رفع ملكية المركبة بصيغة PDF.</div>
+                    </div>
+                `;
             } else if (service) {
                 container.innerHTML = `
                     <div class="form-group">
@@ -5773,6 +5806,81 @@
                     if (idsResumesEl) idsResumesEl.classList.remove('invalid');
                     if (idsResumesErr) idsResumesErr.style.display = 'none';
                 }
+            } else if (['hazardous_materials_1day_transport', 'hazardous_materials_transport_1day', 'One-Day Permit for Transporting Hazardous Material Shipments', 'One-Day Hazardous Material Shipment Transport Permit', 'ترخيص بالموافقة على نقل شحنات المواد الخطرة ليوم واحد'].includes(key)) {
+                const appLetterFile = window.dynamicPdfFiles.applicantRequestLetter;
+                const matListFile = window.dynamicPdfFiles.transportedMaterialsList;
+                const msdsFile = window.dynamicPdfFiles.materialsSafetyDataSheet;
+                const trafficDocFile = window.dynamicPdfFiles.trafficDocument;
+                const inspectCertFile = window.dynamicPdfFiles.vehicleInspectionCertificate;
+                const vehicleOwnerFile = window.dynamicPdfFiles.vehicleOwnershipCard;
+
+                const appLetterEl = document.getElementById('app-haz-trans-applicant-letter');
+                const matListEl = document.getElementById('app-haz-trans-materials-list');
+                const msdsEl = document.getElementById('app-haz-trans-msds');
+                const trafficDocEl = document.getElementById('app-haz-trans-traffic-doc');
+                const inspectCertEl = document.getElementById('app-haz-trans-inspection-cert');
+                const vehicleOwnerEl = document.getElementById('app-haz-trans-vehicle-ownership');
+
+                const appLetterErr = document.getElementById('haz-trans-applicant-letter-error');
+                const matListErr = document.getElementById('haz-trans-materials-list-error');
+                const msdsErr = document.getElementById('haz-trans-msds-error');
+                const trafficDocErr = document.getElementById('haz-trans-traffic-doc-error');
+                const inspectCertErr = document.getElementById('haz-trans-inspection-cert-error');
+                const vehicleOwnerErr = document.getElementById('haz-trans-vehicle-ownership-error');
+
+                if (!appLetterFile || !appLetterFile.base64) {
+                    if (appLetterEl) appLetterEl.classList.add('invalid');
+                    if (appLetterErr) { appLetterErr.style.display = 'block'; appLetterErr.innerText = "يرجى رفع رسالة من مقدم الطلب بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (appLetterEl) appLetterEl.classList.remove('invalid');
+                    if (appLetterErr) appLetterErr.style.display = 'none';
+                }
+
+                if (!matListFile || !matListFile.base64) {
+                    if (matListEl) matListEl.classList.add('invalid');
+                    if (matListErr) { matListErr.style.display = 'block'; matListErr.innerText = "يرجى رفع قائمة بالمواد المنقولة بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (matListEl) matListEl.classList.remove('invalid');
+                    if (matListErr) matListErr.style.display = 'none';
+                }
+
+                if (!msdsFile || !msdsFile.base64) {
+                    if (msdsEl) msdsEl.classList.add('invalid');
+                    if (msdsErr) { msdsErr.style.display = 'block'; msdsErr.innerText = "يرجى رفع صحيفة السلامة للمواد (MSDS) بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (msdsEl) msdsEl.classList.remove('invalid');
+                    if (msdsErr) msdsErr.style.display = 'none';
+                }
+
+                if (!trafficDocFile || !trafficDocFile.base64) {
+                    if (trafficDocEl) trafficDocEl.classList.add('invalid');
+                    if (trafficDocErr) { trafficDocErr.style.display = 'block'; trafficDocErr.innerText = "يرجى رفع وثيقة من المرور بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (trafficDocEl) trafficDocEl.classList.remove('invalid');
+                    if (trafficDocErr) trafficDocErr.style.display = 'none';
+                }
+
+                if (!inspectCertFile || !inspectCertFile.base64) {
+                    if (inspectCertEl) inspectCertEl.classList.add('invalid');
+                    if (inspectCertErr) { inspectCertErr.style.display = 'block'; inspectCertErr.innerText = "يرجى رفع شهادة فحص السيارة بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (inspectCertEl) inspectCertEl.classList.remove('invalid');
+                    if (inspectCertErr) inspectCertErr.style.display = 'none';
+                }
+
+                if (!vehicleOwnerFile || !vehicleOwnerFile.base64) {
+                    if (vehicleOwnerEl) vehicleOwnerEl.classList.add('invalid');
+                    if (vehicleOwnerErr) { vehicleOwnerErr.style.display = 'block'; vehicleOwnerErr.innerText = "يرجى رفع ملكية المركبة بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (vehicleOwnerEl) vehicleOwnerEl.classList.remove('invalid');
+                    if (vehicleOwnerErr) vehicleOwnerErr.style.display = 'none';
+                }
             }
 
             if (!isValid) return;
@@ -5882,6 +5990,14 @@
                 const licensesName = window.dynamicPdfFiles.engineeringPracticeLicenses ? window.dynamicPdfFiles.engineeringPracticeLicenses.name : '';
                 const idsResumesName = window.dynamicPdfFiles.idCardsAndResumes ? window.dynamicPdfFiles.idCardsAndResumes.name : '';
                 dynamicSummary = `السجل التجاري: 📄 ${crName} | بيان مفصل للمكتب: 📄 ${profileName} | كشف بأسماء المهندسين: 📄 ${engListName} | رخص مزاولة المهن الهندسية: 📄 ${licensesName} | بطاقات الهوية والسير الذاتية: 📄 ${idsResumesName}`;
+            } else if (['hazardous_materials_1day_transport', 'hazardous_materials_transport_1day', 'One-Day Permit for Transporting Hazardous Material Shipments', 'One-Day Hazardous Material Shipment Transport Permit', 'ترخيص بالموافقة على نقل شحنات المواد الخطرة ليوم واحد'].includes(key)) {
+                const appLetterName = window.dynamicPdfFiles.applicantRequestLetter ? window.dynamicPdfFiles.applicantRequestLetter.name : '';
+                const matListName = window.dynamicPdfFiles.transportedMaterialsList ? window.dynamicPdfFiles.transportedMaterialsList.name : '';
+                const msdsName = window.dynamicPdfFiles.materialsSafetyDataSheet ? window.dynamicPdfFiles.materialsSafetyDataSheet.name : '';
+                const trafficDocName = window.dynamicPdfFiles.trafficDocument ? window.dynamicPdfFiles.trafficDocument.name : '';
+                const inspectCertName = window.dynamicPdfFiles.vehicleInspectionCertificate ? window.dynamicPdfFiles.vehicleInspectionCertificate.name : '';
+                const vehicleOwnerName = window.dynamicPdfFiles.vehicleOwnershipCard ? window.dynamicPdfFiles.vehicleOwnershipCard.name : '';
+                dynamicSummary = `رسالة مقدم الطلب: 📄 ${appLetterName} | قائمة المواد: 📄 ${matListName} | صحيفة السلامة: 📄 ${msdsName} | وثيقة المرور: 📄 ${trafficDocName} | فحص السيارة: 📄 ${inspectCertName} | ملكية المركبة: 📄 ${vehicleOwnerName}`;
             } else {
                 const genericInput = document.getElementById('app-generic-details');
                 if (genericInput) {
@@ -6193,6 +6309,31 @@
                 dynamicFields.idCardsAndResumes = window.dynamicPdfFiles.idCardsAndResumes ? {
                     name: window.dynamicPdfFiles.idCardsAndResumes.name,
                     base64: window.dynamicPdfFiles.idCardsAndResumes.base64
+                } : null;
+            } else if (['hazardous_materials_1day_transport', 'hazardous_materials_transport_1day', 'One-Day Permit for Transporting Hazardous Material Shipments', 'One-Day Hazardous Material Shipment Transport Permit', 'ترخيص بالموافقة على نقل شحنات المواد الخطرة ليوم واحد'].includes(key)) {
+                dynamicFields.applicantRequestLetter = window.dynamicPdfFiles.applicantRequestLetter ? {
+                    name: window.dynamicPdfFiles.applicantRequestLetter.name,
+                    base64: window.dynamicPdfFiles.applicantRequestLetter.base64
+                } : null;
+                dynamicFields.transportedMaterialsList = window.dynamicPdfFiles.transportedMaterialsList ? {
+                    name: window.dynamicPdfFiles.transportedMaterialsList.name,
+                    base64: window.dynamicPdfFiles.transportedMaterialsList.base64
+                } : null;
+                dynamicFields.materialsSafetyDataSheet = window.dynamicPdfFiles.materialsSafetyDataSheet ? {
+                    name: window.dynamicPdfFiles.materialsSafetyDataSheet.name,
+                    base64: window.dynamicPdfFiles.materialsSafetyDataSheet.base64
+                } : null;
+                dynamicFields.trafficDocument = window.dynamicPdfFiles.trafficDocument ? {
+                    name: window.dynamicPdfFiles.trafficDocument.name,
+                    base64: window.dynamicPdfFiles.trafficDocument.base64
+                } : null;
+                dynamicFields.vehicleInspectionCertificate = window.dynamicPdfFiles.vehicleInspectionCertificate ? {
+                    name: window.dynamicPdfFiles.vehicleInspectionCertificate.name,
+                    base64: window.dynamicPdfFiles.vehicleInspectionCertificate.base64
+                } : null;
+                dynamicFields.vehicleOwnershipCard = window.dynamicPdfFiles.vehicleOwnershipCard ? {
+                    name: window.dynamicPdfFiles.vehicleOwnershipCard.name,
+                    base64: window.dynamicPdfFiles.vehicleOwnershipCard.base64
                 } : null;
             } else {
                 const genericInput = document.getElementById('app-generic-details');

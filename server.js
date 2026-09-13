@@ -1530,7 +1530,51 @@ function formatDynamicFields(serviceInput, dynamicFields) {
       if (dynamicFields.commercialCR) parts.push(`رقم السجل التجاري: ${dynamicFields.commercialCR}`);
       break;
 
+    case 'hazardous_materials_1day_transport':
     case 'hazardous_materials_transport_1day':
+    case 'One-Day Permit for Transporting Hazardous Material Shipments':
+    case 'One-Day Hazardous Material Shipment Transport Permit':
+    case 'ترخيص بالموافقة على نقل شحنات المواد الخطرة ليوم واحد':
+      if (dynamicFields.applicantRequestLetter) {
+        const doc = typeof dynamicFields.applicantRequestLetter === 'object'
+          ? (dynamicFields.applicantRequestLetter.name || dynamicFields.applicantRequestLetter.url || 'مرفق رسالة من مقدم الطلب')
+          : dynamicFields.applicantRequestLetter;
+        parts.push(`رسالة من مقدم الطلب: ${doc}`);
+      }
+      if (dynamicFields.transportedMaterialsList) {
+        const doc = typeof dynamicFields.transportedMaterialsList === 'object'
+          ? (dynamicFields.transportedMaterialsList.name || dynamicFields.transportedMaterialsList.url || 'مرفق قائمة بالمواد المنقولة')
+          : dynamicFields.transportedMaterialsList;
+        parts.push(`قائمة بالمواد المنقولة: ${doc}`);
+      }
+      if (dynamicFields.materialsSafetyDataSheet) {
+        const doc = typeof dynamicFields.materialsSafetyDataSheet === 'object'
+          ? (dynamicFields.materialsSafetyDataSheet.name || dynamicFields.materialsSafetyDataSheet.url || 'مرفق صحيفة السلامة للمواد (MSDS)')
+          : dynamicFields.materialsSafetyDataSheet;
+        parts.push(`صحيفة السلامة للمواد (MSDS): ${doc}`);
+      }
+      if (dynamicFields.trafficDocument) {
+        const doc = typeof dynamicFields.trafficDocument === 'object'
+          ? (dynamicFields.trafficDocument.name || dynamicFields.trafficDocument.url || 'مرفق وثيقة من المرور')
+          : dynamicFields.trafficDocument;
+        parts.push(`وثيقة من المرور: ${doc}`);
+      }
+      if (dynamicFields.vehicleInspectionCertificate) {
+        const doc = typeof dynamicFields.vehicleInspectionCertificate === 'object'
+          ? (dynamicFields.vehicleInspectionCertificate.name || dynamicFields.vehicleInspectionCertificate.url || 'مرفق شهادة فحص السيارة')
+          : dynamicFields.vehicleInspectionCertificate;
+        parts.push(`شهادة فحص السيارة: ${doc}`);
+      }
+      if (dynamicFields.vehicleOwnershipCard) {
+        const doc = typeof dynamicFields.vehicleOwnershipCard === 'object'
+          ? (dynamicFields.vehicleOwnershipCard.name || dynamicFields.vehicleOwnershipCard.url || 'مرفق ملكية المركبة')
+          : dynamicFields.vehicleOwnershipCard;
+        parts.push(`ملكية المركبة: ${doc}`);
+      }
+      if (dynamicFields.vehiclePlate) parts.push(`رقم لوحة المركبة: ${dynamicFields.vehiclePlate}`);
+      if (dynamicFields.transportDate) parts.push(`تاريخ النقل: ${dynamicFields.transportDate}`);
+      break;
+
     case 'chemical_transport_vehicles_approval':
       if (dynamicFields.vehiclePlate) parts.push(`رقم لوحة المركبة: ${dynamicFields.vehiclePlate}`);
       if (dynamicFields.transportDate) parts.push(`تاريخ النقل: ${dynamicFields.transportDate}`);
