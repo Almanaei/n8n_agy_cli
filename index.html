@@ -4616,6 +4616,19 @@
                         <div id="elec-municipality-form-error" class="form-error" style="display: none;">يرجى رفع استمارة البلدية (أو ما يثبت) بصيغة PDF.</div>
                     </div>
                 `;
+            } else if (['factory_warehouse_maps_license', 'Factory & Warehouse Maps License', 'Factory & Warehouse Blueprint License', 'إصدار ترخيص خرائط المصانع والمخازن وتجديد الترخيص'].includes(key)) {
+                container.innerHTML = `
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-factory-eng-letter">رسالة المكتب الهندسي (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-factory-eng-letter" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'engineeringOfficeLetter')" required>
+                        <div id="factory-eng-letter-error" class="form-error" style="display: none;">يرجى رفع رسالة المكتب الهندسي بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-factory-eng-drawings">الرسومات الهندسية للمشروع (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-factory-eng-drawings" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'projectEngineeringDrawings')" required>
+                        <div id="factory-eng-drawings-error" class="form-error" style="display: none;">يرجى رفع الرسومات الهندسية للمشروع بصيغة PDF.</div>
+                    </div>
+                `;
             } else if (service) {
                 container.innerHTML = `
                     <div class="form-group">
@@ -4659,6 +4672,8 @@
                 fieldKey === 'tenantLeaseContract' ? 'small-incident-tenant-lease-error' :
                 fieldKey === 'sitePlans' ? 'under-const-site-plans-error' :
                 fieldKey === 'municipalityFormProof' ? 'elec-municipality-form-error' :
+                fieldKey === 'engineeringOfficeLetter' ? 'factory-eng-letter-error' :
+                fieldKey === 'projectEngineeringDrawings' ? 'factory-eng-drawings-error' :
                 `${fieldKey}-error`
             );
             if (errorEl) errorEl.style.display = 'none';
@@ -5111,6 +5126,33 @@
                     if (formEl) formEl.classList.remove('invalid');
                     if (formErr) formErr.style.display = 'none';
                 }
+            } else if (['factory_warehouse_maps_license', 'Factory & Warehouse Maps License', 'Factory & Warehouse Blueprint License', 'إصدار ترخيص خرائط المصانع والمخازن وتجديد الترخيص'].includes(key)) {
+                const engLetterFile = window.dynamicPdfFiles.engineeringOfficeLetter;
+                const drawingsFile = window.dynamicPdfFiles.projectEngineeringDrawings;
+
+                const engLetterEl = document.getElementById('app-factory-eng-letter');
+                const drawingsEl = document.getElementById('app-factory-eng-drawings');
+
+                const engLetterErr = document.getElementById('factory-eng-letter-error');
+                const drawingsErr = document.getElementById('factory-eng-drawings-error');
+
+                if (!engLetterFile || !engLetterFile.base64) {
+                    if (engLetterEl) engLetterEl.classList.add('invalid');
+                    if (engLetterErr) { engLetterErr.style.display = 'block'; engLetterErr.innerText = "يرجى رفع رسالة المكتب الهندسي بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (engLetterEl) engLetterEl.classList.remove('invalid');
+                    if (engLetterErr) engLetterErr.style.display = 'none';
+                }
+
+                if (!drawingsFile || !drawingsFile.base64) {
+                    if (drawingsEl) drawingsEl.classList.add('invalid');
+                    if (drawingsErr) { drawingsErr.style.display = 'block'; drawingsErr.innerText = "يرجى رفع الرسومات الهندسية للمشروع بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (drawingsEl) drawingsEl.classList.remove('invalid');
+                    if (drawingsErr) drawingsErr.style.display = 'none';
+                }
             }
 
             if (!isValid) return;
@@ -5161,6 +5203,10 @@
             } else if (['electrical_connection_final_inspection', 'Final Inspection Certificate for Electrical Connection', 'إصدار شهادة الفحص النهائي لتوصيل التيار الكهربائي للمباني الجديدة'].includes(key)) {
                 const formName = window.dynamicPdfFiles.municipalityFormProof ? window.dynamicPdfFiles.municipalityFormProof.name : '';
                 dynamicSummary = `استمارة البلدية (أو ما يثبت): 📄 ${formName}`;
+            } else if (['factory_warehouse_maps_license', 'Factory & Warehouse Maps License', 'Factory & Warehouse Blueprint License', 'إصدار ترخيص خرائط المصانع والمخازن وتجديد الترخيص'].includes(key)) {
+                const letterName = window.dynamicPdfFiles.engineeringOfficeLetter ? window.dynamicPdfFiles.engineeringOfficeLetter.name : '';
+                const drawingsName = window.dynamicPdfFiles.projectEngineeringDrawings ? window.dynamicPdfFiles.projectEngineeringDrawings.name : '';
+                dynamicSummary = `رسالة المكتب الهندسي: 📄 ${letterName} | الرسومات الهندسية للمشروع: 📄 ${drawingsName}`;
             } else {
                 const genericInput = document.getElementById('app-generic-details');
                 if (genericInput) {
@@ -5320,6 +5366,15 @@
                 dynamicFields.municipalityFormProof = window.dynamicPdfFiles.municipalityFormProof ? {
                     name: window.dynamicPdfFiles.municipalityFormProof.name,
                     base64: window.dynamicPdfFiles.municipalityFormProof.base64
+                } : null;
+            } else if (['factory_warehouse_maps_license', 'Factory & Warehouse Maps License', 'Factory & Warehouse Blueprint License', 'إصدار ترخيص خرائط المصانع والمخازن وتجديد الترخيص'].includes(key)) {
+                dynamicFields.engineeringOfficeLetter = window.dynamicPdfFiles.engineeringOfficeLetter ? {
+                    name: window.dynamicPdfFiles.engineeringOfficeLetter.name,
+                    base64: window.dynamicPdfFiles.engineeringOfficeLetter.base64
+                } : null;
+                dynamicFields.projectEngineeringDrawings = window.dynamicPdfFiles.projectEngineeringDrawings ? {
+                    name: window.dynamicPdfFiles.projectEngineeringDrawings.name,
+                    base64: window.dynamicPdfFiles.projectEngineeringDrawings.base64
                 } : null;
             } else {
                 const genericInput = document.getElementById('app-generic-details');

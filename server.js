@@ -1113,7 +1113,21 @@ function formatDynamicFields(serviceInput, dynamicFields) {
       break;
 
     case 'factory_warehouse_maps_license':
+    case 'Factory & Warehouse Maps License':
     case 'Factory & Warehouse Blueprint License':
+    case 'إصدار ترخيص خرائط المصانع والمخازن وتجديد الترخيص':
+      if (dynamicFields.engineeringOfficeLetter) {
+        const doc = typeof dynamicFields.engineeringOfficeLetter === 'object'
+          ? (dynamicFields.engineeringOfficeLetter.name || dynamicFields.engineeringOfficeLetter.url || 'مرفق رسالة المكتب الهندسي')
+          : dynamicFields.engineeringOfficeLetter;
+        parts.push(`رسالة المكتب الهندسي: ${doc}`);
+      }
+      if (dynamicFields.projectEngineeringDrawings) {
+        const doc = typeof dynamicFields.projectEngineeringDrawings === 'object'
+          ? (dynamicFields.projectEngineeringDrawings.name || dynamicFields.projectEngineeringDrawings.url || 'مرفق الرسومات الهندسية للمشروع')
+          : dynamicFields.projectEngineeringDrawings;
+        parts.push(`الرسومات الهندسية للمشروع: ${doc}`);
+      }
       if (dynamicFields.blueprintNumber) parts.push(`رقم المخطط: ${dynamicFields.blueprintNumber}`);
       if (dynamicFields.factoryArea || dynamicFields.area || dynamicFields.inspectionArea) parts.push(`مساحة المنشأة: ${dynamicFields.factoryArea || dynamicFields.area || dynamicFields.inspectionArea} متر مربع`);
       if (dynamicFields.warehouseType || dynamicFields.facilityType) parts.push(`نوع المنشأة: ${dynamicFields.warehouseType || dynamicFields.facilityType}`);
@@ -1245,6 +1259,8 @@ function formatDynamicFields(serviceInput, dynamicFields) {
     commercialRegisterCopy: 'نسخة من السجل التجاري',
     tenantLeaseContract: 'عقد الإيجار إذا كان المتضرر مستأجرًا',
     municipalityFormProof: 'استمارة البلدية (أو ما يثبت)',
+    engineeringOfficeLetter: 'رسالة المكتب الهندسي',
+    projectEngineeringDrawings: 'الرسومات الهندسية للمشروع',
     stationCapacity: 'سعة خزانات الوقود',
     trainees: 'المتدربون',
     blueprintNumber: 'رقم المخطط',
@@ -2988,7 +3004,9 @@ const server = http.createServer(async (req, res) => {
             { key: 'propertyDeed', label: 'وثيقة ملكية العقار (الطلب الأصلي)', defaultName: 'Property-Deed.pdf' },
             { key: 'commercialRegisterCopy', label: 'نسخة من السجل التجاري (الطلب الأصلي)', defaultName: 'Commercial-Register-Copy.pdf' },
             { key: 'tenantLeaseContract', label: 'عقد الإيجار للمستأجر (الطلب الأصلي)', defaultName: 'Tenant-Lease-Contract.pdf' },
-            { key: 'municipalityFormProof', label: 'استمارة البلدية أو ما يثبت (الطلب الأصلي)', defaultName: 'Municipality-Form-Proof.pdf' }
+            { key: 'municipalityFormProof', label: 'استمارة البلدية أو ما يثبت (الطلب الأصلي)', defaultName: 'Municipality-Form-Proof.pdf' },
+            { key: 'engineeringOfficeLetter', label: 'رسالة المكتب الهندسي (الطلب الأصلي)', defaultName: 'Engineering-Office-Letter.pdf' },
+            { key: 'projectEngineeringDrawings', label: 'الرسومات الهندسية للمشروع (الطلب الأصلي)', defaultName: 'Project-Engineering-Drawings.pdf' }
           ];
 
           for (const conf of dynamicAttConfigs) {
