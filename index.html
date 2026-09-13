@@ -4660,7 +4660,7 @@
                         <div id="gas-maps-approved-maps-error" class="form-error" style="display: none;">يرجى رفع خرائط المشروع المعتمدة بصيغة PDF.</div>
                     </div>
                 `;
-            } else if (['electrical_engineering_plans_review', 'electrical_engineering_plans_study', 'Review of Electrical Engineering Plans', 'Electrical Engineering Plans Review', 'دراسة المخططات الهندسية الكهربائية'].includes(key)) {
+            } else if (['electrical_engineering_plans_review', 'electrical_engineering_plans_study', 'Review of Electrical Engineering Plans', 'Electrical Engineering Plans Review', 'دراسة المخططات الهندسية الكهربائية', 'mechanical_engineering_plans_review', 'mechanical_plans_study', 'Review of Mechanical Engineering Plans', 'Mechanical Engineering Plans Review', 'دراسة المخططات الميكانيكية'].includes(key)) {
                 container.innerHTML = `
                     <div class="form-group" style="margin-bottom: 14px;">
                         <label class="form-label" for="app-elec-plans-entity-letter">رسالة من الجهة المعنية (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
@@ -5274,7 +5274,7 @@
                     if (approvedMapsEl) approvedMapsEl.classList.remove('invalid');
                     if (approvedMapsErr) approvedMapsErr.style.display = 'none';
                 }
-            } else if (['electrical_engineering_plans_review', 'electrical_engineering_plans_study', 'Review of Electrical Engineering Plans', 'Electrical Engineering Plans Review', 'دراسة المخططات الهندسية الكهربائية'].includes(key)) {
+            } else if (['electrical_engineering_plans_review', 'electrical_engineering_plans_study', 'Review of Electrical Engineering Plans', 'Electrical Engineering Plans Review', 'دراسة المخططات الهندسية الكهربائية', 'mechanical_engineering_plans_review', 'mechanical_plans_study', 'Review of Mechanical Engineering Plans', 'Mechanical Engineering Plans Review', 'دراسة المخططات الميكانيكية'].includes(key)) {
                 const entityLetterFile = window.dynamicPdfFiles.concernedEntityLetter;
                 const archPlansFile = window.dynamicPdfFiles.architecturalPlans;
                 const mepPlansFile = window.dynamicPdfFiles.electricalMechanicalPlans;
@@ -5376,7 +5376,7 @@
                 const approvalsName = window.dynamicPdfFiles.otherEntitiesApprovals ? window.dynamicPdfFiles.otherEntitiesApprovals.name : '';
                 const mapsName = window.dynamicPdfFiles.approvedProjectMaps ? window.dynamicPdfFiles.approvedProjectMaps.name : '';
                 dynamicSummary = `رسالة من الجهة المعنية: 📄 ${letterName} | موافقات الجهات الأخرى: 📄 ${approvalsName} | خرائط المشروع: 📄 ${mapsName}`;
-            } else if (['electrical_engineering_plans_review', 'electrical_engineering_plans_study', 'Review of Electrical Engineering Plans', 'Electrical Engineering Plans Review', 'دراسة المخططات الهندسية الكهربائية'].includes(key)) {
+            } else if (['electrical_engineering_plans_review', 'electrical_engineering_plans_study', 'Review of Electrical Engineering Plans', 'Electrical Engineering Plans Review', 'دراسة المخططات الهندسية الكهربائية', 'mechanical_engineering_plans_review', 'mechanical_plans_study', 'Review of Mechanical Engineering Plans', 'Mechanical Engineering Plans Review', 'دراسة المخططات الميكانيكية'].includes(key)) {
                 const letterName = window.dynamicPdfFiles.concernedEntityLetter ? window.dynamicPdfFiles.concernedEntityLetter.name : '';
                 const archName = window.dynamicPdfFiles.architecturalPlans ? window.dynamicPdfFiles.architecturalPlans.name : '';
                 const mepName = window.dynamicPdfFiles.electricalMechanicalPlans ? window.dynamicPdfFiles.electricalMechanicalPlans.name : '';
@@ -5572,7 +5572,7 @@
                     name: window.dynamicPdfFiles.approvedProjectMaps.name,
                     base64: window.dynamicPdfFiles.approvedProjectMaps.base64
                 } : null;
-            } else if (['electrical_engineering_plans_review', 'electrical_engineering_plans_study', 'Review of Electrical Engineering Plans', 'Electrical Engineering Plans Review', 'دراسة المخططات الهندسية الكهربائية'].includes(key)) {
+            } else if (['electrical_engineering_plans_review', 'electrical_engineering_plans_study', 'Review of Electrical Engineering Plans', 'Electrical Engineering Plans Review', 'دراسة المخططات الهندسية الكهربائية', 'mechanical_engineering_plans_review', 'mechanical_plans_study', 'Review of Mechanical Engineering Plans', 'Mechanical Engineering Plans Review', 'دراسة المخططات الميكانيكية'].includes(key)) {
                 dynamicFields.concernedEntityLetter = window.dynamicPdfFiles.concernedEntityLetter ? {
                     name: window.dynamicPdfFiles.concernedEntityLetter.name,
                     base64: window.dynamicPdfFiles.concernedEntityLetter.base64

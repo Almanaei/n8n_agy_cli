@@ -1254,6 +1254,11 @@ function formatDynamicFields(serviceInput, dynamicFields) {
     case 'Review of Electrical Engineering Plans':
     case 'Electrical Engineering Plans Review':
     case 'دراسة المخططات الهندسية الكهربائية':
+    case 'mechanical_engineering_plans_review':
+    case 'mechanical_plans_study':
+    case 'Review of Mechanical Engineering Plans':
+    case 'Mechanical Engineering Plans Review':
+    case 'دراسة المخططات الميكانيكية':
       if (dynamicFields.concernedEntityLetter) {
         const doc = typeof dynamicFields.concernedEntityLetter === 'object'
           ? (dynamicFields.concernedEntityLetter.name || dynamicFields.concernedEntityLetter.url || 'مرفق رسالة من الجهة المعنية')
@@ -1273,10 +1278,6 @@ function formatDynamicFields(serviceInput, dynamicFields) {
         parts.push(`المخططات الكهربائية والميكانيكية: ${doc}`);
       }
       if (dynamicFields.loadCapacity) parts.push(`سعة الحمل الكهربائي: ${dynamicFields.loadCapacity}`);
-      if (dynamicFields.consultantOffice) parts.push(`المكتب الاستشاري: ${dynamicFields.consultantOffice}`);
-      break;
-
-    case 'mechanical_plans_study':
       if (dynamicFields.systemType) parts.push(`نوع النظام الميكانيكي: ${dynamicFields.systemType}`);
       if (dynamicFields.consultantOffice) parts.push(`المكتب الاستشاري: ${dynamicFields.consultantOffice}`);
       break;
