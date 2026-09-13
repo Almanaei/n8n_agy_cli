@@ -936,8 +936,25 @@ function formatDynamicFields(serviceInput, dynamicFields) {
       }
       break;
 
-    case 'trainee_registration':
     case 'heavy_fire_vehicle_driving_training':
+    case 'heavy_fire_vehicle_driving_training_2weeks':
+    case 'Heavy Firefighting Vehicle Driving Training Certificate (2 Weeks)':
+    case 'إصدار شهادة تدريب أفراد منشآت ومؤسسات القطاع الخاص على قيادة مركبات الإطفاء الثقيلة لمدة أسبوعين':
+      if (dynamicFields.courseDetailsLetter || dynamicFields.trainingOfficialLetter) {
+        const fileObj = dynamicFields.courseDetailsLetter || dynamicFields.trainingOfficialLetter;
+        const doc = typeof fileObj === 'object'
+          ? (fileObj.name || fileObj.url || 'مرفق رسالة تفاصيل الدورة')
+          : fileObj;
+        parts.push(`رسالة تفاصيل الدورة (النوع، اللغة، المدة، عدد المشاركين): ${doc}`);
+      }
+      if (Array.isArray(dynamicFields.trainees)) {
+        parts.push(`المتدربون: ${dynamicFields.trainees.join(', ')}`);
+      } else if (dynamicFields.trainees) {
+        parts.push(`المتدربون: ${dynamicFields.trainees}`);
+      }
+      break;
+
+    case 'trainee_registration':
     case 'trainee_registration_16weeks':
     case 'Trainee Registration':
       if (dynamicFields.trainingOfficialLetter) {

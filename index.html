@@ -4476,7 +4476,15 @@
                         <div id="training-request-letter-error" class="form-error" style="display: none;">يرجى رفع كتاب رسمي من الجهة الطالبة للدورة التدريبية بصيغة PDF.</div>
                     </div>
                 `;
-            } else if (['trainee_registration', 'heavy_fire_vehicle_driving_training', 'trainee_registration_16weeks', 'Trainee Registration'].includes(key)) {
+            } else if (['heavy_fire_vehicle_driving_training', 'heavy_fire_vehicle_driving_training_2weeks', 'Heavy Firefighting Vehicle Driving Training Certificate (2 Weeks)', 'إصدار شهادة تدريب أفراد منشآت ومؤسسات القطاع الخاص على قيادة مركبات الإطفاء الثقيلة لمدة أسبوعين'].includes(key)) {
+                container.innerHTML = `
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-heavy-driving-course-letter">رسالة تتضمن نوع الدورة – اللغة - مدة الدورة - عدد المشاركين (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-heavy-driving-course-letter" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'courseDetailsLetter')" required>
+                        <div id="heavy-driving-course-letter-error" class="form-error" style="display: none;">يرجى رفع رسالة تتضمن تفاصيل الدورة بصيغة PDF.</div>
+                    </div>
+                `;
+            } else if (['trainee_registration', 'trainee_registration_16weeks', 'Trainee Registration'].includes(key)) {
                 container.innerHTML = `
                     <div class="form-group" style="margin-bottom: 14px;">
                         <label class="form-label" for="app-training-official-letter">خطاب رسمي (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
@@ -4911,7 +4919,20 @@
                     if (reqLetterEl) reqLetterEl.classList.remove('invalid');
                     if (reqLetterErr) reqLetterErr.style.display = 'none';
                 }
-            } else if (['trainee_registration', 'heavy_fire_vehicle_driving_training', 'trainee_registration_16weeks', 'Trainee Registration'].includes(key)) {
+            } else if (['heavy_fire_vehicle_driving_training', 'heavy_fire_vehicle_driving_training_2weeks', 'Heavy Firefighting Vehicle Driving Training Certificate (2 Weeks)', 'إصدار شهادة تدريب أفراد منشآت ومؤسسات القطاع الخاص على قيادة مركبات الإطفاء الثقيلة لمدة أسبوعين'].includes(key)) {
+                const courseLetterFile = window.dynamicPdfFiles.courseDetailsLetter || window.dynamicPdfFiles.trainingOfficialLetter;
+                const courseLetterEl = document.getElementById('app-heavy-driving-course-letter');
+                const courseLetterErr = document.getElementById('heavy-driving-course-letter-error');
+
+                if (!courseLetterFile || !courseLetterFile.base64) {
+                    if (courseLetterEl) courseLetterEl.classList.add('invalid');
+                    if (courseLetterErr) { courseLetterErr.style.display = 'block'; courseLetterErr.innerText = "يرجى رفع رسالة تتضمن تفاصيل الدورة بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (courseLetterEl) courseLetterEl.classList.remove('invalid');
+                    if (courseLetterErr) courseLetterErr.style.display = 'none';
+                }
+            } else if (['trainee_registration', 'trainee_registration_16weeks', 'Trainee Registration'].includes(key)) {
                 const letterFile = window.dynamicPdfFiles.trainingOfficialLetter;
                 const accredFile = window.dynamicPdfFiles.trainingAccreditations;
                 const letterEl = document.getElementById('app-training-official-letter');
@@ -5344,7 +5365,11 @@
                 const reqLetter = window.dynamicPdfFiles.requestingEntityLetter || window.dynamicPdfFiles.trainingOfficialLetter;
                 const letterName = reqLetter ? reqLetter.name : '';
                 dynamicSummary = `كتاب رسمي من الجهة الطالبة للدورة التدريبية: 📄 ${letterName}`;
-            } else if (['trainee_registration', 'heavy_fire_vehicle_driving_training', 'trainee_registration_16weeks', 'Trainee Registration'].includes(key)) {
+            } else if (['heavy_fire_vehicle_driving_training', 'heavy_fire_vehicle_driving_training_2weeks', 'Heavy Firefighting Vehicle Driving Training Certificate (2 Weeks)', 'إصدار شهادة تدريب أفراد منشآت ومؤسسات القطاع الخاص على قيادة مركبات الإطفاء الثقيلة لمدة أسبوعين'].includes(key)) {
+                const courseLetter = window.dynamicPdfFiles.courseDetailsLetter || window.dynamicPdfFiles.trainingOfficialLetter;
+                const letterName = courseLetter ? courseLetter.name : '';
+                dynamicSummary = `رسالة تفاصيل الدورة (النوع، اللغة، المدة، عدد المشاركين): 📄 ${letterName}`;
+            } else if (['trainee_registration', 'trainee_registration_16weeks', 'Trainee Registration'].includes(key)) {
                 const letterName = window.dynamicPdfFiles.trainingOfficialLetter ? window.dynamicPdfFiles.trainingOfficialLetter.name : '';
                 const accredName = window.dynamicPdfFiles.trainingAccreditations ? window.dynamicPdfFiles.trainingAccreditations.name : '';
                 dynamicSummary = `خطاب رسمي: 📄 ${letterName} | الموافقات/الاعتمادات: 📄 ${accredName}`;
@@ -5475,7 +5500,13 @@
                     name: reqFile.name,
                     base64: reqFile.base64
                 } : null;
-            } else if (['trainee_registration', 'heavy_fire_vehicle_driving_training', 'trainee_registration_16weeks', 'Trainee Registration'].includes(key)) {
+            } else if (['heavy_fire_vehicle_driving_training', 'heavy_fire_vehicle_driving_training_2weeks', 'Heavy Firefighting Vehicle Driving Training Certificate (2 Weeks)', 'إصدار شهادة تدريب أفراد منشآت ومؤسسات القطاع الخاص على قيادة مركبات الإطفاء الثقيلة لمدة أسبوعين'].includes(key)) {
+                const fileObj = window.dynamicPdfFiles.courseDetailsLetter || window.dynamicPdfFiles.trainingOfficialLetter;
+                dynamicFields.courseDetailsLetter = fileObj ? {
+                    name: fileObj.name,
+                    base64: fileObj.base64
+                } : null;
+            } else if (['trainee_registration', 'trainee_registration_16weeks', 'Trainee Registration'].includes(key)) {
                 dynamicFields.trainingOfficialLetter = window.dynamicPdfFiles.trainingOfficialLetter ? {
                     name: window.dynamicPdfFiles.trainingOfficialLetter.name,
                     base64: window.dynamicPdfFiles.trainingOfficialLetter.base64
