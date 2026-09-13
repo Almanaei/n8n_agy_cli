@@ -1032,6 +1032,23 @@ function formatDynamicFields(serviceInput, dynamicFields) {
       }
       break;
 
+    case 'factories_hotels_malls_inspection_certificate':
+    case 'Inspection Certificate for Factories, Hotels, & Malls under Construction':
+    case 'إصدار شهادة فحص المصانع والفنادق والمجمعات التجارية قيد الإنشاء وتجديدها':
+      if (dynamicFields.leaseContractCopy) {
+        const doc = typeof dynamicFields.leaseContractCopy === 'object'
+          ? (dynamicFields.leaseContractCopy.name || dynamicFields.leaseContractCopy.url || 'مرفق نسخة من عقد الإيجار')
+          : dynamicFields.leaseContractCopy;
+        parts.push(`نسخة من عقد الإيجار: ${doc}`);
+      }
+      if (dynamicFields.sitePlans) {
+        const doc = typeof dynamicFields.sitePlans === 'object'
+          ? (dynamicFields.sitePlans.name || dynamicFields.sitePlans.url || 'مرفق مخططات الموقع')
+          : dynamicFields.sitePlans;
+        parts.push(`مخططات الموقع: ${doc}`);
+      }
+      break;
+
     case 'factory_warehouse_maps_license':
     case 'Factory & Warehouse Blueprint License':
       if (dynamicFields.blueprintNumber) parts.push(`رقم المخطط: ${dynamicFields.blueprintNumber}`);
@@ -1158,6 +1175,8 @@ function formatDynamicFields(serviceInput, dynamicFields) {
     trainingAccreditations: 'الموافقات/الاعتمادات',
     gasStationGovApprovals: 'موافقات من الجهات الحكومية',
     gasStationApplicantLetter: 'رسالة رسمية باسم مقدم الطلب',
+    leaseContractCopy: 'نسخة من عقد الإيجار',
+    sitePlans: 'مخططات الموقع',
     stationCapacity: 'سعة خزانات الوقود',
     trainees: 'المتدربون',
     blueprintNumber: 'رقم المخطط',
@@ -2894,7 +2913,9 @@ const server = http.createServer(async (req, res) => {
             { key: 'trainingOfficialLetter', label: 'خطاب رسمي (الطلب الأصلي)', defaultName: 'Training-Official-Letter.pdf' },
             { key: 'trainingAccreditations', label: 'الموافقات والاعتمادات (الطلب الأصلي)', defaultName: 'Training-Accreditations.pdf' },
             { key: 'gasStationGovApprovals', label: 'موافقات من الجهات الحكومية (الطلب الأصلي)', defaultName: 'Gas-Station-Gov-Approvals.pdf' },
-            { key: 'gasStationApplicantLetter', label: 'رسالة رسمية باسم مقدم الطلب (الطلب الأصلي)', defaultName: 'Gas-Station-Applicant-Letter.pdf' }
+            { key: 'gasStationApplicantLetter', label: 'رسالة رسمية باسم مقدم الطلب (الطلب الأصلي)', defaultName: 'Gas-Station-Applicant-Letter.pdf' },
+            { key: 'leaseContractCopy', label: 'نسخة من عقد الإيجار (الطلب الأصلي)', defaultName: 'Lease-Contract-Copy.pdf' },
+            { key: 'sitePlans', label: 'مخططات الموقع (الطلب الأصلي)', defaultName: 'Site-Plans.pdf' }
           ];
 
           for (const conf of dynamicAttConfigs) {

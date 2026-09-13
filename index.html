@@ -4554,6 +4554,19 @@
                         <div id="station-applicant-letter-error" class="form-error" style="display: none;">يرجى رفع الرسالة الرسمية باسم مقدم الطلب بصيغة PDF.</div>
                     </div>
                 `;
+            } else if (['factories_hotels_malls_inspection_certificate', 'Inspection Certificate for Factories, Hotels, & Malls under Construction', 'إصدار شهادة فحص المصانع والفنادق والمجمعات التجارية قيد الإنشاء وتجديدها'].includes(key)) {
+                container.innerHTML = `
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-under-const-lease-contract">نسخة من عقد الإيجار (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-under-const-lease-contract" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'leaseContractCopy')" required>
+                        <div id="under-const-lease-contract-error" class="form-error" style="display: none;">يرجى رفع نسخة من عقد الإيجار بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-under-const-site-plans">مخططات الموقع (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-under-const-site-plans" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'sitePlans')" required>
+                        <div id="under-const-site-plans-error" class="form-error" style="display: none;">يرجى رفع مخططات الموقع بصيغة PDF.</div>
+                    </div>
+                `;
             } else if (service) {
                 container.innerHTML = `
                     <div class="form-group">
@@ -4590,6 +4603,8 @@
                 fieldKey === 'trainingAccreditations' ? 'training-accreditations-error' :
                 fieldKey === 'gasStationGovApprovals' ? 'station-gov-approvals-error' :
                 fieldKey === 'gasStationApplicantLetter' ? 'station-applicant-letter-error' :
+                fieldKey === 'leaseContractCopy' ? 'under-const-lease-contract-error' :
+                fieldKey === 'sitePlans' ? 'under-const-site-plans-error' :
                 `${fieldKey}-error`
             );
             if (errorEl) errorEl.style.display = 'none';
@@ -4912,6 +4927,33 @@
                     if (letterEl) letterEl.classList.remove('invalid');
                     if (letterErr) letterErr.style.display = 'none';
                 }
+            } else if (['factories_hotels_malls_inspection_certificate', 'Inspection Certificate for Factories, Hotels, & Malls under Construction', 'إصدار شهادة فحص المصانع والفنادق والمجمعات التجارية قيد الإنشاء وتجديدها'].includes(key)) {
+                const leaseFile = window.dynamicPdfFiles.leaseContractCopy;
+                const sitePlansFile = window.dynamicPdfFiles.sitePlans;
+
+                const leaseEl = document.getElementById('app-under-const-lease-contract');
+                const sitePlansEl = document.getElementById('app-under-const-site-plans');
+
+                const leaseErr = document.getElementById('under-const-lease-contract-error');
+                const sitePlansErr = document.getElementById('under-const-site-plans-error');
+
+                if (!leaseFile || !leaseFile.base64) {
+                    if (leaseEl) leaseEl.classList.add('invalid');
+                    if (leaseErr) { leaseErr.style.display = 'block'; leaseErr.innerText = "يرجى رفع نسخة من عقد الإيجار بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (leaseEl) leaseEl.classList.remove('invalid');
+                    if (leaseErr) leaseErr.style.display = 'none';
+                }
+
+                if (!sitePlansFile || !sitePlansFile.base64) {
+                    if (sitePlansEl) sitePlansEl.classList.add('invalid');
+                    if (sitePlansErr) { sitePlansErr.style.display = 'block'; sitePlansErr.innerText = "يرجى رفع مخططات الموقع بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (sitePlansEl) sitePlansEl.classList.remove('invalid');
+                    if (sitePlansErr) sitePlansErr.style.display = 'none';
+                }
             }
 
             if (!isValid) return;
@@ -4944,6 +4986,10 @@
                 const govName = window.dynamicPdfFiles.gasStationGovApprovals ? window.dynamicPdfFiles.gasStationGovApprovals.name : '';
                 const letterName = window.dynamicPdfFiles.gasStationApplicantLetter ? window.dynamicPdfFiles.gasStationApplicantLetter.name : '';
                 dynamicSummary = `موافقات الجهات الحكومية: 📄 ${govName} | رسالة باسم مقدم الطلب: 📄 ${letterName}`;
+            } else if (['factories_hotels_malls_inspection_certificate', 'Inspection Certificate for Factories, Hotels, & Malls under Construction', 'إصدار شهادة فحص المصانع والفنادق والمجمعات التجارية قيد الإنشاء وتجديدها'].includes(key)) {
+                const leaseName = window.dynamicPdfFiles.leaseContractCopy ? window.dynamicPdfFiles.leaseContractCopy.name : '';
+                const plansName = window.dynamicPdfFiles.sitePlans ? window.dynamicPdfFiles.sitePlans.name : '';
+                dynamicSummary = `عقد الإيجار: 📄 ${leaseName} | مخططات الموقع: 📄 ${plansName}`;
             } else {
                 const genericInput = document.getElementById('app-generic-details');
                 if (genericInput) {
@@ -5059,6 +5105,15 @@
                 dynamicFields.gasStationApplicantLetter = window.dynamicPdfFiles.gasStationApplicantLetter ? {
                     name: window.dynamicPdfFiles.gasStationApplicantLetter.name,
                     base64: window.dynamicPdfFiles.gasStationApplicantLetter.base64
+                } : null;
+            } else if (['factories_hotels_malls_inspection_certificate', 'Inspection Certificate for Factories, Hotels, & Malls under Construction', 'إصدار شهادة فحص المصانع والفنادق والمجمعات التجارية قيد الإنشاء وتجديدها'].includes(key)) {
+                dynamicFields.leaseContractCopy = window.dynamicPdfFiles.leaseContractCopy ? {
+                    name: window.dynamicPdfFiles.leaseContractCopy.name,
+                    base64: window.dynamicPdfFiles.leaseContractCopy.base64
+                } : null;
+                dynamicFields.sitePlans = window.dynamicPdfFiles.sitePlans ? {
+                    name: window.dynamicPdfFiles.sitePlans.name,
+                    base64: window.dynamicPdfFiles.sitePlans.base64
                 } : null;
             } else {
                 const genericInput = document.getElementById('app-generic-details');
