@@ -1842,6 +1842,223 @@ function formatDynamicFields(serviceInput, dynamicFields) {
   return "";
 }
 
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function buildDynamicFieldsAdminHtml(dynamicFields, serviceName) {
+  if (!dynamicFields) return { html: '', display: 'none' };
+
+  let fieldsObj = null;
+  if (typeof dynamicFields === 'object' && dynamicFields !== null) {
+    fieldsObj = dynamicFields;
+  } else if (typeof dynamicFields === 'string') {
+    const trimmed = dynamicFields.trim();
+    if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+      try {
+        fieldsObj = JSON.parse(trimmed);
+      } catch (e) {
+        fieldsObj = null;
+      }
+    }
+    if (!fieldsObj) {
+      // Parse formatted string: "Label: Value | Label2: Value2"
+      const parts = trimmed.split(/\s*\|\s*/);
+      const items = [];
+      for (const part of parts) {
+        if (!part.trim()) continue;
+        const colonIdx = part.indexOf(':');
+        if (colonIdx !== -1) {
+          const lbl = part.substring(0, colonIdx).trim();
+          const val = part.substring(colonIdx + 1).trim();
+          items.push({ label: lbl, value: val });
+        } else {
+          items.push({ label: 'معلومات إضافية', value: part.trim() });
+        }
+      }
+      if (items.length === 0) return { html: '', display: 'none' };
+
+      const renderedItems = items.map(it => {
+        const isUrl = it.value.startsWith('http://') || it.value.startsWith('https://') || it.value.startsWith('/uploads/');
+        return `
+          <div class="info-group">
+            <span class="info-label">${escapeHtml(it.label)}</span>
+            ${isUrl ? `
+              <div style="margin-top: 6px;">
+                <a href="${escapeHtml(it.value)}" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; padding: 8px 16px; border-radius: 10px; text-decoration: none; font-size: 0.88rem; font-weight: 700; transition: all 0.2s ease;">
+                  <span>📄</span>
+                  <span>معاينة وتحميل المستند المرفق (PDF)</span>
+                </a>
+              </div>
+            ` : `
+              <span class="info-value" style="color: #f8fafc; background: rgba(15, 23, 42, 0.7); border: 1px solid #334155; padding: 8px 14px; border-radius: 10px; display: inline-block; margin-top: 4px; font-size: 0.92rem;">${escapeHtml(it.value)}</span>
+            `}
+          </div>
+        `;
+      }).join('\n');
+
+      return { html: renderedItems, display: 'block' };
+    }
+  }
+
+  const fieldLabels = {
+    inspectionArea: 'مساحة التفتيش',
+    chemicalType: 'نوع المادة الكيميائية',
+    fireInspectionReport: 'تقرير فحص أنظمة الإطفاء والإنذار',
+    maintenanceContract: 'نسخة من عقد الصيانة',
+    moicLetter: 'رسالة من وزارة الصناعة والتجارة والسياحة',
+    gasMinistryLetter: 'تفاصيل خطاب وزارة الصناعة',
+    bakeryCrCopy: 'نسخة من السجل التجاري',
+    bakerySitePhotos: 'صور للموقع',
+    bakeryDrawingsApproval: 'موافقات المخططات المعمارية والكهربائية والميكانيكية',
+    bakeryDrawings: 'موافقات المخططات المعمارية',
+    goldAlarmContract: 'نسخة من عقد الصيانة لأجهزة الإنذار والإطفاء',
+    goldAlarmDetails: 'عقد صيانة نظام الإنذار',
+    trainingOfficialLetter: 'خطاب رسمي للتدريب',
+    trainingAccreditations: 'الموافقات والاعتمادات',
+    gasStationGovApprovals: 'موافقات من الجهات الحكومية',
+    gasStationApplicantLetter: 'رسالة رسمية باسم مقدم الطلب',
+    leaseContractCopy: 'نسخة من عقد الإيجار',
+    detailedSitePlans: 'مخططات تفصيلية للموقع',
+    approvedMaintenanceContract: 'عقد صيانة من شركة معتمدة',
+    sitePlans: 'مخططات الموقع',
+    idCardCopy: 'بطاقة الهوية',
+    propertyDeed: 'وثيقة ملكية العقار',
+    commercialRegisterCopy: 'نسخة من السجل التجاري',
+    tenantLeaseContract: 'عقد الإيجار للمستأجر',
+    municipalityFormProof: 'استمارة البلدية أو ما يثبت',
+    engineeringOfficeLetter: 'رسالة المكتب الهندسي',
+    projectEngineeringDrawings: 'الرسومات الهندسية للمشروع',
+    entityLetter: 'خطاب من الجهة',
+    architecturalPlans: 'المخططات المعمارية',
+    concernedEntityLetter: 'رسالة من الجهة المعنية',
+    otherEntitiesApprovals: 'موافقات الجهات المعنية الأخرى',
+    approvedProjectMaps: 'خرائط المشروع المعتمدة',
+    electricalMechanicalPlans: 'المخططات الكهربائية والميكانيكية',
+    crCopy: 'شهادة السجل التجاري',
+    officeDetails: 'بيان مفصل للمكتب',
+    engineersList: 'كشف بأسماء المهندسين',
+    engineeringLicenses: 'رخص مزاولة المهن الهندسية',
+    engineersCvs: 'بطاقات الهوية والسيرة الذاتية للمهندسين',
+    gasOfficialLetter: 'رسالة رسمية',
+    maintenanceCert: 'شهادة صيانة سارية',
+    hazmatPrevApproval: 'الموافقة السابقة من فرع المواد الخطرة',
+    allPrevApprovals: 'جميع الموافقات السابقة',
+    officialLetter: 'رسالة رسمية',
+    techCert: 'شهادة فنية',
+    importPermit: 'تصريح استيراد',
+    vehicleOwnership: 'ملكية المركبة',
+    msdsSheet: 'صحيفة السلامة',
+    driverInstructions: 'تعليمات قائد المركبة',
+    fireFightingCert: 'شهادة دورة إطفاء للسائق',
+    emergencyOfficialsList: 'قائمة بالمسؤولين للتعامل مع الطوارئ',
+    techSpecs: 'المواصفات الفنية',
+    applicantLetter: 'رسالة من مقدم الطلب',
+    materialsList: 'قائمة بالمواد المنقولة',
+    trafficDoc: 'وثيقة من المرور',
+    vehicleInspectionCert: 'شهادة فحص السيارة',
+    hazmatChemicalName: 'الاسم العلمي للمواد',
+    hazardousQuantitiesTable: 'جدول كميات المواد الخطرة',
+    safetyDataSheet: 'صحيفة السلامة',
+    alarmFirefightingPlans: 'مخططات الإنذار والإطفاء',
+    maintenanceCertificate: 'شهادة الصيانة',
+    stationCapacity: 'سعة خزانات الوقود',
+    trainees: 'المتدربون',
+    blueprintNumber: 'رقم المخطط',
+    factoryArea: 'مساحة المصنع',
+    warehouseType: 'نوع المخزن',
+    buildingHeight: 'ارتفاع المبنى',
+    floorsCount: 'عدد الطوابق',
+    centerName: 'اسم المركز',
+    villasCount: 'عدد الفلل',
+    complexName: 'اسم المجمع',
+    genericDetails: 'تفاصيل الطلب',
+    incidentDate: 'تاريخ الحادث',
+    facilityName: 'اسم المنشأة',
+    location: 'الموقع',
+    buildingNumber: 'رقم المبنى',
+    electricityAccount: 'حساب الكهرباء',
+    buildingType: 'نوع المبنى',
+    projectTitle: 'اسم المشروع',
+    stationLocation: 'موقع المحطة',
+    tanksCount: 'عدد الخزانات',
+    loadCapacity: 'سعة الحمل',
+    consultantOffice: 'المكتب الاستشاري',
+    systemType: 'نوع النظام',
+    pipingType: 'نوع التمديدات',
+    tanksCapacity: 'سعة الخزانات',
+    trainingDate: 'تاريخ التدريب',
+    traineesCount: 'عدد المتدربين',
+    buildingName: 'اسم المبنى',
+    equipmentType: 'نوع المعدات',
+    brandName: 'العلامة التجارية',
+    officeName: 'اسم المكتب',
+    commercialCR: 'رقم السجل',
+    vehiclePlate: 'رقم المركبة',
+    transportDate: 'تاريخ النقل',
+    tankCapacity: 'سعة الخزان',
+    fuelType: 'نوع الوقود',
+    activityType: 'نوع النشاط',
+    engineerLicense: 'ترخيص المهندس'
+  };
+
+  const renderedElements = [];
+  for (const [key, val] of Object.entries(fieldsObj)) {
+    if (val === null || val === undefined || val === '') continue;
+    const label = fieldLabels[key] || key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).trim();
+
+    if (typeof val === 'object') {
+      if (val.url) {
+        renderedElements.push(`
+          <div class="info-group">
+            <span class="info-label">${escapeHtml(label)}</span>
+            <div style="margin-top: 6px;">
+              <a href="${escapeHtml(val.url)}" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; padding: 8px 16px; border-radius: 10px; text-decoration: none; font-size: 0.88rem; font-weight: 700; transition: all 0.2s ease;">
+                <span>📄</span>
+                <span>معاينة وتحميل: ${escapeHtml(val.name || label)}</span>
+              </a>
+            </div>
+          </div>
+        `);
+      } else if (Array.isArray(val)) {
+        renderedElements.push(`
+          <div class="info-group">
+            <span class="info-label">${escapeHtml(label)}</span>
+            <span class="info-value" style="color: #f8fafc; background: rgba(15, 23, 42, 0.7); border: 1px solid #334155; padding: 8px 14px; border-radius: 10px; display: inline-block; margin-top: 4px; font-size: 0.92rem;">${escapeHtml(val.join(', '))}</span>
+          </div>
+        `);
+      }
+    } else {
+      const valStr = String(val);
+      const isUrl = valStr.startsWith('http://') || valStr.startsWith('https://') || valStr.startsWith('/uploads/');
+      renderedElements.push(`
+        <div class="info-group">
+          <span class="info-label">${escapeHtml(label)}</span>
+          ${isUrl ? `
+            <div style="margin-top: 6px;">
+              <a href="${escapeHtml(valStr)}" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; padding: 8px 16px; border-radius: 10px; text-decoration: none; font-size: 0.88rem; font-weight: 700; transition: all 0.2s ease;">
+                <span>📄</span>
+                <span>معاينة وتحميل المستند المرفق (PDF)</span>
+              </a>
+            </div>
+          ` : `
+            <span class="info-value" style="color: #f8fafc; background: rgba(15, 23, 42, 0.7); border: 1px solid #334155; padding: 8px 14px; border-radius: 10px; display: inline-block; margin-top: 4px; font-size: 0.92rem;">${escapeHtml(valStr)}</span>
+          `}
+        </div>
+      `);
+    }
+  }
+
+  if (renderedElements.length === 0) return { html: '', display: 'none' };
+  return { html: renderedElements.join('\n'), display: 'block' };
+}
+
 function formatDocumentAuditHistoryText(auditHistory) {
   let list = auditHistory;
   if (typeof list === 'string' && list.trim().startsWith('[')) {
@@ -4398,6 +4615,8 @@ const server = http.createServer(async (req, res) => {
         const userPauseDisplay = app.userPauseDuration ? 'flex' : 'none';
         const livePauseDisplay = (app.status === 'Modification Requested') ? 'flex' : 'none';
 
+        const dynamicFieldsResult = buildDynamicFieldsAdminHtml(app.dynamicFields, app.serviceName);
+
         const rendered = html
           .replace(/\{\{APP_ID\}\}/g, escapeHtml(app.appId || ''))
           .replace(/\{\{SERVICE_NAME\}\}/g, escapeHtml(app.serviceName || ''))
@@ -4417,7 +4636,9 @@ const server = http.createServer(async (req, res) => {
           .replace(/\{\{LIVE_PAUSE_DISPLAY\}\}/g, livePauseDisplay)
           .replace(/\{\{EXISTING_ADMIN_NOTE\}\}/g, escapeHtml(app.modificationDetails || ''))
           .replace(/\{\{USER_RESPONSE\}\}/g, escapeHtml(app.userModificationResponse || 'لا يوجد ملاحظات إضافية من المستخدم حتى الآن.'))
-          .replace(/\{\{DOCUMENT_AUDIT_HISTORY_JSON\}\}/g, JSON.stringify(app.documentAuditHistory || []));
+          .replace(/\{\{DOCUMENT_AUDIT_HISTORY_JSON\}\}/g, JSON.stringify(app.documentAuditHistory || []))
+          .replace(/\{\{DYNAMIC_FIELDS_HTML\}\}/g, dynamicFieldsResult.html)
+          .replace(/\{\{DYNAMIC_FIELDS_DISPLAY\}\}/g, dynamicFieldsResult.display);
 
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
         res.end(rendered);
