@@ -4608,6 +4608,14 @@
                         <div id="small-incident-tenant-lease-error" class="form-error" style="display: none;">يرجى رفع عقد الإيجار بصيغة PDF.</div>
                     </div>
                 `;
+            } else if (['electrical_connection_final_inspection', 'Final Inspection Certificate for Electrical Connection', 'إصدار شهادة الفحص النهائي لتوصيل التيار الكهربائي للمباني الجديدة'].includes(key)) {
+                container.innerHTML = `
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-elec-municipality-form">استمارة البلدية (أو مايثبت) (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-elec-municipality-form" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'municipalityFormProof')" required>
+                        <div id="elec-municipality-form-error" class="form-error" style="display: none;">يرجى رفع استمارة البلدية (أو ما يثبت) بصيغة PDF.</div>
+                    </div>
+                `;
             } else if (service) {
                 container.innerHTML = `
                     <div class="form-group">
@@ -4650,6 +4658,7 @@
                 fieldKey === 'leaseContractCopy' ? (document.getElementById('large-incident-lease-contract-error') ? 'large-incident-lease-contract-error' : 'under-const-lease-contract-error') :
                 fieldKey === 'tenantLeaseContract' ? 'small-incident-tenant-lease-error' :
                 fieldKey === 'sitePlans' ? 'under-const-site-plans-error' :
+                fieldKey === 'municipalityFormProof' ? 'elec-municipality-form-error' :
                 `${fieldKey}-error`
             );
             if (errorEl) errorEl.style.display = 'none';
@@ -5089,6 +5098,19 @@
                     if (tenantLeaseEl) tenantLeaseEl.classList.remove('invalid');
                     if (tenantLeaseErr) tenantLeaseErr.style.display = 'none';
                 }
+            } else if (['electrical_connection_final_inspection', 'Final Inspection Certificate for Electrical Connection', 'إصدار شهادة الفحص النهائي لتوصيل التيار الكهربائي للمباني الجديدة'].includes(key)) {
+                const formFile = window.dynamicPdfFiles.municipalityFormProof;
+                const formEl = document.getElementById('app-elec-municipality-form');
+                const formErr = document.getElementById('elec-municipality-form-error');
+
+                if (!formFile || !formFile.base64) {
+                    if (formEl) formEl.classList.add('invalid');
+                    if (formErr) { formErr.style.display = 'block'; formErr.innerText = "يرجى رفع استمارة البلدية (أو ما يثبت) بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (formEl) formEl.classList.remove('invalid');
+                    if (formErr) formErr.style.display = 'none';
+                }
             }
 
             if (!isValid) return;
@@ -5136,6 +5158,9 @@
                 const propName = window.dynamicPdfFiles.propertyDeed ? window.dynamicPdfFiles.propertyDeed.name : '';
                 const leaseName = window.dynamicPdfFiles.tenantLeaseContract ? window.dynamicPdfFiles.tenantLeaseContract.name : '';
                 dynamicSummary = `بطاقة الهوية: 📄 ${idCardName} | وثيقة الملكية: 📄 ${propName} | عقد الإيجار للمستأجر: 📄 ${leaseName}`;
+            } else if (['electrical_connection_final_inspection', 'Final Inspection Certificate for Electrical Connection', 'إصدار شهادة الفحص النهائي لتوصيل التيار الكهربائي للمباني الجديدة'].includes(key)) {
+                const formName = window.dynamicPdfFiles.municipalityFormProof ? window.dynamicPdfFiles.municipalityFormProof.name : '';
+                dynamicSummary = `استمارة البلدية (أو ما يثبت): 📄 ${formName}`;
             } else {
                 const genericInput = document.getElementById('app-generic-details');
                 if (genericInput) {
@@ -5290,6 +5315,11 @@
                 dynamicFields.tenantLeaseContract = window.dynamicPdfFiles.tenantLeaseContract ? {
                     name: window.dynamicPdfFiles.tenantLeaseContract.name,
                     base64: window.dynamicPdfFiles.tenantLeaseContract.base64
+                } : null;
+            } else if (['electrical_connection_final_inspection', 'Final Inspection Certificate for Electrical Connection', 'إصدار شهادة الفحص النهائي لتوصيل التيار الكهربائي للمباني الجديدة'].includes(key)) {
+                dynamicFields.municipalityFormProof = window.dynamicPdfFiles.municipalityFormProof ? {
+                    name: window.dynamicPdfFiles.municipalityFormProof.name,
+                    base64: window.dynamicPdfFiles.municipalityFormProof.base64
                 } : null;
             } else {
                 const genericInput = document.getElementById('app-generic-details');

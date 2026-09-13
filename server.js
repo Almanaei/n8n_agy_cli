@@ -1101,6 +1101,17 @@ function formatDynamicFields(serviceInput, dynamicFields) {
       }
       break;
 
+    case 'electrical_connection_final_inspection':
+    case 'Final Inspection Certificate for Electrical Connection':
+    case 'إصدار شهادة الفحص النهائي لتوصيل التيار الكهربائي للمباني الجديدة':
+      if (dynamicFields.municipalityFormProof) {
+        const doc = typeof dynamicFields.municipalityFormProof === 'object'
+          ? (dynamicFields.municipalityFormProof.name || dynamicFields.municipalityFormProof.url || 'مرفق استمارة البلدية (أو ما يثبت)')
+          : dynamicFields.municipalityFormProof;
+        parts.push(`استمارة البلدية (أو ما يثبت): ${doc}`);
+      }
+      break;
+
     case 'factory_warehouse_maps_license':
     case 'Factory & Warehouse Blueprint License':
       if (dynamicFields.blueprintNumber) parts.push(`رقم المخطط: ${dynamicFields.blueprintNumber}`);
@@ -1233,6 +1244,7 @@ function formatDynamicFields(serviceInput, dynamicFields) {
     propertyDeed: 'وثيقة ملكية العقار',
     commercialRegisterCopy: 'نسخة من السجل التجاري',
     tenantLeaseContract: 'عقد الإيجار إذا كان المتضرر مستأجرًا',
+    municipalityFormProof: 'استمارة البلدية (أو ما يثبت)',
     stationCapacity: 'سعة خزانات الوقود',
     trainees: 'المتدربون',
     blueprintNumber: 'رقم المخطط',
@@ -2975,7 +2987,8 @@ const server = http.createServer(async (req, res) => {
             { key: 'idCardCopy', label: 'بطاقة الهوية (الطلب الأصلي)', defaultName: 'ID-Card-Copy.pdf' },
             { key: 'propertyDeed', label: 'وثيقة ملكية العقار (الطلب الأصلي)', defaultName: 'Property-Deed.pdf' },
             { key: 'commercialRegisterCopy', label: 'نسخة من السجل التجاري (الطلب الأصلي)', defaultName: 'Commercial-Register-Copy.pdf' },
-            { key: 'tenantLeaseContract', label: 'عقد الإيجار للمستأجر (الطلب الأصلي)', defaultName: 'Tenant-Lease-Contract.pdf' }
+            { key: 'tenantLeaseContract', label: 'عقد الإيجار للمستأجر (الطلب الأصلي)', defaultName: 'Tenant-Lease-Contract.pdf' },
+            { key: 'municipalityFormProof', label: 'استمارة البلدية أو ما يثبت (الطلب الأصلي)', defaultName: 'Municipality-Form-Proof.pdf' }
           ];
 
           for (const conf of dynamicAttConfigs) {
