@@ -1078,6 +1078,29 @@ function formatDynamicFields(serviceInput, dynamicFields) {
       }
       break;
 
+    case 'incident_report_small_facilities_homes':
+    case 'Incident Report for Small Facilities & Homes':
+    case 'إصدار تقرير الحوادث للمنشآت الصغيرة والمنازل وما في حكمها':
+      if (dynamicFields.idCardCopy) {
+        const doc = typeof dynamicFields.idCardCopy === 'object'
+          ? (dynamicFields.idCardCopy.name || dynamicFields.idCardCopy.url || 'مرفق بطاقة الهوية')
+          : dynamicFields.idCardCopy;
+        parts.push(`بطاقة الهوية: ${doc}`);
+      }
+      if (dynamicFields.propertyDeed) {
+        const doc = typeof dynamicFields.propertyDeed === 'object'
+          ? (dynamicFields.propertyDeed.name || dynamicFields.propertyDeed.url || 'مرفق وثيقة ملكية العقار')
+          : dynamicFields.propertyDeed;
+        parts.push(`وثيقة ملكية العقار: ${doc}`);
+      }
+      if (dynamicFields.tenantLeaseContract) {
+        const doc = typeof dynamicFields.tenantLeaseContract === 'object'
+          ? (dynamicFields.tenantLeaseContract.name || dynamicFields.tenantLeaseContract.url || 'مرفق عقد الإيجار إذا كان المتضرر مستأجرًا')
+          : dynamicFields.tenantLeaseContract;
+        parts.push(`عقد الإيجار إذا كان المتضرر مستأجرًا: ${doc}`);
+      }
+      break;
+
     case 'factory_warehouse_maps_license':
     case 'Factory & Warehouse Blueprint License':
       if (dynamicFields.blueprintNumber) parts.push(`رقم المخطط: ${dynamicFields.blueprintNumber}`);
@@ -1209,6 +1232,7 @@ function formatDynamicFields(serviceInput, dynamicFields) {
     idCardCopy: 'بطاقة الهوية',
     propertyDeed: 'وثيقة ملكية العقار',
     commercialRegisterCopy: 'نسخة من السجل التجاري',
+    tenantLeaseContract: 'عقد الإيجار إذا كان المتضرر مستأجرًا',
     stationCapacity: 'سعة خزانات الوقود',
     trainees: 'المتدربون',
     blueprintNumber: 'رقم المخطط',
@@ -2950,7 +2974,8 @@ const server = http.createServer(async (req, res) => {
             { key: 'sitePlans', label: 'مخططات الموقع (الطلب الأصلي)', defaultName: 'Site-Plans.pdf' },
             { key: 'idCardCopy', label: 'بطاقة الهوية (الطلب الأصلي)', defaultName: 'ID-Card-Copy.pdf' },
             { key: 'propertyDeed', label: 'وثيقة ملكية العقار (الطلب الأصلي)', defaultName: 'Property-Deed.pdf' },
-            { key: 'commercialRegisterCopy', label: 'نسخة من السجل التجاري (الطلب الأصلي)', defaultName: 'Commercial-Register-Copy.pdf' }
+            { key: 'commercialRegisterCopy', label: 'نسخة من السجل التجاري (الطلب الأصلي)', defaultName: 'Commercial-Register-Copy.pdf' },
+            { key: 'tenantLeaseContract', label: 'عقد الإيجار للمستأجر (الطلب الأصلي)', defaultName: 'Tenant-Lease-Contract.pdf' }
           ];
 
           for (const conf of dynamicAttConfigs) {
