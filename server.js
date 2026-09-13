@@ -3459,8 +3459,26 @@ const server = http.createServer(async (req, res) => {
     }
 
     let body = '';
-    req.on('data', chunk => { body += chunk.toString(); });
+    let bodyLength = 0;
+    const MAX_PAYLOAD_BYTES = 100 * 1024 * 1024; // 100MB
+    let payloadTooLarge = false;
+
+    req.on('data', chunk => {
+      bodyLength += chunk.length;
+      if (bodyLength > MAX_PAYLOAD_BYTES) {
+        payloadTooLarge = true;
+        return;
+      }
+      body += chunk.toString();
+    });
+
     req.on('end', async () => {
+      if (payloadTooLarge) {
+        res.writeHead(413, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: "حجم الملفات المرفقة كبير جداً. الحد الأقصى الإجمالي المسموح به هو 100 ميجابايت." }));
+        return;
+      }
+
       try {
         const appData = JSON.parse(body);
         const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
@@ -3510,57 +3528,86 @@ const server = http.createServer(async (req, res) => {
           }
         }
 
-        // Process dynamic file attachments if present (e.g. fireInspectionReport, maintenanceContract)
+        // Process dynamic file attachments universally for all services
         if (appData.dynamicFields && typeof appData.dynamicFields === 'object') {
-          const dynamicAttConfigs = [
-            { key: 'fireInspectionReport', label: 'تقرير فحص أنظمة الإطفاء والإنذار (الطلب الأصلي)', defaultName: 'Fire-Inspection-Report.pdf' },
-            { key: 'maintenanceContract', label: 'نسخة من عقد الصيانة (الطلب الأصلي)', defaultName: 'Maintenance-Contract.pdf' },
-            { key: 'moicLetter', label: 'رسالة من وزارة الصناعة والتجارة والسياحة (الطلب الأصلي)', defaultName: 'MOIC-Letter.pdf' },
-            { key: 'bakeryCrCopy', label: 'نسخة من السجل التجاري (الطلب الأصلي)', defaultName: 'Bakery-CR-Copy.pdf' },
-            { key: 'bakerySitePhotos', label: 'صور للموقع (الطلب الأصلي)', defaultName: 'Bakery-Site-Photos.pdf' },
-            { key: 'bakeryDrawingsApproval', label: 'موافقات المخططات المعمارية والكهربائية والميكانيكية (الطلب الأصلي)', defaultName: 'Bakery-Drawings-Approval.pdf' },
-            { key: 'goldAlarmContract', label: 'نسخة من عقد الصيانة لأجهزة الإنذار والإطفاء (الطلب الأصلي)', defaultName: 'Gold-Alarm-Maintenance-Contract.pdf' },
-            { key: 'trainingOfficialLetter', label: 'خطاب رسمي (الطلب الأصلي)', defaultName: 'Training-Official-Letter.pdf' },
-            { key: 'trainingAccreditations', label: 'الموافقات والاعتمادات (الطلب الأصلي)', defaultName: 'Training-Accreditations.pdf' },
-            { key: 'gasStationGovApprovals', label: 'موافقات من الجهات الحكومية (الطلب الأصلي)', defaultName: 'Gas-Station-Gov-Approvals.pdf' },
-            { key: 'gasStationApplicantLetter', label: 'رسالة رسمية باسم مقدم الطلب (الطلب الأصلي)', defaultName: 'Gas-Station-Applicant-Letter.pdf' },
-            { key: 'leaseContractCopy', label: 'نسخة من عقد الإيجار (الطلب الأصلي)', defaultName: 'Lease-Contract-Copy.pdf' },
-            { key: 'sitePlans', label: 'مخططات الموقع (الطلب الأصلي)', defaultName: 'Site-Plans.pdf' },
-            { key: 'idCardCopy', label: 'بطاقة الهوية (الطلب الأصلي)', defaultName: 'ID-Card-Copy.pdf' },
-            { key: 'propertyDeed', label: 'وثيقة ملكية العقار (الطلب الأصلي)', defaultName: 'Property-Deed.pdf' },
-            { key: 'commercialRegisterCopy', label: 'نسخة من السجل التجاري (الطلب الأصلي)', defaultName: 'Commercial-Register-Copy.pdf' },
-            { key: 'tenantLeaseContract', label: 'عقد الإيجار للمستأجر (الطلب الأصلي)', defaultName: 'Tenant-Lease-Contract.pdf' },
-            { key: 'municipalityFormProof', label: 'استمارة البلدية أو ما يثبت (الطلب الأصلي)', defaultName: 'Municipality-Form-Proof.pdf' },
-            { key: 'engineeringOfficeLetter', label: 'رسالة المكتب الهندسي (الطلب الأصلي)', defaultName: 'Engineering-Office-Letter.pdf' },
-            { key: 'projectEngineeringDrawings', label: 'الرسومات الهندسية للمشروع (الطلب الأصلي)', defaultName: 'Project-Engineering-Drawings.pdf' },
-            { key: 'entityLetter', label: 'خطاب من الجهة (الطلب الأصلي)', defaultName: 'Entity-Official-Letter.pdf' },
-            { key: 'architecturalPlans', label: 'المخططات المعمارية (الطلب الأصلي)', defaultName: 'Architectural-Plans.pdf' },
-            { key: 'concernedEntityLetter', label: 'رسالة من الجهة المعنية (الطلب الأصلي)', defaultName: 'Concerned-Entity-Letter.pdf' },
-            { key: 'otherEntitiesApprovals', label: 'موافقات الجهات المعنية الأخرى (الطلب الأصلي)', defaultName: 'Other-Entities-Approvals.pdf' },
-            { key: 'approvedProjectMaps', label: 'خرائط المشروع المعتمدة (الطلب الأصلي)', defaultName: 'Approved-Project-Maps.pdf' },
-            { key: 'electricalMechanicalPlans', label: 'المخططات الكهربائية والميكانيكية (الطلب الأصلي)', defaultName: 'Electrical-Mechanical-Plans.pdf' }
-          ];
+          const labelDictionary = {
+            fireInspectionReport: 'تقرير فحص أنظمة الإطفاء والإنذار (الطلب الأصلي)',
+            maintenanceContract: 'نسخة من عقد الصيانة (الطلب الأصلي)',
+            moicLetter: 'رسالة من وزارة الصناعة والتجارة والسياحة (الطلب الأصلي)',
+            bakeryCrCopy: 'نسخة من السجل التجاري (الطلب الأصلي)',
+            bakerySitePhotos: 'صور للموقع (الطلب الأصلي)',
+            bakeryDrawingsApproval: 'موافقات المخططات المعمارية والكهربائية والميكانيكية (الطلب الأصلي)',
+            goldAlarmContract: 'نسخة من عقد الصيانة لأجهزة الإنذار والإطفاء (الطلب الأصلي)',
+            trainingOfficialLetter: 'خطاب رسمي (الطلب الأصلي)',
+            trainingAccreditations: 'الموافقات والاعتمادات (الطلب الأصلي)',
+            gasStationGovApprovals: 'موافقات من الجهات الحكومية (الطلب الأصلي)',
+            gasStationApplicantLetter: 'رسالة رسمية باسم مقدم الطلب (الطلب الأصلي)',
+            leaseContractCopy: 'نسخة من عقد الإيجار (الطلب الأصلي)',
+            detailedSitePlans: 'مخططات تفصيلية للموقع (الطلب الأصلي)',
+            approvedMaintenanceContract: 'عقد صيانة من شركة معتمدة (الطلب الأصلي)',
+            sitePlans: 'مخططات الموقع (الطلب الأصلي)',
+            idCardCopy: 'بطاقة الهوية (الطلب الأصلي)',
+            propertyDeed: 'وثيقة ملكية العقار (الطلب الأصلي)',
+            commercialRegisterCopy: 'نسخة من السجل التجاري (الطلب الأصلي)',
+            tenantLeaseContract: 'عقد الإيجار للمستأجر (الطلب الأصلي)',
+            municipalityFormProof: 'استمارة البلدية أو ما يثبت (الطلب الأصلي)',
+            engineeringOfficeLetter: 'رسالة المكتب الهندسي (الطلب الأصلي)',
+            projectEngineeringDrawings: 'الرسومات الهندسية للمشروع (الطلب الأصلي)',
+            entityLetter: 'خطاب من الجهة (الطلب الأصلي)',
+            architecturalPlans: 'المخططات المعمارية (الطلب الأصلي)',
+            concernedEntityLetter: 'رسالة من الجهة المعنية (الطلب الأصلي)',
+            otherEntitiesApprovals: 'موافقات الجهات المعنية الأخرى (الطلب الأصلي)',
+            approvedProjectMaps: 'خرائط المشروع المعتمدة (الطلب الأصلي)',
+            electricalMechanicalPlans: 'المخططات الكهربائية والميكانيكية (الطلب الأصلي)',
+            crCopy: 'شهادة السجل التجاري (الطلب الأصلي)',
+            officeDetails: 'بيان مفصل للمكتب (الطلب الأصلي)',
+            engineersList: 'كشف بأسماء المهندسين (الطلب الأصلي)',
+            engineeringLicenses: 'رخص مزاولة المهن الهندسية (الطلب الأصلي)',
+            engineersCvs: 'بطاقات الهوية والسيرة الذاتية للمهندسين (الطلب الأصلي)',
+            gasOfficialLetter: 'رسالة رسمية (الطلب الأصلي)',
+            maintenanceCert: 'شهادة صيانة سارية (الطلب الأصلي)',
+            hazmatPrevApproval: 'الموافقة السابقة من فرع المواد الخطرة (الطلب الأصلي)',
+            allPrevApprovals: 'جميع الموافقات السابقة (الطلب الأصلي)',
+            officialLetter: 'رسالة رسمية (الطلب الأصلي)',
+            techCert: 'شهادة فنية (الطلب الأصلي)',
+            importPermit: 'تصريح استيراد (الطلب الأصلي)',
+            vehicleOwnership: 'ملكية المركبة (الطلب الأصلي)',
+            msdsSheet: 'صحيفة السلامة (الطلب الأصلي)',
+            driverInstructions: 'تعليمات قائد المركبة (الطلب الأصلي)',
+            fireFightingCert: 'شهادة دورة إطفاء للسائق (الطلب الأصلي)',
+            emergencyOfficialsList: 'قائمة بالمسؤولين للتعامل مع الطوارئ (الطلب الأصلي)',
+            techSpecs: 'المواصفات الفنية (الطلب الأصلي)',
+            applicantLetter: 'رسالة من مقدم الطلب (الطلب الأصلي)',
+            materialsList: 'قائمة بالمواد المنقولة (الطلب الأصلي)',
+            trafficDoc: 'وثيقة من المرور (الطلب الأصلي)',
+            vehicleInspectionCert: 'شهادة فحص السيارة (الطلب الأصلي)',
+            hazardousQuantitiesTable: 'جدول كميات المواد الخطرة (الطلب الأصلي)',
+            safetyDataSheet: 'صحيفة السلامة (الطلب الأصلي)',
+            alarmFirefightingPlans: 'مخططات الإنذار والإطفاء (الطلب الأصلي)',
+            maintenanceCertificate: 'شهادة الصيانة (الطلب الأصلي)'
+          };
 
-          for (const conf of dynamicAttConfigs) {
-            const fieldVal = appData.dynamicFields[conf.key];
+          for (const [key, fieldVal] of Object.entries(appData.dynamicFields)) {
             if (fieldVal && typeof fieldVal === 'object' && fieldVal.base64) {
-              const validation = validateAndSanitizePdfBase64(fieldVal.base64, fieldVal.name || conf.defaultName);
+              const defaultName = `${key}.pdf`;
+              const validation = validateAndSanitizePdfBase64(fieldVal.base64, fieldVal.name || defaultName);
               if (validation.valid) {
                 const timestampMs = Date.now();
-                const safeName = `${appId}-${conf.key}-${timestampMs}.pdf`;
+                const safeName = `${appId}-${key}-${timestampMs}.pdf`;
                 fs.writeFileSync(path.join(uploadsDir, safeName), validation.buffer);
                 const fileUrl = `${publicUrl}/uploads/${safeName}`;
                 attachmentLinks.push(fileUrl);
+                const label = labelDictionary[key] || (fieldVal.name ? `${fieldVal.name} (الطلب الأصلي)` : `${key} (الطلب الأصلي)`);
                 documentAuditHistory.push({
                   version: 1,
-                  fileName: validation.sanitizedName || conf.defaultName,
+                  fileName: validation.sanitizedName || defaultName,
                   fileUrl: fileUrl,
                   fileSizeBytes: validation.sizeBytes,
                   uploadedAt: nowFormatted,
-                  label: conf.label
+                  label: label
                 });
-                appData.dynamicFields[conf.key] = {
-                  name: validation.sanitizedName || conf.defaultName,
+                appData.dynamicFields[key] = {
+                  name: validation.sanitizedName || defaultName,
                   url: fileUrl
                 };
               }
@@ -3665,8 +3712,26 @@ const server = http.createServer(async (req, res) => {
     }
 
     let body = '';
-    req.on('data', chunk => { body += chunk.toString(); });
+    let bodyLength = 0;
+    const MAX_PAYLOAD_BYTES = 100 * 1024 * 1024; // 100MB
+    let payloadTooLarge = false;
+
+    req.on('data', chunk => {
+      bodyLength += chunk.length;
+      if (bodyLength > MAX_PAYLOAD_BYTES) {
+        payloadTooLarge = true;
+        return;
+      }
+      body += chunk.toString();
+    });
+
     req.on('end', async () => {
+      if (payloadTooLarge) {
+        res.writeHead(413, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: "حجم الملفات المرفقة كبير جداً. الحد الأقصى الإجمالي المسموح به هو 100 ميجابايت." }));
+        return;
+      }
+
       try {
         const modData = JSON.parse(body);
         const { appId } = modData;
