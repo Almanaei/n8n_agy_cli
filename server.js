@@ -1220,7 +1220,31 @@ function formatDynamicFields(serviceInput, dynamicFields) {
       if (dynamicFields.projectTitle) parts.push(`اسم المشروع: ${dynamicFields.projectTitle}`);
       break;
 
+    case 'new_gas_stations_maps_review':
     case 'new_gas_station_maps_study':
+    case 'new_fuel_stations_plans_review':
+    case 'Review of Maps for New Fuel Stations':
+    case 'Review of Building Plans for New Fuel Stations':
+    case 'New Fuel Station Building Plans Review':
+    case 'دراسة الخرائط لمحطات الوقود الجديدة':
+      if (dynamicFields.concernedEntityLetter) {
+        const doc = typeof dynamicFields.concernedEntityLetter === 'object'
+          ? (dynamicFields.concernedEntityLetter.name || dynamicFields.concernedEntityLetter.url || 'مرفق رسالة من الجهة المعنية')
+          : dynamicFields.concernedEntityLetter;
+        parts.push(`رسالة من الجهة المعنية: ${doc}`);
+      }
+      if (dynamicFields.otherEntitiesApprovals) {
+        const doc = typeof dynamicFields.otherEntitiesApprovals === 'object'
+          ? (dynamicFields.otherEntitiesApprovals.name || dynamicFields.otherEntitiesApprovals.url || 'مرفق موافقات الجهات المعنية الأخرى')
+          : dynamicFields.otherEntitiesApprovals;
+        parts.push(`موافقات الجهات المعنية الأخرى: ${doc}`);
+      }
+      if (dynamicFields.approvedProjectMaps) {
+        const doc = typeof dynamicFields.approvedProjectMaps === 'object'
+          ? (dynamicFields.approvedProjectMaps.name || dynamicFields.approvedProjectMaps.url || 'مرفق خرائط المشروع المعتمدة')
+          : dynamicFields.approvedProjectMaps;
+        parts.push(`خرائط المشروع المعتمدة: ${doc}`);
+      }
       if (dynamicFields.stationLocation) parts.push(`موقع المحطة: ${dynamicFields.stationLocation}`);
       if (dynamicFields.tanksCount) parts.push(`عدد الخزانات: ${dynamicFields.tanksCount}`);
       break;
@@ -1314,6 +1338,9 @@ function formatDynamicFields(serviceInput, dynamicFields) {
     projectEngineeringDrawings: 'الرسومات الهندسية للمشروع',
     entityLetter: 'خطاب من الجهة',
     architecturalPlans: 'المخططات المعمارية',
+    concernedEntityLetter: 'رسالة من الجهة المعنية',
+    otherEntitiesApprovals: 'موافقات الجهات المعنية الأخرى',
+    approvedProjectMaps: 'خرائط المشروع المعتمدة',
     stationCapacity: 'سعة خزانات الوقود',
     trainees: 'المتدربون',
     blueprintNumber: 'رقم المخطط',
@@ -3061,7 +3088,10 @@ const server = http.createServer(async (req, res) => {
             { key: 'engineeringOfficeLetter', label: 'رسالة المكتب الهندسي (الطلب الأصلي)', defaultName: 'Engineering-Office-Letter.pdf' },
             { key: 'projectEngineeringDrawings', label: 'الرسومات الهندسية للمشروع (الطلب الأصلي)', defaultName: 'Project-Engineering-Drawings.pdf' },
             { key: 'entityLetter', label: 'خطاب من الجهة (الطلب الأصلي)', defaultName: 'Entity-Official-Letter.pdf' },
-            { key: 'architecturalPlans', label: 'المخططات المعمارية (الطلب الأصلي)', defaultName: 'Architectural-Plans.pdf' }
+            { key: 'architecturalPlans', label: 'المخططات المعمارية (الطلب الأصلي)', defaultName: 'Architectural-Plans.pdf' },
+            { key: 'concernedEntityLetter', label: 'رسالة من الجهة المعنية (الطلب الأصلي)', defaultName: 'Concerned-Entity-Letter.pdf' },
+            { key: 'otherEntitiesApprovals', label: 'موافقات الجهات المعنية الأخرى (الطلب الأصلي)', defaultName: 'Other-Entities-Approvals.pdf' },
+            { key: 'approvedProjectMaps', label: 'خرائط المشروع المعتمدة (الطلب الأصلي)', defaultName: 'Approved-Project-Maps.pdf' }
           ];
 
           for (const conf of dynamicAttConfigs) {
