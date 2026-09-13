@@ -4660,6 +4660,24 @@
                         <div id="gas-maps-approved-maps-error" class="form-error" style="display: none;">يرجى رفع خرائط المشروع المعتمدة بصيغة PDF.</div>
                     </div>
                 `;
+            } else if (['electrical_engineering_plans_review', 'electrical_engineering_plans_study', 'Review of Electrical Engineering Plans', 'Electrical Engineering Plans Review', 'دراسة المخططات الهندسية الكهربائية'].includes(key)) {
+                container.innerHTML = `
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-elec-plans-entity-letter">رسالة من الجهة المعنية (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-elec-plans-entity-letter" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'concernedEntityLetter')" required>
+                        <div id="elec-plans-entity-letter-error" class="form-error" style="display: none;">يرجى رفع رسالة من الجهة المعنية بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-elec-plans-arch-plans">المخططات المعمارية (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-elec-plans-arch-plans" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'architecturalPlans')" required>
+                        <div id="elec-plans-arch-plans-error" class="form-error" style="display: none;">يرجى رفع المخططات المعمارية بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-elec-plans-mep-plans">المخططات الكهربائية والميكانيكية (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-elec-plans-mep-plans" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'electricalMechanicalPlans')" required>
+                        <div id="elec-plans-mep-plans-error" class="form-error" style="display: none;">يرجى رفع المخططات الكهربائية والميكانيكية بصيغة PDF.</div>
+                    </div>
+                `;
             } else if (service) {
                 container.innerHTML = `
                     <div class="form-group">
@@ -4706,10 +4724,11 @@
                 fieldKey === 'engineeringOfficeLetter' ? 'factory-eng-letter-error' :
                 fieldKey === 'projectEngineeringDrawings' ? 'factory-eng-drawings-error' :
                 fieldKey === 'entityLetter' ? 'worship-entity-letter-error' :
-                fieldKey === 'architecturalPlans' ? 'worship-arch-plans-error' :
-                fieldKey === 'concernedEntityLetter' ? 'gas-maps-entity-letter-error' :
+                fieldKey === 'architecturalPlans' ? (document.getElementById('elec-plans-arch-plans-error') ? 'elec-plans-arch-plans-error' : 'worship-arch-plans-error') :
+                fieldKey === 'concernedEntityLetter' ? (document.getElementById('elec-plans-entity-letter-error') ? 'elec-plans-entity-letter-error' : 'gas-maps-entity-letter-error') :
                 fieldKey === 'otherEntitiesApprovals' ? 'gas-maps-other-approvals-error' :
                 fieldKey === 'approvedProjectMaps' ? 'gas-maps-approved-maps-error' :
+                fieldKey === 'electricalMechanicalPlans' ? 'elec-plans-mep-plans-error' :
                 `${fieldKey}-error`
             );
             if (errorEl) errorEl.style.display = 'none';
@@ -5255,6 +5274,45 @@
                     if (approvedMapsEl) approvedMapsEl.classList.remove('invalid');
                     if (approvedMapsErr) approvedMapsErr.style.display = 'none';
                 }
+            } else if (['electrical_engineering_plans_review', 'electrical_engineering_plans_study', 'Review of Electrical Engineering Plans', 'Electrical Engineering Plans Review', 'دراسة المخططات الهندسية الكهربائية'].includes(key)) {
+                const entityLetterFile = window.dynamicPdfFiles.concernedEntityLetter;
+                const archPlansFile = window.dynamicPdfFiles.architecturalPlans;
+                const mepPlansFile = window.dynamicPdfFiles.electricalMechanicalPlans;
+
+                const entityLetterEl = document.getElementById('app-elec-plans-entity-letter');
+                const archPlansEl = document.getElementById('app-elec-plans-arch-plans');
+                const mepPlansEl = document.getElementById('app-elec-plans-mep-plans');
+
+                const entityLetterErr = document.getElementById('elec-plans-entity-letter-error');
+                const archPlansErr = document.getElementById('elec-plans-arch-plans-error');
+                const mepPlansErr = document.getElementById('elec-plans-mep-plans-error');
+
+                if (!entityLetterFile || !entityLetterFile.base64) {
+                    if (entityLetterEl) entityLetterEl.classList.add('invalid');
+                    if (entityLetterErr) { entityLetterErr.style.display = 'block'; entityLetterErr.innerText = "يرجى رفع رسالة من الجهة المعنية بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (entityLetterEl) entityLetterEl.classList.remove('invalid');
+                    if (entityLetterErr) entityLetterErr.style.display = 'none';
+                }
+
+                if (!archPlansFile || !archPlansFile.base64) {
+                    if (archPlansEl) archPlansEl.classList.add('invalid');
+                    if (archPlansErr) { archPlansErr.style.display = 'block'; archPlansErr.innerText = "يرجى رفع المخططات المعمارية بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (archPlansEl) archPlansEl.classList.remove('invalid');
+                    if (archPlansErr) archPlansErr.style.display = 'none';
+                }
+
+                if (!mepPlansFile || !mepPlansFile.base64) {
+                    if (mepPlansEl) mepPlansEl.classList.add('invalid');
+                    if (mepPlansErr) { mepPlansErr.style.display = 'block'; mepPlansErr.innerText = "يرجى رفع المخططات الكهربائية والميكانيكية بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (mepPlansEl) mepPlansEl.classList.remove('invalid');
+                    if (mepPlansErr) mepPlansErr.style.display = 'none';
+                }
             }
 
             if (!isValid) return;
@@ -5318,6 +5376,11 @@
                 const approvalsName = window.dynamicPdfFiles.otherEntitiesApprovals ? window.dynamicPdfFiles.otherEntitiesApprovals.name : '';
                 const mapsName = window.dynamicPdfFiles.approvedProjectMaps ? window.dynamicPdfFiles.approvedProjectMaps.name : '';
                 dynamicSummary = `رسالة من الجهة المعنية: 📄 ${letterName} | موافقات الجهات الأخرى: 📄 ${approvalsName} | خرائط المشروع: 📄 ${mapsName}`;
+            } else if (['electrical_engineering_plans_review', 'electrical_engineering_plans_study', 'Review of Electrical Engineering Plans', 'Electrical Engineering Plans Review', 'دراسة المخططات الهندسية الكهربائية'].includes(key)) {
+                const letterName = window.dynamicPdfFiles.concernedEntityLetter ? window.dynamicPdfFiles.concernedEntityLetter.name : '';
+                const archName = window.dynamicPdfFiles.architecturalPlans ? window.dynamicPdfFiles.architecturalPlans.name : '';
+                const mepName = window.dynamicPdfFiles.electricalMechanicalPlans ? window.dynamicPdfFiles.electricalMechanicalPlans.name : '';
+                dynamicSummary = `رسالة من الجهة المعنية: 📄 ${letterName} | المخططات المعمارية: 📄 ${archName} | المخططات الكهربائية والميكانيكية: 📄 ${mepName}`;
             } else {
                 const genericInput = document.getElementById('app-generic-details');
                 if (genericInput) {
@@ -5508,6 +5571,19 @@
                 dynamicFields.approvedProjectMaps = window.dynamicPdfFiles.approvedProjectMaps ? {
                     name: window.dynamicPdfFiles.approvedProjectMaps.name,
                     base64: window.dynamicPdfFiles.approvedProjectMaps.base64
+                } : null;
+            } else if (['electrical_engineering_plans_review', 'electrical_engineering_plans_study', 'Review of Electrical Engineering Plans', 'Electrical Engineering Plans Review', 'دراسة المخططات الهندسية الكهربائية'].includes(key)) {
+                dynamicFields.concernedEntityLetter = window.dynamicPdfFiles.concernedEntityLetter ? {
+                    name: window.dynamicPdfFiles.concernedEntityLetter.name,
+                    base64: window.dynamicPdfFiles.concernedEntityLetter.base64
+                } : null;
+                dynamicFields.architecturalPlans = window.dynamicPdfFiles.architecturalPlans ? {
+                    name: window.dynamicPdfFiles.architecturalPlans.name,
+                    base64: window.dynamicPdfFiles.architecturalPlans.base64
+                } : null;
+                dynamicFields.electricalMechanicalPlans = window.dynamicPdfFiles.electricalMechanicalPlans ? {
+                    name: window.dynamicPdfFiles.electricalMechanicalPlans.name,
+                    base64: window.dynamicPdfFiles.electricalMechanicalPlans.base64
                 } : null;
             } else {
                 const genericInput = document.getElementById('app-generic-details');

@@ -1249,7 +1249,29 @@ function formatDynamicFields(serviceInput, dynamicFields) {
       if (dynamicFields.tanksCount) parts.push(`عدد الخزانات: ${dynamicFields.tanksCount}`);
       break;
 
+    case 'electrical_engineering_plans_review':
     case 'electrical_engineering_plans_study':
+    case 'Review of Electrical Engineering Plans':
+    case 'Electrical Engineering Plans Review':
+    case 'دراسة المخططات الهندسية الكهربائية':
+      if (dynamicFields.concernedEntityLetter) {
+        const doc = typeof dynamicFields.concernedEntityLetter === 'object'
+          ? (dynamicFields.concernedEntityLetter.name || dynamicFields.concernedEntityLetter.url || 'مرفق رسالة من الجهة المعنية')
+          : dynamicFields.concernedEntityLetter;
+        parts.push(`رسالة من الجهة المعنية: ${doc}`);
+      }
+      if (dynamicFields.architecturalPlans) {
+        const doc = typeof dynamicFields.architecturalPlans === 'object'
+          ? (dynamicFields.architecturalPlans.name || dynamicFields.architecturalPlans.url || 'مرفق المخططات المعمارية')
+          : dynamicFields.architecturalPlans;
+        parts.push(`المخططات المعمارية: ${doc}`);
+      }
+      if (dynamicFields.electricalMechanicalPlans) {
+        const doc = typeof dynamicFields.electricalMechanicalPlans === 'object'
+          ? (dynamicFields.electricalMechanicalPlans.name || dynamicFields.electricalMechanicalPlans.url || 'مرفق المخططات الكهربائية والميكانيكية')
+          : dynamicFields.electricalMechanicalPlans;
+        parts.push(`المخططات الكهربائية والميكانيكية: ${doc}`);
+      }
       if (dynamicFields.loadCapacity) parts.push(`سعة الحمل الكهربائي: ${dynamicFields.loadCapacity}`);
       if (dynamicFields.consultantOffice) parts.push(`المكتب الاستشاري: ${dynamicFields.consultantOffice}`);
       break;
@@ -1341,6 +1363,7 @@ function formatDynamicFields(serviceInput, dynamicFields) {
     concernedEntityLetter: 'رسالة من الجهة المعنية',
     otherEntitiesApprovals: 'موافقات الجهات المعنية الأخرى',
     approvedProjectMaps: 'خرائط المشروع المعتمدة',
+    electricalMechanicalPlans: 'المخططات الكهربائية والميكانيكية',
     stationCapacity: 'سعة خزانات الوقود',
     trainees: 'المتدربون',
     blueprintNumber: 'رقم المخطط',
@@ -3091,7 +3114,8 @@ const server = http.createServer(async (req, res) => {
             { key: 'architecturalPlans', label: 'المخططات المعمارية (الطلب الأصلي)', defaultName: 'Architectural-Plans.pdf' },
             { key: 'concernedEntityLetter', label: 'رسالة من الجهة المعنية (الطلب الأصلي)', defaultName: 'Concerned-Entity-Letter.pdf' },
             { key: 'otherEntitiesApprovals', label: 'موافقات الجهات المعنية الأخرى (الطلب الأصلي)', defaultName: 'Other-Entities-Approvals.pdf' },
-            { key: 'approvedProjectMaps', label: 'خرائط المشروع المعتمدة (الطلب الأصلي)', defaultName: 'Approved-Project-Maps.pdf' }
+            { key: 'approvedProjectMaps', label: 'خرائط المشروع المعتمدة (الطلب الأصلي)', defaultName: 'Approved-Project-Maps.pdf' },
+            { key: 'electricalMechanicalPlans', label: 'المخططات الكهربائية والميكانيكية (الطلب الأصلي)', defaultName: 'Electrical-Mechanical-Plans.pdf' }
           ];
 
           for (const conf of dynamicAttConfigs) {
