@@ -4518,17 +4518,32 @@
                         <div id="maintenance-contract-error" class="form-error" style="display: none;">يرجى رفع نسخة من عقد الصيانة بصيغة PDF.</div>
                     </div>
                 `;
-            } else if (['hazardous_material_permit', 'Hazardous Material Permit'].includes(key)) {
+            } else if (['hazardous_material_permit', 'Hazardous Material Permit', 'Chemical & Hazardous Material Storage NOC Permit', 'إصدار ترخيص عدم ممانعة لتخزين مواد كيميائية أو المتفجرات، وتجديد الترخيص'].includes(key)) {
                 container.innerHTML = `
-                    <div class="form-group">
-                        <label class="form-label" for="app-chemical-type">نوع المادة الكيميائية المراد تخزينها أو استخدامها</label>
-                        <select id="app-chemical-type" class="form-select" required>
-                            <option value="" disabled selected>-- اختر النوع --</option>
-                            <option value="Flammable Liquids">سوائل قابلة للاشتعال (Flammable Liquids)</option>
-                            <option value="Compressed Gases">غازات مضغوطة (Compressed Gases)</option>
-                            <option value="Toxic Chemicals">مواد سامة (Toxic Chemicals)</option>
-                            <option value="Corrosive Materials">مواد أكالة (Corrosive Materials)</option>
-                        </select>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-hazmat-materials-name">الاسم العلمي للمواد <span style="color: #ef4444;">*</span></label>
+                        <input type="text" id="app-hazmat-materials-name" class="form-input" placeholder="اكتب الاسم العلمي للمواد الكيميائية أو المتفجرات..." required>
+                        <div id="hazmat-materials-name-error" class="form-error" style="display: none;">يرجى إدخال الاسم العلمي للمواد.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-hazmat-quantities-table">جدول كميات المواد الخطرة (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-hazmat-quantities-table" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'hazmatQuantitiesTable')" required>
+                        <div id="hazmat-quantities-table-error" class="form-error" style="display: none;">يرجى رفع جدول كميات المواد الخطرة بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-hazmat-msds">صحيفة السلامة (MSDS) (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-hazmat-msds" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'safetyDataSheetMSDS')" required>
+                        <div id="hazmat-msds-error" class="form-error" style="display: none;">يرجى رفع صحيفة السلامة (MSDS) بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-hazmat-alarm-plans">مخططات الإنذار والإطفاء (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-hazmat-alarm-plans" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'alarmFirefightingPlans')" required>
+                        <div id="hazmat-alarm-plans-error" class="form-error" style="display: none;">يرجى رفع مخططات الإنذار والإطفاء بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-hazmat-maint-cert">شهادة الصيانة (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-hazmat-maint-cert" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'maintenanceCertificate')" required>
+                        <div id="hazmat-maint-cert-error" class="form-error" style="display: none;">يرجى رفع شهادة الصيانة بصيغة PDF.</div>
                     </div>
                 `;
             } else if (['gold_shop_license', 'Gold Shop License'].includes(key)) {
@@ -5109,14 +5124,67 @@
                     if (maintFileEl) maintFileEl.classList.remove('invalid');
                     if (maintErr) maintErr.style.display = 'none';
                 }
-            } else if (['hazardous_material_permit', 'Hazardous Material Permit'].includes(key)) {
-                const chemicalSelect = document.getElementById('app-chemical-type');
-                if (chemicalSelect) {
-                    chemicalSelect.classList.remove('invalid');
-                    if (!chemicalSelect.value) {
-                        chemicalSelect.classList.add('invalid');
-                        isValid = false;
-                    }
+            } else if (['hazardous_material_permit', 'Hazardous Material Permit', 'Chemical & Hazardous Material Storage NOC Permit', 'إصدار ترخيص عدم ممانعة لتخزين مواد كيميائية أو المتفجرات، وتجديد الترخيص'].includes(key)) {
+                const matNameEl = document.getElementById('app-hazmat-materials-name');
+                const matNameErr = document.getElementById('hazmat-materials-name-error');
+                const tableFile = window.dynamicPdfFiles.hazmatQuantitiesTable;
+                const msdsFile = window.dynamicPdfFiles.safetyDataSheetMSDS;
+                const alarmPlansFile = window.dynamicPdfFiles.alarmFirefightingPlans;
+                const maintCertFile = window.dynamicPdfFiles.maintenanceCertificate;
+
+                const tableEl = document.getElementById('app-hazmat-quantities-table');
+                const msdsEl = document.getElementById('app-hazmat-msds');
+                const alarmPlansEl = document.getElementById('app-hazmat-alarm-plans');
+                const maintCertEl = document.getElementById('app-hazmat-maint-cert');
+
+                const tableErr = document.getElementById('hazmat-quantities-table-error');
+                const msdsErr = document.getElementById('hazmat-msds-error');
+                const alarmPlansErr = document.getElementById('hazmat-alarm-plans-error');
+                const maintCertErr = document.getElementById('hazmat-maint-cert-error');
+
+                if (!matNameEl || !matNameEl.value.trim()) {
+                    if (matNameEl) matNameEl.classList.add('invalid');
+                    if (matNameErr) { matNameErr.style.display = 'block'; matNameErr.innerText = "يرجى إدخال الاسم العلمي للمواد."; }
+                    isValid = false;
+                } else {
+                    if (matNameEl) matNameEl.classList.remove('invalid');
+                    if (matNameErr) matNameErr.style.display = 'none';
+                }
+
+                if (!tableFile || !tableFile.base64) {
+                    if (tableEl) tableEl.classList.add('invalid');
+                    if (tableErr) { tableErr.style.display = 'block'; tableErr.innerText = "يرجى رفع جدول كميات المواد الخطرة بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (tableEl) tableEl.classList.remove('invalid');
+                    if (tableErr) tableErr.style.display = 'none';
+                }
+
+                if (!msdsFile || !msdsFile.base64) {
+                    if (msdsEl) msdsEl.classList.add('invalid');
+                    if (msdsErr) { msdsErr.style.display = 'block'; msdsErr.innerText = "يرجى رفع صحيفة السلامة (MSDS) بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (msdsEl) msdsEl.classList.remove('invalid');
+                    if (msdsErr) msdsErr.style.display = 'none';
+                }
+
+                if (!alarmPlansFile || !alarmPlansFile.base64) {
+                    if (alarmPlansEl) alarmPlansEl.classList.add('invalid');
+                    if (alarmPlansErr) { alarmPlansErr.style.display = 'block'; alarmPlansErr.innerText = "يرجى رفع مخططات الإنذار والإطفاء بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (alarmPlansEl) alarmPlansEl.classList.remove('invalid');
+                    if (alarmPlansErr) alarmPlansErr.style.display = 'none';
+                }
+
+                if (!maintCertFile || !maintCertFile.base64) {
+                    if (maintCertEl) maintCertEl.classList.add('invalid');
+                    if (maintCertErr) { maintCertErr.style.display = 'block'; maintCertErr.innerText = "يرجى رفع شهادة الصيانة بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (maintCertEl) maintCertEl.classList.remove('invalid');
+                    if (maintCertErr) maintCertErr.style.display = 'none';
                 }
             } else if (['gold_shop_license', 'Gold Shop License'].includes(key)) {
                 const alarmFile = window.dynamicPdfFiles.goldAlarmContract;
@@ -5730,10 +5798,13 @@
             } else if (['safety_certificate_renewal', 'Safety Certificate Renewal'].includes(key)) {
                 const fireName = window.dynamicPdfFiles.fireInspectionReport ? window.dynamicPdfFiles.fireInspectionReport.name : '';
                 const contractName = window.dynamicPdfFiles.maintenanceContract ? window.dynamicPdfFiles.maintenanceContract.name : '';
-                dynamicSummary = `تقرير فحص أنظمة الإطفاء والإنذار: 📄 ${fireName} | نسخة من عقد الصيانة: 📄 ${contractName}`;
-            } else if (['hazardous_material_permit', 'Hazardous Material Permit'].includes(key)) {
-                const chemical = document.getElementById('app-chemical-type').value;
-                dynamicSummary = `نوع المادة الكيميائية: ${chemical}`;
+            } else if (['hazardous_material_permit', 'Hazardous Material Permit', 'Chemical & Hazardous Material Storage NOC Permit', 'إصدار ترخيص عدم ممانعة لتخزين مواد كيميائية أو المتفجرات، وتجديد الترخيص'].includes(key)) {
+                const matName = document.getElementById('app-hazmat-materials-name') ? document.getElementById('app-hazmat-materials-name').value.trim() : '';
+                const hazmatTableName = window.dynamicPdfFiles.hazmatQuantitiesTable ? window.dynamicPdfFiles.hazmatQuantitiesTable.name : '';
+                const msdsName = window.dynamicPdfFiles.safetyDataSheetMSDS ? window.dynamicPdfFiles.safetyDataSheetMSDS.name : '';
+                const alarmPlansName = window.dynamicPdfFiles.alarmFirefightingPlans ? window.dynamicPdfFiles.alarmFirefightingPlans.name : '';
+                const maintCertName = window.dynamicPdfFiles.maintenanceCertificate ? window.dynamicPdfFiles.maintenanceCertificate.name : '';
+                dynamicSummary = `الاسم العلمي للمواد: ${matName} | جدول الكميات: 📄 ${hazmatTableName} | صحيفة السلامة: 📄 ${msdsName} | مخططات الإنذار والإطفاء: 📄 ${alarmPlansName} | شهادة الصيانة: 📄 ${maintCertName}`;
             } else if (['gas_selling_shops_license', 'Gas Selling Shops License'].includes(key)) {
                 const gasLetterName = window.dynamicPdfFiles.moicLetter ? window.dynamicPdfFiles.moicLetter.name : '';
                 dynamicSummary = `رسالة من وزارة الصناعة والتجارة والسياحة: 📄 ${gasLetterName}`;
@@ -5909,10 +5980,25 @@
                 dynamicFields.maintenanceContract = window.dynamicPdfFiles.maintenanceContract ? {
                     name: window.dynamicPdfFiles.maintenanceContract.name,
                     base64: window.dynamicPdfFiles.maintenanceContract.base64
+            } else if (['hazardous_material_permit', 'Hazardous Material Permit', 'Chemical & Hazardous Material Storage NOC Permit', 'إصدار ترخيص عدم ممانعة لتخزين مواد كيميائية أو المتفجرات، وتجديد الترخيص'].includes(key)) {
+                const matNameEl = document.getElementById('app-hazmat-materials-name');
+                dynamicFields.materialsScientificName = matNameEl ? matNameEl.value.trim() : '';
+                dynamicFields.hazmatQuantitiesTable = window.dynamicPdfFiles.hazmatQuantitiesTable ? {
+                    name: window.dynamicPdfFiles.hazmatQuantitiesTable.name,
+                    base64: window.dynamicPdfFiles.hazmatQuantitiesTable.base64
                 } : null;
-            } else if (['hazardous_material_permit', 'Hazardous Material Permit'].includes(key)) {
-                const el = document.getElementById('app-chemical-type');
-                dynamicFields.chemicalType = el ? el.value : '';
+                dynamicFields.safetyDataSheetMSDS = window.dynamicPdfFiles.safetyDataSheetMSDS ? {
+                    name: window.dynamicPdfFiles.safetyDataSheetMSDS.name,
+                    base64: window.dynamicPdfFiles.safetyDataSheetMSDS.base64
+                } : null;
+                dynamicFields.alarmFirefightingPlans = window.dynamicPdfFiles.alarmFirefightingPlans ? {
+                    name: window.dynamicPdfFiles.alarmFirefightingPlans.name,
+                    base64: window.dynamicPdfFiles.alarmFirefightingPlans.base64
+                } : null;
+                dynamicFields.maintenanceCertificate = window.dynamicPdfFiles.maintenanceCertificate ? {
+                    name: window.dynamicPdfFiles.maintenanceCertificate.name,
+                    base64: window.dynamicPdfFiles.maintenanceCertificate.base64
+                } : null;
             } else if (['gas_selling_shops_license', 'Gas Selling Shops License'].includes(key)) {
                 dynamicFields.moicLetter = window.dynamicPdfFiles.moicLetter ? {
                     name: window.dynamicPdfFiles.moicLetter.name,

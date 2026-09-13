@@ -1015,6 +1015,35 @@ function formatDynamicFields(serviceInput, dynamicFields) {
 
     case 'hazardous_material_permit':
     case 'Hazardous Material Permit':
+    case 'Chemical & Hazardous Material Storage NOC Permit':
+    case 'إصدار ترخيص عدم ممانعة لتخزين مواد كيميائية أو المتفجرات، وتجديد الترخيص':
+      if (dynamicFields.materialsScientificName) {
+        parts.push(`الاسم العلمي للمواد: ${dynamicFields.materialsScientificName}`);
+      }
+      if (dynamicFields.hazmatQuantitiesTable) {
+        const doc = typeof dynamicFields.hazmatQuantitiesTable === 'object'
+          ? (dynamicFields.hazmatQuantitiesTable.name || dynamicFields.hazmatQuantitiesTable.url || 'مرفق جدول كميات المواد الخطرة')
+          : dynamicFields.hazmatQuantitiesTable;
+        parts.push(`جدول كميات المواد الخطرة: ${doc}`);
+      }
+      if (dynamicFields.safetyDataSheetMSDS) {
+        const doc = typeof dynamicFields.safetyDataSheetMSDS === 'object'
+          ? (dynamicFields.safetyDataSheetMSDS.name || dynamicFields.safetyDataSheetMSDS.url || 'مرفق صحيفة السلامة (MSDS)')
+          : dynamicFields.safetyDataSheetMSDS;
+        parts.push(`صحيفة السلامة (MSDS): ${doc}`);
+      }
+      if (dynamicFields.alarmFirefightingPlans) {
+        const doc = typeof dynamicFields.alarmFirefightingPlans === 'object'
+          ? (dynamicFields.alarmFirefightingPlans.name || dynamicFields.alarmFirefightingPlans.url || 'مرفق مخططات الإنذار والإطفاء')
+          : dynamicFields.alarmFirefightingPlans;
+        parts.push(`مخططات الإنذار والإطفاء: ${doc}`);
+      }
+      if (dynamicFields.maintenanceCertificate) {
+        const doc = typeof dynamicFields.maintenanceCertificate === 'object'
+          ? (dynamicFields.maintenanceCertificate.name || dynamicFields.maintenanceCertificate.url || 'مرفق شهادة الصيانة')
+          : dynamicFields.maintenanceCertificate;
+        parts.push(`شهادة الصيانة: ${doc}`);
+      }
       if (dynamicFields.chemicalType) {
         parts.push(`نوع المادة الكيميائية: ${dynamicFields.chemicalType}`);
       }
