@@ -4567,6 +4567,29 @@
                         <div id="under-const-site-plans-error" class="form-error" style="display: none;">يرجى رفع مخططات الموقع بصيغة PDF.</div>
                     </div>
                 `;
+            } else if (['incident_report_large_facilities', 'Incident Report for Large Facilities, Factories, & Malls', 'إصدار تقرير الحوادث للمنشآت الكبيرة والمصانع والفنادق والمجمعات التجارية وما في حكمها'].includes(key)) {
+                container.innerHTML = `
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-large-incident-id-card">بطاقة الهوية (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-large-incident-id-card" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'idCardCopy')" required>
+                        <div id="large-incident-id-card-error" class="form-error" style="display: none;">يرجى رفع نسخة من بطاقة الهوية بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-large-incident-property-deed">وثيقة ملكية العقار (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-large-incident-property-deed" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'propertyDeed')" required>
+                        <div id="large-incident-property-deed-error" class="form-error" style="display: none;">يرجى رفع وثيقة ملكية العقار بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-large-incident-lease-contract">نسخة من عقد الإيجار (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-large-incident-lease-contract" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'leaseContractCopy')" required>
+                        <div id="large-incident-lease-contract-error" class="form-error" style="display: none;">يرجى رفع نسخة من عقد الإيجار بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-large-incident-cr-copy">نسخة من السجل التجاري (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-large-incident-cr-copy" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'commercialRegisterCopy')" required>
+                        <div id="large-incident-cr-copy-error" class="form-error" style="display: none;">يرجى رفع نسخة من السجل التجاري بصيغة PDF.</div>
+                    </div>
+                `;
             } else if (service) {
                 container.innerHTML = `
                     <div class="form-group">
@@ -4603,7 +4626,10 @@
                 fieldKey === 'trainingAccreditations' ? 'training-accreditations-error' :
                 fieldKey === 'gasStationGovApprovals' ? 'station-gov-approvals-error' :
                 fieldKey === 'gasStationApplicantLetter' ? 'station-applicant-letter-error' :
-                fieldKey === 'leaseContractCopy' ? 'under-const-lease-contract-error' :
+                fieldKey === 'idCardCopy' ? 'large-incident-id-card-error' :
+                fieldKey === 'propertyDeed' ? 'large-incident-property-deed-error' :
+                fieldKey === 'commercialRegisterCopy' ? 'large-incident-cr-copy-error' :
+                fieldKey === 'leaseContractCopy' ? (document.getElementById('large-incident-lease-contract-error') ? 'large-incident-lease-contract-error' : 'under-const-lease-contract-error') :
                 fieldKey === 'sitePlans' ? 'under-const-site-plans-error' :
                 `${fieldKey}-error`
             );
@@ -4954,6 +4980,57 @@
                     if (sitePlansEl) sitePlansEl.classList.remove('invalid');
                     if (sitePlansErr) sitePlansErr.style.display = 'none';
                 }
+            } else if (['incident_report_large_facilities', 'Incident Report for Large Facilities, Factories, & Malls', 'إصدار تقرير الحوادث للمنشآت الكبيرة والمصانع والفنادق والمجمعات التجارية وما في حكمها'].includes(key)) {
+                const idCardFile = window.dynamicPdfFiles.idCardCopy;
+                const propFile = window.dynamicPdfFiles.propertyDeed;
+                const leaseFile = window.dynamicPdfFiles.leaseContractCopy;
+                const crFile = window.dynamicPdfFiles.commercialRegisterCopy;
+
+                const idCardEl = document.getElementById('app-large-incident-id-card');
+                const propEl = document.getElementById('app-large-incident-property-deed');
+                const leaseEl = document.getElementById('app-large-incident-lease-contract');
+                const crEl = document.getElementById('app-large-incident-cr-copy');
+
+                const idCardErr = document.getElementById('large-incident-id-card-error');
+                const propErr = document.getElementById('large-incident-property-deed-error');
+                const leaseErr = document.getElementById('large-incident-lease-contract-error');
+                const crErr = document.getElementById('large-incident-cr-copy-error');
+
+                if (!idCardFile || !idCardFile.base64) {
+                    if (idCardEl) idCardEl.classList.add('invalid');
+                    if (idCardErr) { idCardErr.style.display = 'block'; idCardErr.innerText = "يرجى رفع بطاقة الهوية بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (idCardEl) idCardEl.classList.remove('invalid');
+                    if (idCardErr) idCardErr.style.display = 'none';
+                }
+
+                if (!propFile || !propFile.base64) {
+                    if (propEl) propEl.classList.add('invalid');
+                    if (propErr) { propErr.style.display = 'block'; propErr.innerText = "يرجى رفع وثيقة ملكية العقار بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (propEl) propEl.classList.remove('invalid');
+                    if (propErr) propErr.style.display = 'none';
+                }
+
+                if (!leaseFile || !leaseFile.base64) {
+                    if (leaseEl) leaseEl.classList.add('invalid');
+                    if (leaseErr) { leaseErr.style.display = 'block'; leaseErr.innerText = "يرجى رفع نسخة من عقد الإيجار بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (leaseEl) leaseEl.classList.remove('invalid');
+                    if (leaseErr) leaseErr.style.display = 'none';
+                }
+
+                if (!crFile || !crFile.base64) {
+                    if (crEl) crEl.classList.add('invalid');
+                    if (crErr) { crErr.style.display = 'block'; crErr.innerText = "يرجى رفع نسخة من السجل التجاري بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (crEl) crEl.classList.remove('invalid');
+                    if (crErr) crErr.style.display = 'none';
+                }
             }
 
             if (!isValid) return;
@@ -4990,6 +5067,12 @@
                 const leaseName = window.dynamicPdfFiles.leaseContractCopy ? window.dynamicPdfFiles.leaseContractCopy.name : '';
                 const plansName = window.dynamicPdfFiles.sitePlans ? window.dynamicPdfFiles.sitePlans.name : '';
                 dynamicSummary = `عقد الإيجار: 📄 ${leaseName} | مخططات الموقع: 📄 ${plansName}`;
+            } else if (['incident_report_large_facilities', 'Incident Report for Large Facilities, Factories, & Malls', 'إصدار تقرير الحوادث للمنشآت الكبيرة والمصانع والفنادق والمجمعات التجارية وما في حكمها'].includes(key)) {
+                const idCardName = window.dynamicPdfFiles.idCardCopy ? window.dynamicPdfFiles.idCardCopy.name : '';
+                const propName = window.dynamicPdfFiles.propertyDeed ? window.dynamicPdfFiles.propertyDeed.name : '';
+                const leaseName = window.dynamicPdfFiles.leaseContractCopy ? window.dynamicPdfFiles.leaseContractCopy.name : '';
+                const crName = window.dynamicPdfFiles.commercialRegisterCopy ? window.dynamicPdfFiles.commercialRegisterCopy.name : '';
+                dynamicSummary = `بطاقة الهوية: 📄 ${idCardName} | وثيقة الملكية: 📄 ${propName} | عقد الإيجار: 📄 ${leaseName} | السجل التجاري: 📄 ${crName}`;
             } else {
                 const genericInput = document.getElementById('app-generic-details');
                 if (genericInput) {
@@ -5114,6 +5197,23 @@
                 dynamicFields.sitePlans = window.dynamicPdfFiles.sitePlans ? {
                     name: window.dynamicPdfFiles.sitePlans.name,
                     base64: window.dynamicPdfFiles.sitePlans.base64
+                } : null;
+            } else if (['incident_report_large_facilities', 'Incident Report for Large Facilities, Factories, & Malls', 'إصدار تقرير الحوادث للمنشآت الكبيرة والمصانع والفنادق والمجمعات التجارية وما في حكمها'].includes(key)) {
+                dynamicFields.idCardCopy = window.dynamicPdfFiles.idCardCopy ? {
+                    name: window.dynamicPdfFiles.idCardCopy.name,
+                    base64: window.dynamicPdfFiles.idCardCopy.base64
+                } : null;
+                dynamicFields.propertyDeed = window.dynamicPdfFiles.propertyDeed ? {
+                    name: window.dynamicPdfFiles.propertyDeed.name,
+                    base64: window.dynamicPdfFiles.propertyDeed.base64
+                } : null;
+                dynamicFields.leaseContractCopy = window.dynamicPdfFiles.leaseContractCopy ? {
+                    name: window.dynamicPdfFiles.leaseContractCopy.name,
+                    base64: window.dynamicPdfFiles.leaseContractCopy.base64
+                } : null;
+                dynamicFields.commercialRegisterCopy = window.dynamicPdfFiles.commercialRegisterCopy ? {
+                    name: window.dynamicPdfFiles.commercialRegisterCopy.name,
+                    base64: window.dynamicPdfFiles.commercialRegisterCopy.base64
                 } : null;
             } else {
                 const genericInput = document.getElementById('app-generic-details');

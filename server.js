@@ -1049,6 +1049,35 @@ function formatDynamicFields(serviceInput, dynamicFields) {
       }
       break;
 
+    case 'incident_report_large_facilities':
+    case 'Incident Report for Large Facilities, Factories, & Malls':
+    case 'إصدار تقرير الحوادث للمنشآت الكبيرة والمصانع والفنادق والمجمعات التجارية وما في حكمها':
+      if (dynamicFields.idCardCopy) {
+        const doc = typeof dynamicFields.idCardCopy === 'object'
+          ? (dynamicFields.idCardCopy.name || dynamicFields.idCardCopy.url || 'مرفق بطاقة الهوية')
+          : dynamicFields.idCardCopy;
+        parts.push(`بطاقة الهوية: ${doc}`);
+      }
+      if (dynamicFields.propertyDeed) {
+        const doc = typeof dynamicFields.propertyDeed === 'object'
+          ? (dynamicFields.propertyDeed.name || dynamicFields.propertyDeed.url || 'مرفق وثيقة ملكية العقار')
+          : dynamicFields.propertyDeed;
+        parts.push(`وثيقة ملكية العقار: ${doc}`);
+      }
+      if (dynamicFields.leaseContractCopy) {
+        const doc = typeof dynamicFields.leaseContractCopy === 'object'
+          ? (dynamicFields.leaseContractCopy.name || dynamicFields.leaseContractCopy.url || 'مرفق نسخة من عقد الإيجار')
+          : dynamicFields.leaseContractCopy;
+        parts.push(`نسخة من عقد الإيجار: ${doc}`);
+      }
+      if (dynamicFields.commercialRegisterCopy) {
+        const doc = typeof dynamicFields.commercialRegisterCopy === 'object'
+          ? (dynamicFields.commercialRegisterCopy.name || dynamicFields.commercialRegisterCopy.url || 'مرفق نسخة من السجل التجاري')
+          : dynamicFields.commercialRegisterCopy;
+        parts.push(`نسخة من السجل التجاري: ${doc}`);
+      }
+      break;
+
     case 'factory_warehouse_maps_license':
     case 'Factory & Warehouse Blueprint License':
       if (dynamicFields.blueprintNumber) parts.push(`رقم المخطط: ${dynamicFields.blueprintNumber}`);
@@ -1177,6 +1206,9 @@ function formatDynamicFields(serviceInput, dynamicFields) {
     gasStationApplicantLetter: 'رسالة رسمية باسم مقدم الطلب',
     leaseContractCopy: 'نسخة من عقد الإيجار',
     sitePlans: 'مخططات الموقع',
+    idCardCopy: 'بطاقة الهوية',
+    propertyDeed: 'وثيقة ملكية العقار',
+    commercialRegisterCopy: 'نسخة من السجل التجاري',
     stationCapacity: 'سعة خزانات الوقود',
     trainees: 'المتدربون',
     blueprintNumber: 'رقم المخطط',
@@ -2915,7 +2947,10 @@ const server = http.createServer(async (req, res) => {
             { key: 'gasStationGovApprovals', label: 'موافقات من الجهات الحكومية (الطلب الأصلي)', defaultName: 'Gas-Station-Gov-Approvals.pdf' },
             { key: 'gasStationApplicantLetter', label: 'رسالة رسمية باسم مقدم الطلب (الطلب الأصلي)', defaultName: 'Gas-Station-Applicant-Letter.pdf' },
             { key: 'leaseContractCopy', label: 'نسخة من عقد الإيجار (الطلب الأصلي)', defaultName: 'Lease-Contract-Copy.pdf' },
-            { key: 'sitePlans', label: 'مخططات الموقع (الطلب الأصلي)', defaultName: 'Site-Plans.pdf' }
+            { key: 'sitePlans', label: 'مخططات الموقع (الطلب الأصلي)', defaultName: 'Site-Plans.pdf' },
+            { key: 'idCardCopy', label: 'بطاقة الهوية (الطلب الأصلي)', defaultName: 'ID-Card-Copy.pdf' },
+            { key: 'propertyDeed', label: 'وثيقة ملكية العقار (الطلب الأصلي)', defaultName: 'Property-Deed.pdf' },
+            { key: 'commercialRegisterCopy', label: 'نسخة من السجل التجاري (الطلب الأصلي)', defaultName: 'Commercial-Register-Copy.pdf' }
           ];
 
           for (const conf of dynamicAttConfigs) {
