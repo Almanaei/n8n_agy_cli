@@ -4852,6 +4852,54 @@
                         <div id="haz-trans-vehicle-ownership-error" class="form-error" style="display: none;">يرجى رفع ملكية المركبة بصيغة PDF.</div>
                     </div>
                 `;
+            } else if (['chemical_hazmat_transport_vehicles_license', 'chemical_transport_license', 'chemical_transport_vehicles_approval', 'Approval License for Chemical & Hazardous Transport Vehicles', 'Chemical & Hazardous Material Transport Vehicles License', 'إصدار ترخيص الموافقة على سيارات نقل المواد الكيميائية والخطرة، وتجديد الترخيص'].includes(key)) {
+                container.innerHTML = `
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-chem-trans-official-letter">رسالة رسمية (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-chem-trans-official-letter" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'officialLetter')" required>
+                        <div id="chem-trans-official-letter-error" class="form-error" style="display: none;">يرجى رفع الرسالة الرسمية بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-chem-trans-tech-cert">شهادة فنية (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-chem-trans-tech-cert" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'technicalCertificate')" required>
+                        <div id="chem-trans-tech-cert-error" class="form-error" style="display: none;">يرجى رفع الشهادة الفنية بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-chem-trans-import-permit">تصريح استيراد (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-chem-trans-import-permit" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'importPermit')" required>
+                        <div id="chem-trans-import-permit-error" class="form-error" style="display: none;">يرجى رفع تصريح الاستيراد بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-chem-trans-vehicle-ownership">ملكية المركبة (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-chem-trans-vehicle-ownership" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'vehicleOwnershipCard')" required>
+                        <div id="chem-trans-vehicle-ownership-error" class="form-error" style="display: none;">يرجى رفع ملكية المركبة بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-chem-trans-msds">صحيفة السلامة (MSDS) (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-chem-trans-msds" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'safetyDataSheetMSDS')" required>
+                        <div id="chem-trans-msds-error" class="form-error" style="display: none;">يرجى رفع صحيفة السلامة (MSDS) بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-chem-trans-driver-instructions">تعليمات قائد المركبة (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-chem-trans-driver-instructions" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'driverInstructionsDoc')" required>
+                        <div id="chem-trans-driver-instructions-error" class="form-error" style="display: none;">يرجى رفع تعليمات قائد المركبة بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-chem-trans-driver-fire-cert">شهادة دورة إطفاء للسائق (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-chem-trans-driver-fire-cert" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'driverFireCourseCertificate')" required>
+                        <div id="chem-trans-driver-fire-cert-error" class="form-error" style="display: none;">يرجى رفع شهادة دورة إطفاء للسائق بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-chem-trans-emergency-responders">قائمة بالمسؤولين للتعامل مع الطوارئ (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-chem-trans-emergency-responders" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'emergencyRespondersList')" required>
+                        <div id="chem-trans-emergency-responders-error" class="form-error" style="display: none;">يرجى رفع قائمة بالمسؤولين للتعامل مع الطوارئ بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-chem-trans-tech-specs">المواصفات الفنية (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-chem-trans-tech-specs" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'technicalSpecificationsDoc')" required>
+                        <div id="chem-trans-tech-specs-error" class="form-error" style="display: none;">يرجى رفع المواصفات الفنية بصيغة PDF.</div>
+                    </div>
+                `;
             } else if (service) {
                 container.innerHTML = `
                     <div class="form-group">
@@ -5881,6 +5929,117 @@
                     if (vehicleOwnerEl) vehicleOwnerEl.classList.remove('invalid');
                     if (vehicleOwnerErr) vehicleOwnerErr.style.display = 'none';
                 }
+            } else if (['chemical_hazmat_transport_vehicles_license', 'chemical_transport_license', 'chemical_transport_vehicles_approval', 'Approval License for Chemical & Hazardous Transport Vehicles', 'Chemical & Hazardous Material Transport Vehicles License', 'إصدار ترخيص الموافقة على سيارات نقل المواد الكيميائية والخطرة، وتجديد الترخيص'].includes(key)) {
+                const offLetterFile = window.dynamicPdfFiles.officialLetter;
+                const techCertFile = window.dynamicPdfFiles.technicalCertificate;
+                const importPermitFile = window.dynamicPdfFiles.importPermit;
+                const vehicleOwnerFile = window.dynamicPdfFiles.vehicleOwnershipCard;
+                const msdsFile = window.dynamicPdfFiles.safetyDataSheetMSDS;
+                const driverInstFile = window.dynamicPdfFiles.driverInstructionsDoc;
+                const driverFireCertFile = window.dynamicPdfFiles.driverFireCourseCertificate;
+                const emergListFile = window.dynamicPdfFiles.emergencyRespondersList;
+                const techSpecsFile = window.dynamicPdfFiles.technicalSpecificationsDoc;
+
+                const offLetterEl = document.getElementById('app-chem-trans-official-letter');
+                const techCertEl = document.getElementById('app-chem-trans-tech-cert');
+                const importPermitEl = document.getElementById('app-chem-trans-import-permit');
+                const vehicleOwnerEl = document.getElementById('app-chem-trans-vehicle-ownership');
+                const msdsEl = document.getElementById('app-chem-trans-msds');
+                const driverInstEl = document.getElementById('app-chem-trans-driver-instructions');
+                const driverFireCertEl = document.getElementById('app-chem-trans-driver-fire-cert');
+                const emergListEl = document.getElementById('app-chem-trans-emergency-responders');
+                const techSpecsEl = document.getElementById('app-chem-trans-tech-specs');
+
+                const offLetterErr = document.getElementById('chem-trans-official-letter-error');
+                const techCertErr = document.getElementById('chem-trans-tech-cert-error');
+                const importPermitErr = document.getElementById('chem-trans-import-permit-error');
+                const vehicleOwnerErr = document.getElementById('chem-trans-vehicle-ownership-error');
+                const msdsErr = document.getElementById('chem-trans-msds-error');
+                const driverInstErr = document.getElementById('chem-trans-driver-instructions-error');
+                const driverFireCertErr = document.getElementById('chem-trans-driver-fire-cert-error');
+                const emergListErr = document.getElementById('chem-trans-emergency-responders-error');
+                const techSpecsErr = document.getElementById('chem-trans-tech-specs-error');
+
+                if (!offLetterFile || !offLetterFile.base64) {
+                    if (offLetterEl) offLetterEl.classList.add('invalid');
+                    if (offLetterErr) { offLetterErr.style.display = 'block'; offLetterErr.innerText = "يرجى رفع الرسالة الرسمية بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (offLetterEl) offLetterEl.classList.remove('invalid');
+                    if (offLetterErr) offLetterErr.style.display = 'none';
+                }
+
+                if (!techCertFile || !techCertFile.base64) {
+                    if (techCertEl) techCertEl.classList.add('invalid');
+                    if (techCertErr) { techCertErr.style.display = 'block'; techCertErr.innerText = "يرجى رفع الشهادة الفنية بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (techCertEl) techCertEl.classList.remove('invalid');
+                    if (techCertErr) techCertErr.style.display = 'none';
+                }
+
+                if (!importPermitFile || !importPermitFile.base64) {
+                    if (importPermitEl) importPermitEl.classList.add('invalid');
+                    if (importPermitErr) { importPermitErr.style.display = 'block'; importPermitErr.innerText = "يرجى رفع تصريح الاستيراد بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (importPermitEl) importPermitEl.classList.remove('invalid');
+                    if (importPermitErr) importPermitErr.style.display = 'none';
+                }
+
+                if (!vehicleOwnerFile || !vehicleOwnerFile.base64) {
+                    if (vehicleOwnerEl) vehicleOwnerEl.classList.add('invalid');
+                    if (vehicleOwnerErr) { vehicleOwnerErr.style.display = 'block'; vehicleOwnerErr.innerText = "يرجى رفع ملكية المركبة بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (vehicleOwnerEl) vehicleOwnerEl.classList.remove('invalid');
+                    if (vehicleOwnerErr) vehicleOwnerErr.style.display = 'none';
+                }
+
+                if (!msdsFile || !msdsFile.base64) {
+                    if (msdsEl) msdsEl.classList.add('invalid');
+                    if (msdsErr) { msdsErr.style.display = 'block'; msdsErr.innerText = "يرجى رفع صحيفة السلامة (MSDS) بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (msdsEl) msdsEl.classList.remove('invalid');
+                    if (msdsErr) msdsErr.style.display = 'none';
+                }
+
+                if (!driverInstFile || !driverInstFile.base64) {
+                    if (driverInstEl) driverInstEl.classList.add('invalid');
+                    if (driverInstErr) { driverInstErr.style.display = 'block'; driverInstErr.innerText = "يرجى رفع تعليمات قائد المركبة بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (driverInstEl) driverInstEl.classList.remove('invalid');
+                    if (driverInstErr) driverInstErr.style.display = 'none';
+                }
+
+                if (!driverFireCertFile || !driverFireCertFile.base64) {
+                    if (driverFireCertEl) driverFireCertEl.classList.add('invalid');
+                    if (driverFireCertErr) { driverFireCertErr.style.display = 'block'; driverFireCertErr.innerText = "يرجى رفع شهادة دورة إطفاء للسائق بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (driverFireCertEl) driverFireCertEl.classList.remove('invalid');
+                    if (driverFireCertErr) driverFireCertErr.style.display = 'none';
+                }
+
+                if (!emergListFile || !emergListFile.base64) {
+                    if (emergListEl) emergListEl.classList.add('invalid');
+                    if (emergListErr) { emergListErr.style.display = 'block'; emergListErr.innerText = "يرجى رفع قائمة بالمسؤولين للتعامل مع الطوارئ بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (emergListEl) emergListEl.classList.remove('invalid');
+                    if (emergListErr) emergListErr.style.display = 'none';
+                }
+
+                if (!techSpecsFile || !techSpecsFile.base64) {
+                    if (techSpecsEl) techSpecsEl.classList.add('invalid');
+                    if (techSpecsErr) { techSpecsErr.style.display = 'block'; techSpecsErr.innerText = "يرجى رفع المواصفات الفنية بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (techSpecsEl) techSpecsEl.classList.remove('invalid');
+                    if (techSpecsErr) techSpecsErr.style.display = 'none';
+                }
             }
 
             if (!isValid) return;
@@ -5998,6 +6157,17 @@
                 const inspectCertName = window.dynamicPdfFiles.vehicleInspectionCertificate ? window.dynamicPdfFiles.vehicleInspectionCertificate.name : '';
                 const vehicleOwnerName = window.dynamicPdfFiles.vehicleOwnershipCard ? window.dynamicPdfFiles.vehicleOwnershipCard.name : '';
                 dynamicSummary = `رسالة مقدم الطلب: 📄 ${appLetterName} | قائمة المواد: 📄 ${matListName} | صحيفة السلامة: 📄 ${msdsName} | وثيقة المرور: 📄 ${trafficDocName} | فحص السيارة: 📄 ${inspectCertName} | ملكية المركبة: 📄 ${vehicleOwnerName}`;
+            } else if (['chemical_hazmat_transport_vehicles_license', 'chemical_transport_license', 'chemical_transport_vehicles_approval', 'Approval License for Chemical & Hazardous Transport Vehicles', 'Chemical & Hazardous Material Transport Vehicles License', 'إصدار ترخيص الموافقة على سيارات نقل المواد الكيميائية والخطرة، وتجديد الترخيص'].includes(key)) {
+                const offLetterName = window.dynamicPdfFiles.officialLetter ? window.dynamicPdfFiles.officialLetter.name : '';
+                const techCertName = window.dynamicPdfFiles.technicalCertificate ? window.dynamicPdfFiles.technicalCertificate.name : '';
+                const importPermitName = window.dynamicPdfFiles.importPermit ? window.dynamicPdfFiles.importPermit.name : '';
+                const vehicleOwnerName = window.dynamicPdfFiles.vehicleOwnershipCard ? window.dynamicPdfFiles.vehicleOwnershipCard.name : '';
+                const msdsName = window.dynamicPdfFiles.safetyDataSheetMSDS ? window.dynamicPdfFiles.safetyDataSheetMSDS.name : '';
+                const driverInstName = window.dynamicPdfFiles.driverInstructionsDoc ? window.dynamicPdfFiles.driverInstructionsDoc.name : '';
+                const driverFireCertName = window.dynamicPdfFiles.driverFireCourseCertificate ? window.dynamicPdfFiles.driverFireCourseCertificate.name : '';
+                const emergListName = window.dynamicPdfFiles.emergencyRespondersList ? window.dynamicPdfFiles.emergencyRespondersList.name : '';
+                const techSpecsName = window.dynamicPdfFiles.technicalSpecificationsDoc ? window.dynamicPdfFiles.technicalSpecificationsDoc.name : '';
+                dynamicSummary = `رسالة رسمية: 📄 ${offLetterName} | شهادة فنية: 📄 ${techCertName} | تصريح استيراد: 📄 ${importPermitName} | ملكية المركبة: 📄 ${vehicleOwnerName} | صحيفة السلامة: 📄 ${msdsName} | تعليمات قائد المركبة: 📄 ${driverInstName} | شهادة إطفاء السائق: 📄 ${driverFireCertName} | قائمة مسؤولي الطوارئ: 📄 ${emergListName} | المواصفات الفنية: 📄 ${techSpecsName}`;
             } else {
                 const genericInput = document.getElementById('app-generic-details');
                 if (genericInput) {
@@ -6334,6 +6504,43 @@
                 dynamicFields.vehicleOwnershipCard = window.dynamicPdfFiles.vehicleOwnershipCard ? {
                     name: window.dynamicPdfFiles.vehicleOwnershipCard.name,
                     base64: window.dynamicPdfFiles.vehicleOwnershipCard.base64
+                } : null;
+            } else if (['chemical_hazmat_transport_vehicles_license', 'chemical_transport_license', 'chemical_transport_vehicles_approval', 'Approval License for Chemical & Hazardous Transport Vehicles', 'Chemical & Hazardous Material Transport Vehicles License', 'إصدار ترخيص الموافقة على سيارات نقل المواد الكيميائية والخطرة، وتجديد الترخيص'].includes(key)) {
+                dynamicFields.officialLetter = window.dynamicPdfFiles.officialLetter ? {
+                    name: window.dynamicPdfFiles.officialLetter.name,
+                    base64: window.dynamicPdfFiles.officialLetter.base64
+                } : null;
+                dynamicFields.technicalCertificate = window.dynamicPdfFiles.technicalCertificate ? {
+                    name: window.dynamicPdfFiles.technicalCertificate.name,
+                    base64: window.dynamicPdfFiles.technicalCertificate.base64
+                } : null;
+                dynamicFields.importPermit = window.dynamicPdfFiles.importPermit ? {
+                    name: window.dynamicPdfFiles.importPermit.name,
+                    base64: window.dynamicPdfFiles.importPermit.base64
+                } : null;
+                dynamicFields.vehicleOwnershipCard = window.dynamicPdfFiles.vehicleOwnershipCard ? {
+                    name: window.dynamicPdfFiles.vehicleOwnershipCard.name,
+                    base64: window.dynamicPdfFiles.vehicleOwnershipCard.base64
+                } : null;
+                dynamicFields.safetyDataSheetMSDS = window.dynamicPdfFiles.safetyDataSheetMSDS ? {
+                    name: window.dynamicPdfFiles.safetyDataSheetMSDS.name,
+                    base64: window.dynamicPdfFiles.safetyDataSheetMSDS.base64
+                } : null;
+                dynamicFields.driverInstructionsDoc = window.dynamicPdfFiles.driverInstructionsDoc ? {
+                    name: window.dynamicPdfFiles.driverInstructionsDoc.name,
+                    base64: window.dynamicPdfFiles.driverInstructionsDoc.base64
+                } : null;
+                dynamicFields.driverFireCourseCertificate = window.dynamicPdfFiles.driverFireCourseCertificate ? {
+                    name: window.dynamicPdfFiles.driverFireCourseCertificate.name,
+                    base64: window.dynamicPdfFiles.driverFireCourseCertificate.base64
+                } : null;
+                dynamicFields.emergencyRespondersList = window.dynamicPdfFiles.emergencyRespondersList ? {
+                    name: window.dynamicPdfFiles.emergencyRespondersList.name,
+                    base64: window.dynamicPdfFiles.emergencyRespondersList.base64
+                } : null;
+                dynamicFields.technicalSpecificationsDoc = window.dynamicPdfFiles.technicalSpecificationsDoc ? {
+                    name: window.dynamicPdfFiles.technicalSpecificationsDoc.name,
+                    base64: window.dynamicPdfFiles.technicalSpecificationsDoc.base64
                 } : null;
             } else {
                 const genericInput = document.getElementById('app-generic-details');

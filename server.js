@@ -1575,7 +1575,66 @@ function formatDynamicFields(serviceInput, dynamicFields) {
       if (dynamicFields.transportDate) parts.push(`تاريخ النقل: ${dynamicFields.transportDate}`);
       break;
 
+    case 'chemical_hazmat_transport_vehicles_license':
+    case 'chemical_transport_license':
     case 'chemical_transport_vehicles_approval':
+    case 'Approval License for Chemical & Hazardous Transport Vehicles':
+    case 'Chemical & Hazardous Material Transport Vehicles License':
+    case 'إصدار ترخيص الموافقة على سيارات نقل المواد الكيميائية والخطرة، وتجديد الترخيص':
+      if (dynamicFields.officialLetter) {
+        const doc = typeof dynamicFields.officialLetter === 'object'
+          ? (dynamicFields.officialLetter.name || dynamicFields.officialLetter.url || 'مرفق رسالة رسمية')
+          : dynamicFields.officialLetter;
+        parts.push(`رسالة رسمية: ${doc}`);
+      }
+      if (dynamicFields.technicalCertificate) {
+        const doc = typeof dynamicFields.technicalCertificate === 'object'
+          ? (dynamicFields.technicalCertificate.name || dynamicFields.technicalCertificate.url || 'مرفق شهادة فنية')
+          : dynamicFields.technicalCertificate;
+        parts.push(`شهادة فنية: ${doc}`);
+      }
+      if (dynamicFields.importPermit) {
+        const doc = typeof dynamicFields.importPermit === 'object'
+          ? (dynamicFields.importPermit.name || dynamicFields.importPermit.url || 'مرفق تصريح استيراد')
+          : dynamicFields.importPermit;
+        parts.push(`تصريح استيراد: ${doc}`);
+      }
+      if (dynamicFields.vehicleOwnershipCard) {
+        const doc = typeof dynamicFields.vehicleOwnershipCard === 'object'
+          ? (dynamicFields.vehicleOwnershipCard.name || dynamicFields.vehicleOwnershipCard.url || 'مرفق ملكية المركبة')
+          : dynamicFields.vehicleOwnershipCard;
+        parts.push(`ملكية المركبة: ${doc}`);
+      }
+      if (dynamicFields.safetyDataSheetMSDS) {
+        const doc = typeof dynamicFields.safetyDataSheetMSDS === 'object'
+          ? (dynamicFields.safetyDataSheetMSDS.name || dynamicFields.safetyDataSheetMSDS.url || 'مرفق صحيفة السلامة (MSDS)')
+          : dynamicFields.safetyDataSheetMSDS;
+        parts.push(`صحيفة السلامة (MSDS): ${doc}`);
+      }
+      if (dynamicFields.driverInstructionsDoc) {
+        const doc = typeof dynamicFields.driverInstructionsDoc === 'object'
+          ? (dynamicFields.driverInstructionsDoc.name || dynamicFields.driverInstructionsDoc.url || 'مرفق تعليمات قائد المركبة')
+          : dynamicFields.driverInstructionsDoc;
+        parts.push(`تعليمات قائد المركبة: ${doc}`);
+      }
+      if (dynamicFields.driverFireCourseCertificate) {
+        const doc = typeof dynamicFields.driverFireCourseCertificate === 'object'
+          ? (dynamicFields.driverFireCourseCertificate.name || dynamicFields.driverFireCourseCertificate.url || 'مرفق شهادة دورة إطفاء للسائق')
+          : dynamicFields.driverFireCourseCertificate;
+        parts.push(`شهادة دورة إطفاء للسائق: ${doc}`);
+      }
+      if (dynamicFields.emergencyRespondersList) {
+        const doc = typeof dynamicFields.emergencyRespondersList === 'object'
+          ? (dynamicFields.emergencyRespondersList.name || dynamicFields.emergencyRespondersList.url || 'مرفق قائمة بالمسؤولين للتعامل مع الطوارئ')
+          : dynamicFields.emergencyRespondersList;
+        parts.push(`قائمة بالمسؤولين للتعامل مع الطوارئ: ${doc}`);
+      }
+      if (dynamicFields.technicalSpecificationsDoc) {
+        const doc = typeof dynamicFields.technicalSpecificationsDoc === 'object'
+          ? (dynamicFields.technicalSpecificationsDoc.name || dynamicFields.technicalSpecificationsDoc.url || 'مرفق المواصفات الفنية')
+          : dynamicFields.technicalSpecificationsDoc;
+        parts.push(`المواصفات الفنية: ${doc}`);
+      }
       if (dynamicFields.vehiclePlate) parts.push(`رقم لوحة المركبة: ${dynamicFields.vehiclePlate}`);
       if (dynamicFields.transportDate) parts.push(`تاريخ النقل: ${dynamicFields.transportDate}`);
       break;
