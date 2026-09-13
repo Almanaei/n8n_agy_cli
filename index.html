@@ -4776,6 +4776,34 @@
                         <div id="factory-engineering-maps-error" class="form-error" style="display: none;">يرجى رفع الخرائط الهندسية بصيغة PDF.</div>
                     </div>
                 `;
+            } else if (['alarm_firefighting_maintenance_offices_license', 'License for Alarm & Firefighting Maintenance Offices', 'Alarm & Firefighting Maintenance Offices License', 'technical_and_maintenance_offices_license', 'إصدار الترخيص للمكاتب الفنية ومكاتب صيانة أجهزة الإنذار والإطفاء، وتجديد الترخيص'].includes(key)) {
+                container.innerHTML = `
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-maint-office-cr-copy">السجل التجاري (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-maint-office-cr-copy" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'commercialRegisterCopy')" required>
+                        <div id="maint-office-cr-copy-error" class="form-error" style="display: none;">يرجى رفع السجل التجاري بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-maint-office-profile">بيان مفصل للمكتب (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-maint-office-profile" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'officeDetailedProfile')" required>
+                        <div id="maint-office-profile-error" class="form-error" style="display: none;">يرجى رفع بيان مفصل للمكتب بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-maint-office-engineers-list">كشف بأسماء المهندسين (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-maint-office-engineers-list" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'engineersListDoc')" required>
+                        <div id="maint-office-engineers-list-error" class="form-error" style="display: none;">يرجى رفع كشف بأسماء المهندسين بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-maint-office-practice-licenses">رخص مزاولة المهن الهندسية (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-maint-office-practice-licenses" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'engineeringPracticeLicenses')" required>
+                        <div id="maint-office-practice-licenses-error" class="form-error" style="display: none;">يرجى رفع رخص مزاولة المهن الهندسية بصيغة PDF.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-maint-office-ids-resumes">بطاقات الهوية والسير الذاتية (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-maint-office-ids-resumes" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'idCardsAndResumes')" required>
+                        <div id="maint-office-ids-resumes-error" class="form-error" style="display: none;">يرجى رفع بطاقات الهوية والسير الذاتية بصيغة PDF.</div>
+                    </div>
+                `;
             } else if (service) {
                 container.innerHTML = `
                     <div class="form-group">
@@ -5614,6 +5642,69 @@
                     if (mapsEl) mapsEl.classList.remove('invalid');
                     if (mapsErr) mapsErr.style.display = 'none';
                 }
+            } else if (['alarm_firefighting_maintenance_offices_license', 'License for Alarm & Firefighting Maintenance Offices', 'Alarm & Firefighting Maintenance Offices License', 'technical_and_maintenance_offices_license', 'إصدار الترخيص للمكاتب الفنية ومكاتب صيانة أجهزة الإنذار والإطفاء، وتجديد الترخيص'].includes(key)) {
+                const crFile = window.dynamicPdfFiles.commercialRegisterCopy;
+                const profileFile = window.dynamicPdfFiles.officeDetailedProfile;
+                const engListFile = window.dynamicPdfFiles.engineersListDoc;
+                const licensesFile = window.dynamicPdfFiles.engineeringPracticeLicenses;
+                const idsResumesFile = window.dynamicPdfFiles.idCardsAndResumes;
+
+                const crEl = document.getElementById('app-maint-office-cr-copy');
+                const profileEl = document.getElementById('app-maint-office-profile');
+                const engListEl = document.getElementById('app-maint-office-engineers-list');
+                const licensesEl = document.getElementById('app-maint-office-practice-licenses');
+                const idsResumesEl = document.getElementById('app-maint-office-ids-resumes');
+
+                const crErr = document.getElementById('maint-office-cr-copy-error');
+                const profileErr = document.getElementById('maint-office-profile-error');
+                const engListErr = document.getElementById('maint-office-engineers-list-error');
+                const licensesErr = document.getElementById('maint-office-practice-licenses-error');
+                const idsResumesErr = document.getElementById('maint-office-ids-resumes-error');
+
+                if (!crFile || !crFile.base64) {
+                    if (crEl) crEl.classList.add('invalid');
+                    if (crErr) { crErr.style.display = 'block'; crErr.innerText = "يرجى رفع السجل التجاري بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (crEl) crEl.classList.remove('invalid');
+                    if (crErr) crErr.style.display = 'none';
+                }
+
+                if (!profileFile || !profileFile.base64) {
+                    if (profileEl) profileEl.classList.add('invalid');
+                    if (profileErr) { profileErr.style.display = 'block'; profileErr.innerText = "يرجى رفع بيان مفصل للمكتب بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (profileEl) profileEl.classList.remove('invalid');
+                    if (profileErr) profileErr.style.display = 'none';
+                }
+
+                if (!engListFile || !engListFile.base64) {
+                    if (engListEl) engListEl.classList.add('invalid');
+                    if (engListErr) { engListErr.style.display = 'block'; engListErr.innerText = "يرجى رفع كشف بأسماء المهندسين بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (engListEl) engListEl.classList.remove('invalid');
+                    if (engListErr) engListErr.style.display = 'none';
+                }
+
+                if (!licensesFile || !licensesFile.base64) {
+                    if (licensesEl) licensesEl.classList.add('invalid');
+                    if (licensesErr) { licensesErr.style.display = 'block'; licensesErr.innerText = "يرجى رفع رخص مزاولة المهن الهندسية بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (licensesEl) licensesEl.classList.remove('invalid');
+                    if (licensesErr) licensesErr.style.display = 'none';
+                }
+
+                if (!idsResumesFile || !idsResumesFile.base64) {
+                    if (idsResumesEl) idsResumesEl.classList.add('invalid');
+                    if (idsResumesErr) { idsResumesErr.style.display = 'block'; idsResumesErr.innerText = "يرجى رفع بطاقات الهوية والسير الذاتية بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (idsResumesEl) idsResumesEl.classList.remove('invalid');
+                    if (idsResumesErr) idsResumesErr.style.display = 'none';
+                }
             }
 
             if (!isValid) return;
@@ -5713,6 +5804,13 @@
                 const moicName = window.dynamicPdfFiles.moicApproval ? window.dynamicPdfFiles.moicApproval.name : '';
                 const mapsName = window.dynamicPdfFiles.engineeringMaps ? window.dynamicPdfFiles.engineeringMaps.name : '';
                 dynamicSummary = `السجل التجاري: 📄 ${crName} | بيان مفصل للشركة: 📄 ${profileName} | التجهيزات الفنية: 📄 ${techName} | موافقة وزارة الصناعة: 📄 ${moicName} | الخرائط الهندسية: 📄 ${mapsName}`;
+            } else if (['alarm_firefighting_maintenance_offices_license', 'License for Alarm & Firefighting Maintenance Offices', 'Alarm & Firefighting Maintenance Offices License', 'technical_and_maintenance_offices_license', 'إصدار الترخيص للمكاتب الفنية ومكاتب صيانة أجهزة الإنذار والإطفاء، وتجديد الترخيص'].includes(key)) {
+                const crName = window.dynamicPdfFiles.commercialRegisterCopy ? window.dynamicPdfFiles.commercialRegisterCopy.name : '';
+                const profileName = window.dynamicPdfFiles.officeDetailedProfile ? window.dynamicPdfFiles.officeDetailedProfile.name : '';
+                const engListName = window.dynamicPdfFiles.engineersListDoc ? window.dynamicPdfFiles.engineersListDoc.name : '';
+                const licensesName = window.dynamicPdfFiles.engineeringPracticeLicenses ? window.dynamicPdfFiles.engineeringPracticeLicenses.name : '';
+                const idsResumesName = window.dynamicPdfFiles.idCardsAndResumes ? window.dynamicPdfFiles.idCardsAndResumes.name : '';
+                dynamicSummary = `السجل التجاري: 📄 ${crName} | بيان مفصل للمكتب: 📄 ${profileName} | كشف بأسماء المهندسين: 📄 ${engListName} | رخص مزاولة المهن الهندسية: 📄 ${licensesName} | بطاقات الهوية والسير الذاتية: 📄 ${idsResumesName}`;
             } else {
                 const genericInput = document.getElementById('app-generic-details');
                 if (genericInput) {
@@ -5987,6 +6085,27 @@
                 dynamicFields.engineeringMaps = window.dynamicPdfFiles.engineeringMaps ? {
                     name: window.dynamicPdfFiles.engineeringMaps.name,
                     base64: window.dynamicPdfFiles.engineeringMaps.base64
+                } : null;
+            } else if (['alarm_firefighting_maintenance_offices_license', 'License for Alarm & Firefighting Maintenance Offices', 'Alarm & Firefighting Maintenance Offices License', 'technical_and_maintenance_offices_license', 'إصدار الترخيص للمكاتب الفنية ومكاتب صيانة أجهزة الإنذار والإطفاء، وتجديد الترخيص'].includes(key)) {
+                dynamicFields.commercialRegisterCopy = window.dynamicPdfFiles.commercialRegisterCopy ? {
+                    name: window.dynamicPdfFiles.commercialRegisterCopy.name,
+                    base64: window.dynamicPdfFiles.commercialRegisterCopy.base64
+                } : null;
+                dynamicFields.officeDetailedProfile = window.dynamicPdfFiles.officeDetailedProfile ? {
+                    name: window.dynamicPdfFiles.officeDetailedProfile.name,
+                    base64: window.dynamicPdfFiles.officeDetailedProfile.base64
+                } : null;
+                dynamicFields.engineersListDoc = window.dynamicPdfFiles.engineersListDoc ? {
+                    name: window.dynamicPdfFiles.engineersListDoc.name,
+                    base64: window.dynamicPdfFiles.engineersListDoc.base64
+                } : null;
+                dynamicFields.engineeringPracticeLicenses = window.dynamicPdfFiles.engineeringPracticeLicenses ? {
+                    name: window.dynamicPdfFiles.engineeringPracticeLicenses.name,
+                    base64: window.dynamicPdfFiles.engineeringPracticeLicenses.base64
+                } : null;
+                dynamicFields.idCardsAndResumes = window.dynamicPdfFiles.idCardsAndResumes ? {
+                    name: window.dynamicPdfFiles.idCardsAndResumes.name,
+                    base64: window.dynamicPdfFiles.idCardsAndResumes.base64
                 } : null;
             } else {
                 const genericInput = document.getElementById('app-generic-details');

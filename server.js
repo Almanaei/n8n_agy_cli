@@ -1456,7 +1456,45 @@ function formatDynamicFields(serviceInput, dynamicFields) {
       if (dynamicFields.brandName) parts.push(`العلامة التجارية: ${dynamicFields.brandName}`);
       break;
 
+    case 'alarm_firefighting_maintenance_offices_license':
     case 'technical_and_maintenance_offices_license':
+    case 'License for Alarm & Firefighting Maintenance Offices':
+    case 'Alarm & Firefighting Maintenance Offices License':
+    case 'إصدار الترخيص للمكاتب الفنية ومكاتب صيانة أجهزة الإنذار والإطفاء، وتجديد الترخيص':
+      if (dynamicFields.commercialRegisterCopy) {
+        const doc = typeof dynamicFields.commercialRegisterCopy === 'object'
+          ? (dynamicFields.commercialRegisterCopy.name || dynamicFields.commercialRegisterCopy.url || 'مرفق السجل التجاري')
+          : dynamicFields.commercialRegisterCopy;
+        parts.push(`السجل التجاري: ${doc}`);
+      }
+      if (dynamicFields.officeDetailedProfile) {
+        const doc = typeof dynamicFields.officeDetailedProfile === 'object'
+          ? (dynamicFields.officeDetailedProfile.name || dynamicFields.officeDetailedProfile.url || 'مرفق بيان مفصل للمكتب')
+          : dynamicFields.officeDetailedProfile;
+        parts.push(`بيان مفصل للمكتب: ${doc}`);
+      }
+      if (dynamicFields.engineersListDoc) {
+        const doc = typeof dynamicFields.engineersListDoc === 'object'
+          ? (dynamicFields.engineersListDoc.name || dynamicFields.engineersListDoc.url || 'مرفق كشف بأسماء المهندسين')
+          : dynamicFields.engineersListDoc;
+        parts.push(`كشف بأسماء المهندسين: ${doc}`);
+      }
+      if (dynamicFields.engineeringPracticeLicenses) {
+        const doc = typeof dynamicFields.engineeringPracticeLicenses === 'object'
+          ? (dynamicFields.engineeringPracticeLicenses.name || dynamicFields.engineeringPracticeLicenses.url || 'مرفق رخص مزاولة المهن الهندسية')
+          : dynamicFields.engineeringPracticeLicenses;
+        parts.push(`رخص مزاولة المهن الهندسية: ${doc}`);
+      }
+      if (dynamicFields.idCardsAndResumes) {
+        const doc = typeof dynamicFields.idCardsAndResumes === 'object'
+          ? (dynamicFields.idCardsAndResumes.name || dynamicFields.idCardsAndResumes.url || 'مرفق بطاقات الهوية والسير الذاتية')
+          : dynamicFields.idCardsAndResumes;
+        parts.push(`بطاقات الهوية والسير الذاتية: ${doc}`);
+      }
+      if (dynamicFields.officeName) parts.push(`اسم المكتب: ${dynamicFields.officeName}`);
+      if (dynamicFields.commercialCR) parts.push(`رقم السجل التجاري: ${dynamicFields.commercialCR}`);
+      break;
+
     case 'gas_fuel_hazmat_consulting_offices_license':
     case 'engineering_offices_fire_safety_design':
       if (dynamicFields.officeName) parts.push(`اسم المكتب: ${dynamicFields.officeName}`);
