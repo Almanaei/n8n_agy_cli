@@ -1099,18 +1099,21 @@ function formatDynamicFields(serviceInput, dynamicFields) {
 
     case 'gas_station_license':
     case 'Gas Station License':
+    case 'fuel_gas_station_license':
+    case 'إصدار الترخيص لمحطات تزويد الوقود، وتجديد الترخيص':
+      if (dynamicFields.gasStationApplicantLetter) {
+        const doc = typeof dynamicFields.gasStationApplicantLetter === 'object'
+          ? (dynamicFields.gasStationApplicantLetter.name || dynamicFields.gasStationApplicantLetter.url || 'مرفق رسالة رسمية باسم مقدم الطلب')
+          : dynamicFields.gasStationApplicantLetter;
+        parts.push(`رسالة رسمية باسم مقدم الطلب: ${doc}`);
+      }
       if (dynamicFields.gasStationGovApprovals) {
         const doc = typeof dynamicFields.gasStationGovApprovals === 'object'
           ? (dynamicFields.gasStationGovApprovals.name || dynamicFields.gasStationGovApprovals.url || 'مرفق موافقات الجهات الحكومية')
           : dynamicFields.gasStationGovApprovals;
         parts.push(`موافقات الجهات الحكومية: ${doc}`);
       }
-      if (dynamicFields.gasStationApplicantLetter) {
-        const doc = typeof dynamicFields.gasStationApplicantLetter === 'object'
-          ? (dynamicFields.gasStationApplicantLetter.name || dynamicFields.gasStationApplicantLetter.url || 'مرفق رسالة رسمية باسم مقدم الطلب')
-          : dynamicFields.gasStationApplicantLetter;
-        parts.push(`رسالة رسمية باسم مقدم الطلب: ${doc}`);
-      } else if (dynamicFields.stationCapacity) {
+      if (dynamicFields.stationCapacity) {
         parts.push(`سعة خزانات الوقود: ${dynamicFields.stationCapacity} لتر`);
       }
       break;
