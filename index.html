@@ -4484,6 +4484,14 @@
                         <div id="heavy-driving-course-letter-error" class="form-error" style="display: none;">يرجى رفع رسالة تتضمن تفاصيل الدورة بصيغة PDF.</div>
                     </div>
                 `;
+            } else if (['building_evacuation_training', 'Building & Facility Evacuation Operations Training', 'Building Evacuation Training', 'التدريب على عمليات إخلاء المباني والمنشآت'].includes(key)) {
+                container.innerHTML = `
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-evacuation-applicant-letter">رسالة من جهة صاحب الطلب (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-evacuation-applicant-letter" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'applicantEntityLetter')" required>
+                        <div id="evacuation-applicant-letter-error" class="form-error" style="display: none;">يرجى رفع رسالة من جهة صاحب الطلب بصيغة PDF.</div>
+                    </div>
+                `;
             } else if (['trainee_registration', 'Trainee Registration'].includes(key)) {
                 container.innerHTML = `
                     <div class="form-group" style="margin-bottom: 14px;">
@@ -4932,6 +4940,19 @@
                     if (courseLetterEl) courseLetterEl.classList.remove('invalid');
                     if (courseLetterErr) courseLetterErr.style.display = 'none';
                 }
+            } else if (['building_evacuation_training', 'Building & Facility Evacuation Operations Training', 'Building Evacuation Training', 'التدريب على عمليات إخلاء المباني والمنشآت'].includes(key)) {
+                const appLetterFile = window.dynamicPdfFiles.applicantEntityLetter || window.dynamicPdfFiles.requestingEntityLetter || window.dynamicPdfFiles.trainingOfficialLetter;
+                const appLetterEl = document.getElementById('app-evacuation-applicant-letter');
+                const appLetterErr = document.getElementById('evacuation-applicant-letter-error');
+
+                if (!appLetterFile || !appLetterFile.base64) {
+                    if (appLetterEl) appLetterEl.classList.add('invalid');
+                    if (appLetterErr) { appLetterErr.style.display = 'block'; appLetterErr.innerText = "يرجى رفع رسالة من جهة صاحب الطلب بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (appLetterEl) appLetterEl.classList.remove('invalid');
+                    if (appLetterErr) appLetterErr.style.display = 'none';
+                }
             } else if (['trainee_registration', 'Trainee Registration'].includes(key)) {
                 const letterFile = window.dynamicPdfFiles.trainingOfficialLetter;
                 const accredFile = window.dynamicPdfFiles.trainingAccreditations;
@@ -5369,6 +5390,10 @@
                 const courseLetter = window.dynamicPdfFiles.courseDetailsLetter || window.dynamicPdfFiles.trainingOfficialLetter;
                 const letterName = courseLetter ? courseLetter.name : '';
                 dynamicSummary = `رسالة تفاصيل الدورة (النوع، اللغة، المدة، عدد المشاركين): 📄 ${letterName}`;
+            } else if (['building_evacuation_training', 'Building & Facility Evacuation Operations Training', 'Building Evacuation Training', 'التدريب على عمليات إخلاء المباني والمنشآت'].includes(key)) {
+                const appLetter = window.dynamicPdfFiles.applicantEntityLetter || window.dynamicPdfFiles.requestingEntityLetter || window.dynamicPdfFiles.trainingOfficialLetter;
+                const letterName = appLetter ? appLetter.name : '';
+                dynamicSummary = `رسالة من جهة صاحب الطلب: 📄 ${letterName}`;
             } else if (['trainee_registration', 'Trainee Registration'].includes(key)) {
                 const letterName = window.dynamicPdfFiles.trainingOfficialLetter ? window.dynamicPdfFiles.trainingOfficialLetter.name : '';
                 const accredName = window.dynamicPdfFiles.trainingAccreditations ? window.dynamicPdfFiles.trainingAccreditations.name : '';
@@ -5503,6 +5528,12 @@
             } else if (['heavy_fire_vehicle_driving_training', 'heavy_fire_vehicle_driving_training_2weeks', 'Heavy Firefighting Vehicle Driving Training Certificate (2 Weeks)', 'إصدار شهادة تدريب أفراد منشآت ومؤسسات القطاع الخاص على قيادة مركبات الإطفاء الثقيلة لمدة أسبوعين'].includes(key)) {
                 const fileObj = window.dynamicPdfFiles.courseDetailsLetter || window.dynamicPdfFiles.trainingOfficialLetter;
                 dynamicFields.courseDetailsLetter = fileObj ? {
+                    name: fileObj.name,
+                    base64: fileObj.base64
+                } : null;
+            } else if (['building_evacuation_training', 'Building & Facility Evacuation Operations Training', 'Building Evacuation Training', 'التدريب على عمليات إخلاء المباني والمنشآت'].includes(key)) {
+                const fileObj = window.dynamicPdfFiles.applicantEntityLetter || window.dynamicPdfFiles.requestingEntityLetter || window.dynamicPdfFiles.trainingOfficialLetter;
+                dynamicFields.applicantEntityLetter = fileObj ? {
                     name: fileObj.name,
                     base64: fileObj.base64
                 } : null;

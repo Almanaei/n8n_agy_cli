@@ -958,6 +958,21 @@ function formatDynamicFields(serviceInput, dynamicFields) {
       }
       break;
 
+    case 'building_evacuation_training':
+    case 'Building & Facility Evacuation Operations Training':
+    case 'Building Evacuation Training':
+    case 'التدريب على عمليات إخلاء المباني والمنشآت':
+      if (dynamicFields.applicantEntityLetter || dynamicFields.requestingEntityLetter || dynamicFields.trainingOfficialLetter) {
+        const fileObj = dynamicFields.applicantEntityLetter || dynamicFields.requestingEntityLetter || dynamicFields.trainingOfficialLetter;
+        const doc = typeof fileObj === 'object'
+          ? (fileObj.name || fileObj.url || 'مرفق رسالة من جهة صاحب الطلب')
+          : fileObj;
+        parts.push(`رسالة من جهة صاحب الطلب: ${doc}`);
+      }
+      if (dynamicFields.buildingName) parts.push(`اسم المنشأة/المبنى: ${dynamicFields.buildingName}`);
+      if (dynamicFields.traineesCount) parts.push(`عدد المشاركين: ${dynamicFields.traineesCount}`);
+      break;
+
     case 'trainee_registration':
     case 'Trainee Registration':
       if (dynamicFields.trainingOfficialLetter) {
