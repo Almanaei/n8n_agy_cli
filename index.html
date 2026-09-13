@@ -4642,7 +4642,7 @@
                         <div id="worship-arch-plans-error" class="form-error" style="display: none;">يرجى رفع المخططات المعمارية بصيغة PDF.</div>
                     </div>
                 `;
-            } else if (['new_gas_stations_maps_review', 'new_gas_station_maps_study', 'new_fuel_stations_plans_review', 'Review of Maps for New Fuel Stations', 'Review of Building Plans for New Fuel Stations', 'New Fuel Station Building Plans Review', 'دراسة الخرائط لمحطات الوقود الجديدة'].includes(key)) {
+            } else if (['new_gas_stations_maps_review', 'new_gas_station_maps_study', 'new_fuel_stations_plans_review', 'Review of Maps for New Fuel Stations', 'Review of Building Plans for New Fuel Stations', 'New Fuel Station Building Plans Review', 'دراسة الخرائط لمحطات الوقود الجديدة', 'gas_piping_tanks_maps_review', 'gas_piping_tanks_maps_study', 'Review of Maps for Gas Extension Lines & Tanks', 'Gas Extension Lines & Tanks Maps Review', 'Review of Gas Piping and Tanks Plans', 'Gas Piping and Tanks Plans Review', 'دراسة الخرائط على تمديدات الغاز والخزانات'].includes(key)) {
                 container.innerHTML = `
                     <div class="form-group" style="margin-bottom: 14px;">
                         <label class="form-label" for="app-gas-maps-entity-letter">رسالة من الجهة المعنية (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
@@ -5235,7 +5235,7 @@
                     if (archPlansEl) archPlansEl.classList.remove('invalid');
                     if (archPlansErr) archPlansErr.style.display = 'none';
                 }
-            } else if (['new_gas_stations_maps_review', 'new_gas_station_maps_study', 'new_fuel_stations_plans_review', 'Review of Maps for New Fuel Stations', 'Review of Building Plans for New Fuel Stations', 'New Fuel Station Building Plans Review', 'دراسة الخرائط لمحطات الوقود الجديدة'].includes(key)) {
+            } else if (['new_gas_stations_maps_review', 'new_gas_station_maps_study', 'new_fuel_stations_plans_review', 'Review of Maps for New Fuel Stations', 'Review of Building Plans for New Fuel Stations', 'New Fuel Station Building Plans Review', 'دراسة الخرائط لمحطات الوقود الجديدة', 'gas_piping_tanks_maps_review', 'gas_piping_tanks_maps_study', 'Review of Maps for Gas Extension Lines & Tanks', 'Gas Extension Lines & Tanks Maps Review', 'Review of Gas Piping and Tanks Plans', 'Gas Piping and Tanks Plans Review', 'دراسة الخرائط على تمديدات الغاز والخزانات'].includes(key)) {
                 const entityLetterFile = window.dynamicPdfFiles.concernedEntityLetter;
                 const otherApprovalsFile = window.dynamicPdfFiles.otherEntitiesApprovals;
                 const approvedMapsFile = window.dynamicPdfFiles.approvedProjectMaps;
@@ -5371,7 +5371,7 @@
                 const letterName = window.dynamicPdfFiles.entityLetter ? window.dynamicPdfFiles.entityLetter.name : '';
                 const plansName = window.dynamicPdfFiles.architecturalPlans ? window.dynamicPdfFiles.architecturalPlans.name : '';
                 dynamicSummary = `خطاب من الجهة: 📄 ${letterName} | المخططات المعمارية: 📄 ${plansName}`;
-            } else if (['new_gas_stations_maps_review', 'new_gas_station_maps_study', 'new_fuel_stations_plans_review', 'Review of Maps for New Fuel Stations', 'Review of Building Plans for New Fuel Stations', 'New Fuel Station Building Plans Review', 'دراسة الخرائط لمحطات الوقود الجديدة'].includes(key)) {
+            } else if (['new_gas_stations_maps_review', 'new_gas_station_maps_study', 'new_fuel_stations_plans_review', 'Review of Maps for New Fuel Stations', 'Review of Building Plans for New Fuel Stations', 'New Fuel Station Building Plans Review', 'دراسة الخرائط لمحطات الوقود الجديدة', 'gas_piping_tanks_maps_review', 'gas_piping_tanks_maps_study', 'Review of Maps for Gas Extension Lines & Tanks', 'Gas Extension Lines & Tanks Maps Review', 'Review of Gas Piping and Tanks Plans', 'Gas Piping and Tanks Plans Review', 'دراسة الخرائط على تمديدات الغاز والخزانات'].includes(key)) {
                 const letterName = window.dynamicPdfFiles.concernedEntityLetter ? window.dynamicPdfFiles.concernedEntityLetter.name : '';
                 const approvalsName = window.dynamicPdfFiles.otherEntitiesApprovals ? window.dynamicPdfFiles.otherEntitiesApprovals.name : '';
                 const mapsName = window.dynamicPdfFiles.approvedProjectMaps ? window.dynamicPdfFiles.approvedProjectMaps.name : '';
@@ -5559,7 +5559,7 @@
                     name: window.dynamicPdfFiles.architecturalPlans.name,
                     base64: window.dynamicPdfFiles.architecturalPlans.base64
                 } : null;
-            } else if (['new_gas_stations_maps_review', 'new_gas_station_maps_study', 'new_fuel_stations_plans_review', 'Review of Maps for New Fuel Stations', 'Review of Building Plans for New Fuel Stations', 'New Fuel Station Building Plans Review', 'دراسة الخرائط لمحطات الوقود الجديدة'].includes(key)) {
+            } else if (['new_gas_stations_maps_review', 'new_gas_station_maps_study', 'new_fuel_stations_plans_review', 'Review of Maps for New Fuel Stations', 'Review of Building Plans for New Fuel Stations', 'New Fuel Station Building Plans Review', 'دراسة الخرائط لمحطات الوقود الجديدة', 'gas_piping_tanks_maps_review', 'gas_piping_tanks_maps_study', 'Review of Maps for Gas Extension Lines & Tanks', 'Gas Extension Lines & Tanks Maps Review', 'Review of Gas Piping and Tanks Plans', 'Gas Piping and Tanks Plans Review', 'دراسة الخرائط على تمديدات الغاز والخزانات'].includes(key)) {
                 dynamicFields.concernedEntityLetter = window.dynamicPdfFiles.concernedEntityLetter ? {
                     name: window.dynamicPdfFiles.concernedEntityLetter.name,
                     base64: window.dynamicPdfFiles.concernedEntityLetter.base64

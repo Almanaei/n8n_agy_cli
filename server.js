@@ -1227,6 +1227,13 @@ function formatDynamicFields(serviceInput, dynamicFields) {
     case 'Review of Building Plans for New Fuel Stations':
     case 'New Fuel Station Building Plans Review':
     case 'دراسة الخرائط لمحطات الوقود الجديدة':
+    case 'gas_piping_tanks_maps_review':
+    case 'gas_piping_tanks_maps_study':
+    case 'Review of Maps for Gas Extension Lines & Tanks':
+    case 'Gas Extension Lines & Tanks Maps Review':
+    case 'Review of Gas Piping and Tanks Plans':
+    case 'Gas Piping and Tanks Plans Review':
+    case 'دراسة الخرائط على تمديدات الغاز والخزانات':
       if (dynamicFields.concernedEntityLetter) {
         const doc = typeof dynamicFields.concernedEntityLetter === 'object'
           ? (dynamicFields.concernedEntityLetter.name || dynamicFields.concernedEntityLetter.url || 'مرفق رسالة من الجهة المعنية')
