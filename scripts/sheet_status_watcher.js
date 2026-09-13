@@ -132,37 +132,24 @@ async function checkStatusChangesOnce() {
       let shouldNotify = false;
 
       if (!isInitialized) {
-        // Startup scan:
-        // 1. If alertSent matches currentStatus, it was already notified
-        if (alertSent && alertSent.toLowerCase() === currentStatus.toLowerCase()) {
-          shouldNotify = false;
-        } else if (alertSent === 'Yes') {
-          // Legacy row marked 'Yes': notify if created within the last 24 hours and non-initial
-          const rowTime = Date.parse(timestampStr);
-          const isRecent = !isNaN(rowTime) && (now - rowTime < 24 * 60 * 60 * 1000);
-          if (isRecent && !isInitialState) {
-            shouldNotify = true;
-          } else {
-            shouldNotify = false;
-          }
-        } else if (!isInitialState && alertSent.toLowerCase() !== currentStatus.toLowerCase()) {
-          // Status differs from Column O and not initial
+        // Startup scan: purely record initial state without dispatching any historical alerts
+        statusTracker.set(appId, {
+          status: currentStatus,
+          alertSent: alertSent || currentStatus,
+          lastNotified: Date.now()
+        });
+        continue;
+      }
+
+      // Live polling scan (subsequent passes only):
+      if (prev) {
+        if (prev.status.toLowerCase() !== currentStatus.toLowerCase()) {
           shouldNotify = true;
         }
       } else {
-        // Live polling scan (subsequent passes):
-        if (prev) {
-          if (prev.status.toLowerCase() !== currentStatus.toLowerCase()) {
-            shouldNotify = true;
-          } else if (alertSent.toLowerCase() !== currentStatus.toLowerCase() && !isInitialState) {
-            // Sheet was updated externally
-            shouldNotify = true;
-          }
-        } else {
-          // New row detected while server running
-          if (!isInitialState && alertSent.toLowerCase() !== currentStatus.toLowerCase()) {
-            shouldNotify = true;
-          }
+        // Brand new row submitted while server was already running
+        if (!isInitialState && alertSent.toLowerCase() !== currentStatus.toLowerCase()) {
+          shouldNotify = true;
         }
       }
 
@@ -188,7 +175,7 @@ async function checkStatusChangesOnce() {
         const envBase = (process.env.APP_URL || process.env.BASE_URL || process.env.PUBLIC_URL || 'https://bhcdai.com').trim().replace(/\/+$/, '');
         const baseUrl = (!envBase.includes('localhost') && !envBase.includes('127.0.0.1')) ? envBase : 'https://bhcdai.com';
 
-        // 1. Direct High-Priority Email to Customer
+        // 1. Direct High-Priority Email to Customer (Universal Email Policy)
         try {
           const emailRes = await sendUserApplicationStatusEmail({
             appId,
@@ -208,31 +195,7 @@ async function checkStatusChangesOnce() {
           console.error(`[Sheet Status Watcher] ❌ Email dispatch error for ${appId}:`, emailErr.message);
         }
 
-        // 2. Direct Cellular SMS Dispatch for Final Decisions (Approved / Rejected) - Rule 10 Enforcement
-        const sLower = currentStatus.toLowerCase();
-        const isFinalDecision = sLower.includes('approv') || sLower.includes('reject') || sLower.includes('قبول') || sLower.includes('اعتماد') || sLower.includes('رفض');
-
-        if (isFinalDecision && whatsapp) {
-          const statusTextAr = (sLower.includes('approv') || sLower.includes('قبول') || sLower.includes('اعتماد')) ? 'مقبول والمعاملة مكتملة' : 'مرفوض';
-          const trackingUrl = `${baseUrl}/track?id=${appId}`;
-          const smsMsgText = `مرحباً ${firstName || 'عزيزنا المتعامل'}! تم تحديث حالة طلبك رقم (${appId}) لخدمة (${serviceName || 'الدفاع المدني'}) إلى (${statusTextAr}).\nيمكنك متابعة تفاصيل المعاملة مباشرة عبر الرابط التالي:\n${trackingUrl}`;
-
-          try {
-            const { sendDualChannelNotification } = require('../server.js');
-            sendDualChannelNotification({
-              phone: whatsapp,
-              appId: `${appId}_${currentStatus}_${Date.now()}`,
-              trackingLink: trackingUrl,
-              clientName: `${firstName || ''} ${lastName || ''}`.trim() || 'عزيزنا المتعامل',
-              messageText: smsMsgText
-            }).then(res => console.log(`[Sheet Status Watcher] 📱 Final Decision SMS sent for ${appId} (${currentStatus}):`, res))
-              .catch(err => console.error(`[Sheet Status Watcher] ❌ Final Decision SMS error for ${appId}:`, err.message));
-          } catch (smsErr) {
-            console.error(`[Sheet Status Watcher] ❌ SMS Exception for ${appId}:`, smsErr.message);
-          }
-        }
-
-        // 3. Queue update to Google Sheets to mark Alert Sent = currentStatus
+        // Queue update to Google Sheets to mark Alert Sent = currentStatus
         updatesToSheet.push({
           range: `${sheetName}!O${rowNumber}`,
           values: [[currentStatus]]

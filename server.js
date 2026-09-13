@@ -2827,10 +2827,18 @@ async function sendDualChannelNotification({ phone, appId, trackingLink, clientN
   const twilioWhatsAppFrom = process.env.TWILIO_WHATSAPP_FROM || "whatsapp:+14155238886";
   const twilioSmsFrom = process.env.TWILIO_SMS_FROM || "+14155238886";
 
-  const isTest = formattedPhone.includes('000000') || !twilioAccountSid;
-  
+  const isTest = formattedPhone.includes('000000') || 
+    formattedPhone.includes('999999') || 
+    !twilioAccountSid ||
+    (clientName && /^(test|tester|test user|تجربة|اختبار)/i.test(clientName.trim()));
+
   const defaultTextAr = `أهلاً بك ${clientName || 'عزيزنا المتعامل'}! رابط تتبع طلبك رقم (${appId || 'الجديد'}) لدى الدفاع المدني هو:\n${trackingLink}`;
   const messageContent = messageText || defaultTextAr;
+
+  if (isTest) {
+    console.log(`[Notification Engine] 🛑 Test / Simulation detected (${clientName || 'No Name'} / +${formattedPhone}). Skipping live cellular SMS dispatch.`);
+    return { success: true, channel: 'simulated_test', appId, phone: formattedPhone };
+  }
 
   // STEP 1: Attempt Primary Channel (WhatsApp)
   console.log(`[Notification Engine] Dispatching single notification to +${formattedPhone}...`);
