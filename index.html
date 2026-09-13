@@ -4468,7 +4468,15 @@
             const targetItem = window.getServiceItem(service);
             const key = targetItem ? targetItem.id : service;
 
-            if (['trainee_registration', 'trainee_registration_1day', 'trainee_registration_1week', 'heavy_fire_vehicle_driving_training', 'trainee_registration_16weeks', 'Trainee Registration'].includes(key)) {
+            if (['trainee_registration_1day', 'Civil Defense Training Certificate (1 Day)', 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة يوم واحد'].includes(key)) {
+                container.innerHTML = `
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" for="app-training-request-letter">كتاب رسمي من الجهة الطالبة للدورة التدريبية (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
+                        <input type="file" id="app-training-request-letter" class="form-input" accept="application/pdf" onchange="window.handleDynamicPdfSelect(event, 'requestingEntityLetter')" required>
+                        <div id="training-request-letter-error" class="form-error" style="display: none;">يرجى رفع كتاب رسمي من الجهة الطالبة للدورة التدريبية بصيغة PDF.</div>
+                    </div>
+                `;
+            } else if (['trainee_registration', 'trainee_registration_1week', 'heavy_fire_vehicle_driving_training', 'trainee_registration_16weeks', 'Trainee Registration'].includes(key)) {
                 container.innerHTML = `
                     <div class="form-group" style="margin-bottom: 14px;">
                         <label class="form-label" for="app-training-official-letter">خطاب رسمي (نسخة PDF فقط) <span style="color: #ef4444;">*</span></label>
@@ -4890,7 +4898,20 @@
             const targetItem = window.getServiceItem(service);
             const key = targetItem ? targetItem.id : service;
 
-            if (['trainee_registration', 'trainee_registration_1day', 'trainee_registration_1week', 'heavy_fire_vehicle_driving_training', 'trainee_registration_16weeks', 'Trainee Registration'].includes(key)) {
+            if (['trainee_registration_1day', 'Civil Defense Training Certificate (1 Day)', 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة يوم واحد'].includes(key)) {
+                const reqLetterFile = window.dynamicPdfFiles.requestingEntityLetter || window.dynamicPdfFiles.trainingOfficialLetter;
+                const reqLetterEl = document.getElementById('app-training-request-letter');
+                const reqLetterErr = document.getElementById('training-request-letter-error');
+
+                if (!reqLetterFile || !reqLetterFile.base64) {
+                    if (reqLetterEl) reqLetterEl.classList.add('invalid');
+                    if (reqLetterErr) { reqLetterErr.style.display = 'block'; reqLetterErr.innerText = "يرجى رفع كتاب رسمي من الجهة الطالبة للدورة التدريبية بصيغة PDF."; }
+                    isValid = false;
+                } else {
+                    if (reqLetterEl) reqLetterEl.classList.remove('invalid');
+                    if (reqLetterErr) reqLetterErr.style.display = 'none';
+                }
+            } else if (['trainee_registration', 'trainee_registration_1week', 'heavy_fire_vehicle_driving_training', 'trainee_registration_16weeks', 'Trainee Registration'].includes(key)) {
                 const letterFile = window.dynamicPdfFiles.trainingOfficialLetter;
                 const accredFile = window.dynamicPdfFiles.trainingAccreditations;
                 const letterEl = document.getElementById('app-training-official-letter');
@@ -5319,7 +5340,11 @@
 
             const summaryGrid = document.getElementById('summary-grid-el');
             let dynamicSummary = '';
-            if (['trainee_registration', 'trainee_registration_1day', 'trainee_registration_1week', 'heavy_fire_vehicle_driving_training', 'trainee_registration_16weeks', 'Trainee Registration'].includes(key)) {
+            if (['trainee_registration_1day', 'Civil Defense Training Certificate (1 Day)', 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة يوم واحد'].includes(key)) {
+                const reqLetter = window.dynamicPdfFiles.requestingEntityLetter || window.dynamicPdfFiles.trainingOfficialLetter;
+                const letterName = reqLetter ? reqLetter.name : '';
+                dynamicSummary = `كتاب رسمي من الجهة الطالبة للدورة التدريبية: 📄 ${letterName}`;
+            } else if (['trainee_registration', 'trainee_registration_1week', 'heavy_fire_vehicle_driving_training', 'trainee_registration_16weeks', 'Trainee Registration'].includes(key)) {
                 const letterName = window.dynamicPdfFiles.trainingOfficialLetter ? window.dynamicPdfFiles.trainingOfficialLetter.name : '';
                 const accredName = window.dynamicPdfFiles.trainingAccreditations ? window.dynamicPdfFiles.trainingAccreditations.name : '';
                 dynamicSummary = `خطاب رسمي: 📄 ${letterName} | الموافقات/الاعتمادات: 📄 ${accredName}`;
@@ -5444,7 +5469,13 @@
             const notes = notesEl ? notesEl.value.trim() : '';
 
             let dynamicFields = {};
-            if (['trainee_registration', 'trainee_registration_1day', 'trainee_registration_1week', 'heavy_fire_vehicle_driving_training', 'trainee_registration_16weeks', 'Trainee Registration'].includes(key)) {
+            if (['trainee_registration_1day', 'Civil Defense Training Certificate (1 Day)', 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة يوم واحد'].includes(key)) {
+                const reqFile = window.dynamicPdfFiles.requestingEntityLetter || window.dynamicPdfFiles.trainingOfficialLetter;
+                dynamicFields.requestingEntityLetter = reqFile ? {
+                    name: reqFile.name,
+                    base64: reqFile.base64
+                } : null;
+            } else if (['trainee_registration', 'trainee_registration_1week', 'heavy_fire_vehicle_driving_training', 'trainee_registration_16weeks', 'Trainee Registration'].includes(key)) {
                 dynamicFields.trainingOfficialLetter = window.dynamicPdfFiles.trainingOfficialLetter ? {
                     name: window.dynamicPdfFiles.trainingOfficialLetter.name,
                     base64: window.dynamicPdfFiles.trainingOfficialLetter.base64

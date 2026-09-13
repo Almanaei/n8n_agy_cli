@@ -915,8 +915,24 @@ function formatDynamicFields(serviceInput, dynamicFields) {
   const parts = [];
 
   switch (svcId) {
-    case 'trainee_registration':
     case 'trainee_registration_1day':
+    case 'Civil Defense Training Certificate (1 Day)':
+    case 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة يوم واحد':
+      if (dynamicFields.requestingEntityLetter || dynamicFields.trainingOfficialLetter) {
+        const fileObj = dynamicFields.requestingEntityLetter || dynamicFields.trainingOfficialLetter;
+        const doc = typeof fileObj === 'object'
+          ? (fileObj.name || fileObj.url || 'مرفق كتاب رسمي من الجهة الطالبة')
+          : fileObj;
+        parts.push(`كتاب رسمي من الجهة الطالبة للدورة التدريبية: ${doc}`);
+      }
+      if (Array.isArray(dynamicFields.trainees)) {
+        parts.push(`المتدربون: ${dynamicFields.trainees.join(', ')}`);
+      } else if (dynamicFields.trainees) {
+        parts.push(`المتدربون: ${dynamicFields.trainees}`);
+      }
+      break;
+
+    case 'trainee_registration':
     case 'trainee_registration_1week':
     case 'heavy_fire_vehicle_driving_training':
     case 'trainee_registration_16weeks':
