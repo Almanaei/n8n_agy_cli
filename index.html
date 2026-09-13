@@ -5980,6 +5980,7 @@
                 dynamicFields.maintenanceContract = window.dynamicPdfFiles.maintenanceContract ? {
                     name: window.dynamicPdfFiles.maintenanceContract.name,
                     base64: window.dynamicPdfFiles.maintenanceContract.base64
+                } : null;
             } else if (['hazardous_material_permit', 'Hazardous Material Permit', 'Chemical & Hazardous Material Storage NOC Permit', 'إصدار ترخيص عدم ممانعة لتخزين مواد كيميائية أو المتفجرات، وتجديد الترخيص'].includes(key)) {
                 const matNameEl = document.getElementById('app-hazmat-materials-name');
                 dynamicFields.materialsScientificName = matNameEl ? matNameEl.value.trim() : '';
