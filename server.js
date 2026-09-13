@@ -1158,7 +1158,23 @@ function formatDynamicFields(serviceInput, dynamicFields) {
       break;
 
     case 'residential_complexes_maps_license':
+    case 'residential_compounds_plans_license':
+    case 'Residential Complexes Maps License (10+ Villas)':
     case 'Residential Complexes Blueprint License':
+    case 'Residential Compound Plans Permit (10+ Villas)':
+    case 'إصدار ترخيص خرائط المجمعات السكنية التي تحتوي على عشر فلل فأكثر':
+      if (dynamicFields.engineeringOfficeLetter) {
+        const doc = typeof dynamicFields.engineeringOfficeLetter === 'object'
+          ? (dynamicFields.engineeringOfficeLetter.name || dynamicFields.engineeringOfficeLetter.url || 'مرفق رسالة المكتب الهندسي')
+          : dynamicFields.engineeringOfficeLetter;
+        parts.push(`رسالة المكتب الهندسي: ${doc}`);
+      }
+      if (dynamicFields.projectEngineeringDrawings) {
+        const doc = typeof dynamicFields.projectEngineeringDrawings === 'object'
+          ? (dynamicFields.projectEngineeringDrawings.name || dynamicFields.projectEngineeringDrawings.url || 'مرفق الرسومات الهندسية للمشروع')
+          : dynamicFields.projectEngineeringDrawings;
+        parts.push(`الرسومات الهندسية للمشروع: ${doc}`);
+      }
       if (dynamicFields.blueprintNumber) parts.push(`رقم المخطط: ${dynamicFields.blueprintNumber}`);
       if (dynamicFields.villasCount || dynamicFields.unitsCount) parts.push(`عدد الفلل: ${dynamicFields.villasCount || dynamicFields.unitsCount}`);
       if (dynamicFields.complexName) parts.push(`اسم المجمع: ${dynamicFields.complexName}`);
