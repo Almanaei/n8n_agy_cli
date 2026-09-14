@@ -354,8 +354,7 @@ async function sendAdminApplicationNotification(appData) {
  */
 async function sendUserApplicationStatusEmail(appData) {
   const envBase = (process.env.APP_URL || process.env.BASE_URL || process.env.PUBLIC_URL || 'https://bhcdai.com').trim().replace(/\/+$/, '');
-  const baseUrl = (!envBase.includes('localhost') && !envBase.includes('127.0.0.1')) ? envBase : 'https://bhcdai.com';
-  const userEmail = appData.email || appData.userEmail || process.env.ADMIN_EMAIL || 'support@bhcdai.com';
+  const userEmail = (appData.email || appData.userEmail || '').trim();
   const appId = appData.appId || 'APP-UNKNOWN';
   const serviceName = appData.serviceName || 'خدمة الدفاع المدني';
   const clientName = `${appData.firstName || ''} ${appData.lastName || ''}`.trim() || appData.clientName || 'عزيزنا المتعامل';
@@ -363,6 +362,17 @@ async function sendUserApplicationStatusEmail(appData) {
   const certificateLink = `${baseUrl}/receipt?id=${appId}`;
   const status = appData.status || 'Modification Requested';
   const reason = appData.reason || appData.modificationDetails || '';
+
+  const isTest = !userEmail || 
+    userEmail.includes('example.com') || 
+    userEmail.includes('test.com') || 
+    userEmail.includes('dummy') ||
+    /^(test|tester|test user|تجربة|اختبار)/i.test(clientName);
+
+  if (isTest) {
+    console.log(`[User Email Engine] 🛑 Test / Simulation detected (${clientName} / <${userEmail}>). Skipping live email dispatch.`);
+    return { status: 'skipped_test', recipient: userEmail, appId };
+  }
 
   let subject = '';
   let badgeColor = '';

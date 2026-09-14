@@ -5074,15 +5074,7 @@ setInterval(() => {
 
 if (require.main === module) {
   server.listen(3000, () => {
-    console.log('Test server running at http://localhost:3000');
-    
-    // Real-Time Google Sheets Status Change Monitor & Immediate Customer Email Dispatcher
-    try {
-      const { startSheetStatusWatcher } = require('./scripts/sheet_status_watcher');
-      startSheetStatusWatcher(10000); // Check sheet every 10 seconds for Column M changes
-    } catch (err) {
-      console.error('[Server] Failed to initialize Real-Time Sheet Status Watcher:', err);
-    }
+    console.log('Production server running at http://localhost:3000');
   });
 }
 
