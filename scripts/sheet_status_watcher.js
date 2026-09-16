@@ -36,40 +36,10 @@ const statusTracker = new Map();
 let isInitialized = false;
 let isPolling = false;
 
-function generateGoogleAccessToken(clientEmail, privateKey, scopes) {
-  const header = { alg: "RS256", typ: "JWT" };
-  const now = Math.floor(Date.now() / 1000);
-  const claim = {
-    iss: clientEmail,
-    scope: scopes.join(" "),
-    aud: "https://oauth2.googleapis.com/token",
-    exp: now + 3600,
-    iat: now
-  };
-  
-  const base64Header = Buffer.from(JSON.stringify(header)).toString('base64url');
-  const base64Claim = Buffer.from(JSON.stringify(claim)).toString('base64url');
-  
-  const sign = crypto.createSign('RSA-SHA256');
-  sign.update(`${base64Header}.${base64Claim}`);
-  const signature = sign.sign(privateKey, 'base64url');
-  
-  return `${base64Header}.${base64Claim}.${signature}`;
-}
+const { getCachedGoogleAccessToken, generateGoogleAccessToken } = require('../src/services/google_sheets_client');
 
 async function getGoogleSheetsAccessToken() {
-  const jwt = generateGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
-  const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-      assertion: jwt
-    })
-  });
-  if (!tokenRes.ok) throw new Error("Google OAuth2 token exchange failed: " + tokenRes.statusText);
-  const tokenData = await tokenRes.json();
-  return tokenData.access_token;
+  return await getCachedGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
 }
 
 /**

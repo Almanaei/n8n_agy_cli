@@ -182,6 +182,7 @@
       ],
       "id": "email-send-id",
       "name": "Send Transcript Email",
+      "disabled": true,
       "webhookId": "1d1dc155-9c1c-471e-89a5-0a653c506e96",
       "credentials": {
         "smtp": {

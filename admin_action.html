@@ -244,58 +244,102 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
         }
 
-        /* Action Buttons */
+        /* Professional Executive Action Buttons */
         .actions-bar {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 12px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 10px;
         }
 
         .btn-action {
-            padding: 14px 20px;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 0.95rem;
+            padding: 11px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.88rem;
             cursor: pointer;
-            border: none;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            transition: all 0.2s ease;
+            transition: all 0.15s ease-in-out;
+            text-decoration: none;
+            letter-spacing: 0.2px;
+        }
+
+        .btn-under-review {
+            background: #0f172a;
+            border: 1px solid #3b82f6;
+            color: #93c5fd;
+        }
+
+        .btn-under-review:hover {
+            background: #1e3a8a;
+            border-color: #60a5fa;
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+        .btn-in-progress {
+            background: #0f172a;
+            border: 1px solid #6366f1;
+            color: #c7d2fe;
+        }
+
+        .btn-in-progress:hover {
+            background: #3730a3;
+            border-color: #818cf8;
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+        .btn-under-inspection {
+            background: #0f172a;
+            border: 1px solid #0d9488;
+            color: #5eead4;
+        }
+
+        .btn-under-inspection:hover {
+            background: #115e59;
+            border-color: #2dd4bf;
+            color: #ffffff;
+            transform: translateY(-1px);
         }
 
         .btn-request-mod {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: #ffffff;
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+            background: #0f172a;
+            border: 1px solid #d97706;
+            color: #fcd34d;
         }
 
         .btn-request-mod:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
+            background: #78350f;
+            border-color: #f59e0b;
+            color: #ffffff;
+            transform: translateY(-1px);
         }
 
         .btn-approve {
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: #065f46;
+            border: 1px solid #059669;
             color: #ffffff;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
 
         .btn-approve:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+            background: #047857;
+            border-color: #10b981;
+            transform: translateY(-1px);
         }
 
         .btn-reject {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
+            background: #7f1d1d;
+            border: 1px solid #991b1b;
             color: #ffffff;
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
         }
 
         .btn-reject:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+            background: #991b1b;
+            border-color: #ef4444;
+            transform: translateY(-1px);
         }
 
         .status-badge {
@@ -450,19 +494,55 @@
             <div class="presets-title">نص السبب أو الملاحظات الموجهة للمستخدم:</div>
             <textarea id="action-reason-textarea" class="textarea-reason" placeholder="اكتب تفاصيل التعديل أو سبب القرار هنا...">{{EXISTING_ADMIN_NOTE}}</textarea>
 
-            <!-- Actions Bar -->
-            <div class="actions-bar">
-                <button class="btn-action btn-request-mod" onclick="executeAdminAction('request_modification')">
-                    <span>⚠️ طلب تعديل من العميل</span>
-                </button>
+            <!-- Actions Bar Groups -->
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+                <!-- 1. Operational Processing Stages -->
+                <div>
+                    <div style="font-size: 0.86rem; font-weight: 700; color: #94a3b8; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                        <span>🔄</span>
+                        <span>المراحل التشغيلية وقيد الإجراء (Operational Stages):</span>
+                    </div>
+                    <div class="actions-bar">
+                        <button class="btn-action btn-under-review" onclick="executeAdminAction('under_review')">
+                            <span>🔍 قيد المراجعة والتدقيق (Under Review)</span>
+                        </button>
+                        <button class="btn-action btn-in-progress" onclick="executeAdminAction('in_progress')">
+                            <span>⚙️ قيد المعالجة والإجراء (In Progress)</span>
+                        </button>
+                        <button class="btn-action btn-under-inspection" onclick="executeAdminAction('under_inspection')">
+                            <span>🚒 قيد المعاينة الميدانية (Under Inspection)</span>
+                        </button>
+                    </div>
+                </div>
 
-                <button class="btn-action btn-approve" onclick="executeAdminAction('approve')">
-                    <span>✅ اعتماد الطلب (مقبول)</span>
-                </button>
+                <!-- 2. Customer Action Required -->
+                <div>
+                    <div style="font-size: 0.86rem; font-weight: 700; color: #94a3b8; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                        <span>👤</span>
+                        <span>إجراءات استكمال العميل (Customer Action):</span>
+                    </div>
+                    <div class="actions-bar">
+                        <button class="btn-action btn-request-mod" onclick="executeAdminAction('request_modification')">
+                            <span>⚠️ طلب استكمال وتعديل من المتعامل (Modification Requested)</span>
+                        </button>
+                    </div>
+                </div>
 
-                <button class="btn-action btn-reject" onclick="executeAdminAction('reject')">
-                    <span>❌ رفض الطلب (مرفوض)</span>
-                </button>
+                <!-- 3. Final Decisions -->
+                <div>
+                    <div style="font-size: 0.86rem; font-weight: 700; color: #94a3b8; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                        <span>🏁</span>
+                        <span>القرار النهائي للطلب (Final Decisions):</span>
+                    </div>
+                    <div class="actions-bar">
+                        <button class="btn-action btn-approve" onclick="executeAdminAction('approve')">
+                            <span>✅ اعتماد وقبول المعاملة (Approved)</span>
+                        </button>
+                        <button class="btn-action btn-reject" onclick="executeAdminAction('reject')">
+                            <span>❌ رفض المعاملة (Rejected)</span>
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <div id="alert-success-msg" class="alert-success">
@@ -493,6 +573,14 @@
             const alertMsg = document.getElementById('alert-success-msg');
             alertMsg.style.display = 'none';
 
+            let actionNameAr = actionType;
+            if (actionType === 'under_review') actionNameAr = 'قيد المراجعة والتدقيق (Under Review)';
+            else if (actionType === 'in_progress') actionNameAr = 'قيد المعالجة والإجراء (In Progress)';
+            else if (actionType === 'under_inspection') actionNameAr = 'قيد المعاينة الميدانية (Under Inspection)';
+            else if (actionType === 'request_modification') actionNameAr = 'طلب تعديل واستكمال من المتعامل (Modification Requested)';
+            else if (actionType === 'approve') actionNameAr = 'اعتماد وقبول الطلب (Approved)';
+            else if (actionType === 'reject') actionNameAr = 'رفض الطلب (Rejected)';
+
             try {
                 const urlParams = new URLSearchParams(window.location.search);
                 const adminKey = urlParams.get('key') || '';
@@ -511,7 +599,7 @@
 
                 if (res.ok) {
                     alertMsg.style.display = 'block';
-                    alertMsg.textContent = "✓ تم تنفيذ الإجراء (" + actionType + ") بنجاح! تم تحديث شيت جوجل وإشعار العميل.";
+                    alertMsg.textContent = "✓ تم تحديث حالة المعاملة بنجاح إلى: " + actionNameAr + "! تم تحديث شيت جوجل وإشعار المتعامل فوراً.";
                     setTimeout(() => {
                         window.location.reload();
                     }, 2500);

@@ -41,7 +41,7 @@ function createEmailTransporter() {
     secure: secure,
     auth: { user, pass },
     tls: {
-      rejectUnauthorized: false
+      rejectUnauthorized: process.env.SMTP_ALLOW_INSECURE_TLS === 'true' ? false : true
     }
   });
 }
@@ -109,13 +109,6 @@ function cleanUrl(inputUrl, appId, pathType = 'track') {
 
 /**
  * Dispatches an official Admin Alert Email for any Application Lifecycle Status.
- * 
- * Supported Statuses:
- * - 'Submitted' / 'New Application'
- * - 'Modification Resubmitted' / 'User Updated'
- * - 'Modification Requested'
- * - 'Approved'
- * - 'Rejected'
  */
 async function sendAdminApplicationNotification(appData) {
   const envBase = (process.env.APP_URL || process.env.BASE_URL || process.env.PUBLIC_URL || 'https://bhcdai.com').trim().replace(/\/+$/, '');
@@ -136,8 +129,6 @@ async function sendAdminApplicationNotification(appData) {
   if (status === 'Pending' && appData.isNewApplication) status = 'Submitted';
 
   let subject = '';
-  let badgeColor = '';
-  let badgeBorder = '';
   let headerTitle = '';
   let badgeSubtitle = '';
   let highlightSection = '';
@@ -145,160 +136,155 @@ async function sendAdminApplicationNotification(appData) {
   switch (status) {
     case 'Submitted':
     case 'New Application':
-      subject = `⚡ طلب خدمة دفاع مدني جديد: ${appId} - ${clientName}`;
-      badgeColor = 'rgba(56, 189, 248, 0.12)';
-      badgeBorder = '#38BDF8';
-      headerTitle = '⚡ إشعار الإدارة: استلام طلب خدمة جديد';
-      badgeSubtitle = 'تم تسجيل معاملة جديدة في النظام وتحتاج إلى تدقيق ضابط الدفاع المدني المختص.';
+      subject = `طلب خدمة جديد: ${appId} - ${clientName}`;
+      headerTitle = 'استلام طلب خدمة جديد';
+      badgeSubtitle = 'تم تسجيل معاملة جديدة في النظام وتحتاج إلى تدقيق ومراجعة ضابط الدفاع المدني المختص.';
       break;
 
     case 'Modification Resubmitted':
     case 'User Updated':
-      subject = `⚠️ تحديث بيانات ومستندات معاملة: ${appId} - ${clientName}`;
-      badgeColor = 'rgba(245, 158, 11, 0.12)';
-      badgeBorder = '#F59E0B';
-      headerTitle = '⚠️ إشعار الإدارة: رد وتحديث مستندات من المتعامل';
-      badgeSubtitle = 'قام المتعامل بإعادة رفع المخططات وتحديث بيانات المعاملة بناءً على الملاحظات.';
+      subject = `تحديث مستندات وبيانات معاملة: ${appId} - ${clientName}`;
+      headerTitle = 'تحديث مستندات من المتعامل';
+      badgeSubtitle = 'قام المتعامل بإعادة رفع المخططات وتحديث بيانات المعاملة بناءً على الملاحظات السابقة.';
       if (appData.modificationDetails || appData.userModificationResponse || appData.notes) {
         highlightSection = `
-          <div style="background: rgba(30, 41, 59, 0.85); border: 1px solid rgba(245, 158, 11, 0.3); padding: 14px; border-radius: 8px; margin: 16px 0;">
-            <strong style="color: #FBBF24;">ملاحظات ورد المتعامل على التعديل:</strong>
-            <p style="margin: 6px 0 0 0; color: #E2E8F0; line-height: 1.5;">${appData.modificationDetails || appData.userModificationResponse || appData.notes}</p>
+          <div style="background: #1e293b; border-right: 3px solid #3b82f6; padding: 14px 16px; border-radius: 6px; margin: 16px 0;">
+            <div style="font-weight: 600; color: #93c5fd; font-size: 0.88rem; margin-bottom: 4px;">ملاحظات ورد المتعامل:</div>
+            <p style="margin: 0; color: #e2e8f0; font-size: 0.9rem; line-height: 1.5;">${appData.modificationDetails || appData.userModificationResponse || appData.notes}</p>
           </div>
         `;
       }
       break;
 
     case 'Modification Requested':
-      subject = `📋 إشعار بطلب تعديل مستندات: ${appId} - ${clientName}`;
-      badgeColor = 'rgba(234, 179, 8, 0.12)';
-      badgeBorder = '#EAB308';
-      headerTitle = '📋 إشعار الإدارة: تم طلب تعديل مستندات من المتعامل';
-      badgeSubtitle = 'تم إخطار المتعامل بضرورة تعديل المخططات أو استكمال البيانات.';
+      subject = `إشعار بطلب تعديل مستندات: ${appId} - ${clientName}`;
+      headerTitle = 'طلب استكمال / تعديل مستندات';
+      badgeSubtitle = 'تم إخطار المتعامل بضرورة تعديل المخططات أو استكمال البيانات المطلوبة.';
       if (appData.reason || appData.modificationDetails) {
         highlightSection = `
-          <div style="background: rgba(30, 41, 59, 0.85); border: 1px solid rgba(234, 179, 8, 0.3); padding: 14px; border-radius: 8px; margin: 16px 0;">
-            <strong style="color: #FDE047;">الملاحظات والتعليمات المرسلة للمتعامل:</strong>
-            <p style="margin: 6px 0 0 0; color: #E2E8F0; line-height: 1.5;">${appData.reason || appData.modificationDetails}</p>
+          <div style="background: #1e293b; border-right: 3px solid #f59e0b; padding: 14px 16px; border-radius: 6px; margin: 16px 0;">
+            <div style="font-weight: 600; color: #fcd34d; font-size: 0.88rem; margin-bottom: 4px;">الملاحظات والتعليمات المرسلة للمتعامل:</div>
+            <p style="margin: 0; color: #e2e8f0; font-size: 0.9rem; line-height: 1.5;">${appData.reason || appData.modificationDetails}</p>
           </div>
         `;
       }
       break;
 
     case 'Approved':
-      subject = `✅ تم اعتماد المعاملة وإصدار الشهادة: ${appId} - ${clientName}`;
-      badgeColor = 'rgba(34, 197, 94, 0.12)';
-      badgeBorder = '#22C55E';
-      headerTitle = '✅ إشعار الإدارة: تم اعتماد المعاملة وإصدار الشهادة الرسمية';
-      badgeSubtitle = 'تم اعتماد المعاملة بنجاح وتوليد شهادة الاستيفاء والترخيص الإلكتروني بالباركود الذكي (QR Code).';
+      subject = `تم اعتماد المعاملة وإصدار الشهادة: ${appId} - ${clientName}`;
+      headerTitle = 'تم اعتماد المعاملة بنجاح';
+      badgeSubtitle = 'تم استيفاء كافة الاشتراطات واعتماد المعاملة وإصدار شهادة الترخيص الرسمية برمز الاستجابة (QR).';
       highlightSection = `
-        <div style="margin: 20px 0; text-align: center;">
-          <a href="${certificateLink}" target="_blank" style="background: #16A34A; color: #FFFFFF; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 0.95rem; display: inline-block; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);">
-            📜 معاينة وتنزيل شهادة الاعتماد الرسمية (PDF & QR)
+        <div style="margin: 18px 0; text-align: center;">
+          <a href="${certificateLink}" target="_blank" style="background: #059669; color: #ffffff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.92rem; display: inline-block;">
+            معاينة شهادة الاعتماد الرسمية (PDF)
           </a>
         </div>
       `;
       break;
 
     case 'Rejected':
-      subject = `❌ إشعار برفض المعاملة: ${appId} - ${clientName}`;
-      badgeColor = 'rgba(239, 68, 68, 0.12)';
-      badgeBorder = '#EF4444';
-      headerTitle = '❌ إشعار الإدارة: تم رفض المعاملة';
-      badgeSubtitle = 'تم تسجيل قرار عدم الموافقة على الطلب وإشعار المتعامل رسمياً.';
+      subject = `إشعار برفض المعاملة: ${appId} - ${clientName}`;
+      headerTitle = 'تم رفض المعاملة';
+      badgeSubtitle = 'تم تسجيل قرار عدم الموافقة على الطلب وإشعار المتعامل رسمياً بالأسباب.';
       if (appData.reason || appData.modificationDetails) {
         highlightSection = `
-          <div style="background: rgba(30, 41, 59, 0.85); border: 1px solid rgba(239, 68, 68, 0.3); padding: 14px; border-radius: 8px; margin: 16px 0;">
-            <strong style="color: #F87171;">أسباب الرفض المسجلة في القرار:</strong>
-            <p style="margin: 6px 0 0 0; color: #E2E8F0; line-height: 1.5;">${appData.reason || appData.modificationDetails}</p>
+          <div style="background: #1e293b; border-right: 3px solid #ef4444; padding: 14px 16px; border-radius: 6px; margin: 16px 0;">
+            <div style="font-weight: 600; color: #fca5a5; font-size: 0.88rem; margin-bottom: 4px;">أسباب عدم الموافقة المسجلة:</div>
+            <p style="margin: 0; color: #e2e8f0; font-size: 0.9rem; line-height: 1.5;">${appData.reason || appData.modificationDetails}</p>
           </div>
         `;
       }
       break;
 
     default:
-      subject = `📌 تحديث حالة المعاملة: ${appId} (${status})`;
-      badgeColor = 'rgba(148, 163, 184, 0.12)';
-      badgeBorder = '#94A3B8';
-      headerTitle = `📌 إشعار الإدارة: تحديث حالة المعاملة إلى (${status})`;
-      badgeSubtitle = 'تم تحديث حالة المعاملة في قاعدة بيانات الدفاع المدني.';
+      subject = `تحديث حالة المعاملة: ${appId} (${status})`;
+      headerTitle = `تحديث حالة المعاملة إلى (${status})`;
+      badgeSubtitle = 'تم تحديث حالة المعاملة في قاعدة بيانات منصة الدفاع المدني.';
       break;
   }
 
   const htmlBody = `
-    <div dir="rtl" style="font-family: 'Segoe UI', Tahoma, Arial, sans-serif; text-align: right; background-color: #0F172A; color: #F8FAFC; padding: 28px 20px; border-radius: 12px; max-width: 620px; margin: 0 auto; border: 1.5px solid #F59E0B; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
-      <div style="text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 16px; margin-bottom: 20px;">
-        <h2 style="color: #F59E0B; margin: 0 0 6px 0; font-size: 1.35rem;">الإدارة العامة للدفاع المدني - مملكة البحرين</h2>
-        <p style="color: #94A3B8; margin: 0; font-size: 0.85rem; letter-spacing: 0.5px;">GENERAL DIRECTORATE OF CIVIL DEFENSE - ADMIN ALERT</p>
+    <div dir="rtl" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; text-align: right; background-color: #0f172a; color: #f8fafc; padding: 32px 24px; border-radius: 12px; max-width: 580px; margin: 0 auto; border: 1px solid #334155; box-shadow: 0 4px 20px rgba(0,0,0,0.35);">
+      
+      <!-- Institutional Header -->
+      <div style="text-align: center; border-bottom: 1px solid #334155; padding-bottom: 18px; margin-bottom: 22px;">
+        <div style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 4px;">مملكة البحرين - وزارة الداخلية</div>
+        <div style="font-size: 1.25rem; color: #ffffff; font-weight: 700; margin: 0 0 4px 0;">الإدارة العامة للدفاع المدني</div>
+        <div style="font-size: 0.72rem; color: #64748b; letter-spacing: 1px;">GENERAL DIRECTORATE OF CIVIL DEFENSE</div>
       </div>
 
-      <div style="background: ${badgeColor}; border: 1px solid ${badgeBorder}; border-radius: 8px; padding: 14px 18px; margin-bottom: 20px;">
-        <h3 style="color: ${badgeBorder}; margin: 0; font-size: 1.15rem;">${headerTitle}</h3>
-        <p style="color: #E2E8F0; margin: 6px 0 0 0; font-size: 0.9rem;">${badgeSubtitle}</p>
+      <!-- Action Banner -->
+      <div style="background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 16px 18px; margin-bottom: 20px;">
+        <div style="font-size: 1.05rem; font-weight: 700; color: #f8fafc; margin-bottom: 4px;">${headerTitle}</div>
+        <div style="font-size: 0.88rem; color: #94a3b8; line-height: 1.5;">${badgeSubtitle}</div>
       </div>
 
-      <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 0.92rem;">
-        <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-          <td style="padding: 10px 0; color: #94A3B8; width: 140px; font-weight: bold;">رقم المعاملة:</td>
-          <td style="padding: 10px 0; font-weight: bold; color: #38BDF8; font-family: monospace; font-size: 1.05rem;">${appId}</td>
-        </tr>
-        <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-          <td style="padding: 10px 0; color: #94A3B8; font-weight: bold;">نوع الخدمة:</td>
-          <td style="padding: 10px 0; color: #FFFFFF; font-weight: bold;">${serviceName}</td>
-        </tr>
-        <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-          <td style="padding: 10px 0; color: #94A3B8; font-weight: bold;">اسم مقدم الطلب:</td>
-          <td style="padding: 10px 0; color: #FFFFFF;">${clientName}</td>
-        </tr>
-        <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-          <td style="padding: 10px 0; color: #94A3B8; font-weight: bold;">حالة المعاملة:</td>
-          <td style="padding: 10px 0; font-weight: bold; color: ${badgeBorder};">${status}</td>
-        </tr>
-        <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-          <td style="padding: 10px 0; color: #94A3B8; font-weight: bold;">رقم الهاتف:</td>
-          <td style="padding: 10px 0; color: #FFFFFF; direction: ltr; text-align: right;">
-            <a href="tel:+${phone.replace(/[^0-9]/g, '')}" style="color: #38BDF8; text-decoration: none;">+${phone.replace(/[^0-9]/g, '')}</a>
-            <a href="https://wa.me/${phone.replace(/[^0-9]/g, '')}" style="background: #25D366; color: #FFFFFF; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; text-decoration: none; margin-right: 8px; font-weight: bold;">واتساب 💬</a>
-          </td>
-        </tr>
-        <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-          <td style="padding: 10px 0; color: #94A3B8; font-weight: bold;">البريد الإلكتروني:</td>
-          <td style="padding: 10px 0; color: #FFFFFF; direction: ltr; text-align: right;">
-            <a href="mailto:${applicantEmail}" style="color: #38BDF8; text-decoration: none;">${applicantEmail}</a>
-          </td>
-        </tr>
-        ${appData.paymentMethod ? `
-        <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-          <td style="padding: 10px 0; color: #94A3B8; font-weight: bold;">طريقة الدفع:</td>
-          <td style="padding: 10px 0; color: #FFFFFF;">${appData.paymentMethod}</td>
-        </tr>` : ''}
-      </table>
+      <!-- Application Details Table -->
+      <div style="background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 14px 18px; margin-bottom: 20px;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+          <tr style="border-bottom: 1px solid #334155;">
+            <td style="padding: 10px 0; color: #94a3b8; width: 130px; font-weight: 600;">رقم المعاملة:</td>
+            <td style="padding: 10px 0; font-weight: 700; color: #38bdf8; font-family: monospace; font-size: 1rem;">${appId}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #334155;">
+            <td style="padding: 10px 0; color: #94a3b8; font-weight: 600;">نوع الخدمة:</td>
+            <td style="padding: 10px 0; color: #ffffff; font-weight: 600;">${serviceName}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #334155;">
+            <td style="padding: 10px 0; color: #94a3b8; font-weight: 600;">مقدم الطلب:</td>
+            <td style="padding: 10px 0; color: #f8fafc;">${clientName}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #334155;">
+            <td style="padding: 10px 0; color: #94a3b8; font-weight: 600;">الحالة الحالية:</td>
+            <td style="padding: 10px 0; font-weight: 600; color: #f8fafc;">${status}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #334155;">
+            <td style="padding: 10px 0; color: #94a3b8; font-weight: 600;">رقم الهاتف:</td>
+            <td style="padding: 10px 0; color: #f8fafc; direction: ltr; text-align: right;">
+              <a href="tel:+${phone.replace(/[^0-9]/g, '')}" style="color: #38bdf8; text-decoration: none;">+${phone.replace(/[^0-9]/g, '')}</a>
+            </td>
+          </tr>
+          <tr style="border-bottom: 1px solid #334155;">
+            <td style="padding: 10px 0; color: #94a3b8; font-weight: 600;">البريد الإلكتروني:</td>
+            <td style="padding: 10px 0; color: #f8fafc; direction: ltr; text-align: right;">
+              <a href="mailto:${applicantEmail}" style="color: #38bdf8; text-decoration: none;">${applicantEmail}</a>
+            </td>
+          </tr>
+          ${appData.paymentMethod ? `
+          <tr>
+            <td style="padding: 10px 0; color: #94a3b8; font-weight: 600;">طريقة الدفع:</td>
+            <td style="padding: 10px 0; color: #f8fafc;">${appData.paymentMethod}</td>
+          </tr>` : ''}
+        </table>
+      </div>
 
       ${highlightSection}
 
       ${attachmentLink ? `
       <div style="margin: 16px 0; text-align: center;">
-        <a href="${attachmentLink}" target="_blank" style="background: #0284C7; color: #FFFFFF; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 0.9rem; display: inline-block;">
-          📄 معاينة وتنزيل المستند والمخطط المرفوع (PDF)
+        <a href="${attachmentLink}" target="_blank" style="background: #334155; color: #f8fafc; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.88rem; display: inline-block;">
+          معاينة المخططات والمستند المرفق (PDF)
         </a>
       </div>` : ''}
 
-      <div style="margin: 24px 0 10px 0; text-align: center;">
-        <a href="${quickActionLink}" style="background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%); color: #FFFFFF; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 800; font-size: 1rem; display: inline-block; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);">
-          ⚡ فتح صفحة الإجراء السريع والاعتماد للمسؤول
+      <div style="margin: 24px 0 12px 0; text-align: center;">
+        <a href="${quickActionLink}" style="background: #2563eb; color: #ffffff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.95rem; display: inline-block;">
+          فتح بوابة الإجراء السريع والاعتماد
         </a>
       </div>
 
-      <div style="text-align: center; margin-top: 14px;">
-        <a href="${trackingLink}" style="color: #94A3B8; font-size: 0.82rem; text-decoration: underline;">
+      <div style="text-align: center; margin-top: 12px;">
+        <a href="${trackingLink}" style="color: #94a3b8; font-size: 0.82rem; text-decoration: underline;">
           رابط بوابة تتبع المتعامل المباشرة
         </a>
       </div>
 
-      <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 24px 0 14px 0;" />
-      <p style="font-size: 0.78rem; color: #64748B; margin: 0; text-align: center;">
-        هذا إشعار آلي داخلي صادر عن منصة خدمات الدفاع المدني الذكية بمملكة البحرين للمسؤول المعتمد (${adminEmail}).
-      </p>
+      <!-- Institutional Footer -->
+      <div style="border-top: 1px solid #334155; padding-top: 18px; margin-top: 24px; text-align: center; font-size: 0.78rem; color: #64748b; line-height: 1.6;">
+        <p style="margin: 0 0 4px 0; color: #94a3b8; font-weight: 600;">مركز خدمات الدفاع المدني: 17461100 • الطوارئ: 999</p>
+        <p style="margin: 0;">هذا إشعار داخلي رسمي صادر للمسؤول المعتمد (${adminEmail}).</p>
+      </div>
     </div>
   `;
 
@@ -350,10 +336,11 @@ async function sendAdminApplicationNotification(appData) {
 
 /**
  * Dispatches an official Citizen/Applicant Email Notification whenever the application
- * status changes (specifically 'Modification Requested', 'Approved', 'Rejected').
+ * status changes.
  */
 async function sendUserApplicationStatusEmail(appData) {
   const envBase = (process.env.APP_URL || process.env.BASE_URL || process.env.PUBLIC_URL || 'https://bhcdai.com').trim().replace(/\/+$/, '');
+  const baseUrl = (!envBase.includes('localhost') && !envBase.includes('127.0.0.1')) ? envBase : 'https://bhcdai.com';
   const userEmail = (appData.email || appData.userEmail || '').trim();
   const appId = appData.appId || 'APP-UNKNOWN';
   const serviceName = appData.serviceName || 'خدمة الدفاع المدني';
@@ -363,21 +350,20 @@ async function sendUserApplicationStatusEmail(appData) {
   const status = appData.status || 'Modification Requested';
   const reason = appData.reason || appData.modificationDetails || '';
 
-  const isTest = !userEmail || 
-    userEmail.includes('example.com') || 
-    userEmail.includes('test.com') || 
-    userEmail.includes('dummy') ||
-    /^(test|tester|test user|تجربة|اختبار)/i.test(clientName);
+  const isInvalidEmail = !userEmail || 
+    !userEmail.includes('@') ||
+    userEmail.endsWith('@example.com') || 
+    userEmail.endsWith('@test.com') || 
+    userEmail.toLowerCase() === 'dummy@dummy.com';
 
-  if (isTest) {
-    console.log(`[User Email Engine] 🛑 Test / Simulation detected (${clientName} / <${userEmail}>). Skipping live email dispatch.`);
-    return { status: 'skipped_test', recipient: userEmail, appId };
+  if (isInvalidEmail) {
+    console.log(`[User Email Engine] 🛑 Invalid or dummy email address detected (<${userEmail}>). Skipping live email dispatch.`);
+    return { status: 'skipped_invalid_email', recipient: userEmail, appId };
   }
 
   let subject = '';
-  let badgeColor = '';
-  let badgeBorder = '';
   let headerTitle = '';
+  let badgeSubtitle = '';
   let mainActionBtn = '';
   let contentHtml = '';
 
@@ -393,248 +379,207 @@ async function sendUserApplicationStatusEmail(appData) {
   const isRejected = normalizedStatus.includes('reject') || normalizedStatus.includes('رفض') || normalizedStatus.includes('ملغي') || normalizedStatus.includes('غير مستوف');
 
   if (isModRequested && !isModResubmitted) {
-    subject = `⚠️ تحديث عاجل: مطلوب تعديل مستندات طلب رقم ${appId} - الدفاع المدني | Action Required: Modification Requested (${appId})`;
-    badgeColor = 'rgba(245, 158, 11, 0.12)';
-    badgeBorder = '#F59E0B';
-    headerTitle = '⚠️ مطلوب تعديل بيانات / مستندات على طلب الخدمة';
+    subject = `مطلوب استكمال وتعديل مستندات المعاملة رقم ${appId} - الدفاع المدني`;
+    headerTitle = 'مطلوب تعديل واستكمال المستندات';
+    badgeSubtitle = 'يرجى مراجعة الملاحظات الفنية أدناه وإعادة رفع المخططات المطلوبة لاستكمال المعاملة.';
     contentHtml = `
-      <p style="font-size: 1rem; line-height: 1.7; color: #E2E8F0;">
-        تود الإدارة العامة للدفاع المدني بمملكة البحرين إفادتكم بضرورة تعديل المستندات أو استكمال البيانات الخاصة بطلبكم رقم (<strong style="color: #38BDF8;">${appId}</strong>) لخدمة (<strong style="color: #FFFFFF;">${serviceName}</strong>).
+      <p style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; margin-bottom: 16px;">
+        تود الإدارة العامة للدفاع المدني إفادتكم بضرورة تعديل المستندات أو استكمال البيانات الخاصة بطلبكم لخدمة (<strong style="color: #ffffff;">${serviceName}</strong>).
       </p>
-      <div style="background: rgba(30, 41, 59, 0.9); border-right: 4px solid #F59E0B; padding: 16px; border-radius: 8px; margin: 18px 0;">
-        <div style="font-weight: bold; color: #FDE047; font-size: 1rem; margin-bottom: 6px;">
-          ملاحظات الإدارة العامة للدفاع المدني:
+      <div style="background: #1e293b; border-right: 3px solid #f59e0b; padding: 14px 16px; border-radius: 6px; margin: 16px 0;">
+        <div style="font-weight: 600; color: #fcd34d; font-size: 0.88rem; margin-bottom: 4px;">
+          ملاحظات وتوجيهات الإدارة:
         </div>
-        <div style="color: #FFFFFF; font-size: 0.95rem; line-height: 1.6;">
-          ${reason || 'يرجى مراجعة صفحة المتابعة لمراجعة الملاحظات'}
+        <div style="color: #ffffff; font-size: 0.9rem; line-height: 1.6;">
+          ${reason || 'يرجى الدخول إلى صفحة المتابعة للاطلاع على النواقص والتعديلات المطلوبة.'}
         </div>
       </div>
-      <p style="font-size: 0.95rem; color: #CBD5E1; line-height: 1.6;">
-        بإمكانك مراجعة كافة بيانات الطلب وإعادة إرفاق المخططات المطلوبة فوراً عبر الضغط على الزر أدناه دون الحاجة لتقديم طلب جديد:
+      <p style="font-size: 0.88rem; color: #94a3b8; line-height: 1.6;">
+        يمكنكم تحديث المخططات والمستندات مباشرة عبر الرابط أدناه دون الحاجة لتقديم طلب جديد:
       </p>
     `;
     mainActionBtn = `
-      <div style="margin: 26px 0; text-align: center;">
-        <a href="${trackingLink}" target="_blank" style="background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%); color: #FFFFFF; padding: 14px 32px; border-radius: 50px; text-decoration: none; font-weight: 800; font-size: 1rem; display: inline-block; box-shadow: 0 4px 18px rgba(2, 132, 199, 0.45); border: 1px solid rgba(56, 189, 248, 0.4);">
-          ✏️ اضغط هنا لتعديل وإعادة رفع المستندات فوراً
+      <div style="margin: 22px 0 16px 0; text-align: center;">
+        <a href="${trackingLink}" target="_blank" style="background: #2563eb; color: #ffffff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.92rem; display: inline-block;">
+          تعديل وإعادة رفع المستندات الآن
         </a>
       </div>
     `;
   } else if (isUnderReview) {
-    subject = `🔍 تحديث حالة طلب الخدمة رقم ${appId} - قيد المراجعة والتدقيق الفني | Status: Under Review (${appId})`;
-    badgeColor = 'rgba(2, 132, 199, 0.12)';
-    badgeBorder = '#0284C7';
-    headerTitle = '🔍 طلبكم قيد المراجعة والتدقيق الفني لدى المختصين';
+    subject = `تحديث حالة المعاملة رقم ${appId}: قيد المراجعة والتدقيق الفني - الدفاع المدني`;
+    headerTitle = 'المعاملة قيد المراجعة والتدقيق الفني';
+    badgeSubtitle = 'يجري حالياً دراسة المخططات والبيانات المرفقة من قبل المهندسين والمختصين.';
     contentHtml = `
-      <p style="font-size: 1rem; line-height: 1.7; color: #E2E8F0;">
-        تود الإدارة العامة للدفاع المدني إفادتكم بأن طلبكم رقم (<strong style="color: #38BDF8;">${appId}</strong>) لخدمة (<strong style="color: #FFFFFF;">${serviceName}</strong>) قد تم تحويله إلى مرحلة: <strong style="color: #38BDF8;">قيد المراجعة والتدقيق الفني (Under Review)</strong>.
-      </p>
-      <p style="font-size: 0.95rem; color: #CBD5E1; line-height: 1.6;">
-        يقوم المهندسون والمختصون حالياً بدراسة المخططات والبيانات المرفقة للتحقق من استيفاء كافة اشتراطات ومعايير السلامة والوقاية من الحريق.
+      <p style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; margin-bottom: 16px;">
+        نفيدكم بأن معاملتكم رقم (<strong style="color: #38bdf8; font-family: monospace;">${appId}</strong>) لخدمة (<strong style="color: #ffffff;">${serviceName}</strong>) قيد التدقيق الهندسي والفني للتحقق من استيفاء اشتراطات السلامة والوقاية من الحريق.
       </p>
       ${reason ? `
-      <div style="background: rgba(30, 41, 59, 0.9); border-right: 4px solid #0284C7; padding: 16px; border-radius: 8px; margin: 18px 0;">
-        <div style="font-weight: bold; color: #38BDF8; font-size: 1rem; margin-bottom: 6px;">
-          ملاحظات قسم التدقيق الفني:
-        </div>
-        <div style="color: #FFFFFF; font-size: 0.95rem; line-height: 1.6;">
-          ${reason}
-        </div>
+      <div style="background: #1e293b; border-right: 3px solid #3b82f6; padding: 14px 16px; border-radius: 6px; margin: 16px 0;">
+        <div style="font-weight: 600; color: #93c5fd; font-size: 0.88rem; margin-bottom: 4px;">ملاحظات التدقيق الفني:</div>
+        <div style="color: #ffffff; font-size: 0.9rem; line-height: 1.6;">${reason}</div>
       </div>` : ''}
     `;
     mainActionBtn = `
-      <div style="margin: 26px 0; text-align: center;">
-        <a href="${trackingLink}" target="_blank" style="background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%); color: #FFFFFF; padding: 14px 32px; border-radius: 50px; text-decoration: none; font-weight: 800; font-size: 1rem; display: inline-block; box-shadow: 0 4px 18px rgba(2, 132, 199, 0.45); border: 1px solid rgba(56, 189, 248, 0.4);">
-          🔍 متابعة وتتبع حالة المعاملة
+      <div style="margin: 22px 0 16px 0; text-align: center;">
+        <a href="${trackingLink}" target="_blank" style="background: #2563eb; color: #ffffff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.92rem; display: inline-block;">
+          متابعة وتتبع حالة المعاملة
         </a>
       </div>
     `;
   } else if (isInProgress) {
-    subject = `⚙️ تحديث حالة طلب الخدمة رقم ${appId} - قيد المعالجة والإجراء | Status: In Progress (${appId})`;
-    badgeColor = 'rgba(79, 70, 229, 0.12)';
-    badgeBorder = '#6366F1';
-    headerTitle = '⚙️ طلبكم قيد المعالجة واستكمال الإجراءات';
+    subject = `تحديث حالة المعاملة رقم ${appId}: قيد المعالجة والإجراء - الدفاع المدني`;
+    headerTitle = 'المعاملة قيد المعالجة واستكمال الإجراءات';
+    badgeSubtitle = 'يجري استكمال الإجراءات الإدارية والفنية الخاصة بمعاملتكم لدى الوحدات المختصة.';
     contentHtml = `
-      <p style="font-size: 1rem; line-height: 1.7; color: #E2E8F0;">
-        تود الإدارة العامة للدفاع المدني إفادتكم بأن طلبكم رقم (<strong style="color: #38BDF8;">${appId}</strong>) لخدمة (<strong style="color: #FFFFFF;">${serviceName}</strong>) في مرحلة: <strong style="color: #818CF8;">قيد المعالجة والإجراء (In Progress)</strong>.
-      </p>
-      <p style="font-size: 0.95rem; color: #CBD5E1; line-height: 1.6;">
-        يجري العمل على استكمال الإجراءات الإدارية والفنية الخاصة بمعاملتكم لدى الشعب والوحدات المختصة.
+      <p style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; margin-bottom: 16px;">
+        نفيدكم بأن معاملتكم رقم (<strong style="color: #38bdf8; font-family: monospace;">${appId}</strong>) لخدمة (<strong style="color: #ffffff;">${serviceName}</strong>) قيد المعالجة والإجراء الداخلي.
       </p>
       ${reason ? `
-      <div style="background: rgba(30, 41, 59, 0.9); border-right: 4px solid #6366F1; padding: 16px; border-radius: 8px; margin: 18px 0;">
-        <div style="font-weight: bold; color: #818CF8; font-size: 1rem; margin-bottom: 6px;">
-          ملاحظات المعاملة:
-        </div>
-        <div style="color: #FFFFFF; font-size: 0.95rem; line-height: 1.6;">
-          ${reason}
-        </div>
+      <div style="background: #1e293b; border-right: 3px solid #3b82f6; padding: 14px 16px; border-radius: 6px; margin: 16px 0;">
+        <div style="font-weight: 600; color: #93c5fd; font-size: 0.88rem; margin-bottom: 4px;">ملاحظات المعاملة:</div>
+        <div style="color: #ffffff; font-size: 0.9rem; line-height: 1.6;">${reason}</div>
       </div>` : ''}
     `;
     mainActionBtn = `
-      <div style="margin: 26px 0; text-align: center;">
-        <a href="${trackingLink}" target="_blank" style="background: linear-gradient(135deg, #4F46E5 0%, #4338CA 100%); color: #FFFFFF; padding: 14px 32px; border-radius: 50px; text-decoration: none; font-weight: 800; font-size: 1rem; display: inline-block;">
-          🔍 تتبع حالة الطلب
+      <div style="margin: 22px 0 16px 0; text-align: center;">
+        <a href="${trackingLink}" target="_blank" style="background: #2563eb; color: #ffffff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.92rem; display: inline-block;">
+          متابعة حالة المعاملة
         </a>
       </div>
     `;
   } else if (isInspection) {
-    subject = `🏢 تحديث حالة طلب الخدمة رقم ${appId} - قيد المعاينة الميدانية | Status: Under Field Inspection (${appId})`;
-    badgeColor = 'rgba(147, 51, 234, 0.12)';
-    badgeBorder = '#A855F7';
-    headerTitle = '🏢 جاري التنسيق للمعاينة والفحص الميداني للموقع';
+    subject = `تحديث حالة المعاملة رقم ${appId}: قيد المعاينة الميدانية - الدفاع المدني`;
+    headerTitle = 'جاري التنسيق للمعاينة والفحص الميداني';
+    badgeSubtitle = 'سيقوم مفتش الدفاع المدني بالتنسيق معكم للتحقق الميداني من جاهزية اشتراطات السلامة.';
     contentHtml = `
-      <p style="font-size: 1rem; line-height: 1.7; color: #E2E8F0;">
-        تود الإدارة العامة للدفاع المدني إفادتكم بأن طلبكم رقم (<strong style="color: #38BDF8;">${appId}</strong>) لخدمة (<strong style="color: #FFFFFF;">${serviceName}</strong>) قد تم تحويله إلى: <strong style="color: #C084FC;">المعاينة الميدانية (Under Inspection)</strong>.
-      </p>
-      <p style="font-size: 0.95rem; color: #CBD5E1; line-height: 1.6;">
-        سيقوم مفتش الدفاع المدني بالتواصل معكم أو زيارة المنشأة للتحقق من جاهزية أنظمة الإطفاء والإنذار ومخارج الطوارئ.
+      <p style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; margin-bottom: 16px;">
+        تم تحويل معاملتكم رقم (<strong style="color: #38bdf8; font-family: monospace;">${appId}</strong>) لخدمة (<strong style="color: #ffffff;">${serviceName}</strong>) إلى مرحلة المعاينة الميدانية للموقع.
       </p>
       ${reason ? `
-      <div style="background: rgba(30, 41, 59, 0.9); border-right: 4px solid #A855F7; padding: 16px; border-radius: 8px; margin: 18px 0;">
-        <div style="font-weight: bold; color: #C084FC; font-size: 1rem; margin-bottom: 6px;">
-          تعليمات وملاحظات المعاينة:
-        </div>
-        <div style="color: #FFFFFF; font-size: 0.95rem; line-height: 1.6;">
-          ${reason}
-        </div>
+      <div style="background: #1e293b; border-right: 3px solid #3b82f6; padding: 14px 16px; border-radius: 6px; margin: 16px 0;">
+        <div style="font-weight: 600; color: #93c5fd; font-size: 0.88rem; margin-bottom: 4px;">تعليمات المعاينة:</div>
+        <div style="color: #ffffff; font-size: 0.9rem; line-height: 1.6;">${reason}</div>
       </div>` : ''}
     `;
     mainActionBtn = `
-      <div style="margin: 26px 0; text-align: center;">
-        <a href="${trackingLink}" target="_blank" style="background: linear-gradient(135deg, #9333EA 0%, #7E22CE 100%); color: #FFFFFF; padding: 14px 32px; border-radius: 50px; text-decoration: none; font-weight: 800; font-size: 1rem; display: inline-block;">
-          🔍 تتبع موعد وتفاصيل المعاينة
+      <div style="margin: 22px 0 16px 0; text-align: center;">
+        <a href="${trackingLink}" target="_blank" style="background: #2563eb; color: #ffffff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.92rem; display: inline-block;">
+          تتبع تفاصيل المعاينة
         </a>
       </div>
     `;
   } else if (isModResubmitted) {
-    subject = `🔄 تأكيد استلام تعديلات طلب الخدمة رقم ${appId} - الدفاع المدني | Modifications Received (${appId})`;
-    badgeColor = 'rgba(13, 148, 136, 0.12)';
-    badgeBorder = '#14B8A6';
-    headerTitle = '🔄 تم استلام التعديلات والمرفقات المحدثة بنجاح';
+    subject = `تأكيد استلام تعديلات المعاملة رقم ${appId} - الدفاع المدني`;
+    headerTitle = 'تم استلام المستندات المحدثة بنجاح';
+    badgeSubtitle = 'تم استلام مرفقاتكم وبياناتكم المحدثة ويجري تدقيقها من قبل الضابط المختص.';
     contentHtml = `
-      <p style="font-size: 1rem; line-height: 1.7; color: #E2E8F0;">
-        تم بحمد الله استلام المستندات والبيانات المحدثة لطلبكم رقم (<strong style="color: #38BDF8;">${appId}</strong>) لخدمة (<strong style="color: #FFFFFF;">${serviceName}</strong>).
-      </p>
-      <p style="font-size: 0.95rem; color: #CBD5E1; line-height: 1.6;">
-        يجري حالياً إعادة مراجعة وتدقيق المستندات المرفقة من قبل ضابط الدفاع المدني المختص.
+      <p style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; margin-bottom: 16px;">
+        تم بنجاح استلام المستندات والبيانات المحدثة لمعاملتكم رقم (<strong style="color: #38bdf8; font-family: monospace;">${appId}</strong>) لخدمة (<strong style="color: #ffffff;">${serviceName}</strong>).
       </p>
     `;
     mainActionBtn = `
-      <div style="margin: 26px 0; text-align: center;">
-        <a href="${trackingLink}" target="_blank" style="background: #0D9488; color: #FFFFFF; padding: 14px 32px; border-radius: 50px; text-decoration: none; font-weight: 800; font-size: 1rem; display: inline-block;">
-          🔍 متابعة حالة الطلب
+      <div style="margin: 22px 0 16px 0; text-align: center;">
+        <a href="${trackingLink}" target="_blank" style="background: #2563eb; color: #ffffff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.92rem; display: inline-block;">
+          متابعة حالة المعاملة
         </a>
       </div>
     `;
   } else if (isApproved) {
-    subject = `✅ تم قبول واعتماد طلب الخدمة رقم ${appId} - الدفاع المدني | Application Approved (${appId})`;
-    badgeColor = 'rgba(34, 197, 94, 0.12)';
-    badgeBorder = '#22C55E';
-    headerTitle = '✅ تم اعتماد وتدقيق طلب الخدمة بنجاح';
+    subject = `تم اعتماد المعاملة وإصدار الشهادة رقم ${appId} - الدفاع المدني`;
+    headerTitle = 'تم اعتماد المعاملة وإصدار الشهادة الرسمية';
+    badgeSubtitle = 'يسرنا إفادتكم باعتماد المعاملة بنجاح وتوليد شهادة الاستيفاء والترخيص الإلكتروني المزودة برمز الاستجابة السريعة (QR).';
     contentHtml = `
-      <p style="font-size: 1rem; line-height: 1.7; color: #E2E8F0;">
-        يسر الإدارة العامة للدفاع المدني إفادتكم بأنه تم بحمد الله تدقيق واعتماد طلبكم رقم (<strong style="color: #38BDF8;">${appId}</strong>) لخدمة (<strong style="color: #FFFFFF;">${serviceName}</strong>).
-      </p>
-      <p style="font-size: 0.95rem; color: #CBD5E1; line-height: 1.6;">
-        تم إصدار شهادة الاستيفاء والترخيص الرسمي المعتمد والمزود برمز التحقق الذكي (QR Code).
+      <p style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; margin-bottom: 16px;">
+        تم بحمد الله تدقيق واعتماد معاملتكم رقم (<strong style="color: #38bdf8; font-family: monospace;">${appId}</strong>) لخدمة (<strong style="color: #ffffff;">${serviceName}</strong>) وفقاً للاشتراطات الفنية المعتمدة.
       </p>
     `;
     mainActionBtn = `
-      <div style="margin: 26px 0; text-align: center;">
-        <a href="${certificateLink}" target="_blank" style="background: linear-gradient(135deg, #16A34A 0%, #15803D 100%); color: #FFFFFF; padding: 14px 32px; border-radius: 50px; text-decoration: none; font-weight: 800; font-size: 1rem; display: inline-block; box-shadow: 0 4px 18px rgba(22, 163, 74, 0.45); border: 1px solid rgba(74, 222, 128, 0.4);">
-          📜 تحميل وطباعة شهادة الاعتماد الرسمية (PDF)
+      <div style="margin: 22px 0 16px 0; text-align: center;">
+        <a href="${certificateLink}" target="_blank" style="background: #059669; color: #ffffff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.92rem; display: inline-block;">
+          تحميل وطباعة شهادة الاعتماد (PDF)
         </a>
       </div>
     `;
   } else if (isRejected) {
-    subject = `❌ إشعار بخصوص طلب الخدمة رقم ${appId} - الدفاع المدني | Application Status Update (${appId})`;
-    badgeColor = 'rgba(239, 68, 68, 0.12)';
-    badgeBorder = '#EF4444';
-    headerTitle = '❌ إشعار بعدم الموافقة على الطلب';
+    subject = `إشعار بخصوص المعاملة رقم ${appId} - الدفاع المدني`;
+    headerTitle = 'إشعار بعدم الموافقة على الطلب';
+    badgeSubtitle = 'نأسف لإبلاغكم بأنه تعذر قبول المعاملة نظراً لعدم استيفاء الاشتراطات المطلوبة.';
     contentHtml = `
-      <p style="font-size: 1rem; line-height: 1.7; color: #E2E8F0;">
-        نأسف لإبلاغكم بأنه تعذر قبول طلبكم رقم (<strong style="color: #38BDF8;">${appId}</strong>) لخدمة (<strong style="color: #FFFFFF;">${serviceName}</strong>).
+      <p style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; margin-bottom: 16px;">
+        نفيدكم بعدم الموافقة على معاملتكم رقم (<strong style="color: #38bdf8; font-family: monospace;">${appId}</strong>) لخدمة (<strong style="color: #ffffff;">${serviceName}</strong>).
       </p>
       ${reason ? `
-      <div style="background: rgba(30, 41, 59, 0.9); border-right: 4px solid #EF4444; padding: 16px; border-radius: 8px; margin: 18px 0;">
-        <div style="font-weight: bold; color: #F87171; font-size: 1rem; margin-bottom: 6px;">
-          أسباب عدم الموافقة:
-        </div>
-        <div style="color: #FFFFFF; font-size: 0.95rem; line-height: 1.6;">
-          ${reason}
-        </div>
+      <div style="background: #1e293b; border-right: 3px solid #ef4444; padding: 14px 16px; border-radius: 6px; margin: 16px 0;">
+        <div style="font-weight: 600; color: #fca5a5; font-size: 0.88rem; margin-bottom: 4px;">أسباب القرار:</div>
+        <div style="color: #ffffff; font-size: 0.9rem; line-height: 1.6;">${reason}</div>
       </div>` : ''}
     `;
     mainActionBtn = `
-      <div style="margin: 26px 0; text-align: center;">
-        <a href="${trackingLink}" target="_blank" style="background: #334155; color: #FFFFFF; padding: 12px 28px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 0.95rem; display: inline-block;">
-          🔍 عرض تفاصيل المعاملة
+      <div style="margin: 22px 0 16px 0; text-align: center;">
+        <a href="${trackingLink}" target="_blank" style="background: #334155; color: #ffffff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.92rem; display: inline-block;">
+          عرض تفاصيل المعاملة
         </a>
       </div>
     `;
   } else if (normalizedStatus === 'submitted' || normalizedStatus === 'pending' || normalizedStatus === 'جديد' || normalizedStatus === 'تم الاستلام' || !rawStatus) {
-    // New Application Submission Initial Confirmation
-    subject = `تأكيد استلام طلب الخدمة - الدفاع المدني (رقم ${appId}) | Application Received (${appId})`;
-    badgeColor = 'rgba(2, 132, 199, 0.12)';
-    badgeBorder = '#0284C7';
-    headerTitle = '📋 تم استلام طلب الخدمة بنجاح';
+    subject = `تأكيد استلام طلب الخدمة رقم ${appId} - الدفاع المدني`;
+    headerTitle = 'تم استلام طلب الخدمة بنجاح';
+    badgeSubtitle = 'تم تسجيل طلبكم رسمياً في النظام وسيتم تدقيقه من قبل المختصين بالدفاع المدني.';
     contentHtml = `
-      <p style="font-size: 1rem; line-height: 1.7; color: #E2E8F0;">
-        يسر الإدارة العامة للدفاع المدني إفادتكم بأنه تم بنجاح استلام طلبكم لخدمة (<strong style="color: #FFFFFF;">${serviceName}</strong>) برقم المعاملة: (<strong style="color: #38BDF8;">${appId}</strong>).
+      <p style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; margin-bottom: 16px;">
+        يسر الإدارة العامة للدفاع المدني إفادتكم باستلام طلبكم لخدمة (<strong style="color: #ffffff;">${serviceName}</strong>) برقم المعاملة (<strong style="color: #38bdf8; font-family: monospace;">${appId}</strong>).
       </p>
-      <p style="font-size: 0.95rem; color: #CBD5E1; line-height: 1.6;">
-        سيتم إشعاركم عبر البريد الإلكتروني فور قيام ضابط الدفاع المدني بمراجعة وتحديث حالة الطلب. بإمكانكم متابعة الطلب أو تعديل البيانات المرفوعة في أي وقت عبر بوابة التتبع المباشرة.
+      <p style="font-size: 0.88rem; color: #94a3b8; line-height: 1.6;">
+        سيتم إشعاركم عبر البريد الإلكتروني فور تحديث حالة المعاملة، وبإمكانكم المتابعة المباشرة في أي وقت.
       </p>
     `;
     mainActionBtn = `
-      <div style="margin: 26px 0; text-align: center;">
-        <a href="${trackingLink}" target="_blank" style="background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%); color: #FFFFFF; padding: 14px 32px; border-radius: 50px; text-decoration: none; font-weight: 800; font-size: 1rem; display: inline-block; box-shadow: 0 4px 18px rgba(2, 132, 199, 0.45); border: 1px solid rgba(56, 189, 248, 0.4);">
-          🔍 متابعة وتتبع حالة الطلب
+      <div style="margin: 22px 0 16px 0; text-align: center;">
+        <a href="${trackingLink}" target="_blank" style="background: #2563eb; color: #ffffff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.92rem; display: inline-block;">
+          متابعة حالة الطلب
         </a>
       </div>
     `;
   } else {
-    // Dynamic Custom Status (Matches Column M exact title)
-    subject = `📌 تحديث حالة طلب الخدمة رقم ${appId} إلى (${rawStatus}) - الدفاع المدني | Status Update (${appId})`;
-    badgeColor = 'rgba(56, 189, 248, 0.12)';
-    badgeBorder = '#38BDF8';
-    headerTitle = `📌 تحديث حالة الطلب إلى: ${rawStatus}`;
+    subject = `تحديث حالة المعاملة رقم ${appId}: (${rawStatus}) - الدفاع المدني`;
+    headerTitle = `تحديث حالة المعاملة إلى: ${rawStatus}`;
+    badgeSubtitle = 'تم تحديث حالة المعاملة في النظام.';
     contentHtml = `
-      <p style="font-size: 1rem; line-height: 1.7; color: #E2E8F0;">
-        تم تحديث حالة طلبكم رقم (<strong style="color: #38BDF8;">${appId}</strong>) لخدمة (<strong style="color: #FFFFFF;">${serviceName}</strong>) في النظام إلى: <strong style="color: #38BDF8; font-size: 1.05rem;">${rawStatus}</strong>.
+      <p style="font-size: 0.95rem; line-height: 1.7; color: #e2e8f0; margin-bottom: 16px;">
+        تم تحديث حالة معاملتكم رقم (<strong style="color: #38bdf8; font-family: monospace;">${appId}</strong>) لخدمة (<strong style="color: #ffffff;">${serviceName}</strong>) إلى: <strong style="color: #ffffff;">${rawStatus}</strong>.
       </p>
       ${reason ? `
-      <div style="background: rgba(30, 41, 59, 0.9); border-right: 4px solid #38BDF8; padding: 16px; border-radius: 8px; margin: 18px 0;">
-        <div style="font-weight: bold; color: #38BDF8; font-size: 1rem; margin-bottom: 6px;">
-          ملاحظات الإدارة:
-        </div>
-        <div style="color: #FFFFFF; font-size: 0.95rem; line-height: 1.6;">
-          ${reason}
-        </div>
+      <div style="background: #1e293b; border-right: 3px solid #3b82f6; padding: 14px 16px; border-radius: 6px; margin: 16px 0;">
+        <div style="font-weight: 600; color: #93c5fd; font-size: 0.88rem; margin-bottom: 4px;">ملاحظات الإدارة:</div>
+        <div style="color: #ffffff; font-size: 0.9rem; line-height: 1.6;">${reason}</div>
       </div>` : ''}
     `;
     mainActionBtn = `
-      <div style="margin: 26px 0; text-align: center;">
-        <a href="${trackingLink}" target="_blank" style="background: #0284C7; color: #FFFFFF; padding: 14px 32px; border-radius: 50px; text-decoration: none; font-weight: 800; font-size: 1rem; display: inline-block;">
-          🔍 متابعة حالة الطلب
+      <div style="margin: 22px 0 16px 0; text-align: center;">
+        <a href="${trackingLink}" target="_blank" style="background: #2563eb; color: #ffffff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.92rem; display: inline-block;">
+          متابعة حالة الطلب
         </a>
       </div>
     `;
   }
 
   const htmlBody = `
-    <div dir="rtl" style="font-family: 'Cairo', 'Segoe UI', Tahoma, Arial, sans-serif; text-align: right; background-color: #0F172A; color: #F8FAFC; padding: 32px 24px; border-radius: 14px; max-width: 620px; margin: 0 auto; border: 1.5px solid ${badgeBorder}; box-shadow: 0 12px 35px rgba(0,0,0,0.55);">
-      <div style="text-align: center; border-bottom: 1px solid rgba(255,255,255,0.12); padding-bottom: 18px; margin-bottom: 22px;">
-        <h2 style="color: #F59E0B; margin: 0 0 6px 0; font-size: 1.4rem;">الإدارة العامة للدفاع المدني - مملكة البحرين</h2>
-        <p style="color: #94A3B8; margin: 0; font-size: 0.85rem; letter-spacing: 0.5px;">GENERAL DIRECTORATE OF CIVIL DEFENSE</p>
+    <div dir="rtl" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; text-align: right; background-color: #0f172a; color: #f8fafc; padding: 32px 24px; border-radius: 12px; max-width: 580px; margin: 0 auto; border: 1px solid #334155; box-shadow: 0 4px 20px rgba(0,0,0,0.35);">
+      
+      <!-- Institutional Header -->
+      <div style="text-align: center; border-bottom: 1px solid #334155; padding-bottom: 18px; margin-bottom: 22px;">
+        <div style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 4px;">مملكة البحرين - وزارة الداخلية</div>
+        <div style="font-size: 1.25rem; color: #ffffff; font-weight: 700; margin: 0 0 4px 0;">الإدارة العامة للدفاع المدني</div>
+        <div style="font-size: 0.72rem; color: #64748b; letter-spacing: 1px;">GENERAL DIRECTORATE OF CIVIL DEFENSE</div>
       </div>
 
-      <div style="background: ${badgeColor}; border: 1.5px solid ${badgeBorder}; border-radius: 10px; padding: 16px 20px; margin-bottom: 22px; text-align: center;">
-        <h3 style="color: ${badgeBorder}; margin: 0; font-size: 1.25rem; font-weight: 800;">${headerTitle}</h3>
+      <!-- Status Notice -->
+      <div style="background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 16px 18px; margin-bottom: 20px;">
+        <div style="font-size: 1.05rem; font-weight: 700; color: #f8fafc; margin-bottom: 4px;">${headerTitle}</div>
+        <div style="font-size: 0.88rem; color: #94a3b8; line-height: 1.5;">${badgeSubtitle}</div>
       </div>
 
-      <p style="font-size: 1.1rem; font-weight: bold; color: #FFFFFF; margin-bottom: 12px;">
+      <p style="font-size: 0.95rem; font-weight: 600; color: #ffffff; margin-bottom: 12px;">
         عزيزنا المتعامل: ${clientName}،
       </p>
 
@@ -642,27 +587,28 @@ async function sendUserApplicationStatusEmail(appData) {
 
       ${mainActionBtn}
 
-      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 16px; margin: 20px 0; font-size: 0.88rem;">
+      <!-- Metadata Box -->
+      <div style="background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 14px 18px; margin: 20px 0; font-size: 0.88rem;">
         <table style="width: 100%; border-collapse: collapse;">
-          <tr>
-            <td style="color: #94A3B8; padding: 6px 0; width: 130px; font-weight: bold;">رقم الطلب:</td>
-            <td style="color: #38BDF8; font-weight: bold; font-family: monospace;">${appId}</td>
+          <tr style="border-bottom: 1px solid #334155;">
+            <td style="color: #94a3b8; padding: 8px 0; width: 130px; font-weight: 600;">رقم المعاملة:</td>
+            <td style="color: #38bdf8; font-weight: 700; font-family: monospace;">${appId}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #334155;">
+            <td style="color: #94a3b8; padding: 8px 0; font-weight: 600;">نوع الخدمة:</td>
+            <td style="color: #ffffff; font-weight: 600;">${serviceName}</td>
           </tr>
           <tr>
-            <td style="color: #94A3B8; padding: 6px 0; font-weight: bold;">نوع الخدمة:</td>
-            <td style="color: #FFFFFF; font-weight: bold;">${serviceName}</td>
-          </tr>
-          <tr>
-            <td style="color: #94A3B8; padding: 6px 0; font-weight: bold;">رابط المتابعة والتعديل:</td>
-            <td style="color: #38BDF8; word-break: break-all;"><a href="${trackingLink}" style="color: #38BDF8;">${trackingLink}</a></td>
+            <td style="color: #94a3b8; padding: 8px 0; font-weight: 600;">رابط المتابعة المباشر:</td>
+            <td style="color: #38bdf8; word-break: break-all;"><a href="${trackingLink}" style="color: #38bdf8; text-decoration: none;">${trackingLink}</a></td>
           </tr>
         </table>
       </div>
 
-      <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 24px 0 16px 0;" />
-      <div style="text-align: center; font-size: 0.8rem; color: #64748B; line-height: 1.6;">
-        <p style="margin: 0 0 4px 0; color: #94A3B8;">مركز خدمات الدفاع المدني الموحد: 17461100 • الطوارئ: 999</p>
-        <p style="margin: 0;">تم إرسال هذا الإشعار تلقائياً إلى بريدكم المسجل (<a href="mailto:${userEmail}" style="color: #94A3B8;">${userEmail}</a>).</p>
+      <!-- Institutional Footer -->
+      <div style="border-top: 1px solid #334155; padding-top: 18px; margin-top: 24px; text-align: center; font-size: 0.78rem; color: #64748b; line-height: 1.6;">
+        <p style="margin: 0 0 4px 0; color: #94a3b8; font-weight: 600;">مركز خدمات الدفاع المدني: 17461100 • الطوارئ: 999</p>
+        <p style="margin: 0;">تم إرسال هذا الإشعار تلقائياً إلى بريدكم المسجل (${userEmail}).</p>
       </div>
     </div>
   `;
@@ -723,52 +669,57 @@ async function sendUserTranscriptEmail({ clientName, userEmail, email, phoneNumb
   const phone = phoneNumber || 'غير مسجل';
   const timestamp = new Date().toLocaleString('ar-BH', { timeZone: 'Asia/Bahrain' });
 
-  const subject = `📋 توثيق وسجل محادثتك مع المساعد الذكي - الإدارة العامة للدفاع المدني`;
+  const subject = `توثيق وسجل المحادثة - الإدارة العامة للدفاع المدني`;
 
   const bodyHtml = `
-    <div dir="rtl" style="font-family: 'Cairo', 'Segoe UI', Tahoma, Arial, sans-serif; text-align: right; background-color: #0A0F1D; color: #F8FAFC; padding: 32px 24px; border-radius: 14px; max-width: 620px; margin: 0 auto; border: 1.5px solid #D4AF37; box-shadow: 0 12px 35px rgba(0,0,0,0.55);">
-      <div style="text-align: center; border-bottom: 2px solid #D4AF37; padding-bottom: 18px; margin-bottom: 22px;">
-        <div style="margin-bottom: 14px; text-align: center;">
-          <img src="cid:civil_defense_logo" alt="شعار الإدارة العامة للدفاع المدني" width="90" style="display: block; margin: 0 auto 10px auto;" />
-        </div>
-        <h1 style="color: #FFFFFF; margin: 0 0 6px 0; font-size: 20px; font-weight: 700;">مملكة البحرين - وزارة الداخلية</h1>
-        <h2 style="color: #D4AF37; margin: 0 0 12px 0; font-size: 17px; font-weight: 600;">الإدارة العامة للدفاع المدني</h2>
-        <div style="display: inline-block; background: rgba(212, 175, 55, 0.12); border: 1px solid #D4AF37; border-radius: 30px; padding: 6px 20px;">
-          <span style="color: #F6E05E; font-size: 13px; font-weight: 700;">📋 توثيق المحادثة وسجل الاستفسارات الرسمية</span>
-        </div>
+    <div dir="rtl" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; text-align: right; background-color: #0f172a; color: #f8fafc; padding: 32px 24px; border-radius: 12px; max-width: 580px; margin: 0 auto; border: 1px solid #334155; box-shadow: 0 4px 20px rgba(0,0,0,0.35);">
+      
+      <!-- Institutional Header -->
+      <div style="text-align: center; border-bottom: 1px solid #334155; padding-bottom: 18px; margin-bottom: 22px;">
+        <div style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 4px;">مملكة البحرين - وزارة الداخلية</div>
+        <div style="font-size: 1.25rem; color: #ffffff; font-weight: 700; margin: 0 0 4px 0;">الإدارة العامة للدفاع المدني</div>
+        <div style="font-size: 0.72rem; color: #64748b; letter-spacing: 1px;">GENERAL DIRECTORATE OF CIVIL DEFENSE</div>
       </div>
 
-      <p style="font-size: 16px; color: #FFFFFF; font-weight: 700; margin-bottom: 12px;">مرحباً بك <span style="color: #F6E05E;">${name}</span>،</p>
-      <p style="font-size: 14px; color: #CBD5E1; line-height: 1.6; margin-bottom: 20px;">نشكر تواصلك مع مركز خدمات الإدارة العامة للدفاع المدني بمملكة البحرين. بناءً على طلبك، نرفق لك التوثيق الكامل لسجل الحوار مع المساعد الذكي:</p>
+      <!-- Banner -->
+      <div style="background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 16px 18px; margin-bottom: 20px;">
+        <div style="font-size: 1.05rem; font-weight: 700; color: #f8fafc; margin-bottom: 4px;">توثيق المحادثة وسجل الاستفسارات</div>
+        <div style="font-size: 0.88rem; color: #94a3b8; line-height: 1.5;">سجل الحوار والتفاعل مع المساعد الذكي للإدارة العامة للدفاع المدني.</div>
+      </div>
+
+      <p style="font-size: 0.95rem; font-weight: 600; color: #ffffff; margin-bottom: 8px;">مرحباً بك ${name}،</p>
+      <p style="font-size: 0.88rem; color: #94a3b8; line-height: 1.6; margin-bottom: 16px;">
+        نشكر تواصلك مع مركز خدمات الدفاع المدني بمملكة البحرين. بناءً على طلبك، نرفق لك التوثيق الكامل لسجل المحادثة:
+      </p>
       
-      <div style="background: rgba(10, 16, 32, 0.8); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 14px 18px; margin-bottom: 20px; font-size: 13px;">
+      <div style="background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; font-size: 0.88rem;">
         <table style="width: 100%; border-collapse: collapse;">
-          <tr>
-            <td style="color: #94A3B8; padding: 4px 0; width: 130px;">👤 اسم المتعامل:</td>
-            <td style="color: #FFFFFF; font-weight: bold;">${name}</td>
+          <tr style="border-bottom: 1px solid #334155;">
+            <td style="color: #94a3b8; padding: 6px 0; width: 120px; font-weight: 600;">اسم المتعامل:</td>
+            <td style="color: #ffffff; font-weight: 600;">${name}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #334155;">
+            <td style="color: #94a3b8; padding: 6px 0; font-weight: 600;">رقم الهاتف:</td>
+            <td style="color: #ffffff; font-weight: 600;">${phone}</td>
           </tr>
           <tr>
-            <td style="color: #94A3B8; padding: 4px 0;">📞 رقم الهاتف:</td>
-            <td style="color: #FFFFFF; font-weight: bold;">${phone}</td>
-          </tr>
-          <tr>
-            <td style="color: #94A3B8; padding: 4px 0;">📅 التاريخ والتوقيت:</td>
-            <td style="color: #E2E8F0;">${timestamp}</td>
+            <td style="color: #94a3b8; padding: 6px 0; font-weight: 600;">التاريخ والتوقيت:</td>
+            <td style="color: #e2e8f0;">${timestamp}</td>
           </tr>
         </table>
       </div>
 
-      ${transcriptHtml || `<div style="background: #080D1A; border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 14px; padding: 20px; margin-bottom: 24px; font-size: 13.5px; line-height: 1.7; color: #F1F5F9; white-space: pre-wrap;">${transcriptText || 'تم توثيق بياناتك وتفاصيل محادثتك مع المساعد الذكي بنجاح.'}</div>`}
+      ${transcriptHtml || `<div style="background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 16px; margin-bottom: 20px; font-size: 0.88rem; line-height: 1.7; color: #f1f5f9; white-space: pre-wrap;">${transcriptText || 'تم توثيق تفاصيل محادثتك مع المساعد الذكي بنجاح.'}</div>`}
 
-      <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 24px 0 16px 0;" />
-      <div style="text-align: center; font-size: 0.8rem; color: #64748B; line-height: 1.6;">
-        <p style="margin: 0 0 4px 0; color: #94A3B8;">مركز خدمات الدفاع المدني الموحد: 17461100 • الطوارئ: 999</p>
-        <p style="margin: 0;">© 2026 الإدارة العامة للدفاع المدني - وزارة الداخلية - مملكة البحرين. جميع الحقوق محفوظة.</p>
+      <!-- Institutional Footer -->
+      <div style="border-top: 1px solid #334155; padding-top: 18px; margin-top: 24px; text-align: center; font-size: 0.78rem; color: #64748b; line-height: 1.6;">
+        <p style="margin: 0 0 4px 0; color: #94a3b8; font-weight: 600;">مركز خدمات الدفاع المدني: 17461100 • الطوارئ: 999</p>
+        <p style="margin: 0;">© 2026 الإدارة العامة للدفاع المدني - وزارة الداخلية - مملكة البحرين.</p>
       </div>
     </div>
   `;
 
-  const plainTextSummary = `مملكة البحرين - وزارة الداخلية\nالإدارة العامة للدفاع المدني\n\nتأكيد وتوثيق المحادثة لـ: ${name}\nرقم الهاتف: ${phone}\nالتاريخ والتوقيت: ${timestamp}\n\nشكراً لتواصلك مع مركز خدمات الدفاع المدني. بناءً على طلبك، تم إرفاق توثيق المحادثة.\n\nمركز الخدمات الموحد: 17461100 • الطوارئ: 999`;
+  const plainTextSummary = `مملكة البحرين - وزارة الداخلية\nالإدارة العامة للدفاع المدني\n\nتوثيق وسجل المحادثة: ${name}\nرقم الهاتف: ${phone}\nالتاريخ والتوقيت: ${timestamp}\n\nشكراً لتواصلك مع مركز خدمات الدفاع المدني.\n\nمركز الخدمات: 17461100 • الطوارئ: 999`;
 
   // Primary Brevo API Dispatch
   try {
@@ -795,25 +746,13 @@ async function sendUserTranscriptEmail({ clientName, userEmail, email, phoneNumb
   }
 
   try {
-    const path = require('path');
     const info = await transporter.sendMail({
       from: `"Bahrain Civil Defense Support" <${process.env.SENDER_EMAIL || process.env.SMTP_USER || 'support@bhcdai.com'}>`,
       to: recipient,
       replyTo: process.env.SENDER_EMAIL || process.env.SMTP_USER || 'support@bhcdai.com',
       subject,
       text: plainTextSummary,
-      html: bodyHtml,
-      attachments: [
-        {
-          filename: 'civil_defense_official_logo.png',
-          path: path.join(__dirname, '..', 'icons', 'civil_defense_official_logo.png'),
-          cid: 'civil_defense_logo'
-        }
-      ],
-      headers: {
-        'X-Auto-Response-Suppress': 'OOF, AutoReply',
-        'X-Report-Abuse-To': process.env.SENDER_EMAIL || process.env.SMTP_USER || 'support@bhcdai.com'
-      }
+      html: bodyHtml
     });
 
     console.log(`[Transcript Email Engine] ✉️ Direct Transcript Email successfully delivered to <${recipient}> (MessageId: ${info.messageId}) ✅`);

@@ -119,7 +119,8 @@
         400
       ],
       "id": "poller-trigger-id",
-      "name": "Poll Sheets Status"
+      "name": "Poll Sheets Status",
+      "disabled": true
     },
     {
       "parameters": {
@@ -628,7 +629,8 @@
           400
         ],
         "id": "poller-trigger-id",
-        "name": "Poll Sheets Status"
+        "name": "Poll Sheets Status",
+        "disabled": true
       },
       {
         "parameters": {

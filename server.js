@@ -43,75 +43,29 @@ const apiKey = process.env.ELEVENLABS_API_KEY || "896c43093392d23879dc8d578e7840
 const agentId = process.env.ELEVENLABS_AGENT_ID || "agent_1601kv6ytcwwfh1sfk46qqhrrq3j";
 const capturedLeadsMap = new Map();
 
-const masterServiceCatalogMap = {
-  "safety_certificate_renewal": "إصدار شهادة استيفاء شروط واحتياجات الحماية والوقاية من الحريق وتجديدها",
-  "Safety Certificate Renewal": "إصدار شهادة استيفاء شروط واحتياجات الحماية والوقاية من الحريق وتجديدها",
-  "gas_selling_shops_license": "إصدار ترخيص محلات بيع الغاز، وتجديد الترخيص",
-  "Gas Selling Shops License": "إصدار ترخيص محلات بيع الغاز، وتجديد الترخيص",
-  "bakery_license": "إصدار ترخيص المخابز الشعبية والآلية، وتجديد الترخيص",
-  "Bakery License": "إصدار ترخيص المخابز الشعبية والآلية، وتجديد الترخيص",
-  "gold_shop_license": "إصدار ترخيص محلات وورش الذهب، وتجديد الترخيص",
-  "Gold Shop License": "إصدار ترخيص محلات وورش الذهب، وتجديد الترخيص",
-  "trainee_registration": "إصدار الترخيص لمعاهد ومراكز التدريب على أعمال الدفاع المدني",
-  "Trainee Registration": "إصدار الترخيص لمعاهد ومراكز التدريب على أعمال الدفاع المدني",
-  "gas_station_license": "إصدار الترخيص لمحطات تزويد الوقود، وتجديد الترخيص",
-  "Gas Station License": "إصدار الترخيص لمحطات تزويد الوقود، وتجديد الترخيص",
-  "hazardous_material_permit": "إصدار ترخيص عدم ممانعة لتخزين مواد كيميائية أو المتفجرات، وتجديد الترخيص",
-  "Hazardous Material Permit": "إصدار ترخيص عدم ممانعة لتخزين مواد كيميائية أو المتفجرات، وتجديد الترخيص",
-  "factories_hotels_malls_inspection_certificate": "إصدار شهادة فحص المصانع والفنادق والمجمعات التجارية قيد الإنشاء وتجديدها",
-  "incident_report_large_facilities": "إصدار تقرير الحوادث للمنشآت الكبيرة والمصانع والفنادق والمجمعات التجارية وما في حكمها",
-  "incident_report_small_facilities_homes": "إصدار تقرير الحوادث للمنشآت الصغيرة والمنازل وما في حكمها",
-  "electrical_connection_final_inspection": "إصدار شهادة الفحص النهائي لتوصيل التيار الكهربائي للمباني الجديدة",
-  "factory_warehouse_maps_license": "إصدار ترخيص خرائط المصانع والمخازن وتجديد الترخيص",
-  "commercial_centers_high_rise_maps_license": "إصدار ترخيص خرائط المراكز التجارية والمباني العالية",
-  "residential_complexes_maps_license": "إصدار ترخيص خرائط المجمعات السكنية التي تحتوي على عشر فلل فأكثر",
-  "worship_courts_museums_maps_review": "دراسة مخططات دور العبادة والمحاكم والمتاحف",
-  "new_gas_stations_maps_review": "دراسة الخرائط لمحطات الوقود الجديدة",
-  "electrical_engineering_plans_review": "دراسة المخططات الهندسية الكهربائية",
-  "mechanical_engineering_plans_review": "دراسة المخططات الميكانيكية",
-  "gas_piping_tanks_maps_review": "دراسة الخرائط على تمديدات الغاز والخزانات",
-  "trainee_registration_1day": "إصدار شهادة تدريب على أعمال الدفاع المدني لمدة يوم واحد",
-  "trainee_registration_1week": "إصدار شهادة تدريب على أعمال الدفاع المدني لمدة  اسبوع",
-  "heavy_fire_vehicle_driving_training": "إصدار شهادة تدريب أفراد منشآت ومؤسسات القطاع الخاص على قيادة مركبات الإطفاء الثقيلة لمدة أسبوعين",
-  "trainee_registration_16weeks": "إصدار شهادة تدريب الفرد على أعمال الدفاع المدني لمدة ستة عشر أسبوعًا.",
-  "building_evacuation_training": "التدريب على عمليات إخلاء المباني والمنشآت",
-  "fire_safety_equipment_license": "إصدار الترخيص لمعدات الحريق والسلامة، وتجديد الترخيص",
-  "fire_safety_equipment_noc": "إصدار ترخيص عدم الممانعة لمعدات الحريق والسلامة، وتجديد الترخيص",
-  "local_fire_equipment_factory_license": "إصدار الترخيص لمصنع محلي لمعدات الإطفاء والوقاية من الحريق، وتجديد الترخيص",
-  "alarm_firefighting_maintenance_offices_license": "إصدار الترخيص للمكاتب الفنية ومكاتب صيانة أجهزة الإنذار والإطفاء، وتجديد الترخيص",
-  "hazardous_materials_1day_transport": "ترخيص بالموافقة على نقل شحنات المواد الخطرة ليوم واحد",
-  "chemical_hazmat_transport_vehicles_license": "إصدار ترخيص الموافقة على سيارات نقل المواد الكيميائية والخطرة، وتجديد الترخيص",
-  "diesel_gas_tanks_installation_license": "إصدار ترخيص الموافقة النهائية على تركيب خزانات الديزل والغاز، وتجديد الترخيص",
-  "consulting_offices_gas_fuel_hazmat_license": "إصدار الترخيص للمكاتب الفنية والاستشارية المختصة بالغاز والوقود والمواد الخطرة، وتجديد الترخيص",
-  "engineering_offices_fire_protection_license": "ترخيص المكاتب الهندسية لتصميم أنظمة الحماية والوقاية من الحريق وتجديد الترخيص",
-  "small_facilities_inspection_certificate": "إصدار شهادة فحص المنشآت الصغيرة، وتجديد الشهادة",
-  "certified_prevention_inspector": "مفتش وقاية معتمد",
-  "fire_equipment_sales_license": "ترخيص بيع وتداول وتخزين معدات الحريق",
-  "fireworks_import_license": "ترخيص استيراد وتخزين الألعاب النارية",
-  "explosives_import_permit": "ترخيص استيراد مواد خطرة ومتفجرات",
-  "temporary_event_tents_permit": "طلب ترخيص الخيام للمناسبات العامة والخاصة المؤقتة"
-};
+const {
+  masterServiceCatalogMap,
+  SERVICES_REGISTRY,
+  resolveOfficialServiceName,
+  resolveService,
+  resolveArabicStatusName,
+  formatDynamicFields,
+  buildDynamicFieldsAdminHtml,
+  escapeHtml
+} = require('./src/services/services_registry');
 
-function resolveOfficialServiceName(input) {
-  if (!input || typeof input !== 'string') return input || '';
-  const trimmed = input.trim();
-  if (masterServiceCatalogMap[trimmed]) return masterServiceCatalogMap[trimmed];
-  const lowered = trimmed.toLowerCase();
-  for (const [key, val] of Object.entries(masterServiceCatalogMap)) {
-    if (key.toLowerCase() === lowered) return val;
-  }
-  return trimmed;
-}
+const {
+  generateGoogleAccessToken,
+  getCachedGoogleAccessToken
+} = require('./src/services/google_sheets_client');
 
-function escapeHtml(str) {
-  if (!str) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
+const {
+  getClientIp,
+  MemoryRateLimiter,
+  voiceRateLimiter,
+  appSubmitRateLimiter,
+  statusLookupRateLimiter
+} = require('./src/middleware/rate_limiter');
 
 function getSanitizedPublicUrl(req) {
   const envUrl = process.env.APP_URL || process.env.BASE_URL || process.env.PUBLIC_URL;
@@ -160,68 +114,6 @@ function sanitizeTrackingLink(rawUrl, appId) {
   }
   return clean;
 }
-
-// ----------------------------------------------------
-// Production Security: Client IP Extraction & Rate Limiter
-// ----------------------------------------------------
-function getClientIp(req) {
-  const forwarded = req.headers['x-forwarded-for'];
-  if (forwarded) {
-    return forwarded.split(',')[0].trim();
-  }
-  const cfConnectingIp = req.headers['cf-connecting-ip'];
-  if (cfConnectingIp) {
-    return cfConnectingIp.trim();
-  }
-  return req.socket?.remoteAddress || req.connection?.remoteAddress || '127.0.0.1';
-}
-
-class MemoryRateLimiter {
-  constructor(windowMs, maxRequests, message) {
-    this.windowMs = windowMs;
-    this.maxRequests = maxRequests;
-    this.message = message || "Too many requests. Please try again later.";
-    this.hits = new Map(); // ip -> [timestamps]
-
-    // Periodically clean up expired timestamps every 2 minutes
-    setInterval(() => {
-      const now = Date.now();
-      for (const [ip, timestamps] of this.hits.entries()) {
-        const valid = timestamps.filter(t => now - t < this.windowMs);
-        if (valid.length === 0) {
-          this.hits.delete(ip);
-        } else {
-          this.hits.set(ip, valid);
-        }
-      }
-    }, 120000).unref();
-  }
-
-  check(ip) {
-    const now = Date.now();
-    const timestamps = this.hits.get(ip) || [];
-    const valid = timestamps.filter(t => now - t < this.windowMs);
-
-    if (valid.length >= this.maxRequests) {
-      const oldest = valid[0];
-      const resetTime = oldest + this.windowMs;
-      const retryAfterSec = Math.max(1, Math.ceil((resetTime - now) / 1000));
-      return { allowed: false, retryAfter: retryAfterSec, remaining: 0, message: this.message };
-    }
-
-    valid.push(now);
-    this.hits.set(ip, valid);
-    return { allowed: true, remaining: this.maxRequests - valid.length };
-  }
-}
-
-// Global Rate Limiter Instances
-// 1. Voice Sessions: Max 3 requests per IP per 1 minute
-const voiceRateLimiter = new MemoryRateLimiter(60 * 1000, 3, "Too many voice session requests. Please wait a minute before starting another call.");
-// 2. Application Submissions & Modifications: Max 5 submissions per IP per 10 minutes
-const appSubmitRateLimiter = new MemoryRateLimiter(10 * 60 * 1000, 5, "Too many application submissions from your IP. Please wait a few minutes before submitting again.");
-// 3. Status Lookups / Tracking: Max 30 lookups per IP per 1 minute
-const statusLookupRateLimiter = new MemoryRateLimiter(60 * 1000, 30, "Too many status lookup requests. Please slow down.");
 
 // ----------------------------------------------------
 // Production Security: PDF Upload Validation & Magic Bytes Check
@@ -273,31 +165,6 @@ function validateAndSanitizePdfBase64(rawBase64, originalFileName) {
   };
 }
 
-function generateGoogleAccessToken(clientEmail, privateKey, scopes) {
-  const header = {
-    alg: "RS256",
-    typ: "JWT"
-  };
-  
-  const now = Math.floor(Date.now() / 1000);
-  const claim = {
-    iss: clientEmail,
-    scope: scopes.join(" "),
-    aud: "https://oauth2.googleapis.com/token",
-    exp: now + 3600,
-    iat: now
-  };
-  
-  const base64Header = Buffer.from(JSON.stringify(header)).toString('base64url');
-  const base64Claim = Buffer.from(JSON.stringify(claim)).toString('base64url');
-  
-  const sign = crypto.createSign('RSA-SHA256');
-  sign.update(`${base64Header}.${base64Claim}`);
-  const signature = sign.sign(privateKey, 'base64url');
-  
-  return `${base64Header}.${base64Claim}.${signature}`;
-}
-
 let latestActiveConversationId = null;
 
 function resolveConversationRow(rows, conversationId) {
@@ -344,24 +211,7 @@ async function formatKpiCell(conversationId, kpiValue) {
   
   const spreadsheetId = "1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8";
 
-  console.log(`[Google Sheets Formatter] Generating access token...`);
-  const jwt = generateGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
-  
-  const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-      assertion: jwt
-    })
-  });
-  
-  if (!tokenRes.ok) {
-    throw new Error(`Failed to exchange JWT for token: ${tokenRes.status} ${await tokenRes.text()}`);
-  }
-  
-  const tokenData = await tokenRes.json();
-  const accessToken = tokenData.access_token;
+  const accessToken = await getCachedGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
   
   console.log(`[Google Sheets Formatter] Fetching sheet rows to locate conversation: ${conversationId}...`);
   const getRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Sheet1!A1:G1000`, {
@@ -428,65 +278,13 @@ async function formatKpiCell(conversationId, kpiValue) {
   console.log(`[Google Sheets Formatter] Successfully formatted Row ${rowIndex + 1} KPI cell to ${kpiValue}! 🎉`);
 }
 
-/**
- * Resolves standard Arabic label for any given application status
- * strictly distinguishing Under Review from In Progress, Inspection, etc.
- */
-function resolveArabicStatusName(rawStatus) {
-  if (!rawStatus) return 'تم استلام الطلب والتحقق المبدئي';
-  const s = rawStatus.trim().toLowerCase();
-  
-  if (s.includes('modification') || s.includes('تعديل') || s.includes('استكمال')) {
-    if (s.includes('resubmit') || s.includes('إعادة') || s.includes('تحديث')) {
-      return 'تم استلام التعديل وقيد إعادة التدقيق';
-    }
-    return 'مطلوب تعديل بيانات ومستندات';
-  }
-  if (s.includes('approv') || s.includes('قبول') || s.includes('اعتماد') || s.includes('مكتمل')) {
-    return 'مقبول والمعاملة معتمدة بنجاح';
-  }
-  if (s.includes('reject') || s.includes('رفض') || s.includes('ملغي') || s.includes('غير مستوف')) {
-    return 'مرفوض / غير مستوفٍ للشروط';
-  }
-  if (s.includes('review') || s.includes('مراجعة') || s.includes('تدقيق') || s.includes('دراسة')) {
-    return 'قيد المراجعة والتدقيق الفني';
-  }
-  if (s.includes('progress') || s.includes('معالجة') || s.includes('إجراء')) {
-    return 'قيد المعالجة والإجراء الإداري';
-  }
-  if (s.includes('inspect') || s.includes('معاينة') || s.includes('فحص')) {
-    return 'قيد المعاينة الميدانية';
-  }
-  if (s === 'pending' || s === 'submitted' || s === 'جديد' || s === 'قيد الانتظار') {
-    return 'تم استلام الطلب والتحقق المبدئي';
-  }
-  return rawStatus;
-}
-
 async function writeFeedbackComment(conversationId, commentText) {
   const clientEmail = globalClientEmail;
   const privateKey = globalPrivateKey;
   
   const spreadsheetId = "1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8";
 
-  console.log(`[Google Sheets Commenter] Generating access token...`);
-  const jwt = generateGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
-  
-  const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-      assertion: jwt
-    })
-  });
-  
-  if (!tokenRes.ok) {
-    throw new Error(`Failed to exchange JWT for token: ${tokenRes.status} ${await tokenRes.text()}`);
-  }
-  
-  const tokenData = await tokenRes.json();
-  const accessToken = tokenData.access_token;
+  const accessToken = await getCachedGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
   
   console.log(`[Google Sheets Commenter] Fetching sheet rows to locate conversation: ${conversationId}...`);
   const getRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Sheet1!A1:H1000`, {
@@ -574,7 +372,7 @@ function processQueue() {
   
   console.log(`[Telemetry Queue] Evaluating ${conversationId}... (Remaining in queue: ${evaluationQueue.length})`);
   
-  const pythonPath = "C:\\Python313\\python.exe";
+  const pythonPath = process.env.PYTHON_PATH || (process.platform === 'win32' && fs.existsSync("C:\\Python313\\python.exe") ? "C:\\Python313\\python.exe" : "python");
   const evalScript = path.join(__dirname, 'telemetry', 'eval_elevenlabs.py');
   
   execFile(pythonPath, [evalScript, conversationId], (error, stdout, stderr) => {
@@ -598,1467 +396,6 @@ if (!fs.existsSync(uploadsDir)) {
   console.log("Created uploads/ folder");
 }
 
-const SERVICES_REGISTRY = [
-  {
-    id: "safety_certificate_renewal",
-    canonicalEn: "Safety Certificate Renewal",
-    arabicName: "إصدار شهادة استيفاء شروط واحتياجات الحماية والوقاية من الحريق وتجديدها",
-    aliases: ["تجديد شهادة السلامة","استيفاء شروط","احتياجات الحماية","الوقاية من الحريق","شروط السلامة","شهادة السلامة","شهاده السلامه","شهادة استيفاء","safety certificate","safety certificate renewal","fire safety certificate","fire protection certificate","fire prevention certificate","safety compliance"]
-  },
-  {
-    id: "gas_selling_shops_license",
-    canonicalEn: "Gas Selling Shops License",
-    arabicName: "إصدار ترخيص محلات بيع الغاز، وتجديد الترخيص",
-    aliases: ["محل غاز","محلات بيع الغاز","بيع الغاز","ترخيص الغاز","سلندر غاز","سلندرات","ترخيص محل غاز","محلات الغاز","gas shop","gas selling shop","gas shop license","gas cylinder shop","gas retail","propane shop"]
-  },
-  {
-    id: "bakery_license",
-    canonicalEn: "Bakery License",
-    arabicName: "إصدار ترخيص المخابز الشعبية والآلية، وتجديد الترخيص",
-    aliases: ["مخبز","مخابز","ترخيص المخابز","فرن شعبى","مخبز آلي","مخابز شعبية","فرن","ترخيص مخبز","bakery","bakery license","bakeries","traditional bakery","automated bakery","bread shop"]
-  },
-  {
-    id: "gold_shop_license",
-    canonicalEn: "Gold Shop License",
-    arabicName: "إصدار ترخيص محلات وورش الذهب، وتجديد الترخيص",
-    aliases: ["ذهب","محل ذهب","ورشة ذهب","ورش الذهب","مجوهرات","انذار الذهب","ترخيص ذهب","ترخيص محل ذهب","gold shop","gold shop license","gold workshop","jewelry shop","jewellery","gold alarm"]
-  },
-  {
-    id: "trainee_registration",
-    canonicalEn: "Civil Defense Training Centers License",
-    arabicName: "إصدار الترخيص لمعاهد ومراكز التدريب على أعمال الدفاع المدني",
-    aliases: ["Trainee Registration","تسجيل متدربين","معاهد التدريب","مراكز التدريب","تدريب الدفاع المدني","تسجيل متدرب","مركز تدريب","ترخيص مركز تدريب","trainee","trainee registration","training center","training institute","civil defense training institute","training center license"]
-  },
-  {
-    id: "gas_station_license",
-    canonicalEn: "Gas Station License",
-    arabicName: "إصدار الترخيص لمحطات تزويد الوقود، وتجديد الترخيص",
-    aliases: ["محطة وقود","تزويد الوقود","بترول","وقود ديزل","محطة البترول","محطه وقود","محطات بيع الوقود","بيع الوقود","محطة بيع الوقود","تصريح محطات وقود","تصريح محطة وقود","تصريح محطات الوقود","محطات وقود","تصريح محروقات","تصريح محطة الوقود","ترخيص محطة وقود","ترخيص محطات وقود","اقدم حق تصريح محطات وقود","gas station","gas station license","fuel station","petrol station","fuel supply station"]
-  },
-  {
-    id: "hazardous_material_permit",
-    canonicalEn: "Hazardous Material Permit",
-    arabicName: "إصدار ترخيص عدم ممانعة لتخزين مواد كيميائية أو المتفجرات، وتجديد الترخيص",
-    aliases: ["تخزين مواد خطرة","مواد كيميائية","تخزين مواد كيميائية","تخزين مواد","مادة خطرة","ترخيص مواد كيميائية","hazardous material","hazardous material permit","chemical storage","chemical permit","hazmat permit"]
-  },
-  {
-    id: "factories_hotels_malls_inspection_certificate",
-    canonicalEn: "Inspection Certificate for Factories, Hotels, & Malls under Construction",
-    arabicName: "إصدار شهادة فحص المصانع والفنادق والمجمعات التجارية قيد الإنشاء وتجديدها",
-    aliases: ["فحص المصانع","فحص الفنادق","مجمعات تجارية","قيد الإنشاء","إنشاء وتجديد","فحص مصنع","فندق قيد الإنشاء","شهادة فحص المباني قيد الإنشاء","factory inspection","hotel inspection","mall inspection","under construction inspection","commercial complex inspection"]
-  },
-  {
-    id: "incident_report_large_facilities",
-    canonicalEn: "Incident Report for Large Facilities, Factories, & Malls",
-    arabicName: "إصدار تقرير الحوادث للمنشآت الكبيرة والمصانع والفنادق والمجمعات التجارية وما في حكمها",
-    aliases: ["تقرير الحوادث للمنشآت الكبيرة","تقرير حادث مصنع","تقرير حادث فندق","حادث مجمع تجاري","تقرير حريق كبير","حادث منشأة كبيرة","incident report large","large facility incident","factory incident report","hotel fire report","mall fire report"]
-  },
-  {
-    id: "incident_report_small_facilities_homes",
-    canonicalEn: "Incident Report for Small Facilities & Homes",
-    arabicName: "إصدار تقرير الحوادث للمنشآت الصغيرة والمنازل وما في حكمها",
-    aliases: ["تقرير الحوادث للأشخاص","تقرير الحوادث","تقرير حادث","تقرير حوادث","تقرير الحوادث للأفراد","تقرير حادث شخصي","تقرير حادث منزلي","تقرير حادث بيت","حادث بسيط","حريق منزل","حادث منشأة صغيرة","حريق بيت","incident report small","home incident report","house fire report","personal incident report","small facility report"]
-  },
-  {
-    id: "electrical_connection_final_inspection",
-    canonicalEn: "Final Inspection Certificate for Electrical Connection",
-    arabicName: "إصدار شهادة الفحص النهائي لتوصيل التيار الكهربائي للمباني الجديدة",
-    aliases: ["تيار كهربائي","توصيل الكهرباء","فحص نهائي كهرباء","توصيل تيار","كهرباء مبنى جديد","فحص كهرباء","شهادة الفحص النهائي لتوصيل التيار الكهربائي","electrical connection","power connection","final electrical inspection","electricity connection","new building electricity"]
-  },
-  {
-    id: "factory_warehouse_maps_license",
-    canonicalEn: "Factory & Warehouse Maps License",
-    arabicName: "إصدار ترخيص خرائط المصانع والمخازن وتجديد الترخيص",
-    aliases: ["خرائط مصانع","مخازن وتجديد","مخطط مستودع","مخطط مصنع","خريطة مخزن","ترخيص خرائط المصانع والمخازن","factory map","warehouse map","factory blueprint","warehouse plan","factory warehouse maps license","factory maps license"]
-  },
-  {
-    id: "commercial_centers_high_rise_maps_license",
-    canonicalEn: "Commercial Centers & High-Rise Buildings Maps License",
-    arabicName: "إصدار ترخيص خرائط المراكز التجارية والمباني العالية",
-    aliases: ["خرائط مراكز تجارية","مباني عالية","خرائط مبنى مرتفع","مخططات أبراج","خرائط برج","ترخيص خرائط المراكز التجارية","commercial center map","high rise building map","tower map","high rise blueprint","commercial mall maps"]
-  },
-  {
-    id: "residential_complexes_maps_license",
-    canonicalEn: "Residential Complexes Maps License (10+ Villas)",
-    arabicName: "إصدار ترخيص خرائط المجمعات السكنية التي تحتوي على عشر فلل فأكثر",
-    aliases: ["خرائط مجمعات سكنية","عشر فلل","مخطط مجمع فلل","خريطة مجمع سكني","مجمع 10 فلل","residential complex map","villas complex map","housing complex map","10 villas map"]
-  },
-  {
-    id: "worship_courts_museums_maps_review",
-    canonicalEn: "Review of Maps for Places of Worship, Courts, & Museums",
-    arabicName: "دراسة مخططات دور العبادة والمحاكم والمتاحف",
-    aliases: ["دور العبادة","مخطط مسجد","مخططات متاحف","مخطط محكمة","مخطط معبد","دراسة مخططات دور العبادة","worship place map","mosque plan","court plan","museum plan","worship review"]
-  },
-  {
-    id: "new_gas_stations_maps_review",
-    canonicalEn: "Review of Maps for New Fuel Stations",
-    arabicName: "دراسة الخرائط لمحطات الوقود الجديدة",
-    aliases: ["خرائط محطة وقود","مخطط محطة وقود جديدة","مخطط بترول جديد","دراسة الخرائط لمحطات الوقود","new gas station map","fuel station map review","petrol station blueprint"]
-  },
-  {
-    id: "electrical_engineering_plans_review",
-    canonicalEn: "Review of Electrical Engineering Plans",
-    arabicName: "دراسة المخططات الهندسية الكهربائية",
-    aliases: ["مخططات هندسية كهربائية","مخطط كهربائي هندسي","خرائط كهرباء هندسية","دراسة المخططات الكهربائية","electrical engineering plan","electrical blueprint","electrical wiring plan review","electrical connection review"]
-  },
-  {
-    id: "mechanical_engineering_plans_review",
-    canonicalEn: "Review of Mechanical Engineering Plans",
-    arabicName: "دراسة المخططات الميكانيكية",
-    aliases: ["مخططات ميكانيكية","مخطط ميكانيكي","خريطة ميكانيك","mechanical plan review","mechanical blueprint","mechanical engineering drawings"]
-  },
-  {
-    id: "gas_piping_tanks_maps_review",
-    canonicalEn: "Review of Maps for Gas Extension Lines & Tanks",
-    arabicName: "دراسة الخرائط على تمديدات الغاز والخزانات",
-    aliases: ["تمديدات الغاز والخزانات","مخطط تمديد غاز","خريطة خزان غاز","دراسة خرائط تمديدات الغاز","gas piping map","gas tank plan","gas extension blueprint","gas pipe design"]
-  },
-  {
-    id: "trainee_registration_1day",
-    canonicalEn: "Civil Defense Training Certificate (1 Day)",
-    arabicName: "إصدار شهادة تدريب على أعمال الدفاع المدني لمدة يوم واحد",
-    aliases: ["تدريب يوم واحد","شهادة تدريب يوم","دورة يوم","تدريب لمدة يوم","trainee registration 1day","1 day training","one day civil defense training","1 day course"]
-  },
-  {
-    id: "trainee_registration_1week",
-    canonicalEn: "Civil Defense Training Certificate (1 Week)",
-    arabicName: "إصدار شهادة تدريب على أعمال الدفاع المدني لمدة  اسبوع",
-    aliases: ["تدريب اسبوع","دورة أسبوع","تدريب لمدة أسبوع","دورة اسبوع","1 week training","one week training course","7 days training"]
-  },
-  {
-    id: "heavy_fire_vehicle_driving_training",
-    canonicalEn: "Heavy Firefighting Vehicle Driving Training Certificate (2 Weeks)",
-    arabicName: "إصدار شهادة تدريب أفراد منشآت ومؤسسات القطاع الخاص على قيادة مركبات الإطفاء الثقيلة لمدة أسبوعين",
-    aliases: ["مركبات الإطفاء الثقيلة","سياقة سيارة إطفاء","تدريب قيادة إطفاء","شاحنة إطفاء ثقيلة","heavy fire vehicle","firefighting truck driving","heavy fire truck training","fire engine driving"]
-  },
-  {
-    id: "trainee_registration_16weeks",
-    canonicalEn: "Civil Defense Individual Training Certificate (16 Weeks)",
-    arabicName: "إصدار شهادة تدريب الفرد على أعمال الدفاع المدني لمدة ستة عشر أسبوعًا.",
-    aliases: ["ستة عشر أسبوعا","تدريب 16 أسبوع","دورة 16 اسبوع","ستة عشر اسبوع","16 weeks training","sixteen weeks course","long civil defense training"]
-  },
-  {
-    id: "building_evacuation_training",
-    canonicalEn: "Building & Facility Evacuation Operations Training",
-    arabicName: "التدريب على عمليات إخلاء المباني والمنشآت",
-    aliases: ["عمليات إخلاء","إخلاء مباني","إخلاء منشآت","خطة إخلاء","تدريب اخلاء","building evacuation","evacuation training","facility evacuation drill"]
-  },
-  {
-    id: "fire_safety_equipment_license",
-    canonicalEn: "Fire Safety & Protection Equipment License",
-    arabicName: "إصدار الترخيص لمعدات الحريق والسلامة، وتجديد الترخيص",
-    aliases: ["معدات الحريق والسلامة","ترخيص معدات السلامة","معدات إطفاء","ترخيص معدات الحريق","fire safety equipment","fire equipment license","safety equipment renewal"]
-  },
-  {
-    id: "fire_safety_equipment_noc",
-    canonicalEn: "No-Objection Certificate (NOC) for Fire Safety Equipment",
-    arabicName: "إصدار ترخيص عدم الممانعة لمعدات الحريق والسلامة، وتجديد الترخيص",
-    aliases: ["عدم الممانعة لمعدات الحريق","عدم ممانعة معدات السلامة","ترخيص عدم ممانعة معدات","fire equipment noc","safety equipment no objection","equipment noc"]
-  },
-  {
-    id: "local_fire_equipment_factory_license",
-    canonicalEn: "License for Local Firefighting Equipment Factory",
-    arabicName: "إصدار الترخيص لمصنع محلي لمعدات الإطفاء والوقاية من الحريق، وتجديد الترخيص",
-    aliases: ["مصنع محلي لمعدات الإطفاء","مصنع معدات حريق","ترخيص مصنع إطفاء","local fire equipment factory","firefighting factory license","local safety factory"]
-  },
-  {
-    id: "alarm_firefighting_maintenance_offices_license",
-    canonicalEn: "License for Alarm & Firefighting Maintenance Offices",
-    arabicName: "إصدار الترخيص للمكاتب الفنية ومكاتب صيانة أجهزة الإنذار والإطفاء، وتجديد الترخيص",
-    aliases: ["مكاتب صيانة أجهزة الإنذار","مكاتب صيانة الإطفاء","مكتب فني صيانة حريق","alarm maintenance office","firefighting maintenance company","technical office license"]
-  },
-  {
-    id: "hazardous_materials_1day_transport",
-    canonicalEn: "One-Day Permit for Transporting Hazardous Material Shipments",
-    arabicName: "ترخيص بالموافقة على نقل شحنات المواد الخطرة ليوم واحد",
-    aliases: ["نقل شحنات المواد الخطرة ليوم واحد","نقل مواد خطرة يوم","شحنة مواد خطرة","hazardous transport 1day","chemical transport permit","1 day hazardous transport","dangerous goods transport"]
-  },
-  {
-    id: "chemical_hazmat_transport_vehicles_license",
-    canonicalEn: "Approval License for Chemical & Hazardous Transport Vehicles",
-    arabicName: "إصدار ترخيص الموافقة على سيارات نقل المواد الكيميائية والخطرة، وتجديد الترخيص",
-    aliases: ["سيارات نقل المواد الكيميائية","مركبات نقل مواد خطرة","ترخيص سيارة نقل كيميائي","شاحنة نقل غاز","chemical transport vehicle","hazmat truck license","hazardous transport vehicle","chemical transport"]
-  },
-  {
-    id: "diesel_gas_tanks_installation_license",
-    canonicalEn: "Final Approval License for Installing Diesel & Gas Tanks",
-    arabicName: "إصدار ترخيص الموافقة النهائية على تركيب خزانات الديزل والغاز، وتجديد الترخيص",
-    aliases: ["تركيب خزانات الديزل والغاز","خزانات ديزل","تركيب خزان غاز","ترخيص خزان ديزل","diesel tank","gas tank installation","diesel tank installation","fuel tank installation license"]
-  },
-  {
-    id: "consulting_offices_gas_fuel_hazmat_license",
-    canonicalEn: "License for Technical & Consulting Offices (Gas, Fuel, & Hazmat)",
-    arabicName: "إصدار الترخيص للمكاتب الفنية والاستشارية المختصة بالغاز والوقود والمواد الخطرة، وتجديد الترخيص",
-    aliases: ["المكاتب الفنية والاستشارية المختصة بالغاز","مكتب استشاري مواد خطرة","استشاري غاز ووقود","gas fuel consulting office","hazmat consulting office","gas technical office"]
-  },
-  {
-    id: "engineering_offices_fire_protection_license",
-    canonicalEn: "License for Engineering Offices Designing Fire Protection Systems",
-    arabicName: "ترخيص المكاتب الهندسية لتصميم أنظمة الحماية والوقاية من الحريق وتجديد الترخيص",
-    aliases: ["ترخيص مكاتب هندسية","مكتب تصميم أنظمة حماية","تصميم أنظمة حريق","مكتب هندسي حريق","engineering office fire protection","fire safety design office","engineering design license"]
-  },
-  {
-    id: "small_facilities_inspection_certificate",
-    canonicalEn: "Small Facilities Inspection Certificate Renewal",
-    arabicName: "إصدار شهادة فحص المنشآت الصغيرة، وتجديد الشهادة",
-    aliases: ["فحص المنشآت الصغيرة","فحص منشأة صغيرة","شهادة فحص منشأة صغيرة","small facilities inspection","small facility certificate","small business inspection"]
-  },
-  {
-    id: "certified_prevention_inspector",
-    canonicalEn: "Certified Prevention Inspector",
-    arabicName: "مفتش وقاية معتمد",
-    aliases: ["مفتش وقاية","مفتش معتمد","مفتش","prevention inspector","certified inspector"]
-  },
-  {
-    id: "fire_equipment_sales_license",
-    canonicalEn: "Fire Equipment Sales, Trading & Storage License",
-    arabicName: "ترخيص بيع وتداول وتخزين معدات الحريق",
-    aliases: ["بيع معدات الحريق","تداول معدات الحريق","تخزين معدات الحريق","fire equipment sales","fire equipment trading"]
-  },
-  {
-    id: "fireworks_import_license",
-    canonicalEn: "Fireworks Import & Storage License",
-    arabicName: "ترخيص استيراد وتخزين الألعاب النارية",
-    aliases: ["ألعاب نارية","استيراد ألعاب نارية","تخزين ألعاب نارية","مفرقعات","fireworks import","fireworks storage","fireworks"]
-  },
-  {
-    id: "explosives_import_permit",
-    canonicalEn: "Hazardous Material & Explosives Import Permit",
-    arabicName: "ترخيص استيراد مواد خطرة ومتفجرات",
-    aliases: ["استيراد متفجرات","مواد خطرة ومتفجرات","explosives import","explosives permit"]
-  },
-  {
-    id: "temporary_event_tents_permit",
-    canonicalEn: "Temporary Event Tents Permit",
-    arabicName: "طلب ترخيص الخيام للمناسبات العامة والخاصة المؤقتة",
-    aliases: ["ترخيص خيام","خيام مناسبات","خيمة","خيام مؤقتة","event tents","temporary tents","tents permit","tent"]
-  }
-];
-
-function resolveService(inputName) {
-  if (!inputName || typeof inputName !== 'string') return null;
-  const rawTrimmed = inputName.trim();
-  if (!rawTrimmed) return null;
-
-  // 1. Direct exact matches
-  for (const svc of SERVICES_REGISTRY) {
-    if (svc.id === rawTrimmed || svc.canonicalEn === rawTrimmed || svc.arabicName === rawTrimmed) {
-      return svc;
-    }
-  }
-
-  // 2. Case-insensitive exact matches
-  const lowerInput = rawTrimmed.toLowerCase();
-  for (const svc of SERVICES_REGISTRY) {
-    if (svc.id.toLowerCase() === lowerInput ||
-        svc.canonicalEn.toLowerCase() === lowerInput ||
-        svc.arabicName.toLowerCase() === lowerInput) {
-      return svc;
-    }
-    if (svc.aliases && svc.aliases.some(alias => alias.toLowerCase() === lowerInput)) {
-      return svc;
-    }
-  }
-
-  // 3. Cleaned punctuation/space normalized match
-  const cleanInput = lowerInput.replace(/[,\.\-\_\s]+/g, ' ').trim();
-  for (const svc of SERVICES_REGISTRY) {
-    const cleanId = svc.id.toLowerCase().replace(/[,\.\-\_\s]+/g, ' ').trim();
-    const cleanEn = svc.canonicalEn.toLowerCase().replace(/[,\.\-\_\s]+/g, ' ').trim();
-    const cleanAr = svc.arabicName.toLowerCase().replace(/[,\.\-\_\s]+/g, ' ').trim();
-
-    if (cleanInput === cleanId || cleanInput === cleanEn || cleanInput === cleanAr) {
-      return svc;
-    }
-    if (svc.aliases) {
-      for (const alias of svc.aliases) {
-        const cleanAlias = alias.toLowerCase().replace(/[,\.\-\_\s]+/g, ' ').trim();
-        if (cleanInput === cleanAlias) return svc;
-      }
-    }
-  }
-
-  // 4. Substring / partial match
-  for (const svc of SERVICES_REGISTRY) {
-    const cleanAr = svc.arabicName.toLowerCase().replace(/[,\.\-\_\s]+/g, ' ').trim();
-    const cleanEn = svc.canonicalEn.toLowerCase().replace(/[,\.\-\_\s]+/g, ' ').trim();
-    if (cleanInput.length >= 5 && (cleanAr.includes(cleanInput) || cleanInput.includes(cleanAr) || cleanEn.includes(cleanInput) || cleanInput.includes(cleanEn))) {
-      return svc;
-    }
-  }
-
-  return null;
-}
-
-function formatDynamicFields(serviceInput, dynamicFields) {
-  if (!dynamicFields) return "";
-
-  if (typeof dynamicFields === 'string') {
-    const trimmed = dynamicFields.trim();
-    if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) {
-      return trimmed;
-    }
-    try {
-      dynamicFields = JSON.parse(trimmed);
-    } catch (e) {
-      return trimmed;
-    }
-  }
-
-  if (typeof dynamicFields !== 'object' || dynamicFields === null) {
-    return String(dynamicFields);
-  }
-
-  const svc = resolveService(serviceInput);
-  const svcId = svc ? svc.id : (typeof serviceInput === 'string' ? serviceInput : '');
-
-  const parts = [];
-
-  switch (svcId) {
-    case 'trainee_registration_1day':
-    case 'trainee_registration_1week':
-    case 'trainee_registration_16weeks':
-    case 'Civil Defense Training Certificate (1 Day)':
-    case 'Civil Defense Training Certificate (1 Week)':
-    case 'Civil Defense Individual Training Certificate (16 Weeks)':
-    case 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة يوم واحد':
-    case 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة اسبوع':
-    case 'إصدار شهادة تدريب على أعمال الدفاع المدني لمدة  اسبوع':
-    case 'إصدار شهادة تدريب الفرد على أعمال الدفاع المدني لمدة ستة عشر أسبوعًا.':
-    case 'إصدار شهادة تدريب الفرد على أعمال الدفاع المدني لمدة ستة عشر أسبوعا.':
-      if (dynamicFields.requestingEntityLetter || dynamicFields.trainingOfficialLetter) {
-        const fileObj = dynamicFields.requestingEntityLetter || dynamicFields.trainingOfficialLetter;
-        const doc = typeof fileObj === 'object'
-          ? (fileObj.name || fileObj.url || 'مرفق كتاب رسمي من الجهة الطالبة')
-          : fileObj;
-        parts.push(`كتاب رسمي من الجهة الطالبة للدورة التدريبية: ${doc}`);
-      }
-      if (Array.isArray(dynamicFields.trainees)) {
-        parts.push(`المتدربون: ${dynamicFields.trainees.join(', ')}`);
-      } else if (dynamicFields.trainees) {
-        parts.push(`المتدربون: ${dynamicFields.trainees}`);
-      }
-      break;
-
-    case 'heavy_fire_vehicle_driving_training':
-    case 'heavy_fire_vehicle_driving_training_2weeks':
-    case 'Heavy Firefighting Vehicle Driving Training Certificate (2 Weeks)':
-    case 'إصدار شهادة تدريب أفراد منشآت ومؤسسات القطاع الخاص على قيادة مركبات الإطفاء الثقيلة لمدة أسبوعين':
-      if (dynamicFields.courseDetailsLetter || dynamicFields.trainingOfficialLetter) {
-        const fileObj = dynamicFields.courseDetailsLetter || dynamicFields.trainingOfficialLetter;
-        const doc = typeof fileObj === 'object'
-          ? (fileObj.name || fileObj.url || 'مرفق رسالة تفاصيل الدورة')
-          : fileObj;
-        parts.push(`رسالة تفاصيل الدورة (النوع، اللغة، المدة، عدد المشاركين): ${doc}`);
-      }
-      if (Array.isArray(dynamicFields.trainees)) {
-        parts.push(`المتدربون: ${dynamicFields.trainees.join(', ')}`);
-      } else if (dynamicFields.trainees) {
-        parts.push(`المتدربون: ${dynamicFields.trainees}`);
-      }
-      break;
-
-    case 'building_evacuation_training':
-    case 'Building & Facility Evacuation Operations Training':
-    case 'Building Evacuation Training':
-    case 'التدريب على عمليات إخلاء المباني والمنشآت':
-      if (dynamicFields.applicantEntityLetter || dynamicFields.requestingEntityLetter || dynamicFields.trainingOfficialLetter) {
-        const fileObj = dynamicFields.applicantEntityLetter || dynamicFields.requestingEntityLetter || dynamicFields.trainingOfficialLetter;
-        const doc = typeof fileObj === 'object'
-          ? (fileObj.name || fileObj.url || 'مرفق رسالة من جهة صاحب الطلب')
-          : fileObj;
-        parts.push(`رسالة من جهة صاحب الطلب: ${doc}`);
-      }
-      if (dynamicFields.buildingName) parts.push(`اسم المنشأة/المبنى: ${dynamicFields.buildingName}`);
-      if (dynamicFields.traineesCount) parts.push(`عدد المشاركين: ${dynamicFields.traineesCount}`);
-      break;
-
-    case 'trainee_registration':
-    case 'Trainee Registration':
-      if (dynamicFields.trainingOfficialLetter) {
-        const doc = typeof dynamicFields.trainingOfficialLetter === 'object'
-          ? (dynamicFields.trainingOfficialLetter.name || dynamicFields.trainingOfficialLetter.url || 'مرفق الخطاب الرسمي')
-          : dynamicFields.trainingOfficialLetter;
-        parts.push(`خطاب رسمي: ${doc}`);
-      }
-      if (dynamicFields.trainingAccreditations) {
-        const doc = typeof dynamicFields.trainingAccreditations === 'object'
-          ? (dynamicFields.trainingAccreditations.name || dynamicFields.trainingAccreditations.url || 'مرفق الموافقات/الاعتمادات')
-          : dynamicFields.trainingAccreditations;
-        parts.push(`الموافقات/الاعتمادات: ${doc}`);
-      }
-      if (Array.isArray(dynamicFields.trainees)) {
-        parts.push(`المتدربون: ${dynamicFields.trainees.join(', ')}`);
-      } else if (dynamicFields.trainees) {
-        parts.push(`المتدربون: ${dynamicFields.trainees}`);
-      }
-      break;
-
-    case 'safety_certificate_renewal':
-    case 'Safety Certificate Renewal':
-      if (dynamicFields.fireInspectionReport) {
-        const rep = typeof dynamicFields.fireInspectionReport === 'object'
-          ? (dynamicFields.fireInspectionReport.name || dynamicFields.fireInspectionReport.url || 'مرفق تقرير الفحص')
-          : dynamicFields.fireInspectionReport;
-        parts.push(`تقرير فحص أنظمة الإطفاء والإنذار: ${rep}`);
-      }
-      if (dynamicFields.maintenanceContract) {
-        const con = typeof dynamicFields.maintenanceContract === 'object'
-          ? (dynamicFields.maintenanceContract.name || dynamicFields.maintenanceContract.url || 'مرفق عقد الصيانة')
-          : dynamicFields.maintenanceContract;
-        parts.push(`نسخة من عقد الصيانة: ${con}`);
-      }
-      if (dynamicFields.inspectionArea) {
-        parts.push(`مساحة التفتيش: ${dynamicFields.inspectionArea} متر مربع`);
-      }
-      break;
-
-    case 'hazardous_material_permit':
-    case 'Hazardous Material Permit':
-    case 'Chemical & Hazardous Material Storage NOC Permit':
-    case 'إصدار ترخيص عدم ممانعة لتخزين مواد كيميائية أو المتفجرات، وتجديد الترخيص':
-      if (dynamicFields.materialsScientificName) {
-        parts.push(`الاسم العلمي للمواد: ${dynamicFields.materialsScientificName}`);
-      }
-      if (dynamicFields.hazmatQuantitiesTable) {
-        const doc = typeof dynamicFields.hazmatQuantitiesTable === 'object'
-          ? (dynamicFields.hazmatQuantitiesTable.name || dynamicFields.hazmatQuantitiesTable.url || 'مرفق جدول كميات المواد الخطرة')
-          : dynamicFields.hazmatQuantitiesTable;
-        parts.push(`جدول كميات المواد الخطرة: ${doc}`);
-      }
-      if (dynamicFields.safetyDataSheetMSDS) {
-        const doc = typeof dynamicFields.safetyDataSheetMSDS === 'object'
-          ? (dynamicFields.safetyDataSheetMSDS.name || dynamicFields.safetyDataSheetMSDS.url || 'مرفق صحيفة السلامة (MSDS)')
-          : dynamicFields.safetyDataSheetMSDS;
-        parts.push(`صحيفة السلامة (MSDS): ${doc}`);
-      }
-      if (dynamicFields.alarmFirefightingPlans) {
-        const doc = typeof dynamicFields.alarmFirefightingPlans === 'object'
-          ? (dynamicFields.alarmFirefightingPlans.name || dynamicFields.alarmFirefightingPlans.url || 'مرفق مخططات الإنذار والإطفاء')
-          : dynamicFields.alarmFirefightingPlans;
-        parts.push(`مخططات الإنذار والإطفاء: ${doc}`);
-      }
-      if (dynamicFields.maintenanceCertificate) {
-        const doc = typeof dynamicFields.maintenanceCertificate === 'object'
-          ? (dynamicFields.maintenanceCertificate.name || dynamicFields.maintenanceCertificate.url || 'مرفق شهادة الصيانة')
-          : dynamicFields.maintenanceCertificate;
-        parts.push(`شهادة الصيانة: ${doc}`);
-      }
-      if (dynamicFields.chemicalType) {
-        parts.push(`نوع المادة الكيميائية: ${dynamicFields.chemicalType}`);
-      }
-      break;
-
-    case 'gas_selling_shops_license':
-    case 'Gas Selling Shops License':
-      if (dynamicFields.moicLetter) {
-        const letter = typeof dynamicFields.moicLetter === 'object'
-          ? (dynamicFields.moicLetter.name || dynamicFields.moicLetter.url || 'مرفق رسالة وزارة الصناعة والتجارة والسياحة')
-          : dynamicFields.moicLetter;
-        parts.push(`رسالة من وزارة الصناعة والتجارة والسياحة: ${letter}`);
-      } else if (dynamicFields.gasMinistryLetter) {
-        parts.push(`رسالة من وزارة الصناعة والتجارة والسياحة: ${dynamicFields.gasMinistryLetter}`);
-      }
-      break;
-
-    case 'bakery_license':
-    case 'Bakery License':
-      if (dynamicFields.bakeryCrCopy) {
-        const doc = typeof dynamicFields.bakeryCrCopy === 'object'
-          ? (dynamicFields.bakeryCrCopy.name || dynamicFields.bakeryCrCopy.url || 'مرفق السجل التجاري')
-          : dynamicFields.bakeryCrCopy;
-        parts.push(`السجل التجاري: ${doc}`);
-      }
-      if (dynamicFields.bakerySitePhotos) {
-        const doc = typeof dynamicFields.bakerySitePhotos === 'object'
-          ? (dynamicFields.bakerySitePhotos.name || dynamicFields.bakerySitePhotos.url || 'مرفق صور الموقع')
-          : dynamicFields.bakerySitePhotos;
-        parts.push(`صور الموقع: ${doc}`);
-      }
-      if (dynamicFields.bakeryDrawingsApproval) {
-        const doc = typeof dynamicFields.bakeryDrawingsApproval === 'object'
-          ? (dynamicFields.bakeryDrawingsApproval.name || dynamicFields.bakeryDrawingsApproval.url || 'مرفق موافقات المخططات')
-          : dynamicFields.bakeryDrawingsApproval;
-        parts.push(`موافقات المخططات المعمارية والكهربائية والميكانيكية: ${doc}`);
-      } else if (dynamicFields.bakeryDrawings) {
-        parts.push(`موافقات المخططات المعمارية: ${dynamicFields.bakeryDrawings}`);
-      }
-      break;
-
-    case 'gold_shop_license':
-    case 'Gold Shop License':
-      if (dynamicFields.goldAlarmContract) {
-        const doc = typeof dynamicFields.goldAlarmContract === 'object'
-          ? (dynamicFields.goldAlarmContract.name || dynamicFields.goldAlarmContract.url || 'مرفق عقد الصيانة لأجهزة الإنذار والإطفاء')
-          : dynamicFields.goldAlarmContract;
-        parts.push(`عقد صيانة أجهزة الإنذار والإطفاء: ${doc}`);
-      } else if (dynamicFields.goldAlarmDetails) {
-        parts.push(`عقد صيانة نظام الإنذار: ${dynamicFields.goldAlarmDetails}`);
-      }
-      break;
-
-    case 'gas_station_license':
-    case 'Gas Station License':
-    case 'fuel_gas_station_license':
-    case 'إصدار الترخيص لمحطات تزويد الوقود، وتجديد الترخيص':
-      if (dynamicFields.gasStationApplicantLetter) {
-        const doc = typeof dynamicFields.gasStationApplicantLetter === 'object'
-          ? (dynamicFields.gasStationApplicantLetter.name || dynamicFields.gasStationApplicantLetter.url || 'مرفق رسالة رسمية باسم مقدم الطلب')
-          : dynamicFields.gasStationApplicantLetter;
-        parts.push(`رسالة رسمية باسم مقدم الطلب: ${doc}`);
-      }
-      if (dynamicFields.gasStationGovApprovals) {
-        const doc = typeof dynamicFields.gasStationGovApprovals === 'object'
-          ? (dynamicFields.gasStationGovApprovals.name || dynamicFields.gasStationGovApprovals.url || 'مرفق موافقات الجهات الحكومية')
-          : dynamicFields.gasStationGovApprovals;
-        parts.push(`موافقات الجهات الحكومية: ${doc}`);
-      }
-      if (dynamicFields.stationCapacity) {
-        parts.push(`سعة خزانات الوقود: ${dynamicFields.stationCapacity} لتر`);
-      }
-      break;
-
-    case 'factories_hotels_malls_inspection_certificate':
-    case 'Inspection Certificate for Factories, Hotels, & Malls under Construction':
-    case 'إصدار شهادة فحص المصانع والفنادق والمجمعات التجارية قيد الإنشاء وتجديدها':
-      if (dynamicFields.leaseContractCopy) {
-        const doc = typeof dynamicFields.leaseContractCopy === 'object'
-          ? (dynamicFields.leaseContractCopy.name || dynamicFields.leaseContractCopy.url || 'مرفق نسخة من عقد الإيجار')
-          : dynamicFields.leaseContractCopy;
-        parts.push(`نسخة من عقد الإيجار: ${doc}`);
-      }
-      if (dynamicFields.sitePlans) {
-        const doc = typeof dynamicFields.sitePlans === 'object'
-          ? (dynamicFields.sitePlans.name || dynamicFields.sitePlans.url || 'مرفق مخططات الموقع')
-          : dynamicFields.sitePlans;
-        parts.push(`مخططات الموقع: ${doc}`);
-      }
-      break;
-
-    case 'incident_report_large_facilities':
-    case 'Incident Report for Large Facilities, Factories, & Malls':
-    case 'إصدار تقرير الحوادث للمنشآت الكبيرة والمصانع والفنادق والمجمعات التجارية وما في حكمها':
-      if (dynamicFields.idCardCopy) {
-        const doc = typeof dynamicFields.idCardCopy === 'object'
-          ? (dynamicFields.idCardCopy.name || dynamicFields.idCardCopy.url || 'مرفق بطاقة الهوية')
-          : dynamicFields.idCardCopy;
-        parts.push(`بطاقة الهوية: ${doc}`);
-      }
-      if (dynamicFields.propertyDeed) {
-        const doc = typeof dynamicFields.propertyDeed === 'object'
-          ? (dynamicFields.propertyDeed.name || dynamicFields.propertyDeed.url || 'مرفق وثيقة ملكية العقار')
-          : dynamicFields.propertyDeed;
-        parts.push(`وثيقة ملكية العقار: ${doc}`);
-      }
-      if (dynamicFields.leaseContractCopy) {
-        const doc = typeof dynamicFields.leaseContractCopy === 'object'
-          ? (dynamicFields.leaseContractCopy.name || dynamicFields.leaseContractCopy.url || 'مرفق نسخة من عقد الإيجار')
-          : dynamicFields.leaseContractCopy;
-        parts.push(`نسخة من عقد الإيجار: ${doc}`);
-      }
-      if (dynamicFields.commercialRegisterCopy) {
-        const doc = typeof dynamicFields.commercialRegisterCopy === 'object'
-          ? (dynamicFields.commercialRegisterCopy.name || dynamicFields.commercialRegisterCopy.url || 'مرفق نسخة من السجل التجاري')
-          : dynamicFields.commercialRegisterCopy;
-        parts.push(`نسخة من السجل التجاري: ${doc}`);
-      }
-      break;
-
-    case 'incident_report_small_facilities_homes':
-    case 'Incident Report for Small Facilities & Homes':
-    case 'إصدار تقرير الحوادث للمنشآت الصغيرة والمنازل وما في حكمها':
-      if (dynamicFields.idCardCopy) {
-        const doc = typeof dynamicFields.idCardCopy === 'object'
-          ? (dynamicFields.idCardCopy.name || dynamicFields.idCardCopy.url || 'مرفق بطاقة الهوية')
-          : dynamicFields.idCardCopy;
-        parts.push(`بطاقة الهوية: ${doc}`);
-      }
-      if (dynamicFields.propertyDeed) {
-        const doc = typeof dynamicFields.propertyDeed === 'object'
-          ? (dynamicFields.propertyDeed.name || dynamicFields.propertyDeed.url || 'مرفق وثيقة ملكية العقار')
-          : dynamicFields.propertyDeed;
-        parts.push(`وثيقة ملكية العقار: ${doc}`);
-      }
-      if (dynamicFields.tenantLeaseContract) {
-        const doc = typeof dynamicFields.tenantLeaseContract === 'object'
-          ? (dynamicFields.tenantLeaseContract.name || dynamicFields.tenantLeaseContract.url || 'مرفق عقد الإيجار إذا كان المتضرر مستأجرًا')
-          : dynamicFields.tenantLeaseContract;
-        parts.push(`عقد الإيجار إذا كان المتضرر مستأجرًا: ${doc}`);
-      }
-      break;
-
-    case 'electrical_connection_final_inspection':
-    case 'Final Inspection Certificate for Electrical Connection':
-    case 'إصدار شهادة الفحص النهائي لتوصيل التيار الكهربائي للمباني الجديدة':
-      if (dynamicFields.municipalityFormProof) {
-        const doc = typeof dynamicFields.municipalityFormProof === 'object'
-          ? (dynamicFields.municipalityFormProof.name || dynamicFields.municipalityFormProof.url || 'مرفق استمارة البلدية (أو ما يثبت)')
-          : dynamicFields.municipalityFormProof;
-        parts.push(`استمارة البلدية (أو ما يثبت): ${doc}`);
-      }
-      break;
-
-    case 'factory_warehouse_maps_license':
-    case 'Factory & Warehouse Maps License':
-    case 'Factory & Warehouse Blueprint License':
-    case 'إصدار ترخيص خرائط المصانع والمخازن وتجديد الترخيص':
-      if (dynamicFields.engineeringOfficeLetter) {
-        const doc = typeof dynamicFields.engineeringOfficeLetter === 'object'
-          ? (dynamicFields.engineeringOfficeLetter.name || dynamicFields.engineeringOfficeLetter.url || 'مرفق رسالة المكتب الهندسي')
-          : dynamicFields.engineeringOfficeLetter;
-        parts.push(`رسالة المكتب الهندسي: ${doc}`);
-      }
-      if (dynamicFields.projectEngineeringDrawings) {
-        const doc = typeof dynamicFields.projectEngineeringDrawings === 'object'
-          ? (dynamicFields.projectEngineeringDrawings.name || dynamicFields.projectEngineeringDrawings.url || 'مرفق الرسومات الهندسية للمشروع')
-          : dynamicFields.projectEngineeringDrawings;
-        parts.push(`الرسومات الهندسية للمشروع: ${doc}`);
-      }
-      if (dynamicFields.blueprintNumber) parts.push(`رقم المخطط: ${dynamicFields.blueprintNumber}`);
-      if (dynamicFields.factoryArea || dynamicFields.area || dynamicFields.inspectionArea) parts.push(`مساحة المنشأة: ${dynamicFields.factoryArea || dynamicFields.area || dynamicFields.inspectionArea} متر مربع`);
-      if (dynamicFields.warehouseType || dynamicFields.facilityType) parts.push(`نوع المنشأة: ${dynamicFields.warehouseType || dynamicFields.facilityType}`);
-      break;
-
-    case 'commercial_centers_high_rise_maps_license':
-    case 'commercial_centers_highrise_maps_license':
-    case 'commercial_centers_highrise_plans_license':
-    case 'Commercial Centers & High-Rise Buildings Maps License':
-    case 'Commercial Centers & High-rise Blueprint License':
-    case 'Commercial Centers and High-Rise Building Plans Permit':
-    case 'إصدار ترخيص خرائط المراكز التجارية والمباني العالية':
-      if (dynamicFields.engineeringOfficeLetter) {
-        const doc = typeof dynamicFields.engineeringOfficeLetter === 'object'
-          ? (dynamicFields.engineeringOfficeLetter.name || dynamicFields.engineeringOfficeLetter.url || 'مرفق رسالة المكتب الهندسي')
-          : dynamicFields.engineeringOfficeLetter;
-        parts.push(`رسالة المكتب الهندسي: ${doc}`);
-      }
-      if (dynamicFields.projectEngineeringDrawings) {
-        const doc = typeof dynamicFields.projectEngineeringDrawings === 'object'
-          ? (dynamicFields.projectEngineeringDrawings.name || dynamicFields.projectEngineeringDrawings.url || 'مرفق الرسومات الهندسية للمشروع')
-          : dynamicFields.projectEngineeringDrawings;
-        parts.push(`الرسومات الهندسية للمشروع: ${doc}`);
-      }
-      if (dynamicFields.blueprintNumber) parts.push(`رقم المخطط: ${dynamicFields.blueprintNumber}`);
-      if (dynamicFields.buildingHeight || dynamicFields.floorsCount || dynamicFields.floors) parts.push(`عدد الطوابق/الارتفاع: ${dynamicFields.buildingHeight || dynamicFields.floorsCount || dynamicFields.floors}`);
-      if (dynamicFields.centerName || dynamicFields.buildingName) parts.push(`اسم المبنى/المركز: ${dynamicFields.centerName || dynamicFields.buildingName}`);
-      break;
-
-    case 'residential_complexes_maps_license':
-    case 'residential_compounds_plans_license':
-    case 'Residential Complexes Maps License (10+ Villas)':
-    case 'Residential Complexes Blueprint License':
-    case 'Residential Compound Plans Permit (10+ Villas)':
-    case 'إصدار ترخيص خرائط المجمعات السكنية التي تحتوي على عشر فلل فأكثر':
-      if (dynamicFields.engineeringOfficeLetter) {
-        const doc = typeof dynamicFields.engineeringOfficeLetter === 'object'
-          ? (dynamicFields.engineeringOfficeLetter.name || dynamicFields.engineeringOfficeLetter.url || 'مرفق رسالة المكتب الهندسي')
-          : dynamicFields.engineeringOfficeLetter;
-        parts.push(`رسالة المكتب الهندسي: ${doc}`);
-      }
-      if (dynamicFields.projectEngineeringDrawings) {
-        const doc = typeof dynamicFields.projectEngineeringDrawings === 'object'
-          ? (dynamicFields.projectEngineeringDrawings.name || dynamicFields.projectEngineeringDrawings.url || 'مرفق الرسومات الهندسية للمشروع')
-          : dynamicFields.projectEngineeringDrawings;
-        parts.push(`الرسومات الهندسية للمشروع: ${doc}`);
-      }
-      if (dynamicFields.blueprintNumber) parts.push(`رقم المخطط: ${dynamicFields.blueprintNumber}`);
-      if (dynamicFields.villasCount || dynamicFields.unitsCount) parts.push(`عدد الفلل: ${dynamicFields.villasCount || dynamicFields.unitsCount}`);
-      if (dynamicFields.complexName) parts.push(`اسم المجمع: ${dynamicFields.complexName}`);
-      break;
-
-    case 'factory_hotel_commercial_inspection':
-      if (dynamicFields.inspectionArea) parts.push(`مساحة الفحص: ${dynamicFields.inspectionArea} متر مربع`);
-      if (dynamicFields.facilityType) parts.push(`نوع المنشأة: ${dynamicFields.facilityType}`);
-      break;
-
-    case 'large_facility_incident_report':
-    case 'small_facility_home_incident_report':
-      if (dynamicFields.incidentDate) parts.push(`تاريخ الحادث: ${dynamicFields.incidentDate}`);
-      if (dynamicFields.facilityName) parts.push(`اسم المنشأة/الموقع: ${dynamicFields.facilityName}`);
-      if (dynamicFields.location) parts.push(`الموقع: ${dynamicFields.location}`);
-      break;
-
-    case 'final_electricity_connection_certificate':
-      if (dynamicFields.buildingNumber) parts.push(`رقم المبنى: ${dynamicFields.buildingNumber}`);
-      if (dynamicFields.electricityAccount) parts.push(`حساب الكهرباء: ${dynamicFields.electricityAccount}`);
-      break;
-
-    case 'worship_courts_museums_maps_review':
-    case 'public_worship_courts_museums_plans_review':
-    case 'Review of Maps for Places of Worship, Courts, & Museums':
-    case 'Review of Engineering Plans for Places of Worship, Courts, and Museums':
-    case 'Places of Worship, Courts, and Museums Engineering Plans Review':
-    case 'دراسة مخططات دور العبادة والمحاكم والمتاحف':
-    case 'worship_court_museum_plans_study':
-      if (dynamicFields.entityLetter) {
-        const doc = typeof dynamicFields.entityLetter === 'object'
-          ? (dynamicFields.entityLetter.name || dynamicFields.entityLetter.url || 'مرفق خطاب من الجهة')
-          : dynamicFields.entityLetter;
-        parts.push(`خطاب من الجهة: ${doc}`);
-      }
-      if (dynamicFields.architecturalPlans) {
-        const doc = typeof dynamicFields.architecturalPlans === 'object'
-          ? (dynamicFields.architecturalPlans.name || dynamicFields.architecturalPlans.url || 'مرفق المخططات المعمارية')
-          : dynamicFields.architecturalPlans;
-        parts.push(`المخططات المعمارية: ${doc}`);
-      }
-      if (dynamicFields.buildingType) parts.push(`نوع المبنى: ${dynamicFields.buildingType}`);
-      if (dynamicFields.projectTitle) parts.push(`اسم المشروع: ${dynamicFields.projectTitle}`);
-      break;
-
-    case 'new_gas_stations_maps_review':
-    case 'new_gas_station_maps_study':
-    case 'new_fuel_stations_plans_review':
-    case 'Review of Maps for New Fuel Stations':
-    case 'Review of Building Plans for New Fuel Stations':
-    case 'New Fuel Station Building Plans Review':
-    case 'دراسة الخرائط لمحطات الوقود الجديدة':
-    case 'gas_piping_tanks_maps_review':
-    case 'gas_piping_tanks_maps_study':
-    case 'Review of Maps for Gas Extension Lines & Tanks':
-    case 'Gas Extension Lines & Tanks Maps Review':
-    case 'Review of Gas Piping and Tanks Plans':
-    case 'Gas Piping and Tanks Plans Review':
-    case 'دراسة الخرائط على تمديدات الغاز والخزانات':
-      if (dynamicFields.concernedEntityLetter) {
-        const doc = typeof dynamicFields.concernedEntityLetter === 'object'
-          ? (dynamicFields.concernedEntityLetter.name || dynamicFields.concernedEntityLetter.url || 'مرفق رسالة من الجهة المعنية')
-          : dynamicFields.concernedEntityLetter;
-        parts.push(`رسالة من الجهة المعنية: ${doc}`);
-      }
-      if (dynamicFields.otherEntitiesApprovals) {
-        const doc = typeof dynamicFields.otherEntitiesApprovals === 'object'
-          ? (dynamicFields.otherEntitiesApprovals.name || dynamicFields.otherEntitiesApprovals.url || 'مرفق موافقات الجهات المعنية الأخرى')
-          : dynamicFields.otherEntitiesApprovals;
-        parts.push(`موافقات الجهات المعنية الأخرى: ${doc}`);
-      }
-      if (dynamicFields.approvedProjectMaps) {
-        const doc = typeof dynamicFields.approvedProjectMaps === 'object'
-          ? (dynamicFields.approvedProjectMaps.name || dynamicFields.approvedProjectMaps.url || 'مرفق خرائط المشروع المعتمدة')
-          : dynamicFields.approvedProjectMaps;
-        parts.push(`خرائط المشروع المعتمدة: ${doc}`);
-      }
-      if (dynamicFields.stationLocation) parts.push(`موقع المحطة: ${dynamicFields.stationLocation}`);
-      if (dynamicFields.tanksCount) parts.push(`عدد الخزانات: ${dynamicFields.tanksCount}`);
-      break;
-
-    case 'electrical_engineering_plans_review':
-    case 'electrical_engineering_plans_study':
-    case 'Review of Electrical Engineering Plans':
-    case 'Electrical Engineering Plans Review':
-    case 'دراسة المخططات الهندسية الكهربائية':
-    case 'mechanical_engineering_plans_review':
-    case 'mechanical_plans_study':
-    case 'Review of Mechanical Engineering Plans':
-    case 'Mechanical Engineering Plans Review':
-    case 'دراسة المخططات الميكانيكية':
-      if (dynamicFields.concernedEntityLetter) {
-        const doc = typeof dynamicFields.concernedEntityLetter === 'object'
-          ? (dynamicFields.concernedEntityLetter.name || dynamicFields.concernedEntityLetter.url || 'مرفق رسالة من الجهة المعنية')
-          : dynamicFields.concernedEntityLetter;
-        parts.push(`رسالة من الجهة المعنية: ${doc}`);
-      }
-      if (dynamicFields.architecturalPlans) {
-        const doc = typeof dynamicFields.architecturalPlans === 'object'
-          ? (dynamicFields.architecturalPlans.name || dynamicFields.architecturalPlans.url || 'مرفق المخططات المعمارية')
-          : dynamicFields.architecturalPlans;
-        parts.push(`المخططات المعمارية: ${doc}`);
-      }
-      if (dynamicFields.electricalMechanicalPlans) {
-        const doc = typeof dynamicFields.electricalMechanicalPlans === 'object'
-          ? (dynamicFields.electricalMechanicalPlans.name || dynamicFields.electricalMechanicalPlans.url || 'مرفق المخططات الكهربائية والميكانيكية')
-          : dynamicFields.electricalMechanicalPlans;
-        parts.push(`المخططات الكهربائية والميكانيكية: ${doc}`);
-      }
-      if (dynamicFields.loadCapacity) parts.push(`سعة الحمل الكهربائي: ${dynamicFields.loadCapacity}`);
-      if (dynamicFields.systemType) parts.push(`نوع النظام الميكانيكي: ${dynamicFields.systemType}`);
-      if (dynamicFields.consultantOffice) parts.push(`المكتب الاستشاري: ${dynamicFields.consultantOffice}`);
-      break;
-
-    case 'gas_piping_tanks_maps_study':
-      if (dynamicFields.pipingType) parts.push(`نوع التمديدات: ${dynamicFields.pipingType}`);
-      if (dynamicFields.tanksCapacity) parts.push(`سعة الخزانات: ${dynamicFields.tanksCapacity}`);
-      break;
-
-    case 'civil_defense_training_1day':
-    case 'civil_defense_training_1week':
-    case 'civil_defense_training_16weeks':
-    case 'heavy_fire_vehicle_driving_training_2weeks':
-    case 'building_evacuation_training':
-      if (dynamicFields.trainingDate) parts.push(`تاريخ التدريب: ${dynamicFields.trainingDate}`);
-      if (dynamicFields.traineesCount) parts.push(`عدد المتدربين: ${dynamicFields.traineesCount}`);
-      if (dynamicFields.buildingName) parts.push(`اسم المنشأة/المبنى: ${dynamicFields.buildingName}`);
-      break;
-
-    case 'fire_safety_equipment_license':
-    case 'Fire Safety & Protection Equipment License':
-    case 'Fire Safety and Protection Equipment License':
-    case 'إصدار الترخيص لمعدات الحريق والسلامة، وتجديد الترخيص':
-      if (dynamicFields.productAccreditationCertificates) {
-        const doc = typeof dynamicFields.productAccreditationCertificates === 'object'
-          ? (dynamicFields.productAccreditationCertificates.name || dynamicFields.productAccreditationCertificates.url || 'مرفق شهادات اعتماد المنتج')
-          : dynamicFields.productAccreditationCertificates;
-        parts.push(`شهادات اعتماد المنتج: ${doc}`);
-      }
-      if (dynamicFields.commercialRegisterCopy) {
-        const doc = typeof dynamicFields.commercialRegisterCopy === 'object'
-          ? (dynamicFields.commercialRegisterCopy.name || dynamicFields.commercialRegisterCopy.url || 'مرفق السجل التجاري')
-          : dynamicFields.commercialRegisterCopy;
-        parts.push(`سجل تجاري: ${doc}`);
-      }
-      if (dynamicFields.companyDetailedProfile) {
-        const doc = typeof dynamicFields.companyDetailedProfile === 'object'
-          ? (dynamicFields.companyDetailedProfile.name || dynamicFields.companyDetailedProfile.url || 'مرفق بيان مفصل للشركة')
-          : dynamicFields.companyDetailedProfile;
-        parts.push(`بيان مفصل للشركة (للشركات الجديدة): ${doc}`);
-      }
-      if (dynamicFields.equipmentType) parts.push(`نوع المعدات: ${dynamicFields.equipmentType}`);
-      if (dynamicFields.brandName) parts.push(`العلامة التجارية: ${dynamicFields.brandName}`);
-      break;
-
-    case 'fire_safety_equipment_noc':
-    case 'noc_fire_safety_equipment_license':
-    case 'No-Objection Certificate (NOC) for Fire Safety Equipment':
-    case 'Fire Safety Equipment NOC License':
-    case 'إصدار ترخيص عدم الممانعة لمعدات الحريق والسلامة، وتجديد الترخيص':
-      if (dynamicFields.materialsScientificName) parts.push(`الاسم العلمي للمواد: ${dynamicFields.materialsScientificName}`);
-      if (dynamicFields.hazmatQuantitiesTable) {
-        const doc = typeof dynamicFields.hazmatQuantitiesTable === 'object'
-          ? (dynamicFields.hazmatQuantitiesTable.name || dynamicFields.hazmatQuantitiesTable.url || 'مرفق جدول كميات المواد الخطرة')
-          : dynamicFields.hazmatQuantitiesTable;
-        parts.push(`جدول كميات المواد الخطرة: ${doc}`);
-      }
-      if (dynamicFields.safetyDataSheetMSDS) {
-        const doc = typeof dynamicFields.safetyDataSheetMSDS === 'object'
-          ? (dynamicFields.safetyDataSheetMSDS.name || dynamicFields.safetyDataSheetMSDS.url || 'مرفق صحيفة السلامة')
-          : dynamicFields.safetyDataSheetMSDS;
-        parts.push(`صحيفة السلامة: ${doc}`);
-      }
-      if (dynamicFields.alarmFirefightingPlans) {
-        const doc = typeof dynamicFields.alarmFirefightingPlans === 'object'
-          ? (dynamicFields.alarmFirefightingPlans.name || dynamicFields.alarmFirefightingPlans.url || 'مرفق مخططات الإنذار والإطفاء')
-          : dynamicFields.alarmFirefightingPlans;
-        parts.push(`مخططات الإنذار والإطفاء: ${doc}`);
-      }
-      if (dynamicFields.maintenanceCertificate) {
-        const doc = typeof dynamicFields.maintenanceCertificate === 'object'
-          ? (dynamicFields.maintenanceCertificate.name || dynamicFields.maintenanceCertificate.url || 'مرفق شهادة الصيانة')
-          : dynamicFields.maintenanceCertificate;
-        parts.push(`شهادة الصيانة: ${doc}`);
-      }
-      if (dynamicFields.equipmentType) parts.push(`نوع المعدات: ${dynamicFields.equipmentType}`);
-      if (dynamicFields.brandName) parts.push(`العلامة التجارية: ${dynamicFields.brandName}`);
-      break;
-
-    case 'local_fire_equipment_factory_license':
-    case 'License for Local Firefighting Equipment Factory':
-    case 'Local Fire Equipment Factory License':
-    case 'إصدار الترخيص لمصنع محلي لمعدات الإطفاء والوقاية من الحريق، وتجديد الترخيص':
-      if (dynamicFields.commercialRegisterCopy) {
-        const doc = typeof dynamicFields.commercialRegisterCopy === 'object'
-          ? (dynamicFields.commercialRegisterCopy.name || dynamicFields.commercialRegisterCopy.url || 'مرفق السجل التجاري')
-          : dynamicFields.commercialRegisterCopy;
-        parts.push(`السجل التجاري: ${doc}`);
-      }
-      if (dynamicFields.companyOperationsProfile) {
-        const doc = typeof dynamicFields.companyOperationsProfile === 'object'
-          ? (dynamicFields.companyOperationsProfile.name || dynamicFields.companyOperationsProfile.url || 'مرفق بيان مفصل للشركة والأعمال')
-          : dynamicFields.companyOperationsProfile;
-        parts.push(`بيان مفصل للشركة والأعمال: ${doc}`);
-      }
-      if (dynamicFields.factoryTechnicalEquipment) {
-        const doc = typeof dynamicFields.factoryTechnicalEquipment === 'object'
-          ? (dynamicFields.factoryTechnicalEquipment.name || dynamicFields.factoryTechnicalEquipment.url || 'مرفق التجهيزات الفنية في المصنع')
-          : dynamicFields.factoryTechnicalEquipment;
-        parts.push(`التجهيزات الفنية في المصنع: ${doc}`);
-      }
-      if (dynamicFields.moicApproval) {
-        const doc = typeof dynamicFields.moicApproval === 'object'
-          ? (dynamicFields.moicApproval.name || dynamicFields.moicApproval.url || 'مرفق موافقة وزارة الصناعة والتجارة')
-          : dynamicFields.moicApproval;
-        parts.push(`موافقة وزارة الصناعة والتجارة: ${doc}`);
-      }
-      if (dynamicFields.engineeringMaps) {
-        const doc = typeof dynamicFields.engineeringMaps === 'object'
-          ? (dynamicFields.engineeringMaps.name || dynamicFields.engineeringMaps.url || 'مرفق الخرائط الهندسية')
-          : dynamicFields.engineeringMaps;
-        parts.push(`الخرائط الهندسية: ${doc}`);
-      }
-      if (dynamicFields.equipmentType) parts.push(`نوع المعدات: ${dynamicFields.equipmentType}`);
-      if (dynamicFields.brandName) parts.push(`العلامة التجارية: ${dynamicFields.brandName}`);
-      break;
-
-    case 'alarm_firefighting_maintenance_offices_license':
-    case 'technical_and_maintenance_offices_license':
-    case 'License for Alarm & Firefighting Maintenance Offices':
-    case 'Alarm & Firefighting Maintenance Offices License':
-    case 'إصدار الترخيص للمكاتب الفنية ومكاتب صيانة أجهزة الإنذار والإطفاء، وتجديد الترخيص':
-      if (dynamicFields.commercialRegisterCopy) {
-        const doc = typeof dynamicFields.commercialRegisterCopy === 'object'
-          ? (dynamicFields.commercialRegisterCopy.name || dynamicFields.commercialRegisterCopy.url || 'مرفق السجل التجاري')
-          : dynamicFields.commercialRegisterCopy;
-        parts.push(`السجل التجاري: ${doc}`);
-      }
-      if (dynamicFields.officeDetailedProfile) {
-        const doc = typeof dynamicFields.officeDetailedProfile === 'object'
-          ? (dynamicFields.officeDetailedProfile.name || dynamicFields.officeDetailedProfile.url || 'مرفق بيان مفصل للمكتب')
-          : dynamicFields.officeDetailedProfile;
-        parts.push(`بيان مفصل للمكتب: ${doc}`);
-      }
-      if (dynamicFields.engineersListDoc) {
-        const doc = typeof dynamicFields.engineersListDoc === 'object'
-          ? (dynamicFields.engineersListDoc.name || dynamicFields.engineersListDoc.url || 'مرفق كشف بأسماء المهندسين')
-          : dynamicFields.engineersListDoc;
-        parts.push(`كشف بأسماء المهندسين: ${doc}`);
-      }
-      if (dynamicFields.engineeringPracticeLicenses) {
-        const doc = typeof dynamicFields.engineeringPracticeLicenses === 'object'
-          ? (dynamicFields.engineeringPracticeLicenses.name || dynamicFields.engineeringPracticeLicenses.url || 'مرفق رخص مزاولة المهن الهندسية')
-          : dynamicFields.engineeringPracticeLicenses;
-        parts.push(`رخص مزاولة المهن الهندسية: ${doc}`);
-      }
-      if (dynamicFields.idCardsAndResumes) {
-        const doc = typeof dynamicFields.idCardsAndResumes === 'object'
-          ? (dynamicFields.idCardsAndResumes.name || dynamicFields.idCardsAndResumes.url || 'مرفق بطاقات الهوية والسير الذاتية')
-          : dynamicFields.idCardsAndResumes;
-        parts.push(`بطاقات الهوية والسير الذاتية: ${doc}`);
-      }
-      if (dynamicFields.officeName) parts.push(`اسم المكتب: ${dynamicFields.officeName}`);
-      if (dynamicFields.commercialCR) parts.push(`رقم السجل التجاري: ${dynamicFields.commercialCR}`);
-      break;
-
-    case 'consulting_offices_gas_fuel_hazmat_license':
-    case 'gas_fuel_hazmat_consulting_offices_license':
-    case 'License for Technical & Consulting Offices (Gas, Fuel, & Hazmat)':
-    case 'Technical & Consulting Offices (Gas, Fuel, & Hazmat) License':
-    case 'إصدار الترخيص للمكاتب الفنية والاستشارية المختصة بالغاز والوقود والمواد الخطرة، وتجديد الترخيص':
-      if (dynamicFields.commercialRegisterCertificate || dynamicFields.commercialRegisterCopy) {
-        const fileObj = dynamicFields.commercialRegisterCertificate || dynamicFields.commercialRegisterCopy;
-        const doc = typeof fileObj === 'object'
-          ? (fileObj.name || fileObj.url || 'مرفق شهادة السجل التجاري')
-          : fileObj;
-        parts.push(`شهادة السجل التجاري: ${doc}`);
-      }
-      if (dynamicFields.officeDetailedProfile) {
-        const doc = typeof dynamicFields.officeDetailedProfile === 'object'
-          ? (dynamicFields.officeDetailedProfile.name || dynamicFields.officeDetailedProfile.url || 'مرفق بيان مفصل للمكتب')
-          : dynamicFields.officeDetailedProfile;
-        parts.push(`بيان مفصل للمكتب: ${doc}`);
-      }
-      if (dynamicFields.engineersListDoc) {
-        const doc = typeof dynamicFields.engineersListDoc === 'object'
-          ? (dynamicFields.engineersListDoc.name || dynamicFields.engineersListDoc.url || 'مرفق كشف بأسماء المهندسين')
-          : dynamicFields.engineersListDoc;
-        parts.push(`كشف بأسماء المهندسين: ${doc}`);
-      }
-      if (dynamicFields.engineeringPracticeLicenses) {
-        const doc = typeof dynamicFields.engineeringPracticeLicenses === 'object'
-          ? (dynamicFields.engineeringPracticeLicenses.name || dynamicFields.engineeringPracticeLicenses.url || 'مرفق رخص مزاولة المهن الهندسية')
-          : dynamicFields.engineeringPracticeLicenses;
-        parts.push(`رخص مزاولة المهن الهندسية: ${doc}`);
-      }
-      if (dynamicFields.engineersIdCardsAndResumes || dynamicFields.idCardsAndResumes) {
-        const fileObj = dynamicFields.engineersIdCardsAndResumes || dynamicFields.idCardsAndResumes;
-        const doc = typeof fileObj === 'object'
-          ? (fileObj.name || fileObj.url || 'مرفق بطاقات الهوية والسيرة الذاتية للمهندسين')
-          : fileObj;
-        parts.push(`بطاقات الهوية والسيرة الذاتية للمهندسين: ${doc}`);
-      }
-      if (dynamicFields.officeName) parts.push(`اسم المكتب: ${dynamicFields.officeName}`);
-      if (dynamicFields.commercialCR) parts.push(`رقم السجل التجاري: ${dynamicFields.commercialCR}`);
-      break;
-
-    case 'engineering_offices_fire_safety_design':
-      if (dynamicFields.officeName) parts.push(`اسم المكتب: ${dynamicFields.officeName}`);
-      if (dynamicFields.commercialCR) parts.push(`رقم السجل التجاري: ${dynamicFields.commercialCR}`);
-      break;
-
-    case 'hazardous_materials_1day_transport':
-    case 'hazardous_materials_transport_1day':
-    case 'One-Day Permit for Transporting Hazardous Material Shipments':
-    case 'One-Day Hazardous Material Shipment Transport Permit':
-    case 'ترخيص بالموافقة على نقل شحنات المواد الخطرة ليوم واحد':
-      if (dynamicFields.applicantRequestLetter) {
-        const doc = typeof dynamicFields.applicantRequestLetter === 'object'
-          ? (dynamicFields.applicantRequestLetter.name || dynamicFields.applicantRequestLetter.url || 'مرفق رسالة من مقدم الطلب')
-          : dynamicFields.applicantRequestLetter;
-        parts.push(`رسالة من مقدم الطلب: ${doc}`);
-      }
-      if (dynamicFields.transportedMaterialsList) {
-        const doc = typeof dynamicFields.transportedMaterialsList === 'object'
-          ? (dynamicFields.transportedMaterialsList.name || dynamicFields.transportedMaterialsList.url || 'مرفق قائمة بالمواد المنقولة')
-          : dynamicFields.transportedMaterialsList;
-        parts.push(`قائمة بالمواد المنقولة: ${doc}`);
-      }
-      if (dynamicFields.materialsSafetyDataSheet) {
-        const doc = typeof dynamicFields.materialsSafetyDataSheet === 'object'
-          ? (dynamicFields.materialsSafetyDataSheet.name || dynamicFields.materialsSafetyDataSheet.url || 'مرفق صحيفة السلامة للمواد (MSDS)')
-          : dynamicFields.materialsSafetyDataSheet;
-        parts.push(`صحيفة السلامة للمواد (MSDS): ${doc}`);
-      }
-      if (dynamicFields.trafficDocument) {
-        const doc = typeof dynamicFields.trafficDocument === 'object'
-          ? (dynamicFields.trafficDocument.name || dynamicFields.trafficDocument.url || 'مرفق وثيقة من المرور')
-          : dynamicFields.trafficDocument;
-        parts.push(`وثيقة من المرور: ${doc}`);
-      }
-      if (dynamicFields.vehicleInspectionCertificate) {
-        const doc = typeof dynamicFields.vehicleInspectionCertificate === 'object'
-          ? (dynamicFields.vehicleInspectionCertificate.name || dynamicFields.vehicleInspectionCertificate.url || 'مرفق شهادة فحص السيارة')
-          : dynamicFields.vehicleInspectionCertificate;
-        parts.push(`شهادة فحص السيارة: ${doc}`);
-      }
-      if (dynamicFields.vehicleOwnershipCard) {
-        const doc = typeof dynamicFields.vehicleOwnershipCard === 'object'
-          ? (dynamicFields.vehicleOwnershipCard.name || dynamicFields.vehicleOwnershipCard.url || 'مرفق ملكية المركبة')
-          : dynamicFields.vehicleOwnershipCard;
-        parts.push(`ملكية المركبة: ${doc}`);
-      }
-      if (dynamicFields.vehiclePlate) parts.push(`رقم لوحة المركبة: ${dynamicFields.vehiclePlate}`);
-      if (dynamicFields.transportDate) parts.push(`تاريخ النقل: ${dynamicFields.transportDate}`);
-      break;
-
-    case 'chemical_hazmat_transport_vehicles_license':
-    case 'chemical_transport_license':
-    case 'chemical_transport_vehicles_approval':
-    case 'Approval License for Chemical & Hazardous Transport Vehicles':
-    case 'Chemical & Hazardous Material Transport Vehicles License':
-    case 'إصدار ترخيص الموافقة على سيارات نقل المواد الكيميائية والخطرة، وتجديد الترخيص':
-      if (dynamicFields.officialLetter) {
-        const doc = typeof dynamicFields.officialLetter === 'object'
-          ? (dynamicFields.officialLetter.name || dynamicFields.officialLetter.url || 'مرفق رسالة رسمية')
-          : dynamicFields.officialLetter;
-        parts.push(`رسالة رسمية: ${doc}`);
-      }
-      if (dynamicFields.technicalCertificate) {
-        const doc = typeof dynamicFields.technicalCertificate === 'object'
-          ? (dynamicFields.technicalCertificate.name || dynamicFields.technicalCertificate.url || 'مرفق شهادة فنية')
-          : dynamicFields.technicalCertificate;
-        parts.push(`شهادة فنية: ${doc}`);
-      }
-      if (dynamicFields.importPermit) {
-        const doc = typeof dynamicFields.importPermit === 'object'
-          ? (dynamicFields.importPermit.name || dynamicFields.importPermit.url || 'مرفق تصريح استيراد')
-          : dynamicFields.importPermit;
-        parts.push(`تصريح استيراد: ${doc}`);
-      }
-      if (dynamicFields.vehicleOwnershipCard) {
-        const doc = typeof dynamicFields.vehicleOwnershipCard === 'object'
-          ? (dynamicFields.vehicleOwnershipCard.name || dynamicFields.vehicleOwnershipCard.url || 'مرفق ملكية المركبة')
-          : dynamicFields.vehicleOwnershipCard;
-        parts.push(`ملكية المركبة: ${doc}`);
-      }
-      if (dynamicFields.safetyDataSheetMSDS) {
-        const doc = typeof dynamicFields.safetyDataSheetMSDS === 'object'
-          ? (dynamicFields.safetyDataSheetMSDS.name || dynamicFields.safetyDataSheetMSDS.url || 'مرفق صحيفة السلامة (MSDS)')
-          : dynamicFields.safetyDataSheetMSDS;
-        parts.push(`صحيفة السلامة (MSDS): ${doc}`);
-      }
-      if (dynamicFields.driverInstructionsDoc) {
-        const doc = typeof dynamicFields.driverInstructionsDoc === 'object'
-          ? (dynamicFields.driverInstructionsDoc.name || dynamicFields.driverInstructionsDoc.url || 'مرفق تعليمات قائد المركبة')
-          : dynamicFields.driverInstructionsDoc;
-        parts.push(`تعليمات قائد المركبة: ${doc}`);
-      }
-      if (dynamicFields.driverFireCourseCertificate) {
-        const doc = typeof dynamicFields.driverFireCourseCertificate === 'object'
-          ? (dynamicFields.driverFireCourseCertificate.name || dynamicFields.driverFireCourseCertificate.url || 'مرفق شهادة دورة إطفاء للسائق')
-          : dynamicFields.driverFireCourseCertificate;
-        parts.push(`شهادة دورة إطفاء للسائق: ${doc}`);
-      }
-      if (dynamicFields.emergencyRespondersList) {
-        const doc = typeof dynamicFields.emergencyRespondersList === 'object'
-          ? (dynamicFields.emergencyRespondersList.name || dynamicFields.emergencyRespondersList.url || 'مرفق قائمة بالمسؤولين للتعامل مع الطوارئ')
-          : dynamicFields.emergencyRespondersList;
-        parts.push(`قائمة بالمسؤولين للتعامل مع الطوارئ: ${doc}`);
-      }
-      if (dynamicFields.technicalSpecificationsDoc) {
-        const doc = typeof dynamicFields.technicalSpecificationsDoc === 'object'
-          ? (dynamicFields.technicalSpecificationsDoc.name || dynamicFields.technicalSpecificationsDoc.url || 'مرفق المواصفات الفنية')
-          : dynamicFields.technicalSpecificationsDoc;
-        parts.push(`المواصفات الفنية: ${doc}`);
-      }
-      if (dynamicFields.vehiclePlate) parts.push(`رقم لوحة المركبة: ${dynamicFields.vehiclePlate}`);
-      if (dynamicFields.transportDate) parts.push(`تاريخ النقل: ${dynamicFields.transportDate}`);
-      break;
-
-    case 'diesel_gas_tanks_installation_license':
-    case 'diesel_gas_tanks_installation_approval':
-    case 'Final Approval License for Installing Diesel & Gas Tanks':
-    case 'إصدار ترخيص الموافقة النهائية على تركيب خزانات الديزل والغاز، وتجديد الترخيص':
-      if (dynamicFields.officialLetter) {
-        const doc = typeof dynamicFields.officialLetter === 'object'
-          ? (dynamicFields.officialLetter.name || dynamicFields.officialLetter.url || 'مرفق رسالة رسمية')
-          : dynamicFields.officialLetter;
-        parts.push(`رسالة رسمية: ${doc}`);
-      }
-      if (dynamicFields.validMaintenanceCertificate) {
-        const doc = typeof dynamicFields.validMaintenanceCertificate === 'object'
-          ? (dynamicFields.validMaintenanceCertificate.name || dynamicFields.validMaintenanceCertificate.url || 'مرفق شهادة صيانة سارية')
-          : dynamicFields.validMaintenanceCertificate;
-        parts.push(`شهادة صيانة سارية: ${doc}`);
-      }
-      if (dynamicFields.hazmatBranchPreviousApproval) {
-        const doc = typeof dynamicFields.hazmatBranchPreviousApproval === 'object'
-          ? (dynamicFields.hazmatBranchPreviousApproval.name || dynamicFields.hazmatBranchPreviousApproval.url || 'مرفق الموافقة السابقة من فرع المواد الخطرة')
-          : dynamicFields.hazmatBranchPreviousApproval;
-        parts.push(`الموافقة السابقة من فرع المواد الخطرة: ${doc}`);
-      }
-      if (dynamicFields.allPreviousApprovals) {
-        const doc = typeof dynamicFields.allPreviousApprovals === 'object'
-          ? (dynamicFields.allPreviousApprovals.name || dynamicFields.allPreviousApprovals.url || 'مرفق جميع الموافقات السابقة')
-          : dynamicFields.allPreviousApprovals;
-        parts.push(`جميع الموافقات السابقة: ${doc}`);
-      }
-      if (dynamicFields.tankCapacity) parts.push(`سعة الخزان: ${dynamicFields.tankCapacity}`);
-      if (dynamicFields.fuelType) parts.push(`نوع الوقود: ${dynamicFields.fuelType}`);
-      break;
-
-    case 'small_facilities_inspection_certificate':
-    case 'Small Facilities Inspection Certificate Renewal':
-    case 'small_facility_inspection_certificate':
-    case 'إصدار شهادة فحص المنشآت الصغيرة، وتجديد الشهادة':
-      if (dynamicFields.leaseContractCopy) {
-        const doc = typeof dynamicFields.leaseContractCopy === 'object'
-          ? (dynamicFields.leaseContractCopy.name || dynamicFields.leaseContractCopy.url || 'مرفق نسخة من عقد الإيجار')
-          : dynamicFields.leaseContractCopy;
-        parts.push(`نسخة من عقد الإيجار: ${doc}`);
-      }
-      if (dynamicFields.detailedSitePlans || dynamicFields.sitePlans) {
-        const fileObj = dynamicFields.detailedSitePlans || dynamicFields.sitePlans;
-        const doc = typeof fileObj === 'object'
-          ? (fileObj.name || fileObj.url || 'مرفق مخططات تفصيلية للموقع')
-          : fileObj;
-        parts.push(`مخططات تفصيلية للموقع: ${doc}`);
-      }
-      if (dynamicFields.approvedMaintenanceContract || dynamicFields.maintenanceContract) {
-        const fileObj = dynamicFields.approvedMaintenanceContract || dynamicFields.maintenanceContract;
-        const doc = typeof fileObj === 'object'
-          ? (fileObj.name || fileObj.url || 'مرفق عقد صيانة من شركة معتمدة')
-          : fileObj;
-        parts.push(`عقد صيانة من شركة معتمدة: ${doc}`);
-      }
-      if (dynamicFields.inspectionArea) parts.push(`مساحة المنشأة: ${dynamicFields.inspectionArea} متر مربع`);
-      break;
-  }
-
-  if (dynamicFields.genericDetails) {
-    parts.push(`تفاصيل الطلب: ${dynamicFields.genericDetails}`);
-  }
-
-  if (parts.length > 0) {
-    return parts.join(' | ');
-  }
-
-  const fieldLabels = {
-    inspectionArea: 'مساحة التفتيش',
-    chemicalType: 'نوع المادة الكيميائية',
-    moicLetter: 'رسالة من وزارة الصناعة والتجارة والسياحة',
-    gasMinistryLetter: 'تفاصيل خطاب وزارة الصناعة',
-    bakeryCrCopy: 'نسخة من السجل التجاري',
-    bakerySitePhotos: 'صور للموقع',
-    bakeryDrawingsApproval: 'موافقات المخططات المعمارية والكهربائية والميكانيكية',
-    bakeryDrawings: 'موافقات المخططات المعمارية',
-    goldAlarmContract: 'نسخة من عقد الصيانة لأجهزة الإنذار والإطفاء',
-    goldAlarmDetails: 'عقد صيانة نظام الإنذار',
-    trainingOfficialLetter: 'خطاب رسمي',
-    trainingAccreditations: 'الموافقات/الاعتمادات',
-    gasStationGovApprovals: 'موافقات من الجهات الحكومية',
-    gasStationApplicantLetter: 'رسالة رسمية باسم مقدم الطلب',
-    leaseContractCopy: 'نسخة من عقد الإيجار',
-    sitePlans: 'مخططات الموقع',
-    idCardCopy: 'بطاقة الهوية',
-    propertyDeed: 'وثيقة ملكية العقار',
-    commercialRegisterCopy: 'نسخة من السجل التجاري',
-    tenantLeaseContract: 'عقد الإيجار إذا كان المتضرر مستأجرًا',
-    municipalityFormProof: 'استمارة البلدية (أو ما يثبت)',
-    engineeringOfficeLetter: 'رسالة المكتب الهندسي',
-    projectEngineeringDrawings: 'الرسومات الهندسية للمشروع',
-    entityLetter: 'خطاب من الجهة',
-    architecturalPlans: 'المخططات المعمارية',
-    concernedEntityLetter: 'رسالة من الجهة المعنية',
-    otherEntitiesApprovals: 'موافقات الجهات المعنية الأخرى',
-    approvedProjectMaps: 'خرائط المشروع المعتمدة',
-    electricalMechanicalPlans: 'المخططات الكهربائية والميكانيكية',
-    stationCapacity: 'سعة خزانات الوقود',
-    trainees: 'المتدربون',
-    blueprintNumber: 'رقم المخطط',
-    factoryArea: 'مساحة المصنع',
-    warehouseType: 'نوع المخزن',
-    buildingHeight: 'ارتفاع المبنى',
-    floorsCount: 'عدد الطوابق',
-    centerName: 'اسم المركز',
-    villasCount: 'عدد الفلل',
-    complexName: 'اسم المجمع',
-    genericDetails: 'تفاصيل الطلب',
-    incidentDate: 'تاريخ الحادث',
-    facilityName: 'اسم المنشأة',
-    location: 'الموقع',
-    buildingNumber: 'رقم المبنى',
-    electricityAccount: 'حساب الكهرباء',
-    buildingType: 'نوع المبنى',
-    projectTitle: 'اسم المشروع',
-    stationLocation: 'موقع المحطة',
-    tanksCount: 'عدد الخزانات',
-    loadCapacity: 'سعة الحمل',
-    consultantOffice: 'المكتب الاستشاري',
-    systemType: 'نوع النظام',
-    pipingType: 'نوع التمديدات',
-    tanksCapacity: 'سعة الخزانات',
-    trainingDate: 'تاريخ التدريب',
-    traineesCount: 'عدد المتدربين',
-    buildingName: 'اسم المبنى',
-    equipmentType: 'نوع المعدات',
-    brandName: 'العلامة التجارية',
-    officeName: 'اسم المكتب',
-    commercialCR: 'رقم السجل',
-    vehiclePlate: 'رقم المركبة',
-    transportDate: 'تاريخ النقل',
-    tankCapacity: 'سعة الخزان',
-    fuelType: 'نوع الوقود',
-    validMaintenanceCertificate: 'شهادة صيانة سارية',
-    hazmatBranchPreviousApproval: 'الموافقة السابقة من فرع المواد الخطرة',
-    allPreviousApprovals: 'جميع الموافقات السابقة',
-    commercialRegisterCertificate: 'شهادة السجل التجاري',
-    engineersIdCardsAndResumes: 'بطاقات الهوية والسيرة الذاتية للمهندسين',
-    detailedSitePlans: 'مخططات تفصيلية للموقع',
-    approvedMaintenanceContract: 'عقد صيانة من شركة معتمدة',
-    activityType: 'نوع النشاط',
-    engineerLicense: 'ترخيص المهندس'
-  };
-
-  const fallbackParts = [];
-  for (const [key, val] of Object.entries(dynamicFields)) {
-    if (val === null || val === undefined || val === '') continue;
-    const label = fieldLabels[key] || key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).trim();
-    const formattedVal = Array.isArray(val) ? val.join(', ') : val;
-    fallbackParts.push(`${label}: ${formattedVal}`);
-  }
-
-  if (fallbackParts.length > 0) {
-    return fallbackParts.join(' | ');
-  }
-
-  return "";
-}
-
-function escapeHtml(str) {
-  if (str === null || str === undefined) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
-function buildDynamicFieldsAdminHtml(dynamicFields, serviceName) {
-  if (!dynamicFields) return { html: '', display: 'none' };
-
-  let fieldsObj = null;
-  if (typeof dynamicFields === 'object' && dynamicFields !== null) {
-    fieldsObj = dynamicFields;
-  } else if (typeof dynamicFields === 'string') {
-    const trimmed = dynamicFields.trim();
-    if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
-      try {
-        fieldsObj = JSON.parse(trimmed);
-      } catch (e) {
-        fieldsObj = null;
-      }
-    }
-    if (!fieldsObj) {
-      // Parse formatted string: "Label: Value | Label2: Value2"
-      const parts = trimmed.split(/\s*\|\s*/);
-      const items = [];
-      for (const part of parts) {
-        if (!part.trim()) continue;
-        const colonIdx = part.indexOf(':');
-        if (colonIdx !== -1) {
-          const lbl = part.substring(0, colonIdx).trim();
-          const val = part.substring(colonIdx + 1).trim();
-          items.push({ label: lbl, value: val });
-        } else {
-          items.push({ label: 'معلومات إضافية', value: part.trim() });
-        }
-      }
-      if (items.length === 0) return { html: '', display: 'none' };
-
-      const renderedItems = items.map(it => {
-        const isUrl = it.value.startsWith('http://') || it.value.startsWith('https://') || it.value.startsWith('/uploads/');
-        return `
-          <div class="info-group">
-            <span class="info-label">${escapeHtml(it.label)}</span>
-            ${isUrl ? `
-              <div style="margin-top: 6px;">
-                <a href="${escapeHtml(it.value)}" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; padding: 8px 16px; border-radius: 10px; text-decoration: none; font-size: 0.88rem; font-weight: 700; transition: all 0.2s ease;">
-                  <span>📄</span>
-                  <span>معاينة وتحميل المستند المرفق (PDF)</span>
-                </a>
-              </div>
-            ` : `
-              <span class="info-value" style="color: #f8fafc; background: rgba(15, 23, 42, 0.7); border: 1px solid #334155; padding: 8px 14px; border-radius: 10px; display: inline-block; margin-top: 4px; font-size: 0.92rem;">${escapeHtml(it.value)}</span>
-            `}
-          </div>
-        `;
-      }).join('\n');
-
-      return { html: renderedItems, display: 'block' };
-    }
-  }
-
-  const fieldLabels = {
-    inspectionArea: 'مساحة التفتيش',
-    chemicalType: 'نوع المادة الكيميائية',
-    fireInspectionReport: 'تقرير فحص أنظمة الإطفاء والإنذار',
-    maintenanceContract: 'نسخة من عقد الصيانة',
-    moicLetter: 'رسالة من وزارة الصناعة والتجارة والسياحة',
-    gasMinistryLetter: 'تفاصيل خطاب وزارة الصناعة',
-    bakeryCrCopy: 'نسخة من السجل التجاري',
-    bakerySitePhotos: 'صور للموقع',
-    bakeryDrawingsApproval: 'موافقات المخططات المعمارية والكهربائية والميكانيكية',
-    bakeryDrawings: 'موافقات المخططات المعمارية',
-    goldAlarmContract: 'نسخة من عقد الصيانة لأجهزة الإنذار والإطفاء',
-    goldAlarmDetails: 'عقد صيانة نظام الإنذار',
-    trainingOfficialLetter: 'خطاب رسمي للتدريب',
-    trainingAccreditations: 'الموافقات والاعتمادات',
-    gasStationGovApprovals: 'موافقات من الجهات الحكومية',
-    gasStationApplicantLetter: 'رسالة رسمية باسم مقدم الطلب',
-    leaseContractCopy: 'نسخة من عقد الإيجار',
-    detailedSitePlans: 'مخططات تفصيلية للموقع',
-    approvedMaintenanceContract: 'عقد صيانة من شركة معتمدة',
-    sitePlans: 'مخططات الموقع',
-    idCardCopy: 'بطاقة الهوية',
-    propertyDeed: 'وثيقة ملكية العقار',
-    commercialRegisterCopy: 'نسخة من السجل التجاري',
-    tenantLeaseContract: 'عقد الإيجار للمستأجر',
-    municipalityFormProof: 'استمارة البلدية أو ما يثبت',
-    engineeringOfficeLetter: 'رسالة المكتب الهندسي',
-    projectEngineeringDrawings: 'الرسومات الهندسية للمشروع',
-    entityLetter: 'خطاب من الجهة',
-    architecturalPlans: 'المخططات المعمارية',
-    concernedEntityLetter: 'رسالة من الجهة المعنية',
-    otherEntitiesApprovals: 'موافقات الجهات المعنية الأخرى',
-    approvedProjectMaps: 'خرائط المشروع المعتمدة',
-    electricalMechanicalPlans: 'المخططات الكهربائية والميكانيكية',
-    crCopy: 'شهادة السجل التجاري',
-    officeDetails: 'بيان مفصل للمكتب',
-    engineersList: 'كشف بأسماء المهندسين',
-    engineeringLicenses: 'رخص مزاولة المهن الهندسية',
-    engineersCvs: 'بطاقات الهوية والسيرة الذاتية للمهندسين',
-    gasOfficialLetter: 'رسالة رسمية',
-    maintenanceCert: 'شهادة صيانة سارية',
-    hazmatPrevApproval: 'الموافقة السابقة من فرع المواد الخطرة',
-    allPrevApprovals: 'جميع الموافقات السابقة',
-    officialLetter: 'رسالة رسمية',
-    techCert: 'شهادة فنية',
-    importPermit: 'تصريح استيراد',
-    vehicleOwnership: 'ملكية المركبة',
-    msdsSheet: 'صحيفة السلامة',
-    driverInstructions: 'تعليمات قائد المركبة',
-    fireFightingCert: 'شهادة دورة إطفاء للسائق',
-    emergencyOfficialsList: 'قائمة بالمسؤولين للتعامل مع الطوارئ',
-    techSpecs: 'المواصفات الفنية',
-    applicantLetter: 'رسالة من مقدم الطلب',
-    materialsList: 'قائمة بالمواد المنقولة',
-    trafficDoc: 'وثيقة من المرور',
-    vehicleInspectionCert: 'شهادة فحص السيارة',
-    hazmatChemicalName: 'الاسم العلمي للمواد',
-    hazardousQuantitiesTable: 'جدول كميات المواد الخطرة',
-    safetyDataSheet: 'صحيفة السلامة',
-    alarmFirefightingPlans: 'مخططات الإنذار والإطفاء',
-    maintenanceCertificate: 'شهادة الصيانة',
-    stationCapacity: 'سعة خزانات الوقود',
-    trainees: 'المتدربون',
-    blueprintNumber: 'رقم المخطط',
-    factoryArea: 'مساحة المصنع',
-    warehouseType: 'نوع المخزن',
-    buildingHeight: 'ارتفاع المبنى',
-    floorsCount: 'عدد الطوابق',
-    centerName: 'اسم المركز',
-    villasCount: 'عدد الفلل',
-    complexName: 'اسم المجمع',
-    genericDetails: 'تفاصيل الطلب',
-    incidentDate: 'تاريخ الحادث',
-    facilityName: 'اسم المنشأة',
-    location: 'الموقع',
-    buildingNumber: 'رقم المبنى',
-    electricityAccount: 'حساب الكهرباء',
-    buildingType: 'نوع المبنى',
-    projectTitle: 'اسم المشروع',
-    stationLocation: 'موقع المحطة',
-    tanksCount: 'عدد الخزانات',
-    loadCapacity: 'سعة الحمل',
-    consultantOffice: 'المكتب الاستشاري',
-    systemType: 'نوع النظام',
-    pipingType: 'نوع التمديدات',
-    tanksCapacity: 'سعة الخزانات',
-    trainingDate: 'تاريخ التدريب',
-    traineesCount: 'عدد المتدربين',
-    buildingName: 'اسم المبنى',
-    equipmentType: 'نوع المعدات',
-    brandName: 'العلامة التجارية',
-    officeName: 'اسم المكتب',
-    commercialCR: 'رقم السجل',
-    vehiclePlate: 'رقم المركبة',
-    transportDate: 'تاريخ النقل',
-    tankCapacity: 'سعة الخزان',
-    fuelType: 'نوع الوقود',
-    activityType: 'نوع النشاط',
-    engineerLicense: 'ترخيص المهندس'
-  };
-
-  const renderedElements = [];
-  for (const [key, val] of Object.entries(fieldsObj)) {
-    if (val === null || val === undefined || val === '') continue;
-    const label = fieldLabels[key] || key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).trim();
-
-    if (typeof val === 'object') {
-      if (val.url) {
-        renderedElements.push(`
-          <div class="info-group">
-            <span class="info-label">${escapeHtml(label)}</span>
-            <div style="margin-top: 6px;">
-              <a href="${escapeHtml(val.url)}" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; padding: 8px 16px; border-radius: 10px; text-decoration: none; font-size: 0.88rem; font-weight: 700; transition: all 0.2s ease;">
-                <span>📄</span>
-                <span>معاينة وتحميل: ${escapeHtml(val.name || label)}</span>
-              </a>
-            </div>
-          </div>
-        `);
-      } else if (Array.isArray(val)) {
-        renderedElements.push(`
-          <div class="info-group">
-            <span class="info-label">${escapeHtml(label)}</span>
-            <span class="info-value" style="color: #f8fafc; background: rgba(15, 23, 42, 0.7); border: 1px solid #334155; padding: 8px 14px; border-radius: 10px; display: inline-block; margin-top: 4px; font-size: 0.92rem;">${escapeHtml(val.join(', '))}</span>
-          </div>
-        `);
-      }
-    } else {
-      const valStr = String(val);
-      const isUrl = valStr.startsWith('http://') || valStr.startsWith('https://') || valStr.startsWith('/uploads/');
-      renderedElements.push(`
-        <div class="info-group">
-          <span class="info-label">${escapeHtml(label)}</span>
-          ${isUrl ? `
-            <div style="margin-top: 6px;">
-              <a href="${escapeHtml(valStr)}" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; padding: 8px 16px; border-radius: 10px; text-decoration: none; font-size: 0.88rem; font-weight: 700; transition: all 0.2s ease;">
-                <span>📄</span>
-                <span>معاينة وتحميل المستند المرفق (PDF)</span>
-              </a>
-            </div>
-          ` : `
-            <span class="info-value" style="color: #f8fafc; background: rgba(15, 23, 42, 0.7); border: 1px solid #334155; padding: 8px 14px; border-radius: 10px; display: inline-block; margin-top: 4px; font-size: 0.92rem;">${escapeHtml(valStr)}</span>
-          `}
-        </div>
-      `);
-    }
-  }
-
-  if (renderedElements.length === 0) return { html: '', display: 'none' };
-  return { html: renderedElements.join('\n'), display: 'block' };
-}
-
 function formatDocumentAuditHistoryText(auditHistory) {
   let list = auditHistory;
   if (typeof list === 'string' && list.trim().startsWith('[')) {
@@ -2078,27 +415,29 @@ function formatDocumentAuditHistoryText(auditHistory) {
   }).join('\n');
 }
 
+function formatHyperlinkCell(url, label) {
+  if (!url || !String(url).trim()) return "";
+  const cleanUrl = String(url).trim();
+  const cleanLabel = label ? String(label).replace(/"/g, '""') : cleanUrl.replace(/"/g, '""');
+  return `=HYPERLINK("${cleanUrl}", "${cleanLabel}")`;
+}
+
+function extractUrlFromHyperlink(cellVal) {
+  if (!cellVal) return "";
+  const str = String(cellVal).trim();
+  const match = str.match(/^=HYPERLINK\(\s*"([^"]+)"/i);
+  if (match) return match[1];
+  return str;
+}
+
 async function appendServiceApplication(appData) {
   const clientEmail = globalClientEmail;
   const privateKey = globalPrivateKey;
   const spreadsheetId = "1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8";
   const sheetName = "ServiceApplications";
 
-  console.log(`[Google Sheets Appender] Generating access token...`);
-  const jwt = generateGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
-  const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-      assertion: jwt
-    })
-  });
-  if (!tokenRes.ok) {
-    throw new Error(`Failed to exchange JWT: ${tokenRes.status}`);
-  }
-  const tokenData = await tokenRes.json();
-  const accessToken = tokenData.access_token;
+  console.log(`[Google Sheets Appender] Obtaining cached access token...`);
+  const accessToken = await getCachedGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
 
   // Resolve service matching Unique ID, Canonical English Name, or Full Arabic Name
   const resolvedService = resolveService(appData.serviceName);
@@ -2114,6 +453,23 @@ async function appendServiceApplication(appData) {
 
   const baseUrl = (process.env.PUBLIC_URL && !process.env.PUBLIC_URL.includes('localhost')) ? process.env.PUBLIC_URL.trim() : 'https://bhcdai.com';
 
+  // Format attachmentLink as clickable formula for Google Sheets
+  let attachmentLinkCell = "";
+  if (appData.attachmentLink && appData.attachmentLink.trim()) {
+    const rawLinks = appData.attachmentLink.split(',').map(s => s.trim()).filter(Boolean);
+    if (rawLinks.length === 1) {
+      attachmentLinkCell = formatHyperlinkCell(rawLinks[0], "📄 عرض المستند المرفق");
+    } else if (rawLinks.length > 1) {
+      attachmentLinkCell = formatHyperlinkCell(rawLinks[0], `📄 فتح المستندات (${rawLinks.length} ملفات)`);
+    }
+  }
+
+  // Format trackingLink as clickable formula for Google Sheets
+  let trackingLinkCell = "";
+  if (appData.trackingLink && appData.trackingLink.trim()) {
+    trackingLinkCell = formatHyperlinkCell(appData.trackingLink.trim(), "🔗 رابط التتبع");
+  }
+
   const rowValues = [
     appData.appId,
     appData.timestamp,
@@ -2123,8 +479,8 @@ async function appendServiceApplication(appData) {
     appData.whatsapp,
     appData.email,
     appData.referenceNumber || "",
-    appData.attachmentLink || "",
-    appData.trackingLink || "", // Tracking Link
+    attachmentLinkCell,
+    trackingLinkCell,
     dynamicFieldsStr,
     appData.paymentMethod,
     appData.status || "Submitted", // Status (Initial application status is Submitted)
@@ -2161,18 +517,7 @@ async function getServiceApplication(appId) {
   const spreadsheetId = "1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8";
   const sheetName = "ServiceApplications";
 
-  const jwt = generateGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
-  const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-      assertion: jwt
-    })
-  });
-  if (!tokenRes.ok) throw new Error("Token exchange failed");
-  const tokenData = await tokenRes.json();
-  const accessToken = tokenData.access_token;
+  const accessToken = await getCachedGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
 
   let rows = getCachedSheetRows("ServiceApplications_A1_X2000");
   if (!rows) {
@@ -2242,8 +587,8 @@ async function getServiceApplication(appId) {
     whatsapp: row[5],
     email: row[6],
     referenceNumber: row[7],
-    attachmentLink: row[8],
-    trackingLink: row[9],
+    attachmentLink: extractUrlFromHyperlink(row[8]),
+    trackingLink: extractUrlFromHyperlink(row[9]),
     dynamicFields: row[10],
     paymentMethod: row[11],
     status: row[12],
@@ -2267,18 +612,7 @@ async function updateModificationRequest(appId, details) {
   const spreadsheetId = "1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8";
   const sheetName = "ServiceApplications";
 
-  const jwt = generateGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
-  const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-      assertion: jwt
-    })
-  });
-  if (!tokenRes.ok) throw new Error("Auth token exchange failed");
-  const tokenData = await tokenRes.json();
-  const accessToken = tokenData.access_token;
+  const accessToken = await getCachedGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
 
   const getRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}!A1:A2000`, {
     headers: { "Authorization": `Bearer ${accessToken}` }
@@ -2341,18 +675,7 @@ async function updateUserModificationResponse(appId, userMessage) {
   const spreadsheetId = "1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8";
   const sheetName = "ServiceApplications";
 
-  const jwt = generateGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
-  const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-      assertion: jwt
-    })
-  });
-  if (!tokenRes.ok) throw new Error("Auth token exchange failed");
-  const tokenData = await tokenRes.json();
-  const accessToken = tokenData.access_token;
+  const accessToken = await getCachedGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
 
   const getRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}!A1:Z2000`, {
     headers: { "Authorization": `Bearer ${accessToken}` }
@@ -2418,18 +741,7 @@ async function executeAdminQuickAction(appId, action, reason) {
   const spreadsheetId = "1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8";
   const sheetName = "ServiceApplications";
 
-  const jwt = generateGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
-  const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-      assertion: jwt
-    })
-  });
-  if (!tokenRes.ok) throw new Error("Auth token exchange failed");
-  const tokenData = await tokenRes.json();
-  const accessToken = tokenData.access_token;
+  const accessToken = await getCachedGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
 
   const getRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}!A1:Z2000`, {
     headers: { "Authorization": `Bearer ${accessToken}` }
@@ -2445,9 +757,22 @@ async function executeAdminQuickAction(appId, action, reason) {
   const now = new Date();
 
   let statusValue = "In Progress";
-  if (action === "request_modification") statusValue = "Modification Requested";
-  else if (action === "approve") statusValue = "Approved";
-  else if (action === "reject") statusValue = "Rejected";
+  const normAction = String(action || '').toLowerCase().trim();
+  if (normAction === "under_review" || normAction === "review" || normAction === "under review") {
+    statusValue = "Under Review";
+  } else if (normAction === "in_progress" || normAction === "progress" || normAction === "in progress") {
+    statusValue = "In Progress";
+  } else if (normAction === "under_inspection" || normAction === "inspection" || normAction === "under inspection") {
+    statusValue = "Under Inspection";
+  } else if (normAction === "request_modification" || normAction === "modification" || normAction === "modification requested") {
+    statusValue = "Modification Requested";
+  } else if (normAction === "approve" || normAction === "approved") {
+    statusValue = "Approved";
+  } else if (normAction === "reject" || normAction === "rejected") {
+    statusValue = "Rejected";
+  } else {
+    statusValue = action;
+  }
 
   const updateData = {
     valueInputOption: "USER_ENTERED",
@@ -2457,15 +782,15 @@ async function executeAdminQuickAction(appId, action, reason) {
     ]
   };
 
-  if (reason !== undefined) {
+  if (reason !== undefined && reason !== null) {
     updateData.data.push({ range: `${sheetName}!P${rowNum}`, values: [[reason]] });
   }
 
-  if (action === "request_modification") {
+  if (statusValue === "Modification Requested") {
     // Record Sent At in Col V to start pause timer and clear Col Q on new request
     updateData.data.push({ range: `${sheetName}!Q${rowNum}`, values: [[""]] }); // Clear old User Mod Response (Col Q)
     updateData.data.push({ range: `${sheetName}!V${rowNum}`, values: [[now.toISOString()]] });
-  } else if (action === "approve" || action === "reject") {
+  } else if (statusValue === "Approved" || statusValue === "Rejected") {
     const decisionDate = now.toISOString().replace('T', ' ').substring(0, 19);
 
     let totalCalendarMs = 0;
@@ -2505,6 +830,28 @@ async function executeAdminQuickAction(appId, action, reason) {
     updateData.data.push({ range: `${sheetName}!T${rowNum}`, values: [[netSlaStr]] });
     updateData.data.push({ range: `${sheetName}!U${rowNum}`, values: [[pauseStr]] });
     updateData.data.push({ range: `${sheetName}!V${rowNum}`, values: [[""]] }); // Clear Mod Sent At upon final decision
+  } else {
+    // If transitioning back to an operational stage (Under Review, In Progress, Under Inspection),
+    // accumulate any outstanding pause from Col V into Col U and clear Col V.
+    const modSentAt = targetRow[21]; // Col V
+    if (modSentAt) {
+      let userPauseMs = 0;
+      const prevPauseStr = targetRow[20] || ""; // Col U
+      const prevMatch = prevPauseStr.match(/([\d\.]+) hrs/);
+      if (prevMatch) {
+        userPauseMs += parseFloat(prevMatch[1]) * 3600 * 1000;
+      }
+      const sentMs = parseTimestampToMs(modSentAt);
+      if (sentMs > 0) {
+        userPauseMs += Math.max(0, now.getTime() - sentMs);
+      }
+      const pauseHours = (userPauseMs / (1000 * 60 * 60)).toFixed(1);
+      const pauseDays = (userPauseMs / (1000 * 60 * 60 * 24)).toFixed(2);
+      const pauseStr = `${pauseDays} days (${pauseHours} hrs)`;
+
+      updateData.data.push({ range: `${sheetName}!U${rowNum}`, values: [[pauseStr]] });
+      updateData.data.push({ range: `${sheetName}!V${rowNum}`, values: [[""]] });
+    }
   }
 
   const updateRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values:batchUpdate`, {
@@ -2518,34 +865,40 @@ async function executeAdminQuickAction(appId, action, reason) {
   if (!updateRes.ok) throw new Error("Failed to execute admin action");
 
   const publicUrl = getSanitizedPublicUrl();
-  const newStatus = action === 'approve' ? 'Approved' : (action === 'reject' ? 'Rejected' : 'Modification Requested');
+  const newStatus = statusValue;
   const trackingUrl = sanitizeTrackingLink(`${publicUrl}/track?id=${appId}`, appId);
 
-  const statusTextAr = action === 'approve' ? 'مقبول والمعاملة مكتملة' : (action === 'reject' ? 'مرفوض' : 'مطلوب تعديل مستندات');
-  const modNotice = reason ? `\nملاحظات الإدارة للتعديل: ${reason}` : '';
+  let statusTextAr = newStatus;
+  if (newStatus === 'Under Review') statusTextAr = 'قيد المراجعة والتدقيق الفني';
+  else if (newStatus === 'In Progress') statusTextAr = 'قيد المعالجة والإجراء الإداري';
+  else if (newStatus === 'Under Inspection') statusTextAr = 'قيد المعاينة والفحص الميداني';
+  else if (newStatus === 'Modification Requested') statusTextAr = 'مطلوب تعديل واستكمال مستندات';
+  else if (newStatus === 'Approved') statusTextAr = 'مقبول والمعاملة معتمدة بنجاح';
+  else if (newStatus === 'Rejected') statusTextAr = 'مرفوض / غير مستوفٍ للشروط';
+
+  const modNotice = reason ? `\nملاحظات الإدارة: ${reason}` : '';
   const officialServiceTitle = resolveOfficialServiceName(targetRow[2]);
-  const waMessage = `مرحباً ${targetRow[3]}! تم تحديث حالة طلبك رقم (${appId}) لخدمة (${officialServiceTitle}) إلى (${statusTextAr}).${modNotice}\nيمكنك متابعة وتعديل بيانات ومستندات الطلب مباشرة عبر الرابط التالي:\n${trackingUrl}`;
+  const waMessage = `مرحباً ${targetRow[3]}! تم تحديث حالة طلبك رقم (${appId}) لخدمة (${officialServiceTitle}) إلى (${statusTextAr}).${modNotice}\nيمكنك متابعة بيانات ومستندات الطلب مباشرة عبر الرابط التالي:\n${trackingUrl}`;
 
   // Notification Policy Enforcement:
-  // SMS is sent ONLY for:
+  // Cellular SMS is sent ONLY for:
   // 1) Application creation
-  // 2) Final decision taken (approve / reject)
-  // Intermediate status (request_modification) is sent ONLY via Email.
-  const actLower = String(action || '').toLowerCase();
-  const isFinalDecision = actLower.includes('approve') || actLower.includes('approv') || actLower.includes('reject');
+  // 2) Final decision taken (Approved / Rejected)
+  // All intermediate statuses are sent ONLY via Email.
+  const isFinalDecision = (newStatus === 'Approved' || newStatus === 'Rejected');
 
   if (isFinalDecision) {
-    console.log(`[Admin Action] Notification Policy: Final decision '${action}' reached. Triggering Cellular SMS notification for ${appId}...`);
+    console.log(`[Admin Action] Notification Policy: Final decision '${newStatus}' reached. Triggering Cellular SMS notification for ${appId}...`);
     sendDualChannelNotification({
       phone: targetRow[5],
-      appId: `${appId}_${action}_${Date.now()}`,
+      appId: `${appId}_${normAction}_${Date.now()}`,
       trackingLink: trackingUrl,
       clientName: `${targetRow[3]} ${targetRow[4]}`.trim(),
       messageText: waMessage
     }).then(res => console.log(`[Admin Action] Final Decision SMS Notification sent for ${appId}:`, res))
       .catch(err => console.error(`[Admin Action] Failed to send SMS alert for ${appId}:`, err));
   } else {
-    console.log(`[Admin Action] Notification Policy: Intermediate status '${action}' (Modification Requested). Skipping SMS dispatch. User notified via Email.`);
+    console.log(`[Admin Action] Notification Policy: Intermediate status '${newStatus}'. Skipping SMS dispatch per Rule 10. User notified via Email.`);
   }
 
   // Direct Multi-Target Status Email Notifications (Applicant/User + Admin)
@@ -2600,18 +953,7 @@ async function updateServiceApplicationFull(appId, updatedData) {
   const spreadsheetId = "1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8";
   const sheetName = "ServiceApplications";
 
-  const jwt = generateGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
-  const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-      assertion: jwt
-    })
-  });
-  if (!tokenRes.ok) throw new Error("Auth token exchange failed");
-  const tokenData = await tokenRes.json();
-  const accessToken = tokenData.access_token;
+  const accessToken = await getCachedGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
 
   const getRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}!A1:Z2000`, {
     headers: { "Authorization": `Bearer ${accessToken}` }
@@ -2666,7 +1008,14 @@ async function updateServiceApplicationFull(appId, updatedData) {
   ];
 
   if (updatedData.attachmentLink) {
-    dataToUpdate.push({ range: `${sheetName}!I${rowNum}`, values: [[updatedData.attachmentLink]] });
+    const rawLinks = updatedData.attachmentLink.split(',').map(s => s.trim()).filter(Boolean);
+    let cellVal = updatedData.attachmentLink;
+    if (rawLinks.length === 1) {
+      cellVal = formatHyperlinkCell(rawLinks[0], "📄 عرض المستند المرفق");
+    } else if (rawLinks.length > 1) {
+      cellVal = formatHyperlinkCell(rawLinks[0], `📄 فتح المستندات (${rawLinks.length} ملفات)`);
+    }
+    dataToUpdate.push({ range: `${sheetName}!I${rowNum}`, values: [[cellVal]] });
   }
 
   if (updatedData.documentAuditHistory) {
@@ -2698,18 +1047,7 @@ async function appendCallSummary(appIdOrPhone, summaryData) {
   const spreadsheetId = "1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8";
   const sheetName = "ServiceApplications";
 
-  const jwt = generateGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
-  const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-      assertion: jwt
-    })
-  });
-  if (!tokenRes.ok) throw new Error("Auth token exchange failed");
-  const tokenData = await tokenRes.json();
-  const accessToken = tokenData.access_token;
+  const accessToken = await getCachedGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
 
   const getRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}!A1:X2000`, {
     headers: { "Authorization": `Bearer ${accessToken}` }
@@ -2785,7 +1123,7 @@ setInterval(() => {
     }
   }
   console.log(`[Memory Cleaner] Cleared expired items from dispatchTracker. Active items: ${dispatchTracker.size}`);
-}, 12 * 60 * 60 * 1000); // Sweep every 12 hours
+}, 12 * 60 * 60 * 1000).unref(); // Sweep every 12 hours
 
 // Google Sheets 5-second In-Memory Row Cache to prevent API rate limits
 const sheetsRowCache = new Map();
@@ -2991,19 +1329,9 @@ const server = http.createServer(async (req, res) => {
           const spreadsheetId = "1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8";
           const sheetName = "ServiceApplications";
 
-          const jwt = generateGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
-          const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: new URLSearchParams({
-              grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-              assertion: jwt
-            })
-          });
-          const tokenData = await tokenRes.json();
-
+          const accessToken = await getCachedGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
           const getRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}!A1:Z2000`, {
-            headers: { "Authorization": `Bearer ${tokenData.access_token}` }
+            headers: { "Authorization": `Bearer ${accessToken}` }
           });
           const sheetsData = await getRes.json();
           const rows = sheetsData.values || [];
@@ -3121,17 +1449,8 @@ const server = http.createServer(async (req, res) => {
       const spreadsheetId = "1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8";
 
       if (clientEmail && privateKey) {
-        const jwt = generateGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets.readonly"]);
-        const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: new URLSearchParams({
-            grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-            assertion: jwt
-          })
-        });
-
-        if (tokenRes.ok) {
+        const accessToken = await getCachedGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets.readonly"]);
+        if (accessToken) {
           services.googleSheetsCrm = {
             status: "operational",
             latencyMs: Date.now() - gStart,
@@ -3245,22 +1564,7 @@ const server = http.createServer(async (req, res) => {
       const privateKey = globalPrivateKey;
       const spreadsheetId = "1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8";
 
-      const jwt = generateGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
-      const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({
-          grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-          assertion: jwt
-        })
-      });
-
-      if (!tokenRes.ok) {
-        throw new Error(`Failed to exchange JWT for token: ${tokenRes.status}`);
-      }
-
-      const tokenData = await tokenRes.json();
-      const accessToken = tokenData.access_token;
+      const accessToken = await getCachedGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
 
       // 1. Fetch Call Logs (Sheet1)
       let callRows = [];
@@ -3440,22 +1744,7 @@ const server = http.createServer(async (req, res) => {
       const privateKey = globalPrivateKey;
       const spreadsheetId = "1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8";
 
-      const jwt = generateGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
-      const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({
-          grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-          assertion: jwt
-        })
-      });
-      
-      if (!tokenRes.ok) {
-        throw new Error(`Failed to exchange JWT for token: ${tokenRes.status} ${await tokenRes.text()}`);
-      }
-      
-      const tokenData = await tokenRes.json();
-      const accessToken = tokenData.access_token;
+      const accessToken = await getCachedGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
 
       let rows = [];
       try {
@@ -4393,19 +2682,9 @@ const server = http.createServer(async (req, res) => {
         const spreadsheetId = "1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8";
         const sheetName = "ServiceApplications";
 
-        const jwt = generateGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
-        const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: new URLSearchParams({
-            grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-            assertion: jwt
-          })
-        });
-        const tokenData = await tokenRes.json();
-
+        const accessToken = await getCachedGoogleAccessToken(clientEmail, privateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
         const getRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}!A1:Z2000`, {
-          headers: { "Authorization": `Bearer ${tokenData.access_token}` }
+          headers: { "Authorization": `Bearer ${accessToken}` }
         });
         const data = await getRes.json();
         const rows = data.values || [];
@@ -4514,18 +2793,8 @@ const server = http.createServer(async (req, res) => {
 
         // Append to Google Sheets Sheet1
         const spreadsheetId = "1cfJ9RqDUI6ZImycA2IyUXsuMKyhVxTQ8Ky0OuWbyNI8";
-        const jwt = generateGoogleAccessToken(globalClientEmail, globalPrivateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
-        const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: new URLSearchParams({
-            grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-            assertion: jwt
-          })
-        });
-        if (tokenRes.ok) {
-          const tokenData = await tokenRes.json();
-          const accessToken = tokenData.access_token;
+        const accessToken = await getCachedGoogleAccessToken(globalClientEmail, globalPrivateKey, ["https://www.googleapis.com/auth/spreadsheets"]);
+        if (accessToken) {
           const timestamp = new Date().toISOString();
           const rowValues = [
             timestamp,
@@ -4548,8 +2817,6 @@ const server = http.createServer(async (req, res) => {
           } else {
             console.error(`[Webhook Leads Endpoint] ❌ Google Sheets append error:`, await sheetRes.text());
           }
-        } else {
-          console.error(`[Webhook Leads Endpoint] ❌ Google OAuth Token failed:`, await tokenRes.text());
         }
 
         // Forward to local n8n engine if active

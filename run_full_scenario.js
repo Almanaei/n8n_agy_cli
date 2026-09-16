@@ -97,7 +97,8 @@ startProcess('n8n', 'npx', ['n8n', 'start'], '32');
 startProcess('Express Server', 'node', ['server.js'], '34');
 
 // 3. Start Standalone Voice Agent (Magenta - 35)
-startProcess('Python Voice Agent', 'C:\\Python313\\python.exe', ['-m', 'uvicorn', 'standalone.main:app', '--host', '0.0.0.0', '--port', '8000'], '35');
+const pythonExec = process.env.PYTHON_PATH || (process.platform === 'win32' && fs.existsSync("C:\\Python313\\python.exe") ? "C:\\Python313\\python.exe" : "python");
+startProcess('Python Voice Agent', pythonExec, ['-m', 'uvicorn', 'standalone.main:app', '--host', '0.0.0.0', '--port', '8000'], '35');
 
 // 4. Start Cloudflare Tunnel Manager (Cyan - 36)
 const tunnelManager = startProcess('Tunnel Manager', 'node', ['cloudflared_manager.js'], '36');
