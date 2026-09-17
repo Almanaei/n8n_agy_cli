@@ -22,7 +22,7 @@ module.exports = {
     },
     {
       name: "civildefense-n8n",
-      script: "./scratch/run_n8n_process.js",
+      script: "./start_n8n.js",
       cwd: __dirname,
       instances: 1,
       autorestart: true,
