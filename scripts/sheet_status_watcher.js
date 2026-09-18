@@ -33,6 +33,7 @@ let privateKey = (process.env.GOOGLE_PRIVATE_KEY || "").replace(/\\n/g, '\n');
 
 // In-memory state tracking to detect live changes
 const statusTracker = new Map();
+let isInitialized = false;
 let isPolling = false;
 let watcherInterval = null;
 
@@ -84,6 +85,25 @@ async function checkStatusChangesOnce() {
     const json = await res.json();
     const rows = json.values || [];
 
+    // First run baseline: snapshot all existing rows so no historical rows get alerted
+    if (!isInitialized) {
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        if (!row || !row[0] || !row[0].trim()) continue;
+        const appId = row[0].trim();
+        const currentStatus = (row[12] || '').trim();
+        statusTracker.set(appId, {
+          status: currentStatus,
+          alertSent: currentStatus,
+          lastNotified: Date.now()
+        });
+      }
+      isInitialized = true;
+      console.log(`[Sheet Status Watcher] 🛡️ Baseline initialized for ${statusTracker.size} existing applications. No emails sent for historical rows.`);
+      isPolling = false;
+      return [];
+    }
+
     const baseUrl = (process.env.PUBLIC_URL && !process.env.PUBLIC_URL.includes('localhost')) ? process.env.PUBLIC_URL.trim() : 'https://bhcdai.com';
     const pendingSheetUpdates = [];
 
@@ -98,17 +118,21 @@ async function checkStatusChangesOnce() {
       if (!currentStatus) continue;
 
       // Status already marked as alerted
+      const prevTracker = statusTracker.get(appId);
       const isAlreadyAlerted = (
+        (prevTracker && prevTracker.alertSent === currentStatus) ||
         currentStatus === alertSent ||
-        (alertSent === 'Yes' && ['Approved', 'Rejected', 'In Progress', 'Under Review', 'Under Inspection', 'Modification Requested'].includes(currentStatus)) ||
-        (statusTracker.has(appId) && statusTracker.get(appId).alertSent === currentStatus)
+        (alertSent === 'Yes' && ['Approved', 'Rejected', 'In Progress', 'Under Review', 'Under Inspection', 'Modification Requested'].includes(currentStatus))
       );
 
       if (isAlreadyAlerted) {
+        if (!prevTracker) {
+          statusTracker.set(appId, { status: currentStatus, alertSent: currentStatus, lastNotified: Date.now() });
+        }
         continue;
       }
 
-      // Check if this is an active status change
+      // Check if this is an active live status change
       const rowNum = i + 1;
       const firstName = row[3] || '';
       const lastName = row[4] || '';
@@ -118,7 +142,7 @@ async function checkStatusChangesOnce() {
       const serviceName = resolveServiceTitle(rawService);
       const reason = row[15] || row[13] || ''; // Col P (Admin Mod Request) or Col N (Notes)
 
-      console.log(`[Sheet Status Watcher] 🔍 Direct status change detected for ${appId}: '${alertSent}' -> '${currentStatus}' (Client: ${email})`);
+      console.log(`[Sheet Status Watcher] 🔍 Live status change detected for ${appId}: '${alertSent}' -> '${currentStatus}' (Client: ${email})`);
 
       // 1. Mark in memory immediately
       markStatusAlertSent(appId, currentStatus);
@@ -201,10 +225,10 @@ function startSheetStatusWatcher(intervalMs = 12000) {
 
   console.log(`[Sheet Status Watcher] 🚀 Real-time Google Sheet monitor initialized (Polling interval: ${intervalMs / 1000}s).`);
   
-  // Initial check after short delay
+  // Initial check after short delay to establish baseline snapshot
   setTimeout(() => {
     checkStatusChangesOnce().catch(() => {});
-  }, 3000);
+  }, 2000);
 
   watcherInterval = setInterval(() => {
     checkStatusChangesOnce().catch(() => {});
