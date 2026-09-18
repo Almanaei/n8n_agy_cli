@@ -2980,6 +2980,12 @@ setInterval(() => {
 if (require.main === module) {
   server.listen(3000, () => {
     console.log('Production server running at http://localhost:3000');
+    try {
+      const { startSheetStatusWatcher } = require('./scripts/sheet_status_watcher');
+      startSheetStatusWatcher(12000);
+    } catch (watcherErr) {
+      console.warn('Could not initialize Sheet Status Watcher:', watcherErr.message);
+    }
   });
 }
 
