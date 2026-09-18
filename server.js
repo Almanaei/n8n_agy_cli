@@ -1194,8 +1194,31 @@ const server = http.createServer(async (req, res) => {
 
       for (let i = 1; i < appRows.length; i++) {
         const row = appRows[i];
-        if (!row || !row[0]) continue;
-        const appId = row[0];
+        if (!row || !row[0] || !row[0].trim()) continue;
+        const rawService = row[2] || 'خدمة عامة للدفاع المدني';
+        const serviceName = resolveOfficialServiceName(rawService);
+        const status = (row[12] || 'Submitted').trim();
+
+        appFunnel.total++;
+        const sLower = status.toLowerCase();
+        if (sLower === 'approved' || status === 'معتمد') {
+          appFunnel.approved++;
+        } else if (sLower === 'rejected' || status === 'مرفوض') {
+          appFunnel.rejected++;
+        } else if (sLower.includes('modification') || status.includes('تعديل')) {
+          appFunnel.modification++;
+        } else {
+          appFunnel.pending++;
+        }
+
+        serviceCounts[serviceName] = (serviceCounts[serviceName] || 0) + 1;
+      }
+
+      // Collect Most Recent Applications (latest entries first)
+      for (let i = appRows.length - 1; i >= 1; i--) {
+        const row = appRows[i];
+        if (!row || !row[0] || !row[0].trim()) continue;
+        const appId = row[0].trim();
         const timestamp = row[1] || '';
         const rawService = row[2] || 'خدمة عامة للدفاع المدني';
         const serviceName = resolveOfficialServiceName(rawService);
@@ -1203,17 +1226,11 @@ const server = http.createServer(async (req, res) => {
         const lastName = row[4] || '';
         const phone = row[5] || '';
         const email = row[6] || '';
-        const status = row[9] || 'Pending';
+        const rawTrackingLink = row[9] || '';
+        const trackingLink = extractUrlFromHyperlink(rawTrackingLink) || `/track?id=${appId}`;
+        const status = (row[12] || 'Submitted').trim();
 
-        appFunnel.total++;
-        if (status === 'Approved') appFunnel.approved++;
-        else if (status === 'Rejected') appFunnel.rejected++;
-        else if (status === 'Modification Requested') appFunnel.modification++;
-        else appFunnel.pending++;
-
-        serviceCounts[serviceName] = (serviceCounts[serviceName] || 0) + 1;
-
-        if (recentApplications.length < 15) {
+        if (recentApplications.length < 20) {
           recentApplications.push({
             appId,
             timestamp,
@@ -1222,7 +1239,7 @@ const server = http.createServer(async (req, res) => {
             phone,
             email,
             status,
-            trackingLink: row[8] || `/track?id=${appId}`
+            trackingLink
           });
         }
       }
@@ -1244,7 +1261,7 @@ const server = http.createServer(async (req, res) => {
         if (!row || !row[0]) continue;
         const timeStr = row[0];
         const duration = parseInt(row[5] || '0', 10);
-        const kpi = row[6] || '';
+        const kpi = (row[6] || '').trim();
 
         try {
           const d = new Date(timeStr);
@@ -1277,18 +1294,33 @@ const server = http.createServer(async (req, res) => {
         : 95;
       const approvalRate = appFunnel.total > 0
         ? Math.round((appFunnel.approved / appFunnel.total) * 100)
-        : 88;
+        : 0;
       const avgDurationSec = durationCount > 0
         ? Math.round(totalDurationSec / durationCount)
         : 48;
+
+      const hourlyTrafficData = [
+        hourlyDistribution[0] + hourlyDistribution[1],
+        hourlyDistribution[2] + hourlyDistribution[3],
+        hourlyDistribution[4] + hourlyDistribution[5],
+        hourlyDistribution[6] + hourlyDistribution[7],
+        hourlyDistribution[8] + hourlyDistribution[9],
+        hourlyDistribution[10] + hourlyDistribution[11],
+        hourlyDistribution[12] + hourlyDistribution[13],
+        hourlyDistribution[14] + hourlyDistribution[15],
+        hourlyDistribution[16] + hourlyDistribution[17],
+        hourlyDistribution[18] + hourlyDistribution[19],
+        hourlyDistribution[20] + hourlyDistribution[21],
+        hourlyDistribution[22] + hourlyDistribution[23]
+      ];
 
       res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
       res.end(JSON.stringify({
         status: "success",
         timestamp: new Date().toISOString(),
         overview: {
-          totalCalls: Math.max(totalCalls, 24),
-          totalApplications: Math.max(appFunnel.total, 18),
+          totalCalls: totalCalls,
+          totalApplications: appFunnel.total,
           approvalRatePercent: approvalRate,
           csatScorePercent: csatScore,
           avgCallDurationSec: avgDurationSec
@@ -1300,23 +1332,17 @@ const server = http.createServer(async (req, res) => {
           approved: appFunnel.approved,
           rejected: appFunnel.rejected
         },
-        topServices: topServices.length > 0 ? topServices : [
-          { name: "إصدار شهادة استيفاء شروط السلامة للأنشطة التجارية والصناعية", count: 12 },
-          { name: "إصدار ترخيص محطات الوقود وتجديد الترخيص", count: 8 },
-          { name: "إصدار ترخيص المخابز ومحلات الحلويات والمعجنات", count: 6 },
-          { name: "إصدار ترخيص محلات تصنيع وتعبئة وتوزيع الغاز", count: 5 },
-          { name: "ترخيص المكاتب الهندسية لتصميم أنظمة الحماية والوقاية من الحريق", count: 4 }
-        ],
+        topServices: topServices.length > 0 ? topServices : [],
         csat: {
-          excellent: csat.excellent || 18,
-          acceptable: csat.acceptable || 4,
-          poor: csat.poor || 1,
-          totalRated: csat.totalRated || 23,
+          excellent: csat.excellent,
+          acceptable: csat.acceptable,
+          poor: csat.poor,
+          totalRated: csat.totalRated,
           scorePercent: csatScore
         },
         hourlyTraffic: {
           labels: ["00:00", "02:00", "04:00", "06:00", "08:00", "10:00", "12:00", "14:00", "16:00", "18:00", "20:00", "22:00"],
-          data: [1, 0, 0, 3, 14, 28, 25, 21, 12, 7, 4, 2]
+          data: hourlyTrafficData
         },
         recentApplications
       }));

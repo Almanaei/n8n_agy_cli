@@ -904,10 +904,10 @@
                     labels: t.funnel_labels,
                     datasets: [{
                         data: [
-                            funnel.approved || 10,
-                            funnel.pending || 4,
-                            funnel.modification || 2,
-                            funnel.rejected || 1
+                            funnel.approved || 0,
+                            funnel.pending || 0,
+                            funnel.modification || 0,
+                            funnel.rejected || 0
                         ],
                         backgroundColor: ['#10B981', '#38BDF8', '#F59E0B', '#EF4444'],
                         borderColor: '#0B1120',
@@ -972,17 +972,17 @@
 
         function renderCsatSection(csat) {
             const total = csat.totalRated || 1;
-            const pExc = Math.round((csat.excellent / total) * 100);
-            const pAcc = Math.round((csat.acceptable / total) * 100);
-            const pPoor = Math.round((csat.poor / total) * 100);
+            const pExc = Math.round(((csat.excellent || 0) / total) * 100);
+            const pAcc = Math.round(((csat.acceptable || 0) / total) * 100);
+            const pPoor = Math.round(((csat.poor || 0) / total) * 100);
 
-            document.getElementById('csat-excellent-count').innerText = `${csat.excellent} (${pExc}%)`;
+            document.getElementById('csat-excellent-count').innerText = `${csat.excellent || 0} (${pExc}%)`;
             document.getElementById('csat-excellent-bar').style.width = `${pExc}%`;
 
-            document.getElementById('csat-acceptable-count').innerText = `${csat.acceptable} (${pAcc}%)`;
+            document.getElementById('csat-acceptable-count').innerText = `${csat.acceptable || 0} (${pAcc}%)`;
             document.getElementById('csat-acceptable-bar').style.width = `${pAcc}%`;
 
-            document.getElementById('csat-poor-count').innerText = `${csat.poor} (${pPoor}%)`;
+            document.getElementById('csat-poor-count').innerText = `${csat.poor || 0} (${pPoor}%)`;
             document.getElementById('csat-poor-bar').style.width = `${pPoor}%`;
 
             const ctx = document.getElementById('csatChart').getContext('2d');
@@ -993,7 +993,7 @@
                 data: {
                     labels: ['Excellent 😃', 'Acceptable 🙂', 'Poor 😞'],
                     datasets: [{
-                        data: [csat.excellent, csat.acceptable, csat.poor],
+                        data: [csat.excellent || 0, csat.acceptable || 0, csat.poor || 0],
                         backgroundColor: ['#10B981', '#F59E0B', '#EF4444'],
                         borderColor: '#0B1120',
                         borderWidth: 2
@@ -1024,9 +1024,31 @@
             tbody.innerHTML = apps.map(app => {
                 let statusClass = 'Pending';
                 let statusLabel = t.status_pending;
-                if (app.status === 'Approved') { statusClass = 'Approved'; statusLabel = t.status_approved; }
-                else if (app.status === 'Rejected') { statusClass = 'Rejected'; statusLabel = t.status_rejected; }
-                else if (app.status === 'Modification Requested') { statusClass = 'Modification'; statusLabel = t.status_modification; }
+                const s = (app.status || '').trim();
+                const sLower = s.toLowerCase();
+
+                if (s === 'Approved' || sLower === 'approved' || s === 'معتمد') {
+                    statusClass = 'Approved';
+                    statusLabel = t.status_approved;
+                } else if (s === 'Rejected' || sLower === 'rejected' || s === 'مرفوض') {
+                    statusClass = 'Rejected';
+                    statusLabel = t.status_rejected;
+                } else if (s.includes('Modification') || sLower.includes('modification') || s.includes('تعديل')) {
+                    statusClass = 'Modification';
+                    statusLabel = t.status_modification;
+                } else if (s === 'Submitted' || sLower === 'submitted') {
+                    statusClass = 'Pending';
+                    statusLabel = currentLang === 'ar' ? 'تم الاستلام' : 'Submitted';
+                } else if (s === 'Under Inspection' || sLower === 'under inspection') {
+                    statusClass = 'Pending';
+                    statusLabel = currentLang === 'ar' ? 'قيد المعاينة' : 'Under Inspection';
+                } else if (s === 'In Progress' || sLower === 'in progress') {
+                    statusClass = 'Pending';
+                    statusLabel = currentLang === 'ar' ? 'جاري المعالجة' : 'In Progress';
+                } else {
+                    statusClass = 'Pending';
+                    statusLabel = currentLang === 'ar' ? 'قيد المراجعة' : 'Under Review';
+                }
 
                 let dateFormatted = app.timestamp;
                 try {
